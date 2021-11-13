@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Image/error.png</file>
+        <file>Image/Homepage.png</file>
+        <file>Image/OK.png</file>
+        <file>Image/qr_pay.png</file>
+        <file>Image/Status_Finish.png</file>
+        <file>Image/todo.png</file>
+        <file>Image/Wait_Cursor.png</file>
+        <file>Image/backgroud.jpg</file>
+        <file>Image/Card1.png</file>
+        <file>Image/Card2.png</file>
+        <file>Image/Card3.png</file>
+        <file>Image/ChangeCard.png</file>
+        <file>Image/Registerlost.png</file>
+        <file>Image/banklogo.png</file>
+        <file>Image/UpdateCard.png</file>
+        <file>Image/qr_wechat1.png</file>
+        <file>Image/qr_wechat2.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,1 @@
+d:\Qt\5.15.2\msvc2019\bin\qmake.exe -tp vc  %1

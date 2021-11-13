@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainPage</class>
+ <widget class="QWidget" name="MainPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1900</width>
+    <height>866</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1900</width>
+    <height>866</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">width: 1900px;
+height: 666px;
+background-image: url(:/Image/backgroud.jpg);</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_6">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>43</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QQuickWidget" name="quickWidget">
+       <property name="minimumSize">
+        <size>
+         <width>1186</width>
+         <height>626</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">width: 1186px;
+height: 626px;
+
+</string>
+       </property>
+       <property name="resizeMode">
+        <enum>QQuickWidget::SizeRootObjectToView</enum>
+       </property>
+       <property name="source">
+        <url>
+         <string>qrc:/SliderPlayer.qml</string>
+        </url>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>43</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>178</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
+         <item>
+          <widget class="QLabel" name="label_QR1">
+           <property name="minimumSize">
+            <size>
+             <width>143</width>
+             <height>143</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>143</width>
+             <height>143</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-image: url(:/Image/qr_wechat1.png);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,1">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_QR1_Service">
+             <property name="styleSheet">
+              <string notr="true">	width: 257px;
+	height: 24px;
+	font-family: &quot;思源黑体 CN Bold&quot;;
+	font-size: 25px;
+	font-weight: bold;
+	font-stretch: normal;
+	line-height: 49px;
+	letter-spacing: 1px;
+	color: #414141;</string>
+             </property>
+             <property name="text">
+              <string>关注驻马店人社公众号</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_QR1_Service_Text1">
+             <property name="styleSheet">
+              <string notr="true">width: 206px;
+	height: 24px;
+	font-family: &quot;思源黑体 CN Bold&quot;;
+	font-size: 25px;
+	font-weight: bold;
+	font-stretch: normal;
+	line-height: 49px;
+	letter-spacing: 1px;
+	color: #414141;</string>
+             </property>
+             <property name="text">
+              <string>提供查询社保服务</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_QR1_Service_Text2">
+             <property name="styleSheet">
+              <string notr="true">	width: 257px;
+	height: 24px;
+	font-family: &quot;思源黑体 CN Bold&quot;;
+	font-size: 25px;
+	font-weight: bold;
+	font-stretch: normal;
+	line-height: 49px;
+	letter-spacing: 1px;
+	color: #414141;</string>
+             </property>
+             <property name="text">
+              <string>提供缴费通知服务</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>88</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_QR2">
+           <property name="minimumSize">
+            <size>
+             <width>143</width>
+             <height>143</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>143</width>
+             <height>143</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border-image: url(:/Image/qr_wechat2.png);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,1">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_QR2_Service">
+               <property name="styleSheet">
+                <string notr="true">	width: 257px;
+	height: 24px;
+	font-family: &quot;思源黑体 CN Bold&quot;;
+	font-size: 25px;
+	font-weight: bold;
+	font-stretch: normal;
+	line-height: 49px;
+	letter-spacing: 1px;
+	color: #414141;</string>
+               </property>
+               <property name="text">
+                <string>关注驻马店人社公众号</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_QR2_Service_Text1">
+               <property name="styleSheet">
+                <string notr="true">	width: 257px;
+	height: 24px;
+	font-family: &quot;思源黑体 CN Bold&quot;;
+	font-size: 25px;
+	font-weight: bold;
+	font-stretch: normal;
+	line-height: 49px;
+	letter-spacing: 1px;
+	color: #414141;</string>
+               </property>
+               <property name="text">
+                <string>提供查询社保服务</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_QR2_Service_Text2">
+               <property name="styleSheet">
+                <string notr="true">	width: 257px;
+	height: 24px;
+	font-family: &quot;思源黑体 CN Bold&quot;;
+	font-size: 25px;
+	font-weight: bold;
+	font-stretch: normal;
+	line-height: 49px;
+	letter-spacing: 1px;
+	color: #414141;</string>
+               </property>
+               <property name="text">
+                <string>提供缴费通知服务</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>103</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>113</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPushButton" name="pushButton_Updatecard">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>280</width>
+           <height>120</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>500</width>
+           <height>290</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-position:center;
+background-repeat:no-repeat;
+width: 500px;
+height: 291px;
+background-color: #00dbc5;
+box-shadow: 8px 4px 8px 1px rgba(144, 143, 143, 0.61);
+border-radius: 33px;
+background-image: url(:/Image/UpdateCard.png);</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="pushButton_ChangePWD">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>140</width>
+             <height>160</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/Image/ChangeCard.png);
+	width: 245px;
+	height: 244px;
+	background-color: #ffa844;
+	box-shadow: 8px 4px 8px 1px 
+		rgba(144, 143, 143, 0.61);
+	border-radius: 31px;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_RegisterLost">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>140</width>
+             <height>160</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/Image/Registerlost.png);
+	width: 245px;
+	height: 244px;
+	background-color: #ff765c;
+	box-shadow: 8px 4px 8px 1px 
+		rgba(144, 143, 143, 0.61);
+	border-radius: 31px;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>237</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>76</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

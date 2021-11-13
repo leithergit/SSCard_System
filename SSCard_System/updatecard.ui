@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UpdateCard</class>
+ <widget class="QWidget" name="UpdateCard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1117</width>
+    <height>677</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget"/>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,3">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_Waitcursor">
+         <property name="minimumSize">
+          <size>
+           <width>64</width>
+           <height>70</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 28pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(0, 0, 0);
+border-image: url(:/Image/Wait_Cursor.png);</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_CountDown">
+         <property name="minimumSize">
+          <size>
+           <width>64</width>
+           <height>70</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 28pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="text">
+          <string>30</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_MainPage">
+         <property name="minimumSize">
+          <size>
+           <width>170</width>
+           <height>70</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">	image: url(:/Image/Homepage.png);
+    image-origin: content;
+    image-position: left;
+    padding-left: 2px;
+    imagerepeat: no-repeat;
+    text-align: right;
+    padding-right: 2px;
+    font-size: 12px;
+	font: 28pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="text">
+          <string>主页</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_Step">
+       <property name="styleSheet">
+        <string notr="true">QGroupBox#groupBox_Stop{
+border-radius:15px;
+border:2px solid rgb(0,0,0);
+}
+
+
+
+</string>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="label_ReadCard">
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(0, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>读取身份证</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_FaceCompare">
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(200, 200, 200);</string>
+          </property>
+          <property name="text">
+           <string>人脸对比</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_EnsureInformation">
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(200, 200, 200);
+</string>
+          </property>
+          <property name="text">
+           <string>确认信息并挂失</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_InputMobile">
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(200, 200, 200);</string>
+          </property>
+          <property name="text">
+           <string>输入手机号码</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_Pay">
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(200, 200, 200);</string>
+          </property>
+          <property name="text">
+           <string>缴费</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_MakeCard">
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
+color: rgb(200, 200, 200);</string>
+          </property>
+          <property name="text">
+           <string>制卡</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1FCF9E5A-E7D3-3637-89F5-AD2708FDD01B}</ProjectGuid>
+    <RootNamespace>HNBXZM</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+    <OutputDirectory>release\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>HNBXZM</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+    <OutputDirectory>debug\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>HNBXZM</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  </ImportGroup>
+  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\</IntDir>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">HNBXZM</TargetName>
+    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">false</LinkIncremental>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\</OutDir>
+    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\</IntDir>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">HNBXZM</TargetName>
+    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\Qt\5.15.2\msvc2019\include;..\..\..\Qt\5.15.2\msvc2019\include\QtWidgets;..\..\..\Qt\5.15.2\msvc2019\include\QtGui;..\..\..\Qt\5.15.2\msvc2019\include\QtANGLE;..\..\..\Qt\5.15.2\msvc2019\include\QtCore;release;.;/include;..\..\..\Qt\5.15.2\msvc2019\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>release\</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName></ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:\Qt\5.15.2\msvc2019\lib\Qt5Widgets.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Gui.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Core.lib;D:\Qt\5.15.2\msvc2019\lib\qtmain.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>$(OutDir)\HNBXZM.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\..\..\Qt\5.15.2\msvc2019\include;..\..\..\Qt\5.15.2\msvc2019\include\QtWidgets;..\..\..\Qt\5.15.2\msvc2019\include\QtGui;..\..\..\Qt\5.15.2\msvc2019\include\QtANGLE;..\..\..\Qt\5.15.2\msvc2019\include\QtCore;debug;.;/include;..\..\..\Qt\5.15.2\msvc2019\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>debug\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:\Qt\5.15.2\msvc2019\lib\Qt5Widgetsd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Guid.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Cored.lib;D:\Qt\5.15.2\msvc2019\lib\qtmaind.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)\HNBXZM.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="failedwindow.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mainpage.cpp" />
+    <ClCompile Include="mainwindow.cpp" />
+    <ClCompile Include="qstackpage.cpp" />
+    <ClCompile Include="registerlost.cpp" />
+    <ClCompile Include="rl_ensureinformation.cpp" />
+    <ClCompile Include="uc_adforfinance.cpp" />
+    <ClCompile Include="uc_ensureinformation.cpp" />
+    <ClCompile Include="uc_facecapture.cpp" />
+    <ClCompile Include="uc_inputmobile.cpp" />
+    <ClCompile Include="uc_makecard.cpp" />
+    <ClCompile Include="uc_pay.cpp" />
+    <ClCompile Include="uc_readidcard.cpp" />
+    <ClCompile Include="uc_updatecardsucceed.cpp" />
+    <ClCompile Include="up_changepwd.cpp" />
+    <ClCompile Include="up_ensurepwd.cpp" />
+    <ClCompile Include="up_readsscard.cpp" />
+    <ClCompile Include="updatecard.cpp" />
+    <ClCompile Include="updatepassword.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="failedwindow.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">failedwindow.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; failedwindow.h -o release\moc_failedwindow.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC failedwindow.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_failedwindow.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">failedwindow.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; failedwindow.h -o debug\moc_failedwindow.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC failedwindow.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_failedwindow.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="mainpage.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">mainpage.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; mainpage.h -o release\moc_mainpage.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC mainpage.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_mainpage.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">mainpage.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; mainpage.h -o debug\moc_mainpage.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC mainpage.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_mainpage.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="mainwindow.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">mainwindow.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; mainwindow.h -o release\moc_mainwindow.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC mainwindow.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_mainwindow.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">mainwindow.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; mainwindow.h -o debug\moc_mainwindow.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC mainwindow.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_mainwindow.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="qstackpage.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">qstackpage.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; qstackpage.h -o release\moc_qstackpage.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC qstackpage.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_qstackpage.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">qstackpage.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; qstackpage.h -o debug\moc_qstackpage.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC qstackpage.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_qstackpage.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="registerlost.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">registerlost.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; registerlost.h -o release\moc_registerlost.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC registerlost.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_registerlost.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">registerlost.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; registerlost.h -o debug\moc_registerlost.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC registerlost.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_registerlost.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="rl_ensureinformation.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">rl_ensureinformation.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; rl_ensureinformation.h -o release\moc_rl_ensureinformation.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC rl_ensureinformation.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_rl_ensureinformation.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">rl_ensureinformation.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; rl_ensureinformation.h -o debug\moc_rl_ensureinformation.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC rl_ensureinformation.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_rl_ensureinformation.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_adforfinance.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_adforfinance.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_adforfinance.h -o release\moc_uc_adforfinance.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_adforfinance.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_adforfinance.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_adforfinance.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_adforfinance.h -o debug\moc_uc_adforfinance.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_adforfinance.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_adforfinance.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_ensureinformation.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_ensureinformation.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_ensureinformation.h -o release\moc_uc_ensureinformation.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_ensureinformation.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_ensureinformation.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_ensureinformation.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_ensureinformation.h -o debug\moc_uc_ensureinformation.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_ensureinformation.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_ensureinformation.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_facecapture.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_facecapture.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_facecapture.h -o release\moc_uc_facecapture.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_facecapture.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_facecapture.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_facecapture.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_facecapture.h -o debug\moc_uc_facecapture.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_facecapture.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_facecapture.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_inputmobile.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_inputmobile.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_inputmobile.h -o release\moc_uc_inputmobile.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_inputmobile.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_inputmobile.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_inputmobile.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_inputmobile.h -o debug\moc_uc_inputmobile.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_inputmobile.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_inputmobile.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_makecard.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_makecard.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_makecard.h -o release\moc_uc_makecard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_makecard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_makecard.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_makecard.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_makecard.h -o debug\moc_uc_makecard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_makecard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_makecard.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_pay.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_pay.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_pay.h -o release\moc_uc_pay.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_pay.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_pay.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_pay.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_pay.h -o debug\moc_uc_pay.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_pay.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_pay.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_readidcard.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_readidcard.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_readidcard.h -o release\moc_uc_readidcard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_readidcard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_readidcard.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_readidcard.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_readidcard.h -o debug\moc_uc_readidcard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_readidcard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_readidcard.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_updatecardsucceed.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_updatecardsucceed.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_updatecardsucceed.h -o release\moc_uc_updatecardsucceed.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC uc_updatecardsucceed.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_uc_updatecardsucceed.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_updatecardsucceed.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; uc_updatecardsucceed.h -o debug\moc_uc_updatecardsucceed.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC uc_updatecardsucceed.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_uc_updatecardsucceed.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="up_changepwd.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">up_changepwd.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; up_changepwd.h -o release\moc_up_changepwd.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC up_changepwd.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_up_changepwd.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">up_changepwd.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; up_changepwd.h -o debug\moc_up_changepwd.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC up_changepwd.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_up_changepwd.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="up_ensurepwd.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">up_ensurepwd.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; up_ensurepwd.h -o release\moc_up_ensurepwd.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC up_ensurepwd.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_up_ensurepwd.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">up_ensurepwd.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; up_ensurepwd.h -o debug\moc_up_ensurepwd.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC up_ensurepwd.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_up_ensurepwd.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="up_readsscard.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">up_readsscard.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; up_readsscard.h -o release\moc_up_readsscard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC up_readsscard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_up_readsscard.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">up_readsscard.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; up_readsscard.h -o debug\moc_up_readsscard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC up_readsscard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_up_readsscard.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="updatecard.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">updatecard.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; updatecard.h -o release\moc_updatecard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC updatecard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_updatecard.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">updatecard.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; updatecard.h -o debug\moc_updatecard.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC updatecard.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_updatecard.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="updatepassword.h">
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">updatepassword.h;release\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DNDEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/release/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; updatepassword.h -o release\moc_updatepassword.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">MOC updatepassword.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_updatepassword.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">updatepassword.h;debug\moc_predefs.h;D:\Qt\5.15.2\msvc2019\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\moc.exe  -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB --compiler-flavor=msvc --include D:/Work/Henan_shangqiu/HNBXZM/debug/moc_predefs.h -ID:/Qt/5.15.2/msvc2019/mkspecs/win32-msvc -ID:/Work/Henan_shangqiu/HNBXZM -ID:/Qt/5.15.2/msvc2019/include -ID:/Qt/5.15.2/msvc2019/include/QtWidgets -ID:/Qt/5.15.2/msvc2019/include/QtGui -ID:/Qt/5.15.2/msvc2019/include/QtANGLE -ID:/Qt/5.15.2/msvc2019/include/QtCore -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\ATLMFC\include&quot; -I&quot;d:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include&quot; -I&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\ucrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\shared&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\um&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\winrt&quot; -I&quot;D:\Windows Kits\10\include\10.0.19041.0\cppwinrt&quot; updatepassword.h -o debug\moc_updatepassword.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">MOC updatepassword.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_updatepassword.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="debug\moc_failedwindow.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_failedwindow.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_mainpage.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_mainpage.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_mainwindow.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_mainwindow.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">..\..\..\Qt\5.15.2\msvc2019\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">cl -Bxd:\Qt\5.15.2\msvc2019\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E ..\..\..\Qt\5.15.2\msvc2019\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">Generate moc_predefs.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">..\..\..\Qt\5.15.2\msvc2019\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">cl -Bxd:\Qt\5.15.2\msvc2019\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E ..\..\..\Qt\5.15.2\msvc2019\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">Generate moc_predefs.h</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </CustomBuild>
+    <ClCompile Include="debug\moc_qstackpage.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_qstackpage.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_registerlost.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_registerlost.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_rl_ensureinformation.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_rl_ensureinformation.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_adforfinance.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_adforfinance.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_ensureinformation.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_ensureinformation.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_facecapture.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_facecapture.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_inputmobile.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_inputmobile.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_makecard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_makecard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_pay.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_pay.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_readidcard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_readidcard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_uc_updatecardsucceed.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_uc_updatecardsucceed.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_up_changepwd.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_up_changepwd.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_up_ensurepwd.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_up_ensurepwd.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_up_readsscard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_up_readsscard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_updatecard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_updatecard.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\moc_updatepassword.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\moc_updatepassword.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="debug\qrc_Image.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="release\qrc_Image.cpp">
+      <ExcludedFromBuild Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClInclude Include="ui_failedwindow.h" />
+    <ClInclude Include="ui_mainpage.h" />
+    <ClInclude Include="ui_mainwindow.h" />
+    <ClInclude Include="ui_registerlost.h" />
+    <ClInclude Include="ui_rl_ensureinformation.h" />
+    <ClInclude Include="ui_uc_adforfinance.h" />
+    <ClInclude Include="ui_uc_ensureinformation.h" />
+    <ClInclude Include="ui_uc_facecapture.h" />
+    <ClInclude Include="ui_uc_inputmobile.h" />
+    <ClInclude Include="ui_uc_makecard.h" />
+    <ClInclude Include="ui_uc_pay.h" />
+    <ClInclude Include="ui_uc_readidcard.h" />
+    <ClInclude Include="ui_uc_updatecardsucceed.h" />
+    <ClInclude Include="ui_up_changepwd.h" />
+    <ClInclude Include="ui_up_ensurepwd.h" />
+    <ClInclude Include="ui_up_readsscard.h" />
+    <ClInclude Include="ui_updatecard.h" />
+    <ClInclude Include="ui_updatepassword.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="failedwindow.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">failedwindow.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe failedwindow.ui -o ui_failedwindow.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC failedwindow.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_failedwindow.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">failedwindow.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe failedwindow.ui -o ui_failedwindow.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC failedwindow.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_failedwindow.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="mainpage.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">mainpage.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe mainpage.ui -o ui_mainpage.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC mainpage.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_mainpage.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">mainpage.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe mainpage.ui -o ui_mainpage.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC mainpage.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_mainpage.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="mainwindow.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">mainwindow.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe mainwindow.ui -o ui_mainwindow.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC mainwindow.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_mainwindow.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">mainwindow.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe mainwindow.ui -o ui_mainwindow.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC mainwindow.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_mainwindow.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="registerlost.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">registerlost.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe registerlost.ui -o ui_registerlost.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC registerlost.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_registerlost.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">registerlost.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe registerlost.ui -o ui_registerlost.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC registerlost.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_registerlost.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="rl_ensureinformation.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">rl_ensureinformation.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe rl_ensureinformation.ui -o ui_rl_ensureinformation.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC rl_ensureinformation.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_rl_ensureinformation.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">rl_ensureinformation.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe rl_ensureinformation.ui -o ui_rl_ensureinformation.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC rl_ensureinformation.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_rl_ensureinformation.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_adforfinance.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_adforfinance.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_adforfinance.ui -o ui_uc_adforfinance.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_adforfinance.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_adforfinance.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_adforfinance.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_adforfinance.ui -o ui_uc_adforfinance.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_adforfinance.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_adforfinance.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_ensureinformation.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_ensureinformation.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_ensureinformation.ui -o ui_uc_ensureinformation.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_ensureinformation.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_ensureinformation.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_ensureinformation.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_ensureinformation.ui -o ui_uc_ensureinformation.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_ensureinformation.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_ensureinformation.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_facecapture.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_facecapture.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_facecapture.ui -o ui_uc_facecapture.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_facecapture.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_facecapture.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_facecapture.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_facecapture.ui -o ui_uc_facecapture.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_facecapture.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_facecapture.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_inputmobile.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_inputmobile.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_inputmobile.ui -o ui_uc_inputmobile.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_inputmobile.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_inputmobile.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_inputmobile.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_inputmobile.ui -o ui_uc_inputmobile.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_inputmobile.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_inputmobile.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_makecard.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_makecard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_makecard.ui -o ui_uc_makecard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_makecard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_makecard.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_makecard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_makecard.ui -o ui_uc_makecard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_makecard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_makecard.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_pay.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_pay.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_pay.ui -o ui_uc_pay.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_pay.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_pay.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_pay.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_pay.ui -o ui_uc_pay.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_pay.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_pay.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_readidcard.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_readidcard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_readidcard.ui -o ui_uc_readidcard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_readidcard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_readidcard.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_readidcard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_readidcard.ui -o ui_uc_readidcard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_readidcard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_readidcard.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="uc_updatecardsucceed.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">uc_updatecardsucceed.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_updatecardsucceed.ui -o ui_uc_updatecardsucceed.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC uc_updatecardsucceed.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_uc_updatecardsucceed.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">uc_updatecardsucceed.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe uc_updatecardsucceed.ui -o ui_uc_updatecardsucceed.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC uc_updatecardsucceed.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_uc_updatecardsucceed.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="up_changepwd.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">up_changepwd.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe up_changepwd.ui -o ui_up_changepwd.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC up_changepwd.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_up_changepwd.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">up_changepwd.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe up_changepwd.ui -o ui_up_changepwd.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC up_changepwd.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_up_changepwd.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="up_ensurepwd.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">up_ensurepwd.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe up_ensurepwd.ui -o ui_up_ensurepwd.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC up_ensurepwd.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_up_ensurepwd.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">up_ensurepwd.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe up_ensurepwd.ui -o ui_up_ensurepwd.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC up_ensurepwd.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_up_ensurepwd.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="up_readsscard.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">up_readsscard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe up_readsscard.ui -o ui_up_readsscard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC up_readsscard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_up_readsscard.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">up_readsscard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe up_readsscard.ui -o ui_up_readsscard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC up_readsscard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_up_readsscard.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="updatecard.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">updatecard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe updatecard.ui -o ui_updatecard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC updatecard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_updatecard.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">updatecard.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe updatecard.ui -o ui_updatecard.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC updatecard.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_updatecard.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="updatepassword.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">updatepassword.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe updatepassword.ui -o ui_updatepassword.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">UIC updatepassword.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">ui_updatepassword.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">updatepassword.ui;D:\Qt\5.15.2\msvc2019\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\uic.exe updatepassword.ui -o ui_updatepassword.h</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">UIC updatepassword.ui</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">ui_updatepassword.h;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Image\Homepage.png" />
+    <CustomBuild Include="Image.qrc">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">Image.qrc;D:\Qt\5.15.2\msvc2019\bin\rcc.exe;Image\OK.png;Image\card1.jpg;Image\qr_wechat.png;Image\error.png;Image\todo.png;Image\logo.png;Image\Wait_cursor.png;Image\Homepage.png;Image\card3.jpg;Image\qr_pay.png;Image\card2.jpg;Image\Status_Finish.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\rcc.exe -name Image Image.qrc -o release\qrc_Image.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">RCC Image.qrc</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\qrc_Image.cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">Image.qrc;D:\Qt\5.15.2\msvc2019\bin\rcc.exe;Image\OK.png;Image\card1.jpg;Image\qr_wechat.png;Image\error.png;Image\todo.png;Image\logo.png;Image\Wait_cursor.png;Image\Homepage.png;Image\card3.jpg;Image\qr_pay.png;Image\card2.jpg;Image\Status_Finish.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">D:\Qt\5.15.2\msvc2019\bin\rcc.exe -name Image Image.qrc -o debug\qrc_Image.cpp</Command>
+      <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">RCC Image.qrc</Message>
+      <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\qrc_Image.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="Image\OK.png" />
+    <None Include="Image\Status_Finish.png" />
+    <None Include="Image\Wait_cursor.png" />
+    <None Include="Image\card1.jpg" />
+    <None Include="Image\card2.jpg" />
+    <None Include="Image\card3.jpg" />
+    <None Include="Image\error.png" />
+    <None Include="Image\logo.png" />
+    <None Include="Image\qr_pay.png" />
+    <None Include="Image\qr_wechat.png" />
+    <None Include="Image\todo.png" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

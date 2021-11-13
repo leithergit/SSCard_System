@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="SliderPlayer.qml">../SliderPlayer.qml</file>
+        <file alias="Image/card1.jpg">card1.jpg</file>
+        <file alias="Image/card2.jpg">card2.jpg</file>
+        <file alias="Image/card3.jpg">card3.jpg</file>
+        <file alias="Image/error.png">error.png</file>
+        <file alias="Image/Homepage.png">Homepage.png</file>
+        <file alias="Image/logo.png">logo.png</file>
+        <file alias="Image/OK.png">OK.png</file>
+        <file alias="Image/qr_pay.png">qr_pay.png</file>
+        <file alias="Image/qr_wechat.png">qr_wechat.png</file>
+        <file alias="Image/Status_Finish.png">Status_Finish.png</file>
+        <file alias="Image/todo.png">todo.png</file>
+        <file alias="Image/Wait_Cursor.png">Wait_Cursor.png</file>
+    </qresource>
+</RCC>

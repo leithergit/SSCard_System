@@ -1,0 +1,35 @@
+#ifndef REGISTERLOST_H
+#define REGISTERLOST_H
+
+#include <QWidget>
+#include "qmainstackpage.h"
+#include "qstackpage.h"
+#include <QStackedWidget>
+
+enum    RegisgerLost_Widget
+{
+    _RL_ReadIDCard = 0,
+    _EnsureRegisterlog = 1
+};
+
+namespace Ui {
+class RegisterLost;
+}
+
+class RegisterLost : public QMainStackPage
+{
+    Q_OBJECT
+
+public:
+    explicit RegisterLost(QWidget *parent = nullptr);
+    ~RegisterLost();
+
+    virtual void OnTimerEvent() override;
+private slots:
+
+
+private:
+    Ui::RegisterLost *ui;
+};
+
+#endif // REGISTERLOST_H
