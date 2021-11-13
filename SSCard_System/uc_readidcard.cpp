@@ -14,7 +14,6 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel *pTitle,int nTimeout,QWidget *parent) :
     QStackPage(pTitle,nTimeout,parent),
     ui(new Ui::ReadIDCard)
 {
-    info()<<"Test";
     ui->setupUi(this);
 
 }
@@ -40,7 +39,6 @@ void uc_ReadIDCard::OnTimeout()
     {
         ThreadReadCard.join();
     }
-
 }
 
 void uc_ReadIDCard::ThreadWork()
@@ -57,13 +55,13 @@ void uc_ReadIDCard::ThreadWork()
             {
                 emit SwitchNextPage();
                 break;
-                info() << "Succeed in Reader IDCard!";
+                gInfo() << "Succeed in Reader IDCard!";
             }
             else
             {
                 char szText[256] = {0};
                 GetErrorMessage((IDCard_Status)nResult,szText,sizeof(szText));
-                error() << "Failed in Reader IDCard:"<<szText;
+                gError() << "Failed in Reader IDCard:"<<szText;
             }
         }
         else
@@ -135,13 +133,13 @@ void uc_ReadIDCard::timerEvent(QTimerEvent *event)
         {
             killTimer(m_nTimerReaderIDCard);
             m_nTimerReaderIDCard = 0;
-            info() << "Succeed in Reader IDCard!";
+            gInfo() << "Succeed in Reader IDCard!";
         }
         else
         {
             char szText[256] = {0};
             GetErrorMessage((IDCard_Status)nResult,szText,sizeof(szText));
-            error() << "Failed in Reader IDCard:"<<szText;
+            gError() << "Failed in Reader IDCard:"<<szText;
         }
     }
 }

@@ -5,6 +5,8 @@
 #include <QFileInfo>
 #include "Gloabal.h"
 
+DataCenterPtr g_pDataCenter = make_shared<DataCenter>();
+
 DataCenter::DataCenter()
 {
 }
@@ -24,36 +26,24 @@ int DataCenter::LoadConfig(QString &strError)
 		QFileInfo fi(strConfigPath);
 		if (!fi.isFile())
 		{
-			strError = QString(tr("配置文件%1不存在!")).arg(strConfigPath);
+			strError = QString("配置文件%1不存在!").arg(strConfigPath);
 			return -1;
 		} 
-        pConfig = make_shared<Config>();
+		QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
+        pConfig = make_shared<Config>(&ConfigIni);
 		if (!pConfig)
 		{
-			strError = tr("内存不足!");
+			strError = "内存不足!";
 			return -1;
-		}
-    
-		QSettings Config(strConfigPath, QSettings::IniFormat);
-
-		Config.beginGroup("Device");
-
-		Config.endGroup();
-
-		Config.beginGroup("Region");
-		Config.endGroup();
-
-		Config.beginGroup("CardForm");
-		Config.endGroup();
-
-		Config.beginGroup("Other");
-		Config.endGroup();
+		}	
+		return 0;
     }
    
     catch (std::exception & e)
     {
+		strError = "发生异常:";
+		strError += e.what();
+		//_error() << "Catch exception:" << e.what();
+		return -1;
     }
-   
-
-    return 0;
 }

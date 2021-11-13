@@ -2,13 +2,18 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
+#include <QDateTime>
 #include "mainpage.h"
 #include "updatecard.h"
 #include "updatepassword.h"
 #include "registerlost.h"
 #include "failedwindow.h"
 //#include "operatorfailed.h"
-#include <QDebug>
+
+#include "Gloabal.h"
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

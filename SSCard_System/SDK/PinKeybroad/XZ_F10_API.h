@@ -1,4 +1,4 @@
-#ifndef __XZ_F10_API_4SIM__
+﻿#ifndef __XZ_F10_API_4SIM__
 #define __XZ_F10_API_4SIM__
 
 extern "C"

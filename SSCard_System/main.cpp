@@ -1,6 +1,7 @@
 ﻿#include "mainwindow.h"
 
 #include <QApplication>
+#include <QString>
 #include "Gloabal.h"
 
 int main(int argc, char *argv[])
@@ -15,12 +16,17 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication a(argc, argv);
     MainWindow w;
-    int nInfo = 1;
-    int nWarning = 2;
-    int nError = 3;
-    info()<<"This is a information:"<<nInfo;
-    warning()<<"This is a Warning:"<<nWarning;
-    error()<<"This is a information:"<<nError;
+    if (!g_pDataCenter)
+    {
+        gError() << "内存不足，数据中心无法初始化!";
+        return -1;
+    }
+    QString strError;
+    if (g_pDataCenter->LoadConfig(strError))
+    {
+        gError() << "加载配置文件失败:"<<strError.toStdString();
+        return -1;
+    }
     //w.showFullScreen();
     w.showMaximized();
     int nRes =  a.exec();
