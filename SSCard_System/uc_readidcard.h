@@ -22,18 +22,18 @@ public:
 	virtual void OnTimeout() override;
     //int     m_nTimerReaderIDCard = 0;
 	virtual void timerEvent(QTimerEvent* event) override;
-	int     m_nPort = -1;
 	int     m_nDelayCount = 0;
-	int     m_bSucceed = false;
-	int     ReaderIDCard();
-    int     GetIDImageStorePath(QString &strFilePath);
+	int     m_bSucceed = false;	
+    int     GetIDImageStorePath(string &strFilePath);
+    int     ReaderIDCard();
 	void    ThreadWork();
     void    ShutDownDevice();
-
 	string  m_strDevPort;
 	ushort  m_nBaudreate = 9600;
 
     IDCardInfoPtr m_pIDCard = nullptr;
+private slots:
+    void OnErrorMessage(QString strErrorMsg);
 private:
 	Ui::ReadIDCard* ui;
 };

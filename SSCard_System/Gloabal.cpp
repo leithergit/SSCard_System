@@ -6,6 +6,10 @@
 #include <QFileInfo>
 #include "Gloabal.h"
 
+#pragma comment(lib,"user32.lib")
+#pragma comment(lib,"advapi32.lib")
+#pragma comment(lib,"OleAut32.lib")
+
 extern DataCenterPtr g_pDataCenter;
 DataCenter::DataCenter()
 {

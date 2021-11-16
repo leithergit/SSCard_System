@@ -70,7 +70,7 @@ color: rgb(0, 0, 0);</string>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="lineEdit_OldPassword">
          <property name="minimumSize">
           <size>
            <width>160</width>

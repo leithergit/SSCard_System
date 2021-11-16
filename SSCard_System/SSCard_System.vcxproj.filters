@@ -57,7 +57,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\utility\Autolock.cpp">
+    <ClCompile Include="Gloabal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OperatorSucceed.cpp">
@@ -69,7 +69,7 @@
     <ClCompile Include="..\utility\Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Gloabal.cpp">
+    <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="failedwindow.cpp">
@@ -147,6 +147,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\utility\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="failedwindow.h">

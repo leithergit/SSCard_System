@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_Video">
+    <widget class="QLabel" name="label_FaceDetect">
      <property name="minimumSize">
       <size>
        <width>600</width>
@@ -31,24 +31,28 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_Text">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>80</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 32pt &quot;Microsoft YaHei UI&quot;;
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_Text">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 32pt &quot;Microsoft YaHei UI&quot;;
 color: rgb(0, 0, 0);</string>
-     </property>
-     <property name="text">
-      <string>进在进行人脸识别……</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
+       </property>
+       <property name="text">
+        <string>进在进行人脸识别……</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -37,7 +37,6 @@ enum FaceDetectStatus
     FD_Binocularcamera_OpenFailed,
 };
 
-
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
@@ -185,6 +184,7 @@ struct SysConfig
         nBatchMode       = pSettings->value("BATCHMODE").toInt();
         strDBPath        = pSettings->value("DBPATH").toString().toStdString();
         dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
+        nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength",11).toUInt();
 		pSettings->endGroup();
 	}
 	DeviceConfig	DevConfig;						  // 设备配置
@@ -192,7 +192,8 @@ struct SysConfig
 
 	int				nBatchMode = 0;					  // 批量制卡 开启：0    关闭：1
 	string			strDBPath;						  // 数据存储路径
-    double          dfFaceSimilarity;                  // 人脸认别最低相似度
+    double          dfFaceSimilarity;                 // 人脸认别最低相似度
+    int             nMobilePhoneSize = 11;          // 手机号码长度
 };
 
 using SysConfigPtr  = shared_ptr<SysConfig>;
@@ -206,7 +207,12 @@ public:
 	{
         return pIDCard;
 	}
+    void SetIDCardInfo(IDCardInfoPtr& pCardInfo)
+    {
+        pIDCard = pCardInfo;
+    }
 	int LoadSysConfigure(QString& strError);
+
 	SysConfigPtr& GetSysConfigure()
 	{
 		return pConfig;
@@ -218,10 +224,16 @@ public:
     }
     void ResetIDData()
     {
+        strMobilePhone = "";
         strIDImageFile = "";
+        strSSCardOldPassword = "";
+        strSSCardNewPassword = "";
         pIDCard.reset();
     }
-    QString         strIDImageFile;
+    string         strIDImageFile;
+    string         strMobilePhone;
+    string         strSSCardOldPassword;
+    string         strSSCardNewPassword;
 private:
     IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pConfig = nullptr;

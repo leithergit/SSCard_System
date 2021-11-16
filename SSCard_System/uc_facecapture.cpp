@@ -10,7 +10,7 @@ uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, int nTimeout, QWidget* parent) :
 	ui(new Ui::FaceCapture)
 {
 	ui->setupUi(this);
-
+    connect(this, &uc_FaceCapture::FaceCaptureSucceed, this, &uc_FaceCapture::OnFaceCaptureSucceed);
 }
 
 uc_FaceCapture::~uc_FaceCapture()
@@ -36,6 +36,14 @@ void  uc_FaceCapture::ShutDownDevice()
 
 int uc_FaceCapture::ProcessBussiness()
 {
+    m_bFaceDetectSucceed = false;
+    QString strError;
+    if (!Succeed(OpenCamara(strError)))
+    {
+        gError()<<strError.toLocal8Bit().data();
+        QMessageBox::critical(this,tr("打开摄像机失败"),strError,QMessageBox::Ok);
+        return -1;
+    }
 	return 0;
 }
 
@@ -51,7 +59,7 @@ int uc_FaceCapture::OpenCamara(QString &strError)
     {
         if (!m_pFaceDetectOcx)
         {
-            m_pFaceDetectOcx = new DVTLDCamOCXLib::DVTLDCamOCX(ui->label_Video);
+            m_pFaceDetectOcx = new DVTLDCamOCXLib::DVTLDCamOCX(ui->label_FaceDetect);
             if (!m_pFaceDetectOcx)
             {
                 strError = "人脸检测组件初始化失败!";
@@ -69,17 +77,17 @@ int uc_FaceCapture::OpenCamara(QString &strError)
         }
 
         m_pFaceDetectOcx->setObjectName(QString::fromUtf8("axWidget_FaceDetect"));
-        m_pFaceDetectOcx->setMinimumSize(ui->label_Video->size());
-        m_pFaceDetectOcx->setMaximumSize(ui->label_Video->size());
+        m_pFaceDetectOcx->setMinimumSize(ui->label_FaceDetect->size());
+        m_pFaceDetectOcx->setMaximumSize(ui->label_FaceDetect->size());
         m_pFaceDetectOcx->show();
         connect(m_pFaceDetectOcx, SIGNAL(LiveDetectStatusEvent(int, int)), this, SLOT(OnLiveDetectStatusEvent(int, int)));
 
-    //     QString strDoc = m_pFaceDetectOcx->generateDocumentation();//导出所有ocx控件的所有信号、函数、属性等，可供开发参考
-    //     QString strDetectPhoto = QDir::currentPath() +  "/axHelp.html";
-    //     QFile file("strDetectPhoto);
-    //     file.open(QIODevice::WriteOnly);
-    //     file.write(strDoc.toLatin1(),strDoc.size());
-    //     file.close();
+//        QString strDoc = m_pFaceDetectOcx->generateDocumentation();//导出所有ocx控件的所有信号、函数、属性等，可供开发参考
+//        QString strFaceDetectDoc = QDir::currentPath() +  "/axHelp.html";
+//        QFile file(strFaceDetectDoc);
+//        file.open(QIODevice::WriteOnly);
+//        file.write(strDoc.toLatin1(),strDoc.size());
+//        file.close();
         int nResult = m_pFaceDetectOcx->OpenCamera();
         if (nResult)
         {
@@ -191,18 +199,22 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 
         *m_pImageFaceDetected = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));
         m_pImageFaceDetected->save(strFaceImageFile);
-        QFileInfo fi(g_pDataCenter->strIDImageFile);
+        QFileInfo fi(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
         if (!fi.isFile())
         {
             gError() << QString("身份证照片丢失!").toLocal8Bit().data();
             return;
         }
 
-        double dfSimilarity = m_pFaceDetectOcx->FaceCompareByImage(g_pDataCenter->strIDImageFile, strFaceImageFile);
+        double dfSimilarity = m_pFaceDetectOcx->FaceCompareByImage(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()), strFaceImageFile);
         if (dfSimilarity >= g_pDataCenter->GetSysConfigure()->dfFaceSimilarity )
         {
-            gInfo()<<QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
-            emit FaceCaptureSucceed();
+            gInfo()<<QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
+            if (!m_bFaceDetectSucceed)
+            {
+                emit FaceCaptureSucceed();
+                m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
+            }
         }
     }
     else if (eventID == 0)
@@ -257,3 +269,4 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
     }
     ui->label_Text->setText(strEvent);
 }
+

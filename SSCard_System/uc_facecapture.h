@@ -21,15 +21,18 @@ public:
     DVTLDCamOCXLib::DVTLDCamOCX*m_pFaceDetectOcx = nullptr;
     QImage  *m_pImageFaceDetected = nullptr;
     void    ShutDownDevice();
-
     int    OpenCamara(QString &strError);
     int    CloseCamera(QString &strError);
     bool   m_bOuputProductInfo = false;
-    void   OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
     int    GetFaceCaptureStorePath(QString &strFilePath);
-    void   OnFaceCaptureSucceed();
+    bool   m_bFaceDetectSucceed = false;
+
 signals:
     void   FaceCaptureSucceed();
+private slots:
+    void   OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
+    void   OnFaceCaptureSucceed();
+
 private:
 	Ui::FaceCapture* ui;
 };

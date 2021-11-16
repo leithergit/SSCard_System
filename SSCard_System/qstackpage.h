@@ -15,6 +15,13 @@
 #include "SDK/IDCard/idcard_api.h"
 #include "SDK/PinKeybroad/XZ_F10_API.h"
 
+enum MaskStatus
+{
+    Succeed = 1,
+    Failed = 2,
+    Warning = 3
+};
+
 using namespace std;
 class QStackPage : public QWidget
 {
@@ -32,6 +39,7 @@ public:
         if (m_pWorkThread && m_pWorkThread->joinable())
         {
             m_pWorkThread->join();
+            delete m_pWorkThread;
             m_pWorkThread = nullptr;
         }
     }
@@ -55,14 +63,26 @@ public:
 		if (m_pTitle)
 			m_pTitle->setStyleSheet(QString::fromUtf8("font: 25 24pt \"Microsoft YaHei UI\";color: rgb(200, 200, 200);"));
 	}
+
 	QLabel* m_pTitle = nullptr;
     int     m_nTimeout = 0;
     int     m_nCountDown = 0;
     bool    m_bWorkThreadRunning = false;
-    shared_ptr<std::thread> m_pWorkThread = nullptr;
+    std::thread *m_pWorkThread = nullptr;
+public slots:
+    // 显示遮罩层
+    // strMessage   遮罩层消息
+    // 遮罩层图标状态  0为成功，1为失败，2为警告
+    // 遮罩层滞留时间  单位毫秒
+    virtual void  OnShowMaskWidget(QString strMessage,MaskStatus nStatus,int nTimeoutms )
+    {
+        return;
+    }
 
 signals:
 	void SwitchNextPage();
+    void ErrorMessage(QString strMessage);
+    void ShowMaskWidget(QString strMessage,MaskStatus nStatus ,int nTimeoutms );
 };
 
 #endif // QSTACKPAGE_H

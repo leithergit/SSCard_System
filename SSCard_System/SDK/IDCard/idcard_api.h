@@ -70,6 +70,7 @@ enum IDCard_Status
 {
 	IDCard_Succeed = 0,
 	IDCard_Reader_NotOpen,
+	IDCard_Invalid_Port,
 	IDCard_Invalid_Parameter,
 	IDCard_Library_Notload,
 	IDCard_Reader_NotConnected,

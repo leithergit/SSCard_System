@@ -3,6 +3,7 @@
 #include "ui_uc_readidcard.h"
 #include "Gloabal.h"
 #include <chrono>
+#include <algorithm>
 using namespace std;
 using namespace chrono;
 
@@ -16,6 +17,7 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, int nTimeout, QWidget* parent) :
 	ui(new Ui::ReadIDCard)
 {
 	ui->setupUi(this);
+    connect(this,&QStackPage::ErrorMessage,this,&uc_ReadIDCard::OnErrorMessage);
 }
 
 uc_ReadIDCard::~uc_ReadIDCard()
@@ -27,10 +29,13 @@ uc_ReadIDCard::~uc_ReadIDCard()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
+    m_bSucceed = false;
+    m_pIDCard = make_shared<IDCardInfo>();
 	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
 	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
+    transform(m_strDevPort.begin(),m_strDevPort.end(),m_strDevPort.begin(),::toupper);
     m_bWorkThreadRunning = true;
-    m_pWorkThread = make_shared<std::thread>(&uc_ReadIDCard::ThreadWork, this);
+    m_pWorkThread = new std::thread(&uc_ReadIDCard::ThreadWork, this);
 	return 0;
 }
 
@@ -47,6 +52,12 @@ void  uc_ReadIDCard::ShutDownDevice()
         m_pWorkThread->join();
         m_pWorkThread = nullptr;
     }
+    m_pIDCard = nullptr;
+}
+
+void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
+{
+    ui->label_Notify->setText(strErrorMsg);
 }
 
 void uc_ReadIDCard::ThreadWork()
@@ -69,6 +80,7 @@ void uc_ReadIDCard::ThreadWork()
 			{
 				char szText[256] = { 0 };
 				GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
+                emit ErrorMessage(QString(szText));
                 gError() << QString("读取身份证失败:").toLocal8Bit().data() << QString(szText).toLocal8Bit().data();
 			}
 		}
@@ -79,7 +91,7 @@ void uc_ReadIDCard::ThreadWork()
 	}
 }
 
-int  uc_ReadIDCard::GetIDImageStorePath(QString &strFilePath)
+int  uc_ReadIDCard::GetIDImageStorePath(string &strFilePath)
 {
     QString strStorePath = QCoreApplication::applicationDirPath();
     strStorePath += "/IDImage/";
@@ -97,7 +109,8 @@ int  uc_ReadIDCard::GetIDImageStorePath(QString &strFilePath)
             return -1;
         }
     }
-    strFilePath = strStorePath + QString("ID_%1.bmp").arg((const char *)g_pDataCenter->GetIDCardInfo()->szIdentify);
+    QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char *)g_pDataCenter->GetIDCardInfo()->szIdentify);
+    strFilePath = strTempPath.toStdString();
     return 0;
 }
 
@@ -108,10 +121,10 @@ int uc_ReadIDCard::ReaderIDCard()
 	int nResult = IDCard_Status::IDCard_Succeed;
 	do
 	{
-		if (m_strDevPort.size())
-			nResult = OpenReader(m_strDevPort.c_str());
+        if (m_strDevPort == "AUTO" ||!m_strDevPort.size())
+            nResult = OpenReader(nullptr);
 		else
-			nResult = OpenReader(nullptr);
+            nResult = OpenReader(m_strDevPort.c_str());
 		if (m_bSucceed && m_nDelayCount <= 3)
 		{
 			m_nDelayCount++;
@@ -123,7 +136,7 @@ int uc_ReadIDCard::ReaderIDCard()
 			m_bSucceed = false;
 		}
 
-		nResult = OpenReader(nullptr);;
+        //nResult = OpenReader(nullptr);;
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
 			break;
@@ -134,12 +147,12 @@ int uc_ReadIDCard::ReaderIDCard()
 			break;
 		}
 
-
         nResult = ReadIDCard(*m_pIDCard.get());
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
 			break;
 		}
+        g_pDataCenter->SetIDCardInfo(m_pIDCard);
 
 //            ui->label_Name->setText(QString::fromLocal8Bit((const char *)IDCard.szName));
 //            ui->label_Gender->setText(QString::fromLocal8Bit((const char *)IDCard.szGender));
@@ -153,7 +166,7 @@ int uc_ReadIDCard::ReaderIDCard()
         if (Succeed(GetIDImageStorePath(g_pDataCenter->strIDImageFile)))
         {
             QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto,m_pIDCard->nPhotoSize);
-            ImagePhoto.save(g_pDataCenter->strIDImageFile);
+            ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
         }
 
 		m_bSucceed = true;

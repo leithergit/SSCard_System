@@ -29,15 +29,18 @@ MainPage::~MainPage()
 
 void MainPage::on_pushButton_Updatecard_clicked()
 {
+    g_pDataCenter->ResetIDData();
 	((MainWindow*)m_pMainWindow)->on_pushButton_Updatecard_clicked();
 }
 
 void MainPage::on_pushButton_ChangePWD_clicked()
 {
+    g_pDataCenter->ResetIDData();
 	((MainWindow*)m_pMainWindow)->on_pushButton_ChangePWD_clicked();
 }
 
 void MainPage::on_pushButton_RegisterLost_clicked()
 {
+    g_pDataCenter->ResetIDData();
 	((MainWindow*)m_pMainWindow)->on_pushButton_RegisterLost_clicked();
 }

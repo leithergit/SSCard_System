@@ -1,8 +1,7 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "uc_inputmobile.h"
 #include "ui_uc_inputmobile.h"
-
-
+#include "Gloabal.h"
 
 uc_InputMobile::uc_InputMobile(QLabel* pTitle, int nTimeout, QWidget* parent) :
 	QStackPage(pTitle, nTimeout, parent),
@@ -132,5 +131,13 @@ void uc_InputMobile::on_pushButton_Backspace_clicked()
 
 void uc_InputMobile::on_pushButton_Ensure_clicked()
 {
-	emit SwitchNextPage();
+    if (m_strMobile.size() == g_pDataCenter->GetSysConfigure()->nMobilePhoneSize)
+    {
+        g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
+        emit SwitchNextPage();
+    }
+    else
+    {
+
+    }
 }
