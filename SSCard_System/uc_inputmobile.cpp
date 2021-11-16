@@ -1,23 +1,24 @@
+﻿#pragma execution_character_set("utf-8")
 #include "uc_inputmobile.h"
 #include "ui_uc_inputmobile.h"
 
 
 
-uc_InputMobile::uc_InputMobile(QLabel *pTitle,int nTimeout,QWidget *parent) :
-    QStackPage(pTitle,nTimeout,parent),
-    ui(new Ui::InputMobile)
+uc_InputMobile::uc_InputMobile(QLabel* pTitle, int nTimeout, QWidget* parent) :
+	QStackPage(pTitle, nTimeout, parent),
+	ui(new Ui::InputMobile)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 }
 
 uc_InputMobile::~uc_InputMobile()
 {
-    delete ui;
+	delete ui;
 }
 
 int uc_InputMobile::ProcessBussiness()
 {
-    return 0;
+	return 0;
 }
 
 void uc_InputMobile::OnTimeout()
@@ -27,110 +28,109 @@ void uc_InputMobile::OnTimeout()
 
 void uc_InputMobile::on_pushButton_0_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-        m_strMobile += "0";
-        ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "0";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_1_clicked()
 {
-     if (m_strMobile.size() < MaxMobileSize)
-     {
-        m_strMobile += "1";
-        ui->lineEdit_Mobile->setText(m_strMobile);
-     }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "1";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_2_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "2";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "2";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_3_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "3";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "3";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_4_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "4";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "4";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_5_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "5";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "5";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_6_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "6";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "6";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_7_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "7";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "7";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_8_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "8";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "8";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_9_clicked()
 {
-    if (m_strMobile.size() < MaxMobileSize)
-    {
-       m_strMobile += "9";
-       ui->lineEdit_Mobile->setText(m_strMobile);
-    }
+	if (m_strMobile.size() < MaxMobileSize)
+	{
+		m_strMobile += "9";
+		ui->lineEdit_Mobile->setText(m_strMobile);
+	}
 }
 
 void uc_InputMobile::on_pushButton_Clear_clicked()
 {
-    m_strMobile = "";
-    ui->lineEdit_Mobile->setText(m_strMobile);
+	m_strMobile = "";
+	ui->lineEdit_Mobile->setText(m_strMobile);
 }
 
 
 void uc_InputMobile::on_pushButton_Backspace_clicked()
 {
-    m_strMobile = m_strMobile.left(m_strMobile.size() - 1);
-    ui->lineEdit_Mobile->setText(m_strMobile);
+	m_strMobile = m_strMobile.left(m_strMobile.size() - 1);
+	ui->lineEdit_Mobile->setText(m_strMobile);
 }
 
 
 void uc_InputMobile::on_pushButton_Ensure_clicked()
 {
-    emit SwitchNextPage();
+	emit SwitchNextPage();
 }
-

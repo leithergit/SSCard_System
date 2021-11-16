@@ -1,37 +1,41 @@
-#ifndef UC_READIDCARD_H
+﻿#ifndef UC_READIDCARD_H
 #define UC_READIDCARD_H
-
+#pragma execution_character_set("utf-8")
 #include <QWidget>
+#include <memory>
 #include "qstackpage.h"
 #include "./SDK/IDCard/idcard_api.h"
 
+
 namespace Ui {
-class ReadIDCard;
+	class ReadIDCard;
 }
 
 class uc_ReadIDCard : public QStackPage
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit uc_ReadIDCard(QLabel *pTitle,int nTimeout = 30,QWidget *parent = nullptr);
-    ~uc_ReadIDCard();
-    virtual int ProcessBussiness() override;
-    virtual void OnTimeout() override;
-    int     m_nTimerReaderIDCard = 0;
-    virtual void timerEvent(QTimerEvent *event);
-    int     nPort = -1;
-    int     nDelayCount = 0;
-    int     bSucceed = false;
-    int     ReaderIDCard();
-    void    ThreadWork();
-    std::thread ThreadReadCard;
+	explicit uc_ReadIDCard(QLabel* pTitle, int nTimeout = 30, QWidget* parent = nullptr);
+	~uc_ReadIDCard();
+	virtual int ProcessBussiness() override;
+	virtual void OnTimeout() override;
+    //int     m_nTimerReaderIDCard = 0;
+	virtual void timerEvent(QTimerEvent* event) override;
+	int     m_nPort = -1;
+	int     m_nDelayCount = 0;
+	int     m_bSucceed = false;
+	int     ReaderIDCard();
+    int     GetIDImageStorePath(QString &strFilePath);
+	void    ThreadWork();
+    void    ShutDownDevice();
 
-    IDCardInfo IDCard;
-    bool    bRunning = false;
+	string  m_strDevPort;
+	ushort  m_nBaudreate = 9600;
 
+    IDCardInfoPtr m_pIDCard = nullptr;
 private:
-    Ui::ReadIDCard *ui;
+	Ui::ReadIDCard* ui;
 };
 
 #endif // UC_READIDCARD_H

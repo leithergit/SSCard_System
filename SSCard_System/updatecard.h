@@ -1,6 +1,6 @@
-#ifndef UPDATECARD_H
+﻿#ifndef UPDATECARD_H
 #define UPDATECARD_H
-
+#pragma execution_character_set("utf-8")
 #include <QWidget>
 #include "qmainstackpage.h"
 #include "qstackpage.h"
@@ -9,36 +9,36 @@
 
 enum    UpdateCard_Widget
 {
-    _ReadIDCard = 0,
-    _FaceCapture,
-    _EnsureInformation,
-    _InputMobile,
-    _Pay,
-    _MakeCard,
-    _AdforFinance,
-    _UpdateCardSucceed
+	_ReadIDCard = 0,
+	_FaceCapture,
+	_EnsureInformation,
+	_InputMobile,
+	_Pay,
+	_MakeCard,
+	_AdforFinance,
+	_UpdateCardSucceed
 };
 
 namespace Ui {
-class UpdateCard;
+	class UpdateCard;
 }
 
 class UpdateCard : public QMainStackPage
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit UpdateCard(QWidget *parent = nullptr);
-    ~UpdateCard();
-    virtual void OnTimerEvent() override;
-    uc_InputMobile *m_pInputMobile = nullptr;
+	explicit UpdateCard(QWidget* parent = nullptr);
+	~UpdateCard();
+	virtual void OnTimerEvent() override;
+	uc_InputMobile* m_pInputMobile = nullptr;
 
 private slots:
-    //void on_pushButton_MainPage_clicked();
-    //virtual void on_SwitchNextPage() override;
+	//void on_pushButton_MainPage_clicked();
+	//virtual void on_SwitchNextPage() override;
 
 private:
-    Ui::UpdateCard *ui;
+	Ui::UpdateCard* ui;
 };
 
 #endif // UPDATECARD_H

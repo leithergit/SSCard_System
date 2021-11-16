@@ -1,11 +1,11 @@
+ï»¿
 #ifndef GLOABAL_H
 #define GLOABAL_H
-
+#pragma execution_character_set("utf-8")
 #include <thread>
 #include <chrono>
 #include <iostream>
-using namespace std;
-using namespace chrono;
+#include <errno.h>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <string>
@@ -13,13 +13,30 @@ using namespace chrono;
 #include <QString>
 #include <memory>
 #include <QSettings>
-#include "../utility/TimeUtility.h"
-#include "../utility/Utility.h"
-#include "../utility/AutoLock.h"
+#include <QFileInfo>
+#include <QDateTime>
+#include <Windows.h>
+#include <winreg.h>
+
 #include "SDK/IDCard/idcard_api.h"
 #include "SDK/PinKeybroad/XZ_F10_API.h"
+#include "../utility/Utility.h"
+#include "../utility/TimeUtility.h"
+#include "../utility/AutoLock.h"
+
+
 #include "logging.h"
+#define Succeed(x)      (x == 0)
 using namespace std;
+
+using namespace chrono;
+
+enum FaceDetectStatus
+{
+    FD_Succeed,
+    FD_Binocularcamera_OpenFailed,
+};
+
 
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
@@ -32,36 +49,36 @@ struct DeviceConfig
 			return;
 		gInfo() << "Try to read device configure";
 		pSettings->beginGroup("Device");
-		strPrinter				= pSettings->value("Printer").toString().toStdString();
-		strDPI					= pSettings->value("PrinterDPI","300*300").toString().toStdString();
-		PinKeybroadPort			= pSettings->value("PinKeybroadPort").toString().toStdString();
-		nPinKeybroadBaudrate	= pSettings->value("PinKeybroadBaudrate","9600").toUInt();
-		strSSCardReadType		= pSettings->value("SSCardReadType","DC").toString().toStdString();
-		nSSCardReaderPowerOnType= pSettings->value("SSCardReaderPowerOnType").toUInt();
-		strSSCardReaderPort		= pSettings->value("SSCardReaderPORT", "100").toString().toStdString();
-		strIDCardReaderPort		= pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
-// 		Info() << "Device Cofnigure:\n";
-// 		Info() << "\t\Printer:" << strPrinter;
-// 		Info() << "\t\PrinterDPI:" << strPrinter;
-// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
-// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
-// 		Info() << "\t\SSCardReadType:" << strPrinter;
-// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
-// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
+		strPrinter = pSettings->value("Printer").toString().toStdString();
+		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
+		PinKeybroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
+		nPinKeybroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
+		strSSCardReadType = pSettings->value("SSCardReadType", "DC").toString().toStdString();
+		nSSCardReaderPowerOnType = pSettings->value("SSCardReaderPowerOnType").toUInt();
+		strSSCardReaderPort = pSettings->value("SSCardReaderPORT", "100").toString().toStdString();
+		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
+		// 		Info() << "Device Cofnigure:\n";
+		// 		Info() << "\t\Printer:" << strPrinter;
+		// 		Info() << "\t\PrinterDPI:" << strPrinter;
+		// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
+		// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
+		// 		Info() << "\t\SSCardReadType:" << strPrinter;
+		// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
+		// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
 		pSettings->endGroup();
 	}
-	string		strPrinter;							   // ´òÓ¡»úÃû
-	string		strDPI;								   // ´òÓ¡»úDPI£¬300*300,300*600
-	string		PinKeybroadPort;					   // ÃÜÂë¼üÅÌ´®¿ÚºÍ²¨ÌØÂÊ
+	string		strPrinter;							   // æ‰“å°æœºå
+	string		strDPI;								   // æ‰“å°æœºDPIï¼Œ300*300,300*600
+	string		PinKeybroadPort;					   // å¯†ç é”®ç›˜ä¸²å£å’Œæ³¢ç‰¹ç‡
 	string		nPinKeybroadBaudrate;				   // 9600
-	string		strSSCardReadType;					   // ¶Á¿¨Æ÷	DC || HD
-	string		nSSCardReaderPowerOnType;			   // ÉÏµç·½Ê½  1:½Ó´¥ 2 : ·Ç½Ó
-	string		strSSCardReaderPort;				   // ¶Á¿¨Æ÷¶Ë¿Ú COM1 = 0£¬COM2 = 1.....USB = 100
-	string		strIDCardReaderPort;				   // Éí·İÖ¤¶Á¿¨Æ÷ÅäÖÃ:USB, COM1, COM2...
+	string		strSSCardReadType;					   // è¯»å¡å™¨	DC || HD
+	string		nSSCardReaderPowerOnType;			   // ä¸Šç”µæ–¹å¼  1:æ¥è§¦ 2 : éæ¥
+	string		strSSCardReaderPort;				   // è¯»å¡å™¨ç«¯å£ COM1 = 0ï¼ŒCOM2 = 1.....USB = 100
+	string		strIDCardReaderPort;				   // èº«ä»½è¯è¯»å¡å™¨é…ç½®:USB, COM1, COM2...
 };
 
 struct RegionInfo
-{				
+{
 	RegionInfo(QSettings* pSettings)
 	{
 		if (!pSettings)
@@ -73,122 +90,143 @@ struct RegionInfo
 		strLicense = pSettings->value("License").toString().toStdString();
 		strEMURL = pSettings->value("EMURL").toUInt();
 		strCMURL = pSettings->value("CMURL").toString().toStdString();
-		
-// 		_info() << "Region Cofnigure:\n";
-// 		_info() << "\t\Region:" << strRegionCode;
-// 		_info() << "\t\Area:" << strArea;
-// 		_info() << "\t\License:" << strLicense;
-// 		_info() << "\t\EMURL:" << strEMURL;
-// 		_info() << "\t\CMURL:" << strCMURL;
+
+		// 		_info() << "Region Cofnigure:\n";
+		// 		_info() << "\t\Region:" << strRegionCode;
+		// 		_info() << "\t\Area:" << strArea;
+		// 		_info() << "\t\License:" << strLicense;
+		// 		_info() << "\t\EMURL:" << strEMURL;
+		// 		_info() << "\t\CMURL:" << strCMURL;
 		pSettings->endGroup();
 	}
-	string		strRegionCode;						   // µØÊĞ±àÂë 410700
-	string		strArea;							   // ÇøÓò±àÂë 41070000
+	string		strRegionCode;						   // åœ°å¸‚ç¼–ç  410700
+	string		strArea;							   // åŒºåŸŸç¼–ç  41070000
 	string		strLicense;							   // LICENSE = STZOLdFrhbc
-	string		strEMURL;							   // ¼ÓÃÜ»úip http://10.120.6.239:7777/
-	string		strCMURL;							   // ¿¨¹Üip   http://10.120.1.18:7001/hnCardService/services/CardService
+	string		strEMURL;							   // åŠ å¯†æœºip http://10.120.6.239:7777/
+	string		strCMURL;							   // å¡ç®¡ip   http://10.120.1.18:7001/hnCardService/services/CardService
 };
 
 struct TextPosition
 {
-	string		strText;							   // ´òÓ¡µÄÄÚÈİ
-	string		strFontName;						   // ´òÓ¡×ÖÌå,ÀıÈç"ËÎÌå"
-	int			nFontSize;							   // ×ÖÌå´óĞ¡,µ¥Î»Îªpt,1…¼=72pt
-	int			nColor;								   // ´òÓ¡×ÖÌåÑÕÉ«,RGBÑÕÉ«Öµ
-	int			nFontStyle;							   // ×ÖÌå·ç¸ñ£º1-³£¹æ£»2-´ÖÌå£»4-Ğ±Ìå£»8-ºÚÌå
-	float		fxPos;								   // ÆğÊ¼X×ø±ê£¬µ¥Î»ºÁÃ×
-	float		fyPos;								   // ÆğÊ¼Y×ø±ê£¬µ¥Î»ºÁÃ×
-	int			fAngle;								   // Ğı×ª½Ç¶È
+	string		strText;							   // æ‰“å°çš„å†…å®¹
+	string		strFontName;						   // æ‰“å°å­—ä½“,ä¾‹å¦‚"å®‹ä½“"
+	int			nFontSize;							   // å­—ä½“å¤§å°,å•ä½ä¸ºpt,1å‹=72pt
+	int			nColor;								   // æ‰“å°å­—ä½“é¢œè‰²,RGBé¢œè‰²å€¼
+	int			nFontStyle;							   // å­—ä½“é£æ ¼ï¼š1-å¸¸è§„ï¼›2-ç²—ä½“ï¼›4-æ–œä½“ï¼›8-é»‘ä½“
+	float		fxPos;								   // èµ·å§‹Xåæ ‡ï¼Œå•ä½æ¯«ç±³
+	float		fyPos;								   // èµ·å§‹Yåæ ‡ï¼Œå•ä½æ¯«ç±³
+    int			nAngle;								   // æ—‹è½¬è§’åº¦
 };
 
 struct ImagePosition
 {
-	string		strPath;							   // Í¼Æ¬È«Â·¾¶
-	float		fxPos;								   // ÆğÊ¼X×ø±ê£¬µ¥Î»ºÁÃ×
-	float		fyPos;								   // ÆğÊ¼Y×ø±ê£¬µ¥Î»ºÁÃ×	
-	float		fWidth;								   // ´òÓ¡¿í¶È
-	float		fHeight;							   // ´òÓ¡¸ß¶È
-	int			fAngle;								   // Ğı×ª½Ç¶È
+	string		strPath;							   // å›¾ç‰‡å…¨è·¯å¾„
+	float		fxPos;								   // èµ·å§‹Xåæ ‡ï¼Œå•ä½æ¯«ç±³
+	float		fyPos;								   // èµ·å§‹Yåæ ‡ï¼Œå•ä½æ¯«ç±³	
+	float		fWidth;								   // æ‰“å°å®½åº¦
+	float		fHeight;							   // æ‰“å°é«˜åº¦
+	int			nAngle;								   // æ—‹è½¬è§’åº¦
 };
-struct CardLayout
+
+struct CardForm
 {
-	CardLayout(QSettings* pSettings)
+	CardForm(QSettings* pSettings)
 	{
 		if (!pSettings)
 			return;
 		pSettings->beginGroup("CardForm");
 		QString strTemp = pSettings->value("ImagePOS").toString();
-		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%f|%f|%d", &posImage.fxPos, &posImage.fyPos, &posImage.fWidth, &posImage.fHeight, &posImage.fAngle);
+        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%f|%f|%d", &posImage.fxPos, &posImage.fyPos, &posImage.fWidth, &posImage.fHeight, &posImage.nAngle);
 
 		strTemp = pSettings->value("NamePOS").toString();
-		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posName.fxPos, &posName.fyPos, &posImage.fAngle);
+        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posName.fxPos, &posName.fyPos, &posImage.nAngle);
 
 		strTemp = pSettings->value("IDPOS").toString();
-		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIDNumber.fxPos, &posIDNumber.fyPos, &posIDNumber.fAngle);
+        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIDNumber.fxPos, &posIDNumber.fyPos, &posIDNumber.nAngle);
 
-		strTemp = pSettings->value("CARDNOPOS").toString();
-		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posSSCardID.fxPos, &posSSCardID.fyPos, &posSSCardID.fAngle);
+		strTemp = pSettings->value("CardNumberPos").toString();
+        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posSSCardID.fxPos, &posSSCardID.fyPos, &posSSCardID.nAngle);
 
-		strTemp = pSettings->value("DATEPOS").toString();
-		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIssueDate.fxPos, &posIssueDate.fyPos, &posIssueDate.fAngle);
+		strTemp = pSettings->value("DatePos").toString();
+        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIssueDate.fxPos, &posIssueDate.fyPos, &posIssueDate.nAngle);
 
-		strFont = pSettings->value("Font").toString().toStdString();
+		QByteArray byteFont = pSettings->value("Font").toString().toLatin1();
 
+		int nDataLength = 0;
+		strFont = UTF8StringA(byteFont.data(), nDataLength).get();
 		nFontSize = pSettings->value("FontSize").toUInt();
-		
+
 		nFontColor = pSettings->value("FontColor").toUInt();
 
-		fAngle = pSettings->value("Angle").toUInt();
+		nAngle = pSettings->value("Angle").toUInt();
 
 		pSettings->endGroup();
 	}
-	TextPosition	posName;						   // ĞÕÃû
-    ImagePosition	posImage;						   // ÕÕÆ¬
-	TextPosition	posIDNumber;					   // Éí·İÖ¤ºÅ
-	TextPosition	posSSCardID;					   // Éç±£¿¨ºÅ
-	TextPosition	posIssueDate;					   // Ç©·¢ÈÕÆÚ
-	string			strFont;						   // ×ÖÌåÃû³Æ
-	UINT			nFontColor;						   // ×ÖÌåÑÕÉ«
-	UINT			nFontSize;						   // ×ÖÌå³ß´ç
-	float			fAngle;							   // ÕûÌåĞı×ª½Ç¶È
+	TextPosition	posName;						   // å§“å
+	ImagePosition	posImage;						   // ç…§ç‰‡
+	TextPosition	posIDNumber;					   // èº«ä»½è¯å·
+	TextPosition	posSSCardID;					   // ç¤¾ä¿å¡å·
+	TextPosition	posIssueDate;					   // ç­¾å‘æ—¥æœŸ
+	string			strFont = "å®‹ä½“";				   // å­—ä½“åç§°
+	UINT			nFontColor = 0;					   // å­—ä½“é¢œè‰²
+	UINT			nFontSize = 8;					   // å­—ä½“å°ºå¯¸
+	UINT			nAngle = 0;						   // æ•´ä½“æ—‹è½¬è§’åº¦
 };
 
+using CardFormPtr = std::shared_ptr<CardForm>;
 
-struct Config
+struct SysConfig
 {
-	Config(QSettings* pSettings)
+	SysConfig(QSettings* pSettings)
 		: DevConfig(pSettings)
 		, RegInfo(pSettings)
-		, CardForm(pSettings)
 	{
-		pSettings->beginGroup("CardForm");
-		nBatchMode = pSettings->value("BATCHMODE").toInt();
-		strDBPath = pSettings->value("DBPATH").toString().toStdString();
+		pSettings->beginGroup("Other");
+        nBatchMode       = pSettings->value("BATCHMODE").toInt();
+        strDBPath        = pSettings->value("DBPATH").toString().toStdString();
+        dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
 		pSettings->endGroup();
 	}
-	DeviceConfig	DevConfig;						  // Éè±¸ÅäÖÃ
-	RegionInfo		RegInfo;						  // ÇøÓòĞÅÏ¢ÅäÖÃ
-	CardLayout		CardForm;						  // ´òÓ¡°æÊ½
-	int				nBatchMode;						  // ÅúÁ¿ÖÆ¿¨ ¿ªÆô£º0    ¹Ø±Õ£º1
-	string			strDBPath;						  // Êı¾İ´æ´¢Â·¾¶
+	DeviceConfig	DevConfig;						  // è®¾å¤‡é…ç½®
+	RegionInfo		RegInfo;						  // åŒºåŸŸä¿¡æ¯é…ç½®
+
+	int				nBatchMode = 0;					  // æ‰¹é‡åˆ¶å¡ å¼€å¯ï¼š0    å…³é—­ï¼š1
+	string			strDBPath;						  // æ•°æ®å­˜å‚¨è·¯å¾„
+    double          dfFaceSimilarity;                  // äººè„¸è®¤åˆ«æœ€ä½ç›¸ä¼¼åº¦
 };
 
-using ConfigPtr = shared_ptr<Config>;
+using SysConfigPtr  = shared_ptr<SysConfig>;
 
 class DataCenter
 {
 public:
 	explicit DataCenter();
 	~DataCenter();
-	IDCardInfo& GetIDCardInfo()
+    IDCardInfoPtr& GetIDCardInfo()
 	{
-		return IDCard;
+        return pIDCard;
 	}
-	int LoadConfig(QString& strError);
-	
+	int LoadSysConfigure(QString& strError);
+	SysConfigPtr& GetSysConfigure()
+	{
+		return pConfig;
+	}
+	int LoadCardForm(QString& strError);
+	CardFormPtr& GetCardForm()
+	{
+		return pCardForm;
+    }
+    void ResetIDData()
+    {
+        strIDImageFile = "";
+        pIDCard.reset();
+    }
+    QString         strIDImageFile;
 private:
-	IDCardInfo	IDCard;
-	ConfigPtr	pConfig = nullptr;
+    IDCardInfoPtr	pIDCard = nullptr;
+	SysConfigPtr	pConfig = nullptr;
+	CardFormPtr		pCardForm = nullptr;						  // æ‰“å°ç‰ˆå¼
+
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;

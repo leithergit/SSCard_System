@@ -1,5 +1,6 @@
 ﻿#ifndef __XZ_F10_API_4SIM__
 #define __XZ_F10_API_4SIM__
+#include <windows.h>
 
 extern "C"
 {

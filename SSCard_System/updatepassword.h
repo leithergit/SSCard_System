@@ -1,6 +1,6 @@
-#ifndef UPDATEPASSWORD_H
+﻿#ifndef UPDATEPASSWORD_H
 #define UPDATEPASSWORD_H
-
+#pragma execution_character_set("utf-8")
 #include <QWidget>
 #include "qmainstackpage.h"
 #include "qstackpage.h"
@@ -8,28 +8,28 @@
 
 enum    UpdatePassword_Widget
 {
-    _ReadSSCard = 0,
-    _EnsurePWD,
-    _ChangePWD,
+	_ReadSSCard = 0,
+	_EnsurePWD,
+	_ChangePWD,
 };
 
 namespace Ui {
-class UpdatePassword;
+	class UpdatePassword;
 }
 
 class UpdatePassword : public QMainStackPage
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit UpdatePassword(QWidget *parent = nullptr);
-    ~UpdatePassword();
-     virtual void OnTimerEvent() override;
+	explicit UpdatePassword(QWidget* parent = nullptr);
+	~UpdatePassword();
+	virtual void OnTimerEvent() override;
 
 private slots:
 
 private:
-    Ui::UpdatePassword *ui;
+	Ui::UpdatePassword* ui;
 };
 
 #endif // UPDATEPASSWORD_H

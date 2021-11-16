@@ -1,4 +1,4 @@
-QT       += core gui quickwidgets
+QT       += core gui quickwidgets axcontainer
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,8 +9,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../utility/TimeUtility.cpp \
+    ../utility/Utility.cpp \
     Gloabal.cpp \
     OperatorSucceed.cpp \
+    SDK/dvtldcamocx/dvtldcamocxlib.cpp \
     failedwindow.cpp \
     main.cpp \
     mainpage.cpp \
@@ -31,12 +34,11 @@ SOURCES += \
     up_readsscard.cpp \
     updatecard.cpp \
     updatepassword.cpp \
-    utility/TimeUtility.cpp \
-    utility/Utility.cpp
 
 HEADERS += \
     Gloabal.h \
     OperatorSucceed.h \
+    SDK/dvtldcamocx/dvtldcamocxlib.h \
     failedwindow.h \
     mainpage.h \
     mainwindow.h \
@@ -56,9 +58,9 @@ HEADERS += \
     up_readsscard.h \
     updatecard.h \
     updatepassword.h \
-    utility/AutoLock.h \
-    utility/TimeUtility.h \
-    utility/Utility.h
+    ../utility/AutoLock.h \
+    ../utility/TimeUtility.h \
+    ../utility/Utility.h
 
 FORMS += \
     OperatorSucceed.ui \
@@ -96,6 +98,9 @@ DEPENDPATH += $$PWD/SDK/IDCard
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/glog/ -lglog
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/glog/ -lglogd
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/PinKeybroad -lXZ_F10_API
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/PinKeybroad -lXZ_F10_API
 
 INCLUDEPATH += $$PWD/glog
 DEPENDPATH += $$PWD/glog
