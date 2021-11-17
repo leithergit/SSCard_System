@@ -26,7 +26,8 @@
 
 
 #include "logging.h"
-#define Succeed(x)      (x == 0)
+#define QSucceed(x)      (x == 0)
+#define QFailed(x)       (!x)
 using namespace std;
 
 using namespace chrono;
@@ -181,10 +182,11 @@ struct SysConfig
 		, RegInfo(pSettings)
 	{
 		pSettings->beginGroup("Other");
-        nBatchMode       = pSettings->value("BATCHMODE").toInt();
-        strDBPath        = pSettings->value("DBPATH").toString().toStdString();
-        dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
-        nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength",11).toUInt();
+        nBatchMode          = pSettings->value("BATCHMODE").toInt();
+        strDBPath           = pSettings->value("DBPATH").toString().toStdString();
+        dfFaceSimilarity    = pSettings->value("FaceSimilarity").toDouble();
+        nMobilePhoneSize    = pSettings->value("MobilePhoneNumberLength",11).toUInt();
+        nSSCardPasswordSize = pSettings->value("SSCardPasswordLength",6).toUInt();
 		pSettings->endGroup();
 	}
 	DeviceConfig	DevConfig;						  // 设备配置
@@ -193,7 +195,8 @@ struct SysConfig
 	int				nBatchMode = 0;					  // 批量制卡 开启：0    关闭：1
 	string			strDBPath;						  // 数据存储路径
     double          dfFaceSimilarity;                 // 人脸认别最低相似度
-    int             nMobilePhoneSize = 11;          // 手机号码长度
+    int             nMobilePhoneSize = 11;            // 手机号码长度
+    int             nSSCardPasswordSize = 6;          // 社保卡密码长度
 };
 
 using SysConfigPtr  = shared_ptr<SysConfig>;

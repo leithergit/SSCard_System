@@ -60,6 +60,9 @@
     <ClCompile Include="Gloabal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MaskWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="OperatorSucceed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -72,9 +75,6 @@
     <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="failedwindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -85,6 +85,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="qmainstackpage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qpinkeybroad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="qstackpage.cpp">
@@ -117,10 +120,10 @@
     <ClCompile Include="uc_readidcard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="up_changepwd.cpp">
+    <ClCompile Include="up_Inputpwd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="up_ensurepwd.cpp">
+    <ClCompile Include="up_changepwd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="up_readsscard.cpp">
@@ -140,6 +143,9 @@
     <ClInclude Include="Gloabal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="MaskWidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="OperatorSucceed.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -152,9 +158,6 @@
     <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="failedwindow.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="mainpage.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -162,6 +165,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="qmainstackpage.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qpinkeybroad.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="qstackpage.h">
@@ -194,10 +200,10 @@
     <CustomBuild Include="uc_readidcard.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="up_changepwd.h">
+    <CustomBuild Include="up_Inputpwd.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="up_ensurepwd.h">
+    <CustomBuild Include="up_changepwd.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="up_readsscard.h">
@@ -211,16 +217,16 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="debug\moc_MaskWidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_MaskWidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClCompile Include="debug\moc_OperatorSucceed.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_OperatorSucceed.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_failedwindow.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_failedwindow.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_mainpage.cpp">
@@ -245,6 +251,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_qmainstackpage.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\moc_qpinkeybroad.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_qpinkeybroad.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_qstackpage.cpp">
@@ -307,16 +319,16 @@
     <ClCompile Include="release\moc_uc_readidcard.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="debug\moc_up_Inputpwd.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_up_Inputpwd.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClCompile Include="debug\moc_up_changepwd.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_up_changepwd.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_up_ensurepwd.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_up_ensurepwd.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_up_readsscard.cpp">
@@ -343,10 +355,10 @@
     <ClCompile Include="release\qrc_Image.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClInclude Include="ui_OperatorSucceed.h">
+    <ClInclude Include="ui_MaskWidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_failedwindow.h">
+    <ClInclude Include="ui_OperatorSucceed.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="ui_mainpage.h">
@@ -382,10 +394,10 @@
     <ClInclude Include="ui_uc_readidcard.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_up_changepwd.h">
+    <ClInclude Include="ui_up_Inputpwd.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_up_ensurepwd.h">
+    <ClInclude Include="ui_up_changepwd.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="ui_up_readsscard.h">
@@ -399,10 +411,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="OperatorSucceed.ui">
+    <CustomBuild Include="MaskWidget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="failedwindow.ui">
+    <CustomBuild Include="OperatorSucceed.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="mainpage.ui">
@@ -438,10 +450,10 @@
     <CustomBuild Include="uc_readidcard.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="up_changepwd.ui">
+    <CustomBuild Include="up_Inputpwd.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="up_ensurepwd.ui">
+    <CustomBuild Include="up_changepwd.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="up_readsscard.ui">

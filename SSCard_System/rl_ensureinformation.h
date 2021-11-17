@@ -18,7 +18,7 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 private slots:
-	void on_pushButton_MainPage_clicked();
+    void on_pushButton_OK_clicked();
 
 private:
 	Ui::rl_EnsureInformation* ui;

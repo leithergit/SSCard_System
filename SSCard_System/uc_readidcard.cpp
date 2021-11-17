@@ -4,6 +4,7 @@
 #include "Gloabal.h"
 #include <chrono>
 #include <algorithm>
+//#include "mainwindow.h"
 using namespace std;
 using namespace chrono;
 
@@ -63,6 +64,7 @@ void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
 void uc_ReadIDCard::ThreadWork()
 {
 	auto tLast = high_resolution_clock::now();
+    QString strError;
     while (m_bWorkThreadRunning)
 	{
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
@@ -72,16 +74,18 @@ void uc_ReadIDCard::ThreadWork()
 			int nResult = ReaderIDCard();
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
-                emit SwitchNextPage();
-                gInfo() << QString(tr("读取身份证成功!")).toLocal8Bit().data();
+                strError = "读取身份证成功,随后将进行人脸识别以确认是否本人操作!";
+                gInfo() <<strError.toLocal8Bit().data();
+                emit ShowMaskWidget(strError,Success,Switch_NextPage);
 				break;
 			}
 			else
 			{
 				char szText[256] = { 0 };
-				GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
-                emit ErrorMessage(QString(szText));
-                gError() << QString("读取身份证失败:").toLocal8Bit().data() << QString(szText).toLocal8Bit().data();
+                GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
+                strError = QString("读取身份证失败:%1").arg(szText);
+                emit ErrorMessage(strError);
+                gError() << strError.toLocal8Bit().data() ;
 			}
 		}
 		else
@@ -163,7 +167,7 @@ int uc_ReadIDCard::ReaderIDCard()
 //            ui->label_IssueAuthority->setText(QString::fromLocal8Bit((const char *)IDCard.szIszssueAuthority));
 //            ui->label_ExpirationDate->setText(QString::fromLocal8Bit((const char *)IDCard.szExpirationDate1) + "-" + QString::fromLocal8Bit((const char *)IDCard.szExpirationDate2));
 
-        if (Succeed(GetIDImageStorePath(g_pDataCenter->strIDImageFile)))
+        if (QSucceed(GetIDImageStorePath(g_pDataCenter->strIDImageFile)))
         {
             QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto,m_pIDCard->nPhotoSize);
             ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));

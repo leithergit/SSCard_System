@@ -80,9 +80,12 @@ color: rgb(0, 0, 0);</string>
           <string>000-0000-0000</string>
          </property>
          <property name="text">
-          <string>000-0000-0000</string>
+          <string>138-8888-8888</string>
          </property>
          <property name="maxLength">
+          <number>13</number>
+         </property>
+         <property name="cursorPosition">
           <number>13</number>
          </property>
         </widget>
@@ -296,7 +299,7 @@ color: rgb(0, 0, 0);</string>
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_Ensure">
+        <widget class="QPushButton" name="pushButton_OK">
          <property name="minimumSize">
           <size>
            <width>493</width>

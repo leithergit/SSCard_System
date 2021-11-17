@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FailedWindow</class>
- <widget class="QWidget" name="FailedWindow">
+ <class>MaskWidget</class>
+ <widget class="QWidget" name="MaskWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,7 +46,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_Image">
        <property name="minimumSize">
         <size>
          <width>240</width>

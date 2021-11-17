@@ -41,6 +41,7 @@ UpdateCard::UpdateCard(QWidget* parent) :
 			//connect(ui->stackedWidget->widget(i),SIGNAL(SwitchNextPage),this,SLOT(on_SwitchNextPage));
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
 			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+            connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}
 
 	}

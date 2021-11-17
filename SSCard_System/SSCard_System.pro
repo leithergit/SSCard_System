@@ -12,13 +12,14 @@ SOURCES += \
     ../utility/TimeUtility.cpp \
     ../utility/Utility.cpp \
     Gloabal.cpp \
+    MaskWidget.cpp \
     OperatorSucceed.cpp \
     SDK/dvtldcamocx/dvtldcamocxlib.cpp \
-    failedwindow.cpp \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
     qmainstackpage.cpp \
+    qpinkeybroad.cpp \
     qstackpage.cpp \
     registerlost.cpp \
     rl_ensureinformation.cpp \
@@ -29,20 +30,21 @@ SOURCES += \
     uc_makecard.cpp \
     uc_pay.cpp \
     uc_readidcard.cpp \
+    up_Inputpwd.cpp \
     up_changepwd.cpp \
-    up_ensurepwd.cpp \
     up_readsscard.cpp \
     updatecard.cpp \
     updatepassword.cpp \
 
 HEADERS += \
     Gloabal.h \
+    MaskWidget.h \
     OperatorSucceed.h \
     SDK/dvtldcamocx/dvtldcamocxlib.h \
-    failedwindow.h \
     mainpage.h \
     mainwindow.h \
     qmainstackpage.h \
+    qpinkeybroad.h \
     qstackpage.h \
     registerlost.h \
     rl_ensureinformation.h \
@@ -53,8 +55,8 @@ HEADERS += \
     uc_makecard.h \
     uc_pay.h \
     uc_readidcard.h \
+    up_Inputpwd.h \
     up_changepwd.h \
-    up_ensurepwd.h \
     up_readsscard.h \
     updatecard.h \
     updatepassword.h \
@@ -63,8 +65,8 @@ HEADERS += \
     ../utility/Utility.h
 
 FORMS += \
+    MaskWidget.ui \
     OperatorSucceed.ui \
-    failedwindow.ui \
     mainpage.ui \
     mainwindow.ui \
     registerlost.ui \
@@ -76,8 +78,8 @@ FORMS += \
     uc_makecard.ui \
     uc_pay.ui \
     uc_readidcard.ui \
+    up_Inputpwd.ui \
     up_changepwd.ui \
-    up_ensurepwd.ui \
     up_readsscard.ui \
     updatecard.ui \
     updatepassword.ui

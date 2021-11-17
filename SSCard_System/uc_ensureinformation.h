@@ -17,8 +17,14 @@ public:
 	~uc_EnsureInformation();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
+    // 待完成
+    int    ReadSSCardInfo(QString &strMessage);
+    int    QueryRegisterLost(QString &strMessage);
+    // 待完成
+    int    RegisterLost(QString &strMessage);
+    bool   m_bTestStatus = false;
 private slots:
-	void on_pushButton_MainPage_clicked();
+    void on_pushButton_OK_clicked();
 
 private:
 	Ui::EnsureInformation* ui;

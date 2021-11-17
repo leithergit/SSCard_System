@@ -1,28 +1,43 @@
 ﻿#pragma execution_character_set("utf-8")
-#include "failedwindow.h"
-#include "ui_failedwindow.h"
+#include "MaskWidget.h"
+#include "ui_MaskWidget.h"
 #include <qdesktopwidget.h>
 #include <QScreen>
 #include<QDebug>
 
-FailedWindow::FailedWindow(QWidget* parent) :
+MaskWidget::MaskWidget(QWidget* parent) :
 	QWidget(parent),
-	ui(new Ui::FailedWindow)
+	ui(new Ui::MaskWidget)
 {
 	ui->setupUi(this);
 
 	hide();
 }
 
-FailedWindow::~FailedWindow()
+MaskWidget::~MaskWidget()
 {
 	delete ui;
 }
 
-void FailedWindow::Popup(QString strTitle, int nTimeout)
+void MaskWidget::Popup(QString strTitle, MaskStatus nStatus, PageOperation nPage, int nTimeout)
 {
-	qDebug() << __FUNCTION__;
 	setWindowOpacity(0.8);
+    switch (nStatus)    // 设置相应图标
+	{
+    case Success:
+        //ui->label_Image->setPixmap();
+        break;
+    default:
+    case Information:
+		break;
+	case Error:
+		break;
+	case Failed:
+		break;
+	case Fetal:
+		break;
+	}
+
 	show();
 	setFocus();
 	//   以下代码为下设置全屏遮罩，暂弃用
@@ -45,7 +60,7 @@ void FailedWindow::Popup(QString strTitle, int nTimeout)
 
 }
 
-void FailedWindow::timerEvent(QTimerEvent* event)
+void MaskWidget::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() == m_nTimerID)
 	{
@@ -54,7 +69,7 @@ void FailedWindow::timerEvent(QTimerEvent* event)
 		{
 			killTimer(m_nTimerID);
 			m_nTimerID = 0;
-			emit FailedWindowTimeout();
+			emit MaskTimeout();
 		}
 	}
 }

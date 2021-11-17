@@ -18,6 +18,9 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
     void    ShutDownDevice();
+    int     Pay(QString &strError);
+    void    ThreadWork();
+
 private:
 	Ui::Pay* ui;
 };

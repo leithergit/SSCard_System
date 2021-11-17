@@ -1,9 +1,10 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "failedwindow.h"
+#include "MaskWidget.h"
 #include "Gloabal.h"
 #include <QMessageBox>
+#include "qmainstackpage.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget* parent)
 	m_pUpdateCard = new UpdateCard(this);
 	m_pUpdatePassword = new UpdatePassword(this);
 	m_pRegiserLost = new RegisterLost(this);
-	m_pFailedWindow = new FailedWindow(nullptr);
+    m_pMaskWindow = new MaskWidget(nullptr);
 	//m_pOperatorFailed = new OperatorFailed();
 	ui->stackedWidget->addWidget(m_pMainpage);
 	ui->stackedWidget->addWidget(m_pUpdateCard);
@@ -38,10 +39,11 @@ MainWindow::MainWindow(QWidget* parent)
 	*/
 	//setWindowFlags((Qt::WindowFlags)(windowFlags()|Qt::WindowStaysOnTopHint));
 	//setWindowFlags((Qt::WindowFlags)(windowFlags()));
-	connect(m_pUpdateCard, &QMainStackPage::PopupFailedWindow, this, &MainWindow::On_PopupFailedWindow);
-	connect(m_pUpdatePassword, &QMainStackPage::PopupFailedWindow, this, &MainWindow::On_PopupFailedWindow);
-	connect(m_pRegiserLost, &QMainStackPage::PopupFailedWindow, this, &MainWindow::On_PopupFailedWindow);
-	connect(m_pFailedWindow, &FailedWindow::FailedWindowTimeout, this, &MainWindow::On_FailedWindowTimeout);
+    //connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
+    connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+    connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+    connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+    connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 
 }
 
@@ -50,35 +52,35 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-int MainWindow::LoadConfigure(QString &strError)
+int MainWindow::LoadConfigure(QString& strError)
 {
-    if (g_pDataCenter)
-    {
-        QString strError;
-        int nRes = 0;
-        nRes = g_pDataCenter->LoadSysConfigure(strError);
-        if (nRes != 0)
-            return nRes;
-        nRes = g_pDataCenter->LoadCardForm(strError);
-        if (nRes != 0)
-            return nRes;
-        return 0;
-    }
-    else
-    {
-        gError()<<"The Datacenter is not initialized!";
-        return -1;
-    }
+	if (g_pDataCenter)
+	{
+		QString strError;
+		int nRes = 0;
+		nRes = g_pDataCenter->LoadSysConfigure(strError);
+		if (nRes != 0)
+			return nRes;
+		nRes = g_pDataCenter->LoadCardForm(strError);
+		if (nRes != 0)
+			return nRes;
+		return 0;
+	}
+	else
+	{
+		gError() << "The Datacenter is not initialized!";
+		return -1;
+	}
 }
 void MainWindow::on_pushButton_Updatecard_clicked()
 {
-    QString strError;
-    if (LoadConfigure(strError))
-    {
-        gError()<<strError.toLatin1().data();
-        QMessageBox::critical(this,tr(""),tr(""),QMessageBox::Ok);
-        return ;
-    }
+	QString strError;
+	if (LoadConfigure(strError))
+	{
+		gError() << strError.toLatin1().data();
+		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		return;
+	}
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
 	m_pUpdateCard->show();
@@ -86,13 +88,13 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 
 void MainWindow::on_pushButton_ChangePWD_clicked()
 {
-    QString strError;
-    if (LoadConfigure(strError))
-    {
-        gError()<<strError.toLatin1().data();
-        QMessageBox::critical(this,tr(""),tr(""),QMessageBox::Ok);
-        return ;
-    }
+	QString strError;
+	if (LoadConfigure(strError))
+	{
+		gError() << strError.toLatin1().data();
+		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		return;
+	}
 	ui->stackedWidget->setCurrentWidget(m_pUpdatePassword);
 	m_pUpdatePassword->ResetAllPages();
 	m_pUpdatePassword->show();
@@ -100,13 +102,13 @@ void MainWindow::on_pushButton_ChangePWD_clicked()
 
 void MainWindow::on_pushButton_RegisterLost_clicked()
 {
-    QString strError;
-    if (LoadConfigure(strError))
-    {
-        gError()<<strError.toLatin1().data();
-        QMessageBox::critical(this,tr(""),tr(""),QMessageBox::Ok);
-        return ;
-    }
+	QString strError;
+	if (LoadConfigure(strError))
+	{
+		gError() << strError.toLatin1().data();
+		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		return;
+	}
 	ui->stackedWidget->setCurrentWidget(m_pRegiserLost);
 	m_pRegiserLost->ResetAllPages();
 	m_pRegiserLost->show();
@@ -114,24 +116,39 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 
 void MainWindow::on_pushButton_MainPage_clicked()
 {
-    // 回到主页时需清空所有身份数据
-    g_pDataCenter->ResetIDData();
+	// 回到主页时需清空所有身份数据
+	g_pDataCenter->ResetIDData();
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
 	m_pMainpage->show();
 }
 
-void MainWindow::On_PopupFailedWindow(QString strText, int nTimeout)
+void MainWindow::On_ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nPage)
 {
 	QPoint ptLeftTop = m_pMainpage->mapToGlobal(QPoint(0, 0));
-	m_pFailedWindow->setGeometry(m_pMainpage->geometry());
-	m_pFailedWindow->move(ptLeftTop);
-	m_pFailedWindow->Popup(strText, nTimeout);
+    m_pMaskWindow->setGeometry(m_pMainpage->geometry());
+    m_pMaskWindow->move(ptLeftTop);
+    int nTimeout = 2;
+    switch (nStatus)
+    {
+    case Success :
+    case Information  :
+        nTimeout = 2;
+        break;
+    case Error        :
+    case Failed       :
+        nTimeout = 5;
+        break;
+    case Fetal:
+        nTimeout = 10;
+
+    }
+    m_pMaskWindow->Popup(strMessage,nStatus,nPage, nTimeout);
 }
-void MainWindow::On_FailedWindowTimeout()
+void MainWindow::On_MaskWidgetTimeout()
 {
-	if (m_pFailedWindow)
+    if (m_pMaskWindow)
 	{
-		m_pFailedWindow->hide();
+        m_pMaskWindow->hide();
 	}
 	on_pushButton_MainPage_clicked();
 }

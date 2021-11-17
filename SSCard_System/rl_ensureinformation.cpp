@@ -26,7 +26,9 @@ void rl_EnsureInformation::OnTimeout()
 
 }
 
-void rl_EnsureInformation::on_pushButton_MainPage_clicked()
+
+void rl_EnsureInformation::on_pushButton_OK_clicked()
 {
-	emit SwitchNextPage();
+    emit SwitchNextPage(Switch_NextPage);
 }
+

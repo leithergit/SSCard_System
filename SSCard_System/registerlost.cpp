@@ -25,6 +25,7 @@ RegisterLost::RegisterLost(QWidget* parent) :
 		{
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
 			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+            connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}
 	}
 	catch (exception& e)

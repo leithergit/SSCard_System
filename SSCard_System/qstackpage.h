@@ -17,9 +17,19 @@
 
 enum MaskStatus
 {
-    Succeed = 1,
-    Failed = 2,
-    Warning = 3
+    Success = 0  ,
+    Information  ,
+    Error        ,
+    Failed       ,
+    Fetal
+};
+
+enum PageOperation
+{
+    Return_MainPage,
+    Stay_CurrentPage,
+    Switch_NextPage,
+    Skip_NextPage
 };
 
 using namespace std;
@@ -74,15 +84,18 @@ public slots:
     // strMessage   遮罩层消息
     // 遮罩层图标状态  0为成功，1为失败，2为警告
     // 遮罩层滞留时间  单位毫秒
-    virtual void  OnShowMaskWidget(QString strMessage,MaskStatus nStatus,int nTimeoutms )
+    // nNextPages   0 为保留当前页，1为切换下一页，2..3否则为需要跳过的页数,直接当前页+nNextPages页
+    virtual void  OnShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation)
     {
         return;
     }
 
 signals:
-	void SwitchNextPage();
+    void InputPin(char ch);
+    void SwitchNextPage(PageOperation nOperation);
     void ErrorMessage(QString strMessage);
-    void ShowMaskWidget(QString strMessage,MaskStatus nStatus ,int nTimeoutms );
+    void ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation);
+
 };
 
 #endif // QSTACKPAGE_H

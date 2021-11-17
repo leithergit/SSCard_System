@@ -3,10 +3,10 @@
 #include "ui_updatepassword.h"
 #include "mainwindow.h"
 #include "up_changepwd.h"
-#include "up_ensurepwd.h"
+#include "up_Inputpwd.h"
 #include "up_readsscard.h"
 #include "OperatorSucceed.h"
-#include "failedwindow.h"
+#include "MaskWidget.h"
 #include <array>
 using namespace  std;
 #define _Stack_Count  (_ChangePWD + 1)
@@ -21,13 +21,14 @@ UpdatePassword::UpdatePassword(QWidget* parent) :
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		ui->stackedWidget->addWidget(new up_ReadSSCard(ui->label_ReadSSCard));
-		ui->stackedWidget->addWidget(new up_EnsurePWD(ui->label_EnsurePWD));
+		ui->stackedWidget->addWidget(new up_InputPWD(ui->label_EnsurePWD));
 		ui->stackedWidget->addWidget(new up_ChangePWD(ui->label_ChangePWD));
 		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr));
 		for (int i = 0; i < ui->stackedWidget->count(); i++)
 		{
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
 			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+            connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}
 	}
 	catch (exception& e)

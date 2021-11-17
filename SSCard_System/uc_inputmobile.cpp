@@ -2,6 +2,7 @@
 #include "uc_inputmobile.h"
 #include "ui_uc_inputmobile.h"
 #include "Gloabal.h"
+//#include "mainwindow.h"
 
 uc_InputMobile::uc_InputMobile(QLabel* pTitle, int nTimeout, QWidget* parent) :
 	QStackPage(pTitle, nTimeout, parent),
@@ -17,6 +18,7 @@ uc_InputMobile::~uc_InputMobile()
 
 int uc_InputMobile::ProcessBussiness()
 {
+    m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	return 0;
 }
 
@@ -128,16 +130,19 @@ void uc_InputMobile::on_pushButton_Backspace_clicked()
 	ui->lineEdit_Mobile->setText(m_strMobile);
 }
 
-
-void uc_InputMobile::on_pushButton_Ensure_clicked()
+void uc_InputMobile::on_pushButton_OK_clicked()
 {
-    if (m_strMobile.size() == g_pDataCenter->GetSysConfigure()->nMobilePhoneSize)
+    if (m_strMobile.size() == m_nMobilePhoneSize)
     {
         g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
-        emit SwitchNextPage();
+        QString strInfo = "手机号码已确认，稍后请支付补卡费用!";
+        gInfo()<<strInfo.toLocal8Bit().data();
+        emit ShowMaskWidget(strInfo,Success,Switch_NextPage);
     }
     else
     {
-
+        QString strInfo = QString("手机号码不足%1位,请输入正确的手机号码!").arg(m_nMobilePhoneSize);
+        gInfo()<<strInfo.toLocal8Bit().data();
+        emit ShowMaskWidget(strInfo,Error,Stay_CurrentPage);
     }
 }

@@ -8,11 +8,10 @@
 #include "updatecard.h"
 #include "updatepassword.h"
 #include "registerlost.h"
-#include "failedwindow.h"
+#include "MaskWidget.h"
 //#include "operatorfailed.h"
 
 #include "Gloabal.h"
-
 
 
 QT_BEGIN_NAMESPACE
@@ -30,7 +29,7 @@ public:
 	UpdateCard* m_pUpdateCard = nullptr;
 	UpdatePassword* m_pUpdatePassword = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
-	FailedWindow* m_pFailedWindow = nullptr;
+    MaskWidget* m_pMaskWindow = nullptr;
 
 	void on_pushButton_Updatecard_clicked();
 
@@ -42,11 +41,13 @@ public:
 	int m_nDateTimer = 0;
 	virtual void timerEvent(QTimerEvent* event);
 
-    int LoadConfigure(QString &strError);
+	int LoadConfigure(QString& strError);
+signals:
+    void ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation);
 
 private slots:
-	void On_FailedWindowTimeout();
-	void On_PopupFailedWindow(QString strText, int nTimeout);
+    void On_ShowMaskWidget(QString,MaskStatus nStatus,PageOperation nPage);
+    void On_MaskWidgetTimeout();
 
 private:
 	Ui::MainWindow* ui;

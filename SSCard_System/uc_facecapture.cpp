@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QObject>
 #include "Gloabal.h"
+//#include "mainwindow.h"
 
 uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, int nTimeout, QWidget* parent) :
 	QStackPage(pTitle, nTimeout, parent),
@@ -38,7 +39,7 @@ int uc_FaceCapture::ProcessBussiness()
 {
     m_bFaceDetectSucceed = false;
     QString strError;
-    if (!Succeed(OpenCamara(strError)))
+    if (QFailed(OpenCamara(strError)))
     {
         gError()<<strError.toLocal8Bit().data();
         QMessageBox::critical(this,tr("打开摄像机失败"),strError,QMessageBox::Ok);
@@ -142,11 +143,12 @@ int uc_FaceCapture::CloseCamera(QString &strError)
 void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
     QString strError;
-    if (!Succeed(CloseCamera(strError)))
+    if (QFailed(CloseCamera(strError)))
     {
         gInfo()<< strError.toLocal8Bit().data();
     }
-    emit SwitchNextPage();
+    emit ShowMaskWidget("人脸识别成功,稍后请确认卡信息!",Success,Switch_NextPage);
+    //emit SwitchNextPage();
 }
 
 int  uc_FaceCapture::GetFaceCaptureStorePath(QString &strFilePath)
@@ -182,7 +184,7 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
         gInfo()<< strEvent.toLocal8Bit().data();
 
         QString strFaceImageFile;
-        if (!Succeed(GetFaceCaptureStorePath(strFaceImageFile)))
+        if (QFailed(GetFaceCaptureStorePath(strFaceImageFile)))
         {
             gError()<< QString("无法访问人脸数据目录!").toLocal8Bit().data();
             return;

@@ -26,10 +26,13 @@ public:
 
 public slots:
 	void on_pushButton_MainPage_clicked();
-	virtual void on_SwitchNextPage();
+    virtual void on_SwitchNextPage(PageOperation nOperation);
+    void On_ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation)
+    {
+        emit ShowMaskWidget(strMessage,nStatus, nOperation);
+    }
 signals:
-	void PopupFailedWindow(QString strText, int nTimeout);
-	void FailedWindowTimeout();
+   void ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation);
 };
 
 #endif // QMAINSTACKPAGE_H
