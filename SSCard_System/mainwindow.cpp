@@ -161,3 +161,4 @@ void MainWindow::timerEvent(QTimerEvent* event)
 		ui->label_DateTime->setText(tNow.toString("yyyy-MM-dd HH:mm:ss"));
 	}
 }
+

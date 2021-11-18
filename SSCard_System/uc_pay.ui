@@ -93,17 +93,17 @@ color: rgb(0, 0, 0);</string>
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_PaymentQRCode">
        <property name="minimumSize">
         <size>
-         <width>120</width>
-         <height>120</height>
+         <width>300</width>
+         <height>300</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>320</width>
-         <height>320</height>
+         <width>300</width>
+         <height>300</height>
         </size>
        </property>
        <property name="styleSheet">

@@ -40,8 +40,8 @@ public:
 	void on_pushButton_MainPage_clicked();
 	int m_nDateTimer = 0;
 	virtual void timerEvent(QTimerEvent* event);
-
 	int LoadConfigure(QString& strError);
+
 signals:
     void ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation);
 

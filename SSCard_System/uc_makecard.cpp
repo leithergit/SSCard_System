@@ -1,6 +1,8 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "uc_makecard.h"
 #include "ui_uc_makecard.h"
+#include "./SDK/Printer/KT_Printer.h"
+#include "./SDK/Reader/KT_Reader.h"
 
 uc_MakeCard::uc_MakeCard(QLabel* pTitle, int nTimeout, QWidget* parent) :
 	QStackPage(pTitle, nTimeout, parent),
@@ -17,6 +19,7 @@ uc_MakeCard::~uc_MakeCard()
 
 int uc_MakeCard::ProcessBussiness()
 {
+
 
 	return 0;
 }

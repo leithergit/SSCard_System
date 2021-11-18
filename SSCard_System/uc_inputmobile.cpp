@@ -19,6 +19,7 @@ uc_InputMobile::~uc_InputMobile()
 int uc_InputMobile::ProcessBussiness()
 {
     m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
+    m_strMobile = "";
 	return 0;
 }
 
@@ -130,14 +131,38 @@ void uc_InputMobile::on_pushButton_Backspace_clicked()
 	ui->lineEdit_Mobile->setText(m_strMobile);
 }
 
+int uc_InputMobile::QueryPayResult(QString &strMessage,int &nResult)
+{
+    nResult = 0;
+
+    return 0;
+}
+
 void uc_InputMobile::on_pushButton_OK_clicked()
 {
     if (m_strMobile.size() == m_nMobilePhoneSize)
     {
         g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
-        QString strInfo = "手机号码已确认，稍后请支付补卡费用!";
-        gInfo()<<strInfo.toLocal8Bit().data();
-        emit ShowMaskWidget(strInfo,Success,Switch_NextPage);
+        QString strMessage;
+        int nResult= 0;
+        if (QFailed(QueryPayResult(strMessage,nResult)))
+        {
+            gInfo()<<strMessage.toLocal8Bit().data();
+            emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
+            return ;
+        }
+        if (QSucceed(nResult))
+        {
+            QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
+            gInfo()<<strInfo.toLocal8Bit().data();
+            emit ShowMaskWidget(strInfo,Success,Skip_NextPage);
+        }
+        else
+        {
+            QString strInfo = "手机号码已确认,稍后请支付补卡费用!";
+            gInfo()<<strInfo.toLocal8Bit().data();
+            emit ShowMaskWidget(strInfo,Success,Switch_NextPage);
+        }
     }
     else
     {

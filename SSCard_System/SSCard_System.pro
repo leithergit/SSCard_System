@@ -14,6 +14,7 @@ SOURCES += \
     Gloabal.cpp \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
+    Payment.cpp \
     SDK/dvtldcamocx/dvtldcamocxlib.cpp \
     main.cpp \
     mainpage.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     Gloabal.h \
     MaskWidget.h \
     OperatorSucceed.h \
+    Payment.h \
     SDK/dvtldcamocx/dvtldcamocxlib.h \
     mainpage.h \
     mainwindow.h \
@@ -111,3 +113,9 @@ DEFINES += _HAS_STD_BYTE=0
 
 DISTFILES += \
     qml/SliderPlayer.qml
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencode
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencoded
+
+INCLUDEPATH += $$PWD/SDK/QREncode
+DEPENDPATH += $$PWD/SDK/QREncode

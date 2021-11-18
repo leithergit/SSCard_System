@@ -35,6 +35,7 @@ private slots:
 	void on_pushButton_Clear_clicked();
 	void on_pushButton_Backspace_clicked();
     void on_pushButton_OK_clicked();
+    int     QueryPayResult(QString &strMessage,int &nResult);
 
 private:
 	Ui::InputMobile* ui;

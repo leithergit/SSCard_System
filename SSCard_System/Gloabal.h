@@ -175,11 +175,29 @@ struct CardForm
 
 using CardFormPtr = std::shared_ptr<CardForm>;
 
+struct PaymentOpt
+{
+    PaymentOpt(QSettings* pSettings)
+    {
+        if (!pSettings)
+            return;
+        gInfo() << "Try to read Payment configure";
+        pSettings->beginGroup("Payment");
+        nWaitTime                = pSettings->value("WaitTime").toUInt();
+        nQueryPayResultInterval  = pSettings->value("QueryPayResultInterval").toUInt();
+        nSocketRetryCount        = pSettings->value("SocketRetryCount").toUInt();
+        pSettings->endGroup();
+    }
+    int     nWaitTime = 300;                         // 支付页面等侍时间，单位秒
+    int     nQueryPayResultInterval = 500;            // 支付结构查询时间间隔单 毫秒
+    int     nSocketRetryCount = 5;                    // 网络失败重试次数
+};
 struct SysConfig
 {
 	SysConfig(QSettings* pSettings)
 		: DevConfig(pSettings)
 		, RegInfo(pSettings)
+        , PaymentConfig(pSettings)
 	{
 		pSettings->beginGroup("Other");
         nBatchMode          = pSettings->value("BATCHMODE").toInt();
@@ -191,7 +209,7 @@ struct SysConfig
 	}
 	DeviceConfig	DevConfig;						  // 设备配置
 	RegionInfo		RegInfo;						  // 区域信息配置
-
+    PaymentOpt      PaymentConfig;                    // 支付相关设置
 	int				nBatchMode = 0;					  // 批量制卡 开启：0    关闭：1
 	string			strDBPath;						  // 数据存储路径
     double          dfFaceSimilarity;                 // 人脸认别最低相似度
