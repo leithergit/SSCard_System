@@ -1,6 +1,0 @@
-#ifndef IDCARD_API_GLOBAL_H
-#define IDCARD_API_GLOBAL_H
-
-
-
-#endif // IDCARD_API_GLOBAL_H

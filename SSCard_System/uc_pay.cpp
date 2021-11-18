@@ -24,6 +24,7 @@ uc_Pay::~uc_Pay()
 	delete ui;
 }
 
+
 int uc_Pay::ProcessBussiness()
 {
     //m_nWaitTime = 300;                         // 支付页面等侍时间，单位秒
@@ -31,7 +32,6 @@ int uc_Pay::ProcessBussiness()
     m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount    ;                    // 网络失败重试次数
     // 这里可能是个耗时的过程，应该需要一个等待画面
     QString strMessage;
-    int nResult = 0;
 //    if (!QFailed(QueryPayResult(strMessage,nResult)))
 //    {
 //        emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
@@ -44,25 +44,52 @@ int uc_Pay::ProcessBussiness()
 //        return 0;
 //    }
 
+
+
     // 获取二维码，并生成图像
     QImage QRImage;
-    if (QFailed(ReqestPaymentQR(strMessage,nResult,QRImage)))
-    {
-        emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
-        return -1;
-    }
+    m_nPayStatus = uc_QueryPayment(strMessage);
 
-    // 获取二维码保存路径
-    QString strQRPath;
-    if (!GetQRCodeStorePath(strQRPath))
+    switch(m_nPayStatus)
     {
+    case Pay_Not:
+    {
+        int nRespond = uc_ReqestPaymentQR(strMessage,QRImage);
+        if (QFailed(nRespond))
+        {
+            gError()<<strMessage.toLocal8Bit().data();
+            emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
+            return -1;
+        }
+        gInfo()<<strMessage.toLocal8Bit().data();
+        // 获取二维码保存路径
+        QString strQRPath;
+        if (!GetQRCodeStorePath(strQRPath))
+        {
+            gError()<<strMessage.toLocal8Bit().data();
+
+        }
+        // 保存二维码图像，并显示
+        QRImage.save(strQRPath);
+        QString strQSS = QString(u8"border-image: url(%1)").arg(strQRPath);
+        ui->label_PaymentQRCode->setStyleSheet(strQSS);
+
+        break;
+        //[[fallthrough]];
+    }
+    case Pay_Succeed:
+    {
+        gInfo()<<strMessage.toLocal8Bit().data();
+        emit ShowMaskWidget("制卡费用已经成功支付,准备",Success,Stay_CurrentPage);
+        break;
+    }
+    default:
+    {
+        gError()<<strMessage.toLocal8Bit().data();
         emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
         return -1;
     }
-    // 保存二维码图像，并显示
-    QRImage.save(strQRPath);
-    QString strQSS = QString(u8"border-image: url(%1)").arg(strQRPath);
-    ui->label_PaymentQRCode->setStyleSheet(strQSS);
+    }
 
     m_bWorkThreadRunning = true;
     m_pWorkThread = new std::thread(&uc_Pay::ThreadWork, this);
@@ -73,137 +100,319 @@ int uc_Pay::ProcessBussiness()
         emit ShowMaskWidget(strError,Fetal,Return_MainPage);
         return -1;
     }
+
+
 	return 0;
 }
 
-int  uc_Pay::uc_ReqestPaymentQR(QString &strMessage,int &nResult,QImage &Image)
+
+
+int  uc_Pay::uc_ReqestPaymentQR(QString &strMessage,QImage &QRImage)
 {
-
-}
-
-#define OverSocketFailedCont   -2
-
-int  uc_Pay::uc_QueryPayResult(QString &strMessage)
-{
-    while ( m_bWorkThreadRunning)
+    int nRespond = -1;
+    QString strPaymentUrl;
+    while (true)
     {
         if (m_nSocketFailedCount >= m_nSocketRetryCount)
         {
-            strMessage = QString("网络操作连续失败次超过%1次,支付流程中断!").arg(m_nSocketRetryCount).toLocal8Bit().data();
-            return OverSocketFailedCont;
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            nRespond OverSocketFailedCont;
+            break;
         }
-        int nRespond = QueryPayResult(strMessage);
+
+        nRespond = RequestPaymentUrl(strMessage,strPaymentUrl);
+        if (QSucceed(nRespond))
+        {
+            if (QFailed(QREnncodeImage(strPaymentUrl ,2,QRImage)))
+            {
+                nRespond = Failed_QREnocode;
+            }
+            else
+                nRespond = 0;
+            break;
+        }
+        else
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("查询支付结果失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+
+    }
+    return nRespond;
+}
+
+int  uc_Pay::uc_QueryPayment(QString &strMessage)
+{
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
+    {
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            nRespond OverSocketFailedCont;
+            break;
+        }
+        nRespond = QueryPayment(strMessage);
         if (QFailed(nRespond))
         {
            m_nSocketFailedCount ++;
-           gError()<<QString("查询支付结果失败:%1").arg(strMessage).toLocal8Bit().data();
-           this_thread::sleep_for(chrono::milliseconds(100));
+           strMessage = QString("查询支付结果失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
         }
-        m_nSocketFailedCount = 0;
-        return 0;
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
     }
+    return nRespond;
 }
 
-int  uc_Pay::GetQRCodeStorePath(QString &strFilePath)
-{
-
-}
-
-int  uc_Pay::uc_GetPaymentUrl(QString &strMessage,QString &strPaymentUrl)
-{
-
-}
 
 int  uc_Pay::uc_ApplyCardReplacement(QString &strMessage)
 {
-    int nRespond = ApplyCardReplacement(strMessage);
-    if (QFailed(nRespond))
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
     {
-         m_nSocketFailedCount ++;
-         gError()<<QString("申请补换卡失败:%1").arg(strMessage).toLocal8Bit().data();
-         if (m_nSocketFailedCount >= m_nSocketRetryCount)
-         {
-             gError()<<QString("网络操作连续失败次超过%1次,支付流程中断!").arg(nSocketRetryCount).toLocal8Bit().data();
-             return OverSocketFailedCont;
-         }
-        return -1;
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            return OverSocketFailedCont;
+        }
+        int nRespond = ApplyCardReplacement(strMessage);
+        if (QFailed(nRespond))
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("申请补换卡失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
     }
-    m_nSocketFailedCount = 0;
-    if (QFailed(nResult))
-    {
-        strMessage = QString("申请补换卡结果:%1,稍后重试!").arg(nResult);
-        gError()<<strMessage.toLocal8Bit().data();
-        break;
-    }
-    bSSCardReplaceSucceed = true;
+    return nRespond;
 }
 
-int  uc_Pay::uc_ResgisterPayment(QString &strMessage,int &nResult)
+int  uc_Pay::uc_ResgisterPayment(QString &strMessage)
 {
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
+    {
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            return OverSocketFailedCont;
+        }
+        nRespond = ResgisterPayment(strMessage);
+        if (QFailed(nRespond))
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("缴费登记失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
+    }
+    return nRespond;
+}
 
+
+int   uc_Pay::uc_MarkCard(QString &strMessage)
+{
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
+    {
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            return OverSocketFailedCont;
+        }
+        nRespond = MarkCard(strMessage);
+        if (QFailed(nRespond))
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("即制卡标注失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
+    }
+    return nRespond;
+}
+
+int   uc_Pay::uc_GetDataCard(QString &strMessage)
+{
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
+    {
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            return OverSocketFailedCont;
+        }
+        nRespond = GetCardData(strMessage);
+        if (QFailed(nRespond))
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("获取即制卡数据失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
+    }
+    return nRespond;
+}
+
+int  uc_Pay::uc_CancelMarkCard(QString &strMessage)
+{
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
+    {
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            return OverSocketFailedCont;
+        }
+        nRespond = CancelMarkCard(strMessage);
+        if (QFailed(nRespond))
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("撤销即制卡标注失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
+    }
+    return nRespond;
+}
+int  uc_Pay::uc_CancelCardReplacement(QString &strMessage)
+{
+    int nRespond = -1;
+    while (m_bWorkThreadRunning)
+    {
+        if (m_nSocketFailedCount >= m_nSocketRetryCount)
+        {
+            strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
+            return OverSocketFailedCont;
+        }
+        nRespond = CancelCardReplacement(strMessage);
+        if (QFailed(nRespond))
+        {
+           m_nSocketFailedCount ++;
+           strMessage = QString("撤销申请补换卡失败:%1").arg(strMessage);
+           this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        else
+        {
+            m_nSocketFailedCount = 0;
+            break;
+        }
+    }
+    return nRespond;
+}
+
+int uc_Pay::uc_CancelCardment(QString &strMessage)
+{
+    int nResult = uc_CancelMarkCard(strMessage);
+    if (QFailed(nResult))
+        return nResult;
+
+    return uc_CancelCardReplacement(strMessage);
 }
 
 void uc_Pay::ThreadWork()
 {
     auto tLast = high_resolution_clock::now();
-    bool bPaySucceed = false;
-    bool bSSCardReplaceSucceed = false;
-    bool bRegisterPayment = false;
-    bool bMarkCardSucced = false;
-    bool bGetCardDataSucceed = false;
+
     int nResult = 0;
-    QString strMessage;
-    int     nSocketFailedCount = 0;
+    QString strMessage;   
+    QString strPayUrl;
+
     while(m_bWorkThreadRunning)
     {
         auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
-        if (tDuration.count() >= nQueryPayResultInterval)
+        if (tDuration.count() >= m_nQueryPayResultInterval)
         {
             do
             {
-                if (!bPaySucceed)
+                if (m_nPayStatus == Pay_Not)                    // 初始状态为未支付
                 {
-
-                    bPaySucceed = true;
-                }
-
-                if (!bSSCardReplaceSucceed)
-                {
-
-                }
-
-                if (!bRegisterPayment)
-                {
-                    if (QFailed(ResgisterPayment(strMessage,nResult)))
+                    nResult = QueryPayment(strMessage);         // 查询支付结果
+                    if (m_nPayStatus == Pay_Not)
                     {
-                        gError()<<QString("缴费登记失败:%1").arg(strMessage).toLocal8Bit().data();
-                        if (nSocketFailedCount >= nSocketRetryCount)
-                        {
-                            gError()<<QString("网络操作连续失败次超过%1次,支付流程中断!").arg(nSocketRetryCount).toLocal8Bit().data();
-                            m_bWorkThreadRunning = false;
-                            emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
-                        }
                         break;
                     }
+                    else if (nResult == Pay_Succeed)
+                    {
+                        nResult = uc_ApplyCardReplacement(strMessage);     //  申请补换卡
+                        if (QFailed(nResult))
+                            break;
+
+                        nResult = uc_ResgisterPayment(strMessage);          // 缴费登记
+                        if (QFailed(nResult))
+                            break;
+                    }
+                    else
+                        break;
+                }
+                else
+                {
+                    m_nPayStatus = nResult;
+                    nResult = uc_ApplyCardReplacement(strMessage);          //  之前已经支付过，只不作缴费登录申请补换卡
                     if (QFailed(nResult))
-                    {
-                        strMessage = QString("缴费登记失败结果:%1,稍后重试!").arg(nResult);
-                        gError()<<strMessage.toLocal8Bit().data();
                         break;
-                    }
-                    bRegisterPayment = true;
                 }
 
+                nResult = uc_MarkCard(strMessage);
+                if (QFailed(nResult))
+                {
+                    nResult = uc_CancelCardment(strMessage);
+                    if (QFailed(nResult))
+                        break;
+                }
 
-                emit ShowMaskWidget(strMessage,Success,Switch_NextPage);
+                nResult = uc_GetDataCard(strMessage);
+                if (QFailed(nResult))
+                {
+                    nResult = uc_CancelCardment(strMessage);
+                    if (QFailed(nResult))
+                        break;
+                }
 
             }while(0);
             tLast = high_resolution_clock::now();
+            if (nResult == Pay_Not)
+            {
+                this_thread::sleep_for(chrono::milliseconds(100));
+                continue;
+            }
+            else if (QSucceed(nResult))
+            {
+                emit ShowMaskWidget(strMessage,Success,Switch_NextPage);
+            }
+            else if (QFailed(nResult))
+            {
+                gError()<<strMessage.toLocal8Bit().data();
+                emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
+            }
         }
-        else
-        {
-            this_thread::sleep_for(chrono::milliseconds(100));
-        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
     }
 }
 
@@ -231,17 +440,17 @@ int  uc_Pay::GetQRCodeStorePath(QString &strFilePath)
     return 0;
 }
 
-int  uc_Pay::ReqestPaymentQR(QString &strMessage,int &nResult,QImage &QRImage)
-{
-    QString strPaymentUrl;
-    if (QFailed(GetPaymentUrl(strMessage,strPaymentUrl)))
-    {
-        return -1;
-    }
+//int  uc_Pay::ReqestPaymentQR(QString &strMessage,int &nResult,QImage &QRImage)
+//{
+//    QString strPaymentUrl;
+//    if (QFailed(GetPaymentUrl(strMessage,strPaymentUrl)))
+//    {
+//        return -1;
+//    }
 
-    QREnncodeImage(strPaymentUrl,2,QRImage);
-    nResult = 0;
-}
+//    QREnncodeImage(strPaymentUrl,2,QRImage);
+//    nResult = 0;
+//}
 
 void uc_Pay::OnTimeout()
 {

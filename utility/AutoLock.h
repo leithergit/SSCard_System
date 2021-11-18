@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#pragma execution_character_set("utf-8")
+#pragma once
 
 #include <assert.h>
 #include <Windows.h>
@@ -31,21 +32,21 @@
 class CAutoLock
 {
 private:
-	CRITICAL_SECTION *m_pCS;
+	CRITICAL_SECTION* m_pCS;
 	bool	m_bAutoDelete;
 	bool	m_bLocked;
 #ifdef _LockOverTime
 	DWORD	m_dwLockTime;
-	CHAR   *m_pszFile;
-	char   *m_pszFunction;
+	CHAR* m_pszFile;
+	char* m_pszFunction;
 	int		m_nLockLine;
 #endif
 
-	explicit CAutoLock():m_pCS(NULL),m_bAutoDelete(false)
+	explicit CAutoLock() :m_pCS(NULL), m_bAutoDelete(false)
 	{
 	}
 public:
-	CAutoLock(CRITICAL_SECTION *pCS, bool bAutoDelete = false, const CHAR *szFile = nullptr, char *szFunction = nullptr, int nLine = 0)
+	CAutoLock(CRITICAL_SECTION* pCS, bool bAutoDelete = false, const CHAR* szFile = nullptr, char* szFunction = nullptr, int nLine = 0)
 	{
 		ZeroMemory(this, sizeof(CAutoLock));
 		assert(pCS != NULL);
@@ -71,7 +72,7 @@ public:
 				CHAR szOuput[1024] = { 0 };
 				if (szFile)
 				{
-					sprintf(szOuput, "Wait Lock @File:%s:%d(%s),Waittime = %d.\n", szFile, nLine, szFunction,timeGetTime() - m_dwLockTime);
+					sprintf(szOuput, "Wait Lock @File:%s:%d(%s),Waittime = %d.\n", szFile, nLine, szFunction, timeGetTime() - m_dwLockTime);
 				}
 				else
 					sprintf(szOuput, "Wait Lock Waittime = %d.\n", timeGetTime() - m_dwLockTime);
@@ -112,7 +113,7 @@ public:
 				delete[]m_pszFunction;
 #endif
 			if (m_bAutoDelete)
-				::DeleteCriticalSection((CRITICAL_SECTION *)m_pCS);
+				::DeleteCriticalSection((CRITICAL_SECTION*)m_pCS);
 		}
 	}
 	~CAutoLock()
@@ -125,15 +126,15 @@ public:
 class CTryLock
 {
 private:
-	CRITICAL_SECTION *m_pCS;
+	CRITICAL_SECTION* m_pCS;
 	bool	m_bAutoDelete;
 	BOOL	m_bLocked;
 public:
-	CTryLock():m_pCS(NULL),m_bAutoDelete(false),m_bLocked(false)
+	CTryLock() :m_pCS(NULL), m_bAutoDelete(false), m_bLocked(false)
 	{
 	}
 
-	BOOL TryLock(CRITICAL_SECTION *pCS,bool bAutoDelete = false)
+	BOOL TryLock(CRITICAL_SECTION* pCS, bool bAutoDelete = false)
 	{
 		assert(pCS != NULL);
 		if (pCS)

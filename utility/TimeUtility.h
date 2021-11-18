@@ -1,4 +1,5 @@
 ﻿#pragma once
+#pragma execution_character_set("utf-8")
 #include <TCHAR.H>
 #include <windows.h>
 #include <time.h>
@@ -25,31 +26,31 @@
 #endif
 
 
-int		GetDateTimeA(CHAR *szDateTime,int nSize);
-int		GetDateTimeW(WCHAR *szDateTime,int nSize);
+int		GetDateTimeA(CHAR* szDateTime, int nSize);
+int		GetDateTimeW(WCHAR* szDateTime, int nSize);
 LPCSTR	DateTimeA();
 LPCWSTR	DateTimeW();
 bool	IsLeapYear(UINT64 nYear);
-UINT64	DateTimeString2UTC(TCHAR *szTime,UINT64 &nTime);
-void	UTC2DateTimeStringA(UINT64 nTime,CHAR *szTime,int nSize);
-void	UTC2DateTimeStringW(UINT64 nTime,WCHAR *szTime,int nSize);
-BOOL	SystemTime2UTC(SYSTEMTIME *pSystemTime,UINT64 *pTime);
-BOOL	UTC2SystemTime(UINT64 *pTime,SYSTEMTIME *pSystemTime);
-void	StringFromSystemTimeA(CHAR* szTimeString,int nSize,bool bMillionSecond = true);
-void	StringFromSystemTimeW(WCHAR* szTimeString,int nSize,bool bMillionSecond = true);
+UINT64	DateTimeString2UTC(TCHAR* szTime, UINT64& nTime);
+void	UTC2DateTimeStringA(UINT64 nTime, CHAR* szTime, int nSize);
+void	UTC2DateTimeStringW(UINT64 nTime, WCHAR* szTime, int nSize);
+BOOL	SystemTime2UTC(SYSTEMTIME* pSystemTime, UINT64* pTime);
+BOOL	UTC2SystemTime(UINT64* pTime, SYSTEMTIME* pSystemTime);
+void	StringFromSystemTimeA(CHAR* szTimeString, int nSize, bool bMillionSecond = true);
+void	StringFromSystemTimeW(WCHAR* szTimeString, int nSize, bool bMillionSecond = true);
 
 // NTP校时包
 struct   NTP_Packet
 {
-	int			Control_Word;   
-	int			root_delay;   
-	int			root_dispersion;   
-	int			reference_identifier;   
-	__int64		reference_timestamp;   
-	__int64		originate_timestamp;   
-	__int64		receive_timestamp;   
-	int			transmit_timestamp_seconds;   
-	int			transmit_timestamp_fractions;   
+	int			Control_Word;
+	int			root_delay;
+	int			root_dispersion;
+	int			reference_identifier;
+	__int64		reference_timestamp;
+	__int64		originate_timestamp;
+	__int64		receive_timestamp;
+	int			transmit_timestamp_seconds;
+	int			transmit_timestamp_fractions;
 };
 
 /************************************************************************/
@@ -81,24 +82,24 @@ typedef struct __ExactTimeBase
 		li.LowPart = ft.dwLowDateTime;
 		li.HighPart = ft.dwHighDateTime;
 		// 从1970年1月1日0:0:0:000到现在的微秒数(UTC时间)
-		Time64 = (li.QuadPart - EPOCHFILETIME) /10;
+		Time64 = (li.QuadPart - EPOCHFILETIME) / 10;
 		return Time64;
 	}
 	__ExactTimeBase()
 	{
-		ZeroMemory(this,sizeof(ETB));
+		ZeroMemory(this, sizeof(ETB));
 		SYSTEMTIME systime1;
 		SYSTEMTIME systime2;
 		ZeroMemory(&systime1, sizeof(SYSTEMTIME));
 		ZeroMemory(&systime2, sizeof(SYSTEMTIME));
 
-		HANDLE hProcess			= GetCurrentProcess();
-		HANDLE hThread			= GetCurrentThread();
+		HANDLE hProcess = GetCurrentProcess();
+		HANDLE hThread = GetCurrentThread();
 
-		DWORD dwPriorityClass	= GetPriorityClass(hProcess);		
-		DWORD dwThreadPriority	= GetThreadPriority(hThread);
+		DWORD dwPriorityClass = GetPriorityClass(hProcess);
+		DWORD dwThreadPriority = GetThreadPriority(hThread);
 
-		DWORD dwError			= 0;
+		DWORD dwError = 0;
 		// 把进程优先级调整到实时级
 		if (!SetPriorityClass(hProcess, REALTIME_PRIORITY_CLASS))
 		{
@@ -134,22 +135,22 @@ typedef struct __ExactTimeBase
 			t2 = GetSysTimeMicros();
 			if (t2 != t1)
 				break;
-			nCompares ++;
+			nCompares++;
 		}
-		nBaseClock = t2/(1000*1000);
-		dfMilliseconds = (double)(t2 - nBaseClock*1000*1000)/1000;
+		nBaseClock = t2 / (1000 * 1000);
+		dfMilliseconds = (double)(t2 - nBaseClock * 1000 * 1000) / 1000;
 
 		// 恢复线程和进程的优先级
 		SetThreadPriority(hThread, dwThreadPriority);
 		SetPriorityClass(hProcess, dwPriorityClass);
 
-// #ifdef _DEBUG
-// 		TCHAR szText[64] = {0};
-// 		_stprintf_s(szText,_T("BaseClock of ETB = %I64d.\n"),nBaseClock);
-// 		OutputDebugString(szText);
-// #endif
-		LARGE_INTEGER LarInt;		
-		QueryPerformanceFrequency(&LarInt);	
+		// #ifdef _DEBUG
+		// 		TCHAR szText[64] = {0};
+		// 		_stprintf_s(szText,_T("BaseClock of ETB = %I64d.\n"),nBaseClock);
+		// 		OutputDebugString(szText);
+		// #endif
+		LARGE_INTEGER LarInt;
+		QueryPerformanceFrequency(&LarInt);
 		dfFreq = LarInt.QuadPart;
 		QueryPerformanceCounter(&LarInt);
 		dfCounter = LarInt.QuadPart;
@@ -260,7 +261,7 @@ class CWaitTime
 	int nLine;
 	char szFunction[256];
 public:
-	CWaitTime(char *szInFile, int nInLine, char *szInFunction)
+	CWaitTime(char* szInFile, int nInLine, char* szInFunction)
 	{
 		dwTimeEnter = timeGetTime();
 		strcpy(szFile, szInFile);
@@ -272,7 +273,7 @@ public:
 		if ((timeGetTime() - dwTimeEnter) > 200)
 		{
 			char szText[1024] = { 0 };
-            sprintf_s(szText,1024, "Wait Timeout @File:%s %d(%s) WaitTime = %d(ms).\n", szFile, nLine, szFunction, (timeGetTime() - dwTimeEnter));
+			sprintf_s(szText, 1024, "Wait Timeout @File:%s %d(%s) WaitTime = %d(ms).\n", szFile, nLine, szFunction, (timeGetTime() - dwTimeEnter));
 			OutputDebugStringA(szText);
 		}
 	}

@@ -3,13 +3,18 @@
 #include <QString>
 #include <QImage>
 
+#define OverSocketFailedCont   -2
+#define Pay_Succeed             1         // 已经支付
+#define Pay_Not                 2         // 沿未支付
+#define Failed_QREnocode        3         // 生成支付二维码失败
+
 int  QREnncodeImage(const QString& s, int bulk,QImage &QRImage);
 
-int  QueryPayResult(QString &strMessage);
+int  QueryPayment(QString &strMessage/*,QString &strPaymentUrl*/);
 
-int  ReqestPaymentQR(QString &strMessage,QImage &Image);
+//int  ReqestPaymentQR(QString &strMessage,QImage &Image);
 
-int  GetPaymentUrl(QString &strMessage,QString &strPaymentUrl);
+int  RequestPaymentUrl(QString &strMessage,QString &strPaymentUrl);
 
 int  ApplyCardReplacement(QString &strMessage);
 

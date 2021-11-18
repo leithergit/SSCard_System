@@ -36,17 +36,18 @@ int  QREnncodeImage(const QString& s, int bulk,QImage &QRImage)
         return -1;
 }
 
-int     QueryPayResult(QString &strMessage)
+// 查询支付结果不能返回支付URL，否则未支付前，每次都带会不同的URL，支付结果可能也无法确定
+int     QueryPayment(QString &strMessage/*,QString &strPaymentUrl*/)
 {
         return 0;
 }
 
-int     ReqestPaymentQR(QString &strMessage,QImage &Image)
-{
-        return 0;
-}
+//int     ReqestPaymentQR(QString &strMessage,QImage &Image)
+//{
+//        return 0;
+//}
 
-int     GetPaymentUrl(QString &strMessage,QString &strPaymentUrl)
+int     RequestPaymentUrl(QString &strMessage,QString &strPaymentUrl)
 {
 #ifdef _DEBUG
         strPaymentUrl =u8"http://kingaotech.com/";
@@ -61,7 +62,7 @@ int     ApplyCardReplacement(QString &strMessage)
 
 int     CancelCardReplacement(QString &strMessage)
 {
-
+        return 0;
 }
 
 int     ResgisterPayment(QString &strMessage)
