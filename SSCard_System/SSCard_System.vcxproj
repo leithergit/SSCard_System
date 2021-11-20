@@ -1,141 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{6BA74DE1-438D-3762-9273-9F728908BD35}</ProjectGuid>
-    <RootNamespace>SSCard_System</RootNamespace>
-    <Keyword>Qt4VSv1.0</Keyword>
+    <ProjectGuid>{B8830F48-BC07-43A5-A60B-29752E15C645}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">10.0.19041.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')"
+      >$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;" Label="Configuration">
-    <PlatformToolset>v142</PlatformToolset>
-    <OutputDirectory>release\</OutputDirectory>
-    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <IntermediateDirectory>release\</IntermediateDirectory>
-    <PrimaryOutput>SSCard_System</PrimaryOutput>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;" Label="Configuration">
-    <PlatformToolset>v142</PlatformToolset>
-    <OutputDirectory>debug\</OutputDirectory>
-    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <IntermediateDirectory>debug\</IntermediateDirectory>
-    <PrimaryOutput>SSCard_System</PrimaryOutput>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
-  <ImportGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="QtSettings">
+    <QtInstall>5.15.2_msvc2019</QtInstall>
+    <QtModules>core;gui;widgets;qml;quickwidgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="QtSettings">
+    <QtInstall>5.15.2_msvc2019</QtInstall>
+    <QtModules>core;gui;widgets;qml;quickwidgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound"
+    BeforeTargets="CustomBuild;ClCompile"
+    Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High"
+      Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">release\</IntDir>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">SSCard_System</TargetName>
-    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">true</IgnoreImportLibrary>
-    <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\</OutDir>
-    <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">debug\</IntDir>
-    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">SSCard_System</TargetName>
-    <IgnoreImportLibrary Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">true</IgnoreImportLibrary>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;SDK\IDCard;glog;..\..\..\Qt\5.15.2\msvc2019\include;..\..\..\Qt\5.15.2\msvc2019\include\QtQuickWidgets;..\..\..\Qt\5.15.2\msvc2019\include\QtQuick;..\..\..\Qt\5.15.2\msvc2019\include\ActiveQt;..\..\..\Qt\5.15.2\msvc2019\include\QtWidgets;..\..\..\Qt\5.15.2\msvc2019\include\QtGui;..\..\..\Qt\5.15.2\msvc2019\include\QtANGLE;..\..\..\Qt\5.15.2\msvc2019\include\QtQmlModels;..\..\..\Qt\5.15.2\msvc2019\include\QtQml;..\..\..\Qt\5.15.2\msvc2019\include\QtNetwork;..\..\..\Qt\5.15.2\msvc2019\include\QtCore;release;.;/include;..\..\..\Qt\5.15.2\msvc2019\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
-      <AssemblerListingLocation>release\</AssemblerListingLocation>
-      <BrowseInformation>false</BrowseInformation>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <ObjectFileName>release\</ObjectFileName>
-      <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;NDEBUG;QT_NO_DEBUG;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessToFile>false</PreprocessToFile>
-      <ProgramDataBaseFileName></ProgramDataBaseFileName>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>D:\Work\SSCard_System\SSCard_System\SDK\IDCard\IDCard_API.lib;D:\Work\SSCard_System\SSCard_System\glog\glog.lib;D:\Work\SSCard_System\SSCard_System\SDK\PinKeybroad\XZ_F10_API.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5QuickWidgets.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Quick.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5AxContainer.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5AxBase.lib;ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Widgets.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Gui.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5QmlModels.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Qml.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Network.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Core.lib;D:\Qt\5.15.2\msvc2019\lib\qtmain.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Work\SSCard_System\SSCard_System\SDK\IDCard;D:\Work\SSCard_System\SSCard_System\glog;D:\Work\SSCard_System\SSCard_System\SDK\PinKeybroad;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
-      <DataExecutionPrevention>true</DataExecutionPrevention>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreImportLibrary>true</IgnoreImportLibrary>
-      <LinkIncremental>false</LinkIncremental>
-      <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>$(OutDir)\SSCard_System.exe</OutputFile>
-      <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>Windows</SubSystem>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-    </Link>
-    <Midl>
-      <DefaultCharType>Unsigned</DefaultCharType>
-      <EnableErrorChecks>None</EnableErrorChecks>
-      <WarningLevel>0</WarningLevel>
-    </Midl>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;NDEBUG;QT_NO_DEBUG;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">
-    <ClCompile>
-      <AdditionalIncludeDirectories>.;SDK\IDCard;glog;..\..\..\Qt\5.15.2\msvc2019\include;..\..\..\Qt\5.15.2\msvc2019\include\QtQuickWidgets;..\..\..\Qt\5.15.2\msvc2019\include\QtQuick;..\..\..\Qt\5.15.2\msvc2019\include\ActiveQt;..\..\..\Qt\5.15.2\msvc2019\include\QtWidgets;..\..\..\Qt\5.15.2\msvc2019\include\QtGui;..\..\..\Qt\5.15.2\msvc2019\include\QtANGLE;..\..\..\Qt\5.15.2\msvc2019\include\QtQmlModels;..\..\..\Qt\5.15.2\msvc2019\include\QtQml;..\..\..\Qt\5.15.2\msvc2019\include\QtNetwork;..\..\..\Qt\5.15.2\msvc2019\include\QtCore;debug;.;/include;..\..\..\Qt\5.15.2\msvc2019\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
-      <AssemblerListingLocation>debug\</AssemblerListingLocation>
-      <BrowseInformation>false</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:\Work\SSCard_System\SSCard_System\SDK\IDCard\IDCard_API.lib;D:\Work\SSCard_System\SSCard_System\glog\glogd.lib;D:\Work\SSCard_System\SSCard_System\SDK\PinKeybroad\XZ_F10_API.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5QuickWidgetsd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Quickd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5AxContainerd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5AxBased.lib;ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Widgetsd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Guid.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5QmlModelsd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Qmld.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Networkd.lib;D:\Qt\5.15.2\msvc2019\lib\Qt5Cored.lib;D:\Qt\5.15.2\msvc2019\lib\qtmaind.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Work\SSCard_System\SSCard_System\SDK\IDCard;D:\Work\SSCard_System\SSCard_System\glog;D:\Work\SSCard_System\SSCard_System\SDK\PinKeybroad;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
-      <DataExecutionPrevention>true</DataExecutionPrevention>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreImportLibrary>true</IgnoreImportLibrary>
-      <OutputFile>$(OutDir)\SSCard_System.exe</OutputFile>
-      <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <Midl>
-      <DefaultCharType>Unsigned</DefaultCharType>
-      <EnableErrorChecks>None</EnableErrorChecks>
-      <WarningLevel>0</WarningLevel>
-    </Midl>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Gloabal.cpp" />

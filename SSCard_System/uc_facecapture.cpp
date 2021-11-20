@@ -42,7 +42,8 @@ int uc_FaceCapture::ProcessBussiness()
     if (QFailed(OpenCamara(strError)))
     {
         gError()<<strError.toLocal8Bit().data();
-        QMessageBox::critical(this,tr("打开摄像机失败"),strError,QMessageBox::Ok);
+        ///QMessageBox::critical(this,tr("打开摄像机失败"),strError,QMessageBox::Ok);
+        emit ShowMaskWidget(strError,Fetal,Return_MainPage);
         return -1;
     }
 	return 0;

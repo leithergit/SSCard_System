@@ -1,4 +1,4 @@
-#ifndef MASKWIDGET_H
+﻿#ifndef MASKWIDGET_H
 #define MASKWIDGET_H
 #pragma execution_character_set("utf-8")
 
@@ -18,14 +18,15 @@ public:
 	explicit MaskWidget(QWidget* parent = nullptr);
 	~MaskWidget();
 	virtual void timerEvent(QTimerEvent* event);
-    void Popup(QString strTitle,MaskStatus nStatus,PageOperation nPage,int nTimeout);
+	void Popup(QString strTitle, int nStatus, int nPage, int nTimeout);
 signals:
-    void MaskTimeout();
+	void MaskTimeout(int nOperationPage);
 private:
 	QString m_strFailedText = "";
 	int m_nTimerID = 0;
 	int m_nTimeout = 0;
-    Ui::MaskWidget* ui;
+	Ui::MaskWidget* ui;
+	int m_nOperatorPage = 0;
 };
 
 #endif // MASKWIDGET_H

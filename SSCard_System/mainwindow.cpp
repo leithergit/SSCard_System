@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget* parent)
 	m_pUpdateCard = new UpdateCard(this);
 	m_pUpdatePassword = new UpdatePassword(this);
 	m_pRegiserLost = new RegisterLost(this);
-    m_pMaskWindow = new MaskWidget(nullptr);
+	m_pMaskWindow = new MaskWidget(this);
 	//m_pOperatorFailed = new OperatorFailed();
 	ui->stackedWidget->addWidget(m_pMainpage);
 	ui->stackedWidget->addWidget(m_pUpdateCard);
@@ -39,11 +39,11 @@ MainWindow::MainWindow(QWidget* parent)
 	*/
 	//setWindowFlags((Qt::WindowFlags)(windowFlags()|Qt::WindowStaysOnTopHint));
 	//setWindowFlags((Qt::WindowFlags)(windowFlags()));
-    //connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
-    connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
-    connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
-    connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
-    connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
+	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
+	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 
 }
 
@@ -122,35 +122,35 @@ void MainWindow::on_pushButton_MainPage_clicked()
 	m_pMainpage->show();
 }
 
-void MainWindow::On_ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nPage)
+void MainWindow::On_ShowMaskWidget(QString strMessage, int nStatus, int nPage)
 {
 	QPoint ptLeftTop = m_pMainpage->mapToGlobal(QPoint(0, 0));
-    m_pMaskWindow->setGeometry(m_pMainpage->geometry());
-    m_pMaskWindow->move(ptLeftTop);
-    int nTimeout = 2;
-    switch (nStatus)
-    {
-    case Success :
-    case Information  :
-        nTimeout = 2;
-        break;
-    case Error        :
-    case Failed       :
-        nTimeout = 5;
-        break;
-    case Fetal:
-        nTimeout = 10;
-
-    }
-    m_pMaskWindow->Popup(strMessage,nStatus,nPage, nTimeout);
-}
-void MainWindow::On_MaskWidgetTimeout()
-{
-    if (m_pMaskWindow)
+	m_pMaskWindow->setGeometry(m_pMainpage->geometry());
+	m_pMaskWindow->move(ptLeftTop);
+	int nTimeout = 2;
+	switch (nStatus)
 	{
-        m_pMaskWindow->hide();
+	case Success:
+	case Information:
+		nTimeout = 2;
+		break;
+	case Error:
+	case Failed:
+		nTimeout = 5;
+		break;
+	case Fetal:
+		nTimeout = 10;
 	}
-	on_pushButton_MainPage_clicked();
+	m_pMaskWindow->Popup(strMessage, (int)nStatus, (int)nPage, nTimeout);
+}
+void MainWindow::On_MaskWidgetTimeout(int nOperation)
+{
+	if (m_pMaskWindow)
+	{
+		m_pMaskWindow->hide();
+	}
+    QMainStackPage *pCurPage = (QMainStackPage *)ui->stackedWidget->currentWidget();
+    pCurPage->emit SwitchNextPage(nOperation);
 }
 
 void MainWindow::timerEvent(QTimerEvent* event)
@@ -161,4 +161,3 @@ void MainWindow::timerEvent(QTimerEvent* event)
 		ui->label_DateTime->setText(tNow.toString("yyyy-MM-dd HH:mm:ss"));
 	}
 }
-

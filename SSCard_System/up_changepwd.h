@@ -20,7 +20,9 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;    
     void    ThreadWork();
-    void    ShutDownDevice();	
+    void    OpenDevice();
+    void    CloseDevice();
+    virtual void ShutDown() override;
     void    ClearPassword();
     int     CheckPassword(QString &strError);
     int     ChangePassword(QString &strError);

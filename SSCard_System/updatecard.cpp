@@ -11,6 +11,8 @@
 #include "uc_adforfinance.h"
 #include "OperatorSucceed.h"
 #include <exception>
+#include "Gloabal.h"
+#include "idcard_api.h"
 using namespace  std;
 
 #define _Stack_Count  (_AdforFinance + 1)
@@ -40,10 +42,10 @@ UpdateCard::UpdateCard(QWidget* parent) :
 		{
 			//connect(ui->stackedWidget->widget(i),SIGNAL(SwitchNextPage),this,SLOT(on_SwitchNextPage));
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
-			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
-            connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
+			//connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}
-
+		connect(this, &QMainStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
 	}
 	catch (exception& e)
 	{

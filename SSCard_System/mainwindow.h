@@ -43,11 +43,11 @@ public:
 	int LoadConfigure(QString& strError);
 
 signals:
-    void ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation);
+    void ShowMaskWidget(QString strMessage,int nStatus,int nOperation);
 
 private slots:
-    void On_ShowMaskWidget(QString,MaskStatus nStatus,PageOperation nPage);
-    void On_MaskWidgetTimeout();
+    void On_ShowMaskWidget(QString,int nStatus,int nPage);
+    void On_MaskWidgetTimeout(int nOperation);
 
 private:
 	Ui::MainWindow* ui;

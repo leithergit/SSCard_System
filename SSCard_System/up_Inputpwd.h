@@ -20,7 +20,7 @@ public:
 	virtual void OnTimeout() override;
 
     void    ThreadWork();
-    void    ShutDownDevice();
+    virtual void  ShutDown() override;
     void    ClearPassword();
 
     uchar   m_szPin[32];

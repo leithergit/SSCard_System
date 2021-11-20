@@ -74,6 +74,11 @@ public:
 			m_pTitle->setStyleSheet(QString::fromUtf8("font: 25 24pt \"Microsoft YaHei UI\";color: rgb(200, 200, 200);"));
 	}
 
+    virtual void    ShutDown()
+    {
+        return ;
+    }
+
 	QLabel* m_pTitle = nullptr;
     int     m_nTimeout = 0;
     int     m_nCountDown = 0;
@@ -85,16 +90,19 @@ public slots:
     // 遮罩层图标状态  0为成功，1为失败，2为警告
     // 遮罩层滞留时间  单位毫秒
     // nNextPages   0 为保留当前页，1为切换下一页，2..3否则为需要跳过的页数,直接当前页+nNextPages页
-    virtual void  OnShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation)
+    virtual void  OnShowMaskWidget(QString strMessage,int nStatus,int nOperation)
     {
+        Q_UNUSED(strMessage);
+        Q_UNUSED(nStatus);
+        Q_UNUSED(nOperation);
         return;
     }
 
 signals:
     void InputPin(char ch);
-    void SwitchNextPage(PageOperation nOperation);
+    void SwitchNextPage(int nOperation);
     void ErrorMessage(QString strMessage);
-    void ShowMaskWidget(QString strMessage,MaskStatus nStatus,PageOperation nOperation);
+    void ShowMaskWidget(QString strMessage,int nStatus,int nOperation);
 
 };
 

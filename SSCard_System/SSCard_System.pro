@@ -119,3 +119,13 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencod
 
 INCLUDEPATH += $$PWD/SDK/QREncode
 DEPENDPATH += $$PWD/SDK/QREncode
+
+win32: LIBS += -L$$PWD/SDK/Printer/ -lKT_Printer
+
+INCLUDEPATH += $$PWD/SDK/Printer
+DEPENDPATH += $$PWD/SDK/Printer
+
+win32: LIBS += -L$$PWD/SDK/Reader/ -lKT_Reader
+
+INCLUDEPATH += $$PWD/SDK/Reader
+DEPENDPATH += $$PWD/SDK/Reader

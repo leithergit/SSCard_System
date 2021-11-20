@@ -23,7 +23,7 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, int nTimeout, QWidget* parent) :
 
 uc_ReadIDCard::~uc_ReadIDCard()
 {
-    ShutDownDevice();
+    ShutDown();
 	delete ui;
 }
 
@@ -31,7 +31,13 @@ uc_ReadIDCard::~uc_ReadIDCard()
 int uc_ReadIDCard::ProcessBussiness()
 {
     m_bSucceed = false;
-    m_pIDCard = make_shared<IDCardInfo>();
+
+    SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+    g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+    IDCardInfoPtr pIDCardInfo = make_shared<IDCardInfo>();
+    g_pDataCenter->SetIDCardInfo(pIDCardInfo);
+
+    m_pIDCard = g_pDataCenter->GetIDCardInfo();
 	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
 	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
     transform(m_strDevPort.begin(),m_strDevPort.end(),m_strDevPort.begin(),::toupper);
@@ -42,10 +48,10 @@ int uc_ReadIDCard::ProcessBussiness()
 
 void uc_ReadIDCard::OnTimeout()
 {
-    ShutDownDevice();
+    ShutDown();
 }
 
-void  uc_ReadIDCard::ShutDownDevice()
+void  uc_ReadIDCard::ShutDown()
 {
     m_bWorkThreadRunning = false;
     if (m_pWorkThread && m_pWorkThread->joinable())
@@ -126,7 +132,9 @@ int uc_ReadIDCard::ReaderIDCard()
 	do
 	{
         if (m_strDevPort == "AUTO" ||!m_strDevPort.size())
+        {
             nResult = OpenReader(nullptr);
+        }
 		else
             nResult = OpenReader(m_strDevPort.c_str());
 		if (m_bSucceed && m_nDelayCount <= 3)
@@ -171,6 +179,7 @@ int uc_ReadIDCard::ReaderIDCard()
         {
             QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto,m_pIDCard->nPhotoSize);
             ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
+            g_pDataCenter->GetSSCardInfo()->strPhotoPath = g_pDataCenter->strIDImageFile;
         }
 
 		m_bSucceed = true;

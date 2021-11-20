@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef KT_READER_H
 #define KT_READER_H
 #include <windows.h>
@@ -6,15 +6,15 @@
 typedef enum ReaderBrand
 {
 	IN_VALID = -1,
-	DC_READER = 1,	//µÂ¿¨¶Á¿¨Æ÷
-	MH_READER,		//Ã÷»ª¶Á¿¨Æ÷
-	HD_READER,		//»ª´ó¶Á¿¨Æ÷
+	DC_READER = 1,	//å¾·å¡è¯»å¡å™¨
+	MH_READER,		//æ˜åè¯»å¡å™¨
+	HD_READER,		//åå¤§è¯»å¡å™¨
 }RT;
 
 typedef enum CardPowerType
 {
-	READER_CONTACT = 1,		//½Ó´¥Ê½
-	READER_UNCONTACT,		//·Ç½ÓÊ½
+	READER_CONTACT = 1,		//æ¥è§¦å¼
+	READER_UNCONTACT,		//éæ¥å¼
 }PowerType;
 
 class KT_Reader
@@ -24,62 +24,62 @@ public:
 	virtual ~KT_Reader() {};
 public:
 	/**
-	 * @brief ´´½¨¶Á¿¨Æ÷ÀàĞÍ,²Î¿¼Ã¶¾ÙReader
-	 * @param[in] ReaderType ¶Á¿¨Æ÷ÀàĞÍ
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief åˆ›å»ºè¯»å¡å™¨ç±»å‹,å‚è€ƒæšä¸¾Reader
+	 * @param[in] ReaderType è¯»å¡å™¨ç±»å‹
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_Create(RT ReaderType, char* resCode) = 0;
 	/**
-	 * @brief ³õÊ¼»¯¶Á¿¨Æ÷¶Ë¿Ú
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief åˆå§‹åŒ–è¯»å¡å™¨ç«¯å£
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_Init(char* resCode) = 0;
 	/**
-	 * @brief ¶Á¿¨Æ÷¶Ë¿ÚÍË³ö
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief è¯»å¡å™¨ç«¯å£é€€å‡º
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_Exit(char* resCode) = 0;
 	/**
-	 * @brief ÉÏµç²Ù×÷
-	 * @param[in] Type ÉÏµçÀàĞÍ,½Ó´¥or·Ç½Ó
-	 * @param[out] CardAtr ATRÊı¾İ
-	 * @param[out] AtrLen  ATRÊı¾İ³¤¶È
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief ä¸Šç”µæ“ä½œ
+	 * @param[in] Type ä¸Šç”µç±»å‹,æ¥è§¦oréæ¥
+	 * @param[out] CardAtr ATRæ•°æ®
+	 * @param[out] AtrLen  ATRæ•°æ®é•¿åº¦
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_PowerOn(PowerType Type, char* CardAtr,int &AtrLen,char* resCode) = 0;
 	/**
-	 * @brief ÏÂµç²Ù×÷
-	 * @param[in] Type ÏÂµçÀàĞÍ,½Ó´¥or·Ç½Ó
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief ä¸‹ç”µæ“ä½œ
+	 * @param[in] Type ä¸‹ç”µç±»å‹,æ¥è§¦oréæ¥
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_PowerOff(PowerType Type,char* resCode) = 0;
 	/**
-	 * @brief Ö´ĞĞÃüÁî²Ù×÷
-	 * @param[in] Cmd ·¢ËÍÃüÁî²ÎÊı
-	 * @param[in] CmdLen ·¢ËÍµÄÃüÁî³¤¶È
-	 * @param[out] OutData ·µ»ØµÄÊı¾İ
-	 * @param[out] OutLen ·µ»ØµÄÊı¾İ³¤¶È
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief æ‰§è¡Œå‘½ä»¤æ“ä½œ
+	 * @param[in] Cmd å‘é€å‘½ä»¤å‚æ•°
+	 * @param[in] CmdLen å‘é€çš„å‘½ä»¤é•¿åº¦
+	 * @param[out] OutData è¿”å›çš„æ•°æ®
+	 * @param[out] OutLen è¿”å›çš„æ•°æ®é•¿åº¦
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_APDU(BYTE* Cmd, int CmdLen, char* OutData, int &OutLen, char* resCode) = 0;
 	/**
-	 * @brief ¶Á¿¨Æ÷·äÃù
-	 * @param[in] TimeOut ³¬Ê±Ê±¼ä
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief è¯»å¡å™¨èœ‚é¸£
+	 * @param[in] TimeOut è¶…æ—¶æ—¶é—´
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_Beep(int TimeOut, char* resCode) { return 0;}
 	/**
-	 * @brief »ñÈ¡¶Á¿¨Æ÷°æ±¾ĞÅÏ¢
-	 * @param[out] Version ·µ»ØµÄ°æ±¾ĞÅÏ¢
-	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
-	 * @return 0:³É¹¦ 1:Ê§°Ü
+	 * @brief è·å–è¯»å¡å™¨ç‰ˆæœ¬ä¿¡æ¯
+	 * @param[out] Version è¿”å›çš„ç‰ˆæœ¬ä¿¡æ¯
+	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
+	 * @return 0:æˆåŠŸ 1:å¤±è´¥
 	 */
 	virtual int Reader_GetVersion(char* Version, char* resCode) { return 0;}
 };

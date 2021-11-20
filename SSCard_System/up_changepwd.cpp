@@ -18,7 +18,7 @@ up_ChangePWD::up_ChangePWD(QLabel* pTitle, int nTimeout, QWidget* parent) :
 
 up_ChangePWD::~up_ChangePWD()
 {
-    ShutDownDevice();
+    ShutDown();
 	delete ui;
 }
 
@@ -99,10 +99,10 @@ int up_ChangePWD::ProcessBussiness()
 
 void up_ChangePWD::OnTimeout()
 {
-    ShutDownDevice();
+    ShutDown();
 }
 
-void  up_ChangePWD::ShutDownDevice()
+void  up_ChangePWD::ShutDown()
 {
     m_bWorkThreadRunning = false;
     if (m_pWorkThread && m_pWorkThread->joinable())

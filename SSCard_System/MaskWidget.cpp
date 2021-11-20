@@ -19,7 +19,7 @@ MaskWidget::~MaskWidget()
 	delete ui;
 }
 
-void MaskWidget::Popup(QString strTitle, MaskStatus nStatus, PageOperation nPage, int nTimeout)
+void MaskWidget::Popup(QString strTitle, int nStatus, int nPage, int nTimeout)
 {
 	setWindowOpacity(0.8);
     switch (nStatus)    // 设置相应图标
@@ -38,8 +38,7 @@ void MaskWidget::Popup(QString strTitle, MaskStatus nStatus, PageOperation nPage
 		break;
 	}
 
-	show();
-	setFocus();
+
 	//   以下代码为下设置全屏遮罩，暂弃用
 	//    QPoint pos = QWidget::mapToGlobal(this->pos()); //获取窗口在桌面上的绝对位置
 	//    qDebug("Pos = (%d,%d)",pos.x(),pos.y());
@@ -53,9 +52,12 @@ void MaskWidget::Popup(QString strTitle, MaskStatus nStatus, PageOperation nPage
 	//        qDebug()<<"Get Screen Succeed.";
 	//    }
 	//    this->setGeometry(pScreen->geometry());
-	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
+    setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
+    show();
+    setFocus();
+    m_nTimeout = nTimeout;
 	m_nTimerID = startTimer(1000);
-	m_nTimeout = nTimeout;
+
 	ui->label_FailedText->setText(strTitle);
 
 }
@@ -69,7 +71,7 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 		{
 			killTimer(m_nTimerID);
 			m_nTimerID = 0;
-			emit MaskTimeout();
+            emit MaskTimeout(m_nOperatorPage);
 		}
 	}
 }

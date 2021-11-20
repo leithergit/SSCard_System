@@ -6,7 +6,6 @@
 #include "qstackpage.h"
 #include "./SDK/IDCard/idcard_api.h"
 
-
 namespace Ui {
 	class ReadIDCard;
 }
@@ -27,7 +26,7 @@ public:
     int     GetIDImageStorePath(string &strFilePath);
     int     ReaderIDCard();
 	void    ThreadWork();
-    void    ShutDownDevice();
+    void    ShutDown() override;
 	string  m_strDevPort;
 	ushort  m_nBaudreate = 9600;
 

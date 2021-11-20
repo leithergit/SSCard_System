@@ -17,12 +17,16 @@
 #include <QDateTime>
 #include <Windows.h>
 #include <winreg.h>
+#include <string>
+#include <algorithm>
 
 #include "SDK/IDCard/idcard_api.h"
 #include "SDK/PinKeybroad/XZ_F10_API.h"
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
 #include "../utility/AutoLock.h"
+#include "../SDK/Printer/KT_Printer.h"
+#include "../SDK/Reader/KT_Reader.h"
 
 
 #include "logging.h"
@@ -31,6 +35,7 @@
 using namespace std;
 
 using namespace chrono;
+using namespace Kingaotech;
 
 enum FaceDetectStatus
 {
@@ -41,6 +46,7 @@ enum FaceDetectStatus
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
+#define Str(x)       #x
 struct DeviceConfig
 {
 	DeviceConfig(QSettings* pSettings)
@@ -50,6 +56,28 @@ struct DeviceConfig
 		gInfo() << "Try to read device configure";
 		pSettings->beginGroup("Device");
 		strPrinter = pSettings->value("Printer").toString().toStdString();
+        strPrinterType = pSettings->value("PrinterType").toString().toStdString();
+        transform(strPrinterType.begin(),strPrinterType.end(),strPrinterType.begin(),::toupper);
+        const char* szTypeList[] = {
+            Str(EVOLIS_KC200),
+            Str(EVOLIS_ZENIUS),
+            Str(EVOLIS_AVANSIA),
+            Str(HITI_CS200),
+            Str(HITI_CS220),
+            Str(HITI_CS290),
+            Str(ENTRUCT_EM1),
+            Str(ENTRUCT_EM2),
+            Str(ENTRUCT_CD809)
+        };
+        for (int nIndex = 0;nIndex < sizeof (szTypeList)/sizeof(char*);nIndex ++)
+        {
+            if (strPrinterType == szTypeList[nIndex])
+            {
+                nPrinterType = (Printer)nIndex;
+                break;
+            }
+        }
+
 		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
 		PinKeybroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
 		nPinKeybroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
@@ -68,6 +96,8 @@ struct DeviceConfig
 		pSettings->endGroup();
 	}
 	string		strPrinter;							   // 打印机名
+    Printer     nPrinterType;                          // 打印机型号代码
+    string      strPrinterType;                        // 打印机型号名
 	string		strDPI;								   // 打印机DPI，300*300,300*600
 	string		PinKeybroadPort;					   // 密码键盘串口和波特率
 	string		nPinKeybroadBaudrate;				   // 9600
@@ -139,7 +169,7 @@ struct CardForm
         sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%f|%f|%d", &posImage.fxPos, &posImage.fyPos, &posImage.fWidth, &posImage.fHeight, &posImage.nAngle);
 
 		strTemp = pSettings->value("NamePOS").toString();
-        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posName.fxPos, &posName.fyPos, &posImage.nAngle);
+        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posName.fxPos, &posName.fyPos, &posName.nAngle);
 
 		strTemp = pSettings->value("IDPOS").toString();
         sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIDNumber.fxPos, &posIDNumber.fyPos, &posIDNumber.nAngle);
@@ -216,8 +246,24 @@ struct SysConfig
     int             nMobilePhoneSize = 11;            // 手机号码长度
     int             nSSCardPasswordSize = 6;          // 社保卡密码长度
 };
-
 using SysConfigPtr  = shared_ptr<SysConfig>;
+
+struct SSCardInfo
+{
+    string  strName;
+    string  strIDNumber;
+    string  strSSCardNumber;
+    string  strIssuedDate;
+    string  strPhotoPath;
+    string  strBank;
+    string  strStatus;
+    void GetInfoFromIDCard(IDCardInfoPtr &pIDCardInfo)
+    {
+        strName      = (const char *)pIDCardInfo->szName;
+        strIDNumber  = (const char *)pIDCardInfo->szIdentify;
+    }
+};
+using SSCardInfoPtr = shared_ptr<SSCardInfo>;
 
 class DataCenter
 {
@@ -232,6 +278,7 @@ public:
     {
         pIDCard = pCardInfo;
     }
+
 	int LoadSysConfigure(QString& strError);
 
 	SysConfigPtr& GetSysConfigure()
@@ -250,7 +297,26 @@ public:
         strSSCardOldPassword = "";
         strSSCardNewPassword = "";
         pIDCard.reset();
+        pSSCardInfo.reset();
     }
+    SSCardInfoPtr &GetSSCardInfo()
+    {
+        return pSSCardInfo;
+    }
+    void FillSSCardWithIDCard()
+    {
+        if (pSSCardInfo && pIDCard)
+        {
+            pSSCardInfo->strName      = (const char *)pIDCard->szName;
+            pSSCardInfo->strIDNumber  = (const char *)pIDCard->szIdentify;
+        }
+    }
+
+    void SetSSCardInfo(SSCardInfoPtr& pCardInfo)
+    {
+        pSSCardInfo = pCardInfo;
+    }
+
     string         strIDImageFile;
     string         strMobilePhone;
     string         strSSCardOldPassword;
@@ -259,6 +325,7 @@ private:
     IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
+    SSCardInfoPtr   pSSCardInfo = nullptr;
 
 };
 

@@ -26,14 +26,18 @@ int uc_EnsureInformation::ProcessBussiness()
         return -1;
     }
 
-    if (QSucceed(QueryRegisterLost(strMessage)))
+    if (QFailed(QueryRegisterLost(strMessage)))
     {
         gError()<<strMessage.toLocal8Bit().data();
         emit ShowMaskWidget(strMessage,Fetal,Stay_CurrentPage);
         return -1;
     }
 
-
+    SSCardInfoPtr &pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+    ui->label_Hello->setText(QString("您好，%1").arg(pSSCardInfo->strName.c_str()));
+    ui->label_SSCard->setText(QString("社保卡号:%1").arg(pSSCardInfo->strSSCardNumber.c_str()));
+    ui->label_Bank->setText(QString("服务银行:%1").arg(pSSCardInfo->strBank.c_str()));
+    ui->label_CardStatus->setText(QString("卡片状态:%1").arg(pSSCardInfo->strStatus.c_str()));
 
 	return 0;
 }
@@ -50,7 +54,12 @@ int uc_EnsureInformation::QueryRegisterLost(QString &strMessage)
 
 int uc_EnsureInformation::ReadSSCardInfo(QString &strError)
 {
-
+#ifdef _DEBUG
+    g_pDataCenter->FillSSCardWithIDCard();
+    g_pDataCenter->GetSSCardInfo()->strSSCardNumber = "H507FE8AX";
+    g_pDataCenter->GetSSCardInfo()->strBank = u8"招商银行";
+    g_pDataCenter->GetSSCardInfo()->strStatus = u8"正常";
+#endif
     return 0;
 }
 

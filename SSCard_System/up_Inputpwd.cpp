@@ -16,7 +16,7 @@ up_InputPWD::up_InputPWD(QLabel* pTitle, int nTimeout, QWidget* parent) :
 
 up_InputPWD::~up_InputPWD()
 {
-    ShutDownDevice();
+    ShutDown();
 	delete ui;
 }
 
@@ -63,10 +63,10 @@ int up_InputPWD::ProcessBussiness()
 
 void up_InputPWD::OnTimeout()
 {
-    ShutDownDevice();
+    ShutDown();
 }
 
-void  up_InputPWD::ShutDownDevice()
+void  up_InputPWD::ShutDown()
 {
     m_bWorkThreadRunning = false;
     if (m_pWorkThread && m_pWorkThread->joinable())

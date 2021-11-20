@@ -13,6 +13,7 @@
 extern DataCenterPtr g_pDataCenter;
 DataCenter::DataCenter()
 {
+    gInfo()<<__FUNCTION__;
 }
 
 DataCenter::~DataCenter()

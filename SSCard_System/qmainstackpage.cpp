@@ -98,7 +98,7 @@ void QMainStackPage::ResetAllPages()
 	}
 }
 
-void QMainStackPage::on_SwitchNextPage(PageOperation nOperation)
+void QMainStackPage::on_SwitchNextPage(int nOperation)
 {
 	if (m_pStackWidget)
 	{
@@ -113,14 +113,17 @@ void QMainStackPage::on_SwitchNextPage(PageOperation nOperation)
             if (m_nTimerID)
                 killTimer(m_nTimerID);
             int nCurIndex = m_pStackWidget->currentIndex();
-            int nNewPage = nCurIndex + nOperation;
+            QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
+            pCurPage->ShutDown();
+
+            int nNewPage = nCurIndex + nOperation - Stay_CurrentPage;
             if (nNewPage < m_pStackWidget->count() - 1)
             {
                 m_pStackWidget->setCurrentIndex(nNewPage);
-                QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
-                pCurPage->ActiveTitle();
-                pCurPage->ProcessBussiness();
-                m_nTimeout = pCurPage->m_nTimeout;
+                QStackPage* pNewPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
+                pNewPage->ActiveTitle();
+                pNewPage->ProcessBussiness();
+                m_nTimeout = pNewPage->m_nTimeout;
                 m_nTimerID = startTimer(1000);
             }
             else

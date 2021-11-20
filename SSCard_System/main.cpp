@@ -4,7 +4,7 @@
 #include <QString>
 #include "Gloabal.h"
 
-DataCenterPtr g_pDataCenter = make_shared<DataCenter>();
+DataCenterPtr g_pDataCenter ;
 
 int main(int argc, char* argv[])
 {
@@ -17,9 +17,8 @@ int main(int argc, char* argv[])
 	google::SetLogFilenameExtension(".log");
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication a(argc, argv);
-	MainWindow w;
 
-	DataCenterPtr g_pDataCenter = make_shared<DataCenter>();
+    g_pDataCenter = make_shared<DataCenter>();
 	if (!g_pDataCenter)
 	{
         gError() << QString("内存不足,初始数据中心失败!").toLocal8Bit().data();
@@ -30,10 +29,18 @@ int main(int argc, char* argv[])
 	{
         gError() << QString("加载系统配置失败:%1").arg(strError).toLocal8Bit().data();
 		return -1;
-	}
+    }
+    if (g_pDataCenter->LoadCardForm(strError))
+    {
+        gError() << QString("加载卡版打印模块失败:%1").arg(strError).toLocal8Bit().data();
+        return -1;
+    }
+
+    MainWindow w;
 	//w.showFullScreen();
 	w.showMaximized();
-	int nRes = a.exec();
+
+    int nRes = a.exec();
 	google::ShutdownGoogleLogging();
 	return nRes;
 }
