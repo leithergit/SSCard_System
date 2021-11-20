@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Form Files">
@@ -64,6 +64,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OperatorSucceed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Payment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\utility\TimeUtility.cpp">
@@ -143,12 +146,15 @@
     <ClInclude Include="Gloabal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="MaskWidget.h">
+    <QtMoc Include="MaskWidget.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="OperatorSucceed.h">
+    </QtMoc>
+    <QtMoc Include="OperatorSucceed.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
+    </QtMoc>
+    <ClInclude Include="Payment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\utility\TimeUtility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -158,313 +164,189 @@
     <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="mainpage.h">
+    <QtMoc Include="mainpage.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="mainwindow.h">
+    </QtMoc>
+    <QtMoc Include="mainwindow.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="qmainstackpage.h">
+    </QtMoc>
+    <QtMoc Include="qmainstackpage.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="qpinkeybroad.h">
+    </QtMoc>
+    <QtMoc Include="qpinkeybroad.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="qstackpage.h">
+    </QtMoc>
+    <QtMoc Include="qstackpage.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="registerlost.h">
+    </QtMoc>
+    <QtMoc Include="registerlost.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="rl_ensureinformation.h">
+    </QtMoc>
+    <QtMoc Include="rl_ensureinformation.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_adforfinance.h">
+    </QtMoc>
+    <QtMoc Include="uc_adforfinance.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_ensureinformation.h">
+    </QtMoc>
+    <QtMoc Include="uc_ensureinformation.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_facecapture.h">
+    </QtMoc>
+    <QtMoc Include="uc_facecapture.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_inputmobile.h">
+    </QtMoc>
+    <QtMoc Include="uc_inputmobile.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_makecard.h">
+    </QtMoc>
+    <QtMoc Include="uc_makecard.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_pay.h">
+    </QtMoc>
+    <QtMoc Include="uc_pay.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_readidcard.h">
+    </QtMoc>
+    <QtMoc Include="uc_readidcard.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="up_Inputpwd.h">
+    </QtMoc>
+    <QtMoc Include="up_Inputpwd.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="up_changepwd.h">
+    </QtMoc>
+    <QtMoc Include="up_changepwd.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="up_readsscard.h">
+    </QtMoc>
+    <QtMoc Include="up_readsscard.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="updatecard.h">
+    </QtMoc>
+    <QtMoc Include="updatecard.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="updatepassword.h">
+    </QtMoc>
+    <QtMoc Include="updatepassword.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="debug\moc_MaskWidget.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_MaskWidget.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_OperatorSucceed.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_OperatorSucceed.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_mainpage.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_mainpage.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_mainwindow.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_mainwindow.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
+    
+    
+    
+    
+    
+    
+    
+    
     <CustomBuild Include="debug\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
     </CustomBuild>
     <CustomBuild Include="release\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
     </CustomBuild>
-    <ClCompile Include="debug\moc_qmainstackpage.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_qmainstackpage.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_qpinkeybroad.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_qpinkeybroad.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_qstackpage.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_qstackpage.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_registerlost.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_registerlost.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_rl_ensureinformation.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_rl_ensureinformation.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_adforfinance.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_adforfinance.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_ensureinformation.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_ensureinformation.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_facecapture.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_facecapture.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_inputmobile.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_inputmobile.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_makecard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_makecard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_pay.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_pay.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_uc_readidcard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_uc_readidcard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_up_Inputpwd.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_up_Inputpwd.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_up_changepwd.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_up_changepwd.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_up_readsscard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_up_readsscard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_updatecard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_updatecard.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\moc_updatepassword.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\moc_updatepassword.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\qrc_Image.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="release\qrc_Image.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClInclude Include="ui_MaskWidget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_OperatorSucceed.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_mainpage.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_mainwindow.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_registerlost.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_rl_ensureinformation.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_adforfinance.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_ensureinformation.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_facecapture.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_inputmobile.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_makecard.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_pay.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_uc_readidcard.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_up_Inputpwd.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_up_changepwd.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_up_readsscard.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_updatecard.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_updatepassword.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="MaskWidget.ui">
+    <QtUic Include="MaskWidget.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="OperatorSucceed.ui">
+    </QtUic>
+    <QtUic Include="OperatorSucceed.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="mainpage.ui">
+    </QtUic>
+    <QtUic Include="mainpage.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="mainwindow.ui">
+    </QtUic>
+    <QtUic Include="mainwindow.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="registerlost.ui">
+    </QtUic>
+    <QtUic Include="registerlost.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="rl_ensureinformation.ui">
+    </QtUic>
+    <QtUic Include="rl_ensureinformation.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_adforfinance.ui">
+    </QtUic>
+    <QtUic Include="uc_adforfinance.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_ensureinformation.ui">
+    </QtUic>
+    <QtUic Include="uc_ensureinformation.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_facecapture.ui">
+    </QtUic>
+    <QtUic Include="uc_facecapture.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_inputmobile.ui">
+    </QtUic>
+    <QtUic Include="uc_inputmobile.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_makecard.ui">
+    </QtUic>
+    <QtUic Include="uc_makecard.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_pay.ui">
+    </QtUic>
+    <QtUic Include="uc_pay.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="uc_readidcard.ui">
+    </QtUic>
+    <QtUic Include="uc_readidcard.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="up_Inputpwd.ui">
+    </QtUic>
+    <QtUic Include="up_Inputpwd.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="up_changepwd.ui">
+    </QtUic>
+    <QtUic Include="up_changepwd.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="up_readsscard.ui">
+    </QtUic>
+    <QtUic Include="up_readsscard.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="updatecard.ui">
+    </QtUic>
+    <QtUic Include="updatecard.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="updatepassword.ui">
+    </QtUic>
+    <QtUic Include="updatepassword.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Card1.png">
@@ -482,9 +364,9 @@
     <None Include="Image\Homepage.png">
       <Filter>Resource Files</Filter>
     </None>
-    <CustomBuild Include="Image.qrc">
+    <QtRcc Include="Image.qrc">
       <Filter>Resource Files</Filter>
-    </CustomBuild>
+    </QtRcc>
     <None Include="Image\OK.png">
       <Filter>Resource Files</Filter>
     </None>
