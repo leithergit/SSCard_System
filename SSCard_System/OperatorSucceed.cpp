@@ -2,8 +2,8 @@
 #include "OperatorSucceed.h"
 #include "ui_OperatorSucceed.h"
 
-OperatorSucceed::OperatorSucceed(QLabel* pTitle, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, nTimeout, parent),
+OperatorSucceed::OperatorSucceed(QLabel* pTitle,QString strStepImage, int nTimeout, QWidget* parent) :
+    QStackPage(pTitle,strStepImage,nTimeout, parent),
 	ui(new Ui::OperatorSucceed)
 {
 	ui->setupUi(this);

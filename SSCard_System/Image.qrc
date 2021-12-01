@@ -8,14 +8,41 @@
         <file>Image/todo.png</file>
         <file>Image/Wait_Cursor.png</file>
         <file>Image/backgroud.jpg</file>
-        <file>Image/Card1.png</file>
-        <file>Image/Card2.png</file>
-        <file>Image/Card3.png</file>
-        <file>Image/ChangeCard.png</file>
         <file>Image/Registerlost.png</file>
         <file>Image/banklogo.png</file>
         <file>Image/UpdateCard.png</file>
         <file>Image/qr_wechat1.png</file>
         <file>Image/qr_wechat2.png</file>
+        <file>Image/Countdown.png</file>
+        <file>Image/OP_ReadID.png</file>
+        <file>Image/Bkgrnd.png</file>
+        <file>Image/changepassword1.png</file>
+        <file>Image/changepassword2.png</file>
+        <file>Image/changepassword3.png</file>
+        <file>Image/Registerlost1.png</file>
+        <file>Image/Registerlost2.png</file>
+        <file>Image/updatecard1.png</file>
+        <file>Image/updatecard2.png</file>
+        <file>Image/updatecard3.png</file>
+        <file>Image/updatecard4.png</file>
+        <file>Image/updatecard5.png</file>
+        <file>Image/updatecard6.png</file>
+        <file>Image/zhifubao.png</file>
+        <file>Image/Kingaotech_QR.png</file>
+        <file>Image/InputMobile_BK.png</file>
+        <file>Image/Mobile_Keybroad_BK.png</file>
+        <file>Image/exclamation.png</file>
+        <file>Image/failed.png</file>
+        <file>Image/Success.png</file>
+        <file>Image/ChangePassword.png</file>
+        <file>Image/ChangePassword_Pressed.png</file>
+        <file>Image/ChangePassword_hover.png</file>
+        <file>Image/Registerlost_hover.png</file>
+        <file>Image/Registerlost_Pressed.png</file>
+        <file>Image/UpdateCard_hover.png</file>
+        <file>Image/UpdateCard_Pressed.png</file>
+    </qresource>
+    <qresource prefix="/qt/etc">
+        <file>qt.conf</file>
     </qresource>
 </RCC>

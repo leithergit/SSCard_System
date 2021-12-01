@@ -14,7 +14,7 @@ class up_InputPWD : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit up_InputPWD(QLabel* pTitle, int nTimeout = 30, QWidget* parent = nullptr);
+    explicit up_InputPWD(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
 	~up_InputPWD();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;

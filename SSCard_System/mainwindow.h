@@ -29,7 +29,7 @@ public:
 	UpdateCard* m_pUpdateCard = nullptr;
 	UpdatePassword* m_pUpdatePassword = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
-    MaskWidget* m_pMaskWindow = nullptr;
+	MaskWidget* m_pMaskWindow = nullptr;
 
 	void on_pushButton_Updatecard_clicked();
 
@@ -39,15 +39,16 @@ public:
 
 	void on_pushButton_MainPage_clicked();
 	int m_nDateTimer = 0;
-	virtual void timerEvent(QTimerEvent* event);
+	virtual void timerEvent(QTimerEvent* event) override;
 	int LoadConfigure(QString& strError);
+	//virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
-    void ShowMaskWidget(QString strMessage,int nStatus,int nOperation);
+	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
 
 private slots:
-    void On_ShowMaskWidget(QString,int nStatus,int nPage);
-    void On_MaskWidgetTimeout(int nOperation);
+	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);
+	void On_MaskWidgetTimeout(int nOperation);
 
 private:
 	Ui::MainWindow* ui;

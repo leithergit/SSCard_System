@@ -17,6 +17,10 @@ typedef enum CardPowerType
 	READER_UNCONTACT,		//非接式
 }PowerType;
 
+#ifndef var_UNUSED
+#define var_UNUSED(x) (void)x;
+#endif
+
 class KT_Reader
 {
 public:
@@ -50,14 +54,14 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_PowerOn(PowerType Type, char* CardAtr,int &AtrLen,char* resCode) = 0;
+	virtual int Reader_PowerOn(PowerType Type, char* CardAtr, int& AtrLen, char* resCode) = 0;
 	/**
 	 * @brief 下电操作
 	 * @param[in] Type 下电类型,接触or非接
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_PowerOff(PowerType Type,char* resCode) = 0;
+	virtual int Reader_PowerOff(PowerType Type, char* resCode) = 0;
 	/**
 	 * @brief 执行命令操作
 	 * @param[in] Cmd 发送命令参数
@@ -67,21 +71,21 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_APDU(BYTE* Cmd, int CmdLen, char* OutData, int &OutLen, char* resCode) = 0;
+	virtual int Reader_APDU(BYTE* Cmd, int CmdLen, char* OutData, int& OutLen, char* resCode) = 0;
 	/**
 	 * @brief 读卡器蜂鸣
 	 * @param[in] TimeOut 超时时间
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_Beep(int TimeOut, char* resCode) { return 0;}
+	virtual int Reader_Beep(int TimeOut, char* resCode) { var_UNUSED(TimeOut); var_UNUSED(resCode); return 0; }
 	/**
 	 * @brief 获取读卡器版本信息
 	 * @param[out] Version 返回的版本信息
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_GetVersion(char* Version, char* resCode) { return 0;}
+	virtual int Reader_GetVersion(char* Version, char* resCode) { var_UNUSED(Version); var_UNUSED(resCode); return 0; }
 };
 
 #endif // !KT_READER_H

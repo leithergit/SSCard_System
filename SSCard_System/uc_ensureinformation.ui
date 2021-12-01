@@ -13,7 +13,25 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,3,2,3">
+  <property name="styleSheet">
+   <string notr="true">#EnsureInformation{background-color: #ffffff;}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,3,5,2,3">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
@@ -44,20 +62,41 @@
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="label_Hello">
          <property name="minimumSize">
           <size>
            <width>240</width>
-           <height>40</height>
+           <height>61</height>
           </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>61</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>思源黑体 CN Medium</family>
+           <pointsize>-1</pointsize>
+           <weight>7</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
+          <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
          </property>
          <property name="text">
-          <string>你好,XXX</string>
+          <string>你好,张某某</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -69,12 +108,22 @@ color: rgb(0, 0, 0);</string>
          <property name="minimumSize">
           <size>
            <width>240</width>
-           <height>40</height>
+           <height>61</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>61</height>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
+          <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+background-color: #f6f7fb;</string>
          </property>
          <property name="text">
           <string>当前社保卡号 : A99999999</string>
@@ -89,12 +138,21 @@ color: rgb(0, 0, 0);</string>
          <property name="minimumSize">
           <size>
            <width>240</width>
-           <height>40</height>
+           <height>61</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>61</height>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
+          <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
          </property>
          <property name="text">
           <string>当前服务银行 : 工商银行</string>
@@ -109,12 +167,22 @@ color: rgb(0, 0, 0);</string>
          <property name="minimumSize">
           <size>
            <width>240</width>
-           <height>40</height>
+           <height>61</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>61</height>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
+          <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+background-color: #f6f7fb;</string>
          </property>
          <property name="text">
           <string>卡状态 : 正常</string>
@@ -129,12 +197,21 @@ color: rgb(0, 0, 0);</string>
          <property name="minimumSize">
           <size>
            <width>240</width>
-           <height>40</height>
+           <height>61</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>61</height>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
+          <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
          </property>
          <property name="text">
           <string>是否确定挂失并补换卡？</string>
@@ -162,7 +239,23 @@ color: rgb(0, 0, 0);</string>
     </layout>
    </item>
    <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -180,23 +273,23 @@ color: rgb(0, 0, 0);</string>
       <widget class="QPushButton" name="pushButton_OK">
        <property name="minimumSize">
         <size>
-         <width>400</width>
-         <height>120</height>
+         <width>266</width>
+         <height>101</height>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">image-origin: content;
-image-position: left;
-padding-left: 2px;
-imagerepeat: no-repeat;
-padding-right: 2px;
-font-size: 12px;
-font: 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);
-background-color: rgb(0, 85, 255);</string>
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 25px;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+</string>
        </property>
        <property name="text">
-        <string>确认补换卡</string>
+        <string>确认挂失</string>
        </property>
       </widget>
      </item>

@@ -2,8 +2,8 @@
 #include "uc_adforfinance.h"
 #include "ui_uc_adforfinance.h"
 
-uc_AdforFinance::uc_AdforFinance(QLabel* pTitle, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, nTimeout, parent),
+uc_AdforFinance::uc_AdforFinance(QLabel* pTitle,QString strStepImage, int nTimeout, QWidget* parent) :
+    QStackPage(pTitle,strStepImage, nTimeout, parent),
 	ui(new Ui::AdforFinance)
 {
 	ui->setupUi(this);

@@ -6,15 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1106</width>
-    <height>661</height>
+    <width>1920</width>
+    <height>874</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1920</width>
+    <height>874</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1920</width>
+    <height>874</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(154, 154, 154);</string>
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -22,10 +34,13 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
-       <height>100</height>
+       <width>1085</width>
+       <height>158</height>
       </size>
      </property>
     </spacer>
@@ -46,19 +61,127 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_Image">
+      <widget class="QFrame" name="frame">
        <property name="minimumSize">
         <size>
-         <width>240</width>
-         <height>250</height>
+         <width>888</width>
+         <height>468</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>888</width>
+         <height>468</height>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">border-image: url(:/Image/error.png);</string>
+        <string notr="true">.frame{border-bottom: 5px solid qlineargradient(y0:0, y1:1,stop: 0 white, stop: 1  #ececef);
+border-right: 5px solid qlineargradient(x0:0, x1:1,stop:  0 white, stop: 1 #ececef);}
+
+
+</string>
        </property>
-       <property name="text">
-        <string/>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="label_Image">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>60</y>
+          <width>79</width>
+          <height>79</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>79</width>
+          <height>79</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>79</width>
+          <height>79</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-image: url(:/Image/Success.png);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_Desc">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>320</y>
+          <width>722</width>
+          <height>110</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>722</width>
+          <height>110</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>722</width>
+          <height>110</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>思源黑体 CN Medium</family>
+          <pointsize>-1</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #666666;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;</string>
+        </property>
+        <property name="text">
+         <string>事件原因描述,请在此放置具体的失败原因及释义或错误代码</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_Title">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>80</y>
+          <width>311</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #20b759;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;</string>
+        </property>
+        <property name="text">
+         <string>制卡成功</string>
+        </property>
+       </widget>
       </widget>
      </item>
      <item>
@@ -75,51 +198,6 @@
       </spacer>
      </item>
     </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>100</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_FailedText">
-     <property name="minimumSize">
-      <size>
-       <width>600</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>Microsoft YaHei UI</family>
-       <pointsize>48</pointsize>
-       <weight>3</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(170, 0, 0);</string>
-     </property>
-     <property name="text">
-      <string>失败原因描述,请在此放置具体的失败原因及释义或错误代码</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

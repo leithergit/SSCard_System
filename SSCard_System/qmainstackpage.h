@@ -4,6 +4,8 @@
 #include <QWidget>
 #include "qstackpage.h"
 #include <vector>
+#include <QPaintEvent>
+#include <QPainter>
 using namespace std;
 
 #define     StartPageIndex     (0)
@@ -19,21 +21,28 @@ public:
 	int     m_nCurPageIndex = 0;
 	QWidget* m_pMainWindow = nullptr;
 	QStackedWidget* m_pStackWidget = nullptr;
-	virtual void timerEvent(QTimerEvent* event);
+	virtual void timerEvent(QTimerEvent* event) override;
 	virtual void OnTimerEvent();
-	bool eventFilter(QObject* object, QEvent* event);
+	bool eventFilter(QObject* object, QEvent* event) override;
 	virtual void  ResetAllPages();
+	// 	virtual void paintEvent(QPaintEvent* event) override
+	// 	{
+	// 		QPainter painter(this);
+	// 		painter.setRenderHint(/*QPainter::Antialiasing | */QPainter::TextAntialiasing, true);
+	// 		QWidget::paintEvent(event);
+	// 	}
 
 public slots:
 	void on_pushButton_MainPage_clicked();
-    virtual void on_SwitchNextPage(int nOperation);
-    void On_ShowMaskWidget(QString strMessage,int nStatus,int nOperation)
-    {
-        emit ShowMaskWidget(strMessage,nStatus, nOperation);
-    }
+	virtual void on_SwitchNextPage(int nPageOperation);
+	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
+	{
+		qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nPageOperation;
+		emit ShowMaskWidget(strTitle, strDesc, nStatus, nPageOperation);
+	}
 signals:
-    void ShowMaskWidget(QString strMessage,int nStatus,int nOperation);
-    void SwitchNextPage(int nOperation);
+	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation);
+	void SwitchNextPage(int nOperation);
 };
 
 #endif // QMAINSTACKPAGE_H

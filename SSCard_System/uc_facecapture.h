@@ -14,7 +14,7 @@ class uc_FaceCapture : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_FaceCapture(QLabel* pTitle, int nTimeout = 30, QWidget* parent = nullptr);
+    explicit uc_FaceCapture(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
 	~uc_FaceCapture();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;

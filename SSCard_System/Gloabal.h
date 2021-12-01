@@ -19,6 +19,7 @@
 #include <winreg.h>
 #include <string>
 #include <algorithm>
+#include <QCoreApplication>
 
 #include "SDK/IDCard/idcard_api.h"
 #include "SDK/PinKeybroad/XZ_F10_API.h"
@@ -28,10 +29,16 @@
 #include "../SDK/Printer/KT_Printer.h"
 #include "../SDK/Reader/KT_Reader.h"
 
+//宏定义
+#define __STR2__(x) #x
+#define __STR1__(x) __STR2__(x)
+#define __LOC__ __FILE__ "("__STR1__(__LINE__)")"
+#define Warning(strMessage) message( __LOC__ " Warning: " strMessage)
+
 
 #include "logging.h"
 #define QSucceed(x)      (x == 0)
-#define QFailed(x)       (!x)
+#define QFailed(x)       (x != 0)
 using namespace std;
 
 using namespace chrono;
@@ -39,14 +46,40 @@ using namespace Kingaotech;
 
 enum FaceDetectStatus
 {
-    FD_Succeed,
-    FD_Binocularcamera_OpenFailed,
+	FD_Succeed,
+	FD_Binocularcamera_OpenFailed,
+};
+
+enum MaskStatus
+{
+	Success = 0,
+	Information,
+	Error,
+	Failed,
+	Fetal
+};
+
+enum Page_Function
+{
+	Page_ReaderIDCard,				//读取身份证
+	Page_FaceCapture,				//读取社保卡	
+	Page_EnsureInformation,			//信息确认
+	Page_InputMobile,				//输入手机号码
+	Page_Payment,					//支付页面
+	Page_MakeCard,					//制卡页面	
+	Page_ReadSSCard,				//读取社保卡	
+	Page_InputSSCardPWD,			//输入社保卡密码	
+	Page_ChangeSSCardPWD,			//修改社保卡密码	
+	Page_RegisterLost,				//挂失 / 解挂
+	Page_AdforFinance				//开通金融页面
 };
 
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
 #define Str(x)       #x
+#define gVal(p)      #p<<" = "<<p <<"\t"
+#define gQStr(p)	 #p<<" = "<<p.toLocal8Bit().data()<<"\t"
 struct DeviceConfig
 {
 	DeviceConfig(QSettings* pSettings)
@@ -56,55 +89,93 @@ struct DeviceConfig
 		gInfo() << "Try to read device configure";
 		pSettings->beginGroup("Device");
 		strPrinter = pSettings->value("Printer").toString().toStdString();
-        strPrinterType = pSettings->value("PrinterType").toString().toStdString();
-        transform(strPrinterType.begin(),strPrinterType.end(),strPrinterType.begin(),::toupper);
-        const char* szTypeList[] = {
-            Str(EVOLIS_KC200),
-            Str(EVOLIS_ZENIUS),
-            Str(EVOLIS_AVANSIA),
-            Str(HITI_CS200),
-            Str(HITI_CS220),
-            Str(HITI_CS290),
-            Str(ENTRUCT_EM1),
-            Str(ENTRUCT_EM2),
-            Str(ENTRUCT_CD809)
-        };
-        for (int nIndex = 0;nIndex < sizeof (szTypeList)/sizeof(char*);nIndex ++)
-        {
-            if (strPrinterType == szTypeList[nIndex])
-            {
-                nPrinterType = (Printer)nIndex;
-                break;
-            }
-        }
+		strPrinterType = pSettings->value("PrinterType").toString().toStdString();
+		transform(strPrinterType.begin(), strPrinterType.end(), strPrinterType.begin(), ::toupper);
+		const char* szPrinterTypeList[] =
+		{
+			Str(EVOLIS_KC200),
+			Str(EVOLIS_ZENIUS),
+			Str(EVOLIS_AVANSIA),
+			Str(HITI_CS200),
+			Str(HITI_CS220),
+			Str(HITI_CS290),
+			Str(ENTRUCT_EM1),
+			Str(ENTRUCT_EM2),
+			Str(ENTRUCT_CD809)
+		};
+		int nPrinterIndex = -1;
+		for (auto& var : szPrinterTypeList)
+		{
+			if (strPrinterType == var)
+			{
+				nPrinterType = (Printer)nPrinterIndex;
+				break;
+			}
+			nPrinterIndex++;
+		}
 
 		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
 		PinKeybroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
 		nPinKeybroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
+		nDepenseBox = pSettings->value("DepenseBox", 1).toUInt();
 		strSSCardReadType = pSettings->value("SSCardReadType", "DC").toString().toStdString();
-		nSSCardReaderPowerOnType = pSettings->value("SSCardReaderPowerOnType").toUInt();
+
+		const char* szReaderTypeList[] =
+		{
+			Str(IN_VALID),
+			Str(DC_READER),//德卡读卡器
+			Str(MH_READER),//明华读卡器
+			Str(HD_READER),//华大读卡器
+		};
+		int nReaderIndex = 0;
+		for (auto var : szReaderTypeList)
+		{
+			if (strSSCardReadType == var)
+			{
+				nSSCardReaderType = (ReaderBrand)nIndex;
+				break;
+			}
+			nReaderIndex++;
+		}
+
+		QString strSSCardPowerOnType = pSettings->value("SSCardReaderPowerOnType", "Contact").toString();
+		if (strSSCardPowerOnType == "Contact")
+			nSSCardReaderPowerOnType = READER_CONTACT;
+		else if (strSSCardPowerOnType == "Contactless")
+			nSSCardReaderPowerOnType = READER_UNCONTACT;
+		else
+		{
+			nSSCardReaderPowerOnType = READER_CONTACT;		// 默认为接触式
+		}
+
 		strSSCardReaderPort = pSettings->value("SSCardReaderPORT", "100").toString().toStdString();
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
-		// 		Info() << "Device Cofnigure:\n";
-		// 		Info() << "\t\Printer:" << strPrinter;
-		// 		Info() << "\t\PrinterDPI:" << strPrinter;
-		// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
-		// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
-		// 		Info() << "\t\SSCardReadType:" << strPrinter;
-		// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
-		// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
+		strPrinterModule = pSettings->value("PrinterModule").toString().toStdString();				// 打印机驱动模块名称，如KT_Printer.dll
+		strReaderModule = pSettings->value("ReaderModule").toString().toStdString();				// 读卡器驱动模块名称,如KT_Reader.dll
+			// 		Info() << "Device Cofnigure:\n";
+			// 		Info() << "\t\Printer:" << strPrinter;
+			// 		Info() << "\t\PrinterDPI:" << strPrinter;
+			// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
+			// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
+			// 		Info() << "\t\SSCardReadType:" << strPrinter;
+			// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
+			// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
 		pSettings->endGroup();
 	}
 	string		strPrinter;							   // 打印机名
-    Printer     nPrinterType;                          // 打印机型号代码
-    string      strPrinterType;                        // 打印机型号名
+	Printer     nPrinterType;                          // 打印机型号代码
+	string      strPrinterType;                        // 打印机型号名
+	int			nDepenseBox;						   // 发卡箱号
 	string		strDPI;								   // 打印机DPI，300*300,300*600
 	string		PinKeybroadPort;					   // 密码键盘串口和波特率
 	string		nPinKeybroadBaudrate;				   // 9600
 	string		strSSCardReadType;					   // 读卡器	DC || HD
-	string		nSSCardReaderPowerOnType;			   // 上电方式  1:接触 2 : 非接
+	ReaderBrand nSSCardReaderType;					   // 读卡器类型
+	CardPowerType nSSCardReaderPowerOnType;			   // 上电方式  1:接触 2 : 非接
 	string		strSSCardReaderPort;				   // 读卡器端口 COM1 = 0，COM2 = 1.....USB = 100
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
+	string		strPrinterModule;					   // 打印机驱动模块名称，如KT_Printer.dll
+	string		strReaderModule;					   // 读卡器驱动模块名称,如KT_Reader.dll
 };
 
 struct RegionInfo
@@ -145,7 +216,7 @@ struct TextPosition
 	int			nFontStyle;							   // 字体风格：1-常规；2-粗体；4-斜体；8-黑体
 	float		fxPos;								   // 起始X坐标，单位毫米
 	float		fyPos;								   // 起始Y坐标，单位毫米
-    int			nAngle;								   // 旋转角度
+	int			nAngle;								   // 旋转角度
 };
 
 struct ImagePosition
@@ -166,19 +237,19 @@ struct CardForm
 			return;
 		pSettings->beginGroup("CardForm");
 		QString strTemp = pSettings->value("ImagePOS").toString();
-        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%f|%f|%d", &posImage.fxPos, &posImage.fyPos, &posImage.fWidth, &posImage.fHeight, &posImage.nAngle);
+		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%f|%f|%d", &posImage.fxPos, &posImage.fyPos, &posImage.fWidth, &posImage.fHeight, &posImage.nAngle);
 
 		strTemp = pSettings->value("NamePOS").toString();
-        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posName.fxPos, &posName.fyPos, &posName.nAngle);
+		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posName.fxPos, &posName.fyPos, &posName.nAngle);
 
 		strTemp = pSettings->value("IDPOS").toString();
-        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIDNumber.fxPos, &posIDNumber.fyPos, &posIDNumber.nAngle);
+		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIDNumber.fxPos, &posIDNumber.fyPos, &posIDNumber.nAngle);
 
 		strTemp = pSettings->value("CardNumberPos").toString();
-        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posSSCardID.fxPos, &posSSCardID.fyPos, &posSSCardID.nAngle);
+		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posSSCardID.fxPos, &posSSCardID.fyPos, &posSSCardID.nAngle);
 
 		strTemp = pSettings->value("DatePos").toString();
-        sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIssueDate.fxPos, &posIssueDate.fyPos, &posIssueDate.nAngle);
+		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIssueDate.fxPos, &posIssueDate.fyPos, &posIssueDate.nAngle);
 
 		QByteArray byteFont = pSettings->value("Font").toString().toLatin1();
 
@@ -207,61 +278,84 @@ using CardFormPtr = std::shared_ptr<CardForm>;
 
 struct PaymentOpt
 {
-    PaymentOpt(QSettings* pSettings)
-    {
-        if (!pSettings)
-            return;
-        gInfo() << "Try to read Payment configure";
-        pSettings->beginGroup("Payment");
-        nWaitTime                = pSettings->value("WaitTime").toUInt();
-        nQueryPayResultInterval  = pSettings->value("QueryPayResultInterval").toUInt();
-        nSocketRetryCount        = pSettings->value("SocketRetryCount").toUInt();
-        pSettings->endGroup();
-    }
-    int     nWaitTime = 300;                         // 支付页面等侍时间，单位秒
-    int     nQueryPayResultInterval = 500;            // 支付结构查询时间间隔单 毫秒
-    int     nSocketRetryCount = 5;                    // 网络失败重试次数
+	PaymentOpt(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		gInfo() << "Try to read Payment configure";
+		pSettings->beginGroup("Payment");
+		nWaitTime = pSettings->value("WaitTime").toUInt();
+		nQueryPayResultInterval = pSettings->value("QueryPayResultInterval").toUInt();
+		nSocketRetryCount = pSettings->value("SocketRetryCount").toUInt();
+		pSettings->endGroup();
+	}
+	int     nWaitTime = 300;                         // 支付页面等侍时间，单位秒
+	int     nQueryPayResultInterval = 500;            // 支付结构查询时间间隔单 毫秒
+	int     nSocketRetryCount = 5;                    // 网络失败重试次数
 };
 struct SysConfig
 {
 	SysConfig(QSettings* pSettings)
 		: DevConfig(pSettings)
 		, RegInfo(pSettings)
-        , PaymentConfig(pSettings)
+		, PaymentConfig(pSettings)
 	{
 		pSettings->beginGroup("Other");
-        nBatchMode          = pSettings->value("BATCHMODE").toInt();
-        strDBPath           = pSettings->value("DBPATH").toString().toStdString();
-        dfFaceSimilarity    = pSettings->value("FaceSimilarity").toDouble();
-        nMobilePhoneSize    = pSettings->value("MobilePhoneNumberLength",11).toUInt();
-        nSSCardPasswordSize = pSettings->value("SSCardPasswordLength",6).toUInt();
+		nBatchMode = pSettings->value("BATCHMODE").toInt();
+		strDBPath = pSettings->value("DBPATH").toString().toStdString();
+		dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
+		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
+		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
+		pSettings->endGroup();
+
+		pSettings->beginGroup("PageTimeOut");
+		nPageTimeout[Page_ReaderIDCard] = pSettings->value("ReaderIDCard", 30).toUInt();
+		nPageTimeout[Page_FaceCapture] = pSettings->value("FaceCapture", 30).toUInt();
+		nPageTimeout[Page_EnsureInformation] = pSettings->value("EnsureInformation", 30).toUInt();
+		nPageTimeout[Page_InputMobile] = pSettings->value("InputMobile", 30).toUInt();
+		nPageTimeout[Page_Payment] = pSettings->value("Payment", 300).toUInt();
+		nPageTimeout[Page_MakeCard] = pSettings->value("MakeCard", 300).toUInt();
+		nPageTimeout[Page_ReadSSCard] = pSettings->value("ReadSSCard", 30).toUInt();
+		nPageTimeout[Page_InputSSCardPWD] = pSettings->value("InputSSCardPWD", 30).toUInt();
+		nPageTimeout[Page_ChangeSSCardPWD] = pSettings->value("ChangeSSCardPWD", 30).toUInt();
+		nPageTimeout[Page_RegisterLost] = pSettings->value("RegisterLost", 30).toUInt();
+		pSettings->endGroup();
+
+		pSettings->beginGroup("MaskPageTimeout");
+		nMaskTimeout[Success] = pSettings->value("Success", 1000).toUInt();
+		nMaskTimeout[Information] = pSettings->value("Information", 1000).toUInt();
+		nMaskTimeout[Error] = pSettings->value("Error", 2000).toUInt();
+		nMaskTimeout[Failed] = pSettings->value("Failed", 5000).toUInt();
+		nMaskTimeout[Fetal] = pSettings->value("Fetal", 10000).toUInt();
 		pSettings->endGroup();
 	}
 	DeviceConfig	DevConfig;						  // 设备配置
 	RegionInfo		RegInfo;						  // 区域信息配置
-    PaymentOpt      PaymentConfig;                    // 支付相关设置
+	PaymentOpt      PaymentConfig;                    // 支付相关设置
 	int				nBatchMode = 0;					  // 批量制卡 开启：0    关闭：1
 	string			strDBPath;						  // 数据存储路径
-    double          dfFaceSimilarity;                 // 人脸认别最低相似度
-    int             nMobilePhoneSize = 11;            // 手机号码长度
-    int             nSSCardPasswordSize = 6;          // 社保卡密码长度
+	double          dfFaceSimilarity;                 // 人脸认别最低相似度
+	int             nMobilePhoneSize = 11;            // 手机号码长度
+	int             nSSCardPasswordSize = 6;          // 社保卡密码长度
+	int				nMaskTimeout[5];				  // 各种遮罩层的逗留时间，单位毫秒
+	int				nPageTimeout[16];				  // 各功能页面超时时间，单位秒
 };
-using SysConfigPtr  = shared_ptr<SysConfig>;
+using SysConfigPtr = shared_ptr<SysConfig>;
 
 struct SSCardInfo
 {
-    string  strName;
-    string  strIDNumber;
-    string  strSSCardNumber;
-    string  strIssuedDate;
-    string  strPhotoPath;
-    string  strBank;
-    string  strStatus;
-    void GetInfoFromIDCard(IDCardInfoPtr &pIDCardInfo)
-    {
-        strName      = (const char *)pIDCardInfo->szName;
-        strIDNumber  = (const char *)pIDCardInfo->szIdentify;
-    }
+	string  strName;
+	string  strIDNumber;
+	string  strSSCardNumber;
+	string  strIssuedDate;
+	string  strPhotoPath;
+	string  strBank;
+	string  strStatus;
+	void GetInfoFromIDCard(IDCardInfoPtr& pIDCardInfo)
+	{
+		strName = (const char*)pIDCardInfo->szName;
+		strIDNumber = (const char*)pIDCardInfo->szIdentify;
+	}
 };
 using SSCardInfoPtr = shared_ptr<SSCardInfo>;
 
@@ -270,14 +364,14 @@ class DataCenter
 public:
 	explicit DataCenter();
 	~DataCenter();
-    IDCardInfoPtr& GetIDCardInfo()
+	IDCardInfoPtr& GetIDCardInfo()
 	{
-        return pIDCard;
+		return pIDCard;
 	}
-    void SetIDCardInfo(IDCardInfoPtr& pCardInfo)
-    {
-        pIDCard = pCardInfo;
-    }
+	void SetIDCardInfo(IDCardInfoPtr& pCardInfo)
+	{
+		pIDCard = pCardInfo;
+	}
 
 	int LoadSysConfigure(QString& strError);
 
@@ -289,43 +383,45 @@ public:
 	CardFormPtr& GetCardForm()
 	{
 		return pCardForm;
-    }
-    void ResetIDData()
-    {
-        strMobilePhone = "";
-        strIDImageFile = "";
-        strSSCardOldPassword = "";
-        strSSCardNewPassword = "";
-        pIDCard.reset();
-        pSSCardInfo.reset();
-    }
-    SSCardInfoPtr &GetSSCardInfo()
-    {
-        return pSSCardInfo;
-    }
-    void FillSSCardWithIDCard()
-    {
-        if (pSSCardInfo && pIDCard)
-        {
-            pSSCardInfo->strName      = (const char *)pIDCard->szName;
-            pSSCardInfo->strIDNumber  = (const char *)pIDCard->szIdentify;
-        }
-    }
+	}
+	void ResetIDData()
+	{
+		strMobilePhone = "";
+		strIDImageFile = "";
+		strSSCardOldPassword = "";
+		strSSCardNewPassword = "";
+		pIDCard.reset();
+		pSSCardInfo.reset();
+	}
+	SSCardInfoPtr& GetSSCardInfo()
+	{
+#pragma Warning("读取社保卡信息功能尚未实现，这里只是空函数!")
+		return pSSCardInfo;
+	}
+	void FillSSCardWithIDCard()
+	{
+		if (pSSCardInfo && pIDCard)
+		{
+			pSSCardInfo->strName = (const char*)pIDCard->szName;
+			pSSCardInfo->strIDNumber = (const char*)pIDCard->szIdentify;
+		}
+	}
 
-    void SetSSCardInfo(SSCardInfoPtr& pCardInfo)
-    {
-        pSSCardInfo = pCardInfo;
-    }
+	void SetSSCardInfo(SSCardInfoPtr& pCardInfo)
+	{
+		pSSCardInfo = pCardInfo;
+	}
 
-    string         strIDImageFile;
-    string         strMobilePhone;
-    string         strSSCardOldPassword;
-    string         strSSCardNewPassword;
+	string         strIDImageFile;
+	string         strMobilePhone;
+	string         strSSCardOldPassword;
+	string         strSSCardNewPassword;
+
 private:
-    IDCardInfoPtr	pIDCard = nullptr;
+	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
-    SSCardInfoPtr   pSSCardInfo = nullptr;
+	SSCardInfoPtr   pSSCardInfo = nullptr;
 
 };
 

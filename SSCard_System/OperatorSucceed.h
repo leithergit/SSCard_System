@@ -12,7 +12,7 @@ class OperatorSucceed : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit OperatorSucceed(QLabel* pTitle, int nTimeout = 10, QWidget* parent = nullptr);
+    explicit OperatorSucceed(QLabel* pTitle,QString strStepImage, int nTimeout = 10, QWidget* parent = nullptr);
 	~OperatorSucceed();
 	virtual void OnTimeout() override;
 private:

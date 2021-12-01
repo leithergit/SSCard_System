@@ -13,18 +13,19 @@ class uc_EnsureInformation : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_EnsureInformation(QLabel* pTitle, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit uc_EnsureInformation(QLabel* pTitle, QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
 	~uc_EnsureInformation();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-    // 待完成
-    int    ReadSSCardInfo(QString &strMessage);
-    int    QueryRegisterLost(QString &strMessage);
-    // 待完成
-    int    RegisterLost(QString &strMessage);
-    bool   m_bTestStatus = false;
+	// 待完成
+	int    ReadSSCardInfo(QString& strMessage);
+	int    QueryRegisterLost(QString& strMessage);
+	// 待完成
+	int    RegisterLost(QString& strMessage);
+    bool   m_bTestStatus = false;       // 测试专用变量
+
 private slots:
-    void on_pushButton_OK_clicked();
+	void on_pushButton_OK_clicked();
 
 private:
 	Ui::EnsureInformation* ui;

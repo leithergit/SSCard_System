@@ -48,7 +48,7 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 
 		if (keyEvent->key() == Qt::Key_Return)
 		{
-            on_SwitchNextPage(Switch_NextPage);
+			on_SwitchNextPage(Switch_NextPage);
 			return true;
 		}
 		else if (keyEvent->key() == Qt::Key_Backspace)
@@ -58,9 +58,9 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 		}
 		else if (keyEvent->key() == Qt::Key_Escape)
 		{
-            killTimer(m_nTimerID);
-            QString strMessage = u8"按下ESC键模拟因错误返回主页!";
-            emit ShowMaskWidget(strMessage,Failed,Stay_CurrentPage);
+			killTimer(m_nTimerID);
+			QString strMessage = "按下ESC键模拟因错误返回主页!";
+			emit ShowMaskWidget(strMessage, "", Failed, Stay_CurrentPage);
 
 			return true;
 		}
@@ -92,47 +92,57 @@ void QMainStackPage::ResetAllPages()
 			pCurPage->DisActiveTitle();
 		}
 		m_pStackWidget->setCurrentIndex(StartPageIndex);
+
 		QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
+		pCurPage->ActiveTitle();
 		pCurPage->ProcessBussiness();
 		m_nTimeout = pCurPage->m_nTimeout;
 	}
 }
 
-void QMainStackPage::on_SwitchNextPage(int nOperation)
+void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 {
+	if (nPageOperation < sizeof(g_szPageOperation) / sizeof(char*))
+		gInfo() << __FUNCTION__ << "Operation = " << g_szPageOperation[nPageOperation];
 	if (m_pStackWidget)
 	{
-        switch (nOperation)
-        {
-        case Stay_CurrentPage:
-            break;
-        case Switch_NextPage:
-        case Skip_NextPage:
-        default:
-        {
-            if (m_nTimerID)
-                killTimer(m_nTimerID);
-            int nCurIndex = m_pStackWidget->currentIndex();
-            QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
-            pCurPage->ShutDown();
+		switch (nPageOperation)
+		{
+		case Return_MainPage:
+			((MainWindow*)m_pMainWindow)->on_pushButton_MainPage_clicked();
+			break;
+		case Stay_CurrentPage:
+			break;
+		case Switch_NextPage:
+			[[fallthrough]];
+		case Skip_NextPage:
+			[[fallthrough]];
+		default:
+		{
+			if (m_nTimerID)
+				killTimer(m_nTimerID);
+			int nCurIndex = m_pStackWidget->currentIndex();
+			QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
+			pCurPage->ShutDown();
 
-            int nNewPage = nCurIndex + nOperation - Stay_CurrentPage;
-            if (nNewPage < m_pStackWidget->count() - 1)
-            {
-                m_pStackWidget->setCurrentIndex(nNewPage);
-                QStackPage* pNewPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
-                pNewPage->ActiveTitle();
-                pNewPage->ProcessBussiness();
-                m_nTimeout = pNewPage->m_nTimeout;
-                m_nTimerID = startTimer(1000);
-            }
-            else
-            {
-                ((MainWindow*)m_pMainWindow)->on_pushButton_MainPage_clicked();
-            }
-            break;
-        }
+			int nNewPage = nCurIndex + nPageOperation - Switch_NextPage + 1;
+			gInfo() << __FUNCTION__ << " nNewPage = " << nNewPage;
+			if (nNewPage < m_pStackWidget->count() - 1)
+			{
+				m_pStackWidget->setCurrentIndex(nNewPage);
+				QStackPage* pNewPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
+				pNewPage->ActiveTitle();
+				pNewPage->ProcessBussiness();
+				m_nTimeout = pNewPage->m_nTimeout;
+				m_nTimerID = startTimer(1000);
+			}
+			else
+			{
+				((MainWindow*)m_pMainWindow)->on_pushButton_MainPage_clicked();
+			}
+			break;
+		}
 
-        }
+		}
 	}
 }

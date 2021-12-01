@@ -8,6 +8,10 @@
 #define _KT_PRINT_H_
 #include <windows.h>
 
+#ifndef var_UNUSED
+#define var_UNUSED(x) (void)x;
+#endif
+
 namespace Kingaotech
 {
 	typedef enum class Printer
@@ -57,7 +61,7 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Init(Kingaotech::PT PrinterType,char* resCode) = 0;
+	virtual int Printer_Init(Kingaotech::PT PrinterType, char* resCode) = 0;
 	/**
 	 * @brief 打开打印机
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
@@ -76,14 +80,14 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Reset(int Action,char* resCode) = 0;
+	virtual int Printer_Reset(int Action, char* resCode) = 0;
 	/**
 	 * @brief 获取动态库版本信息
 	 * @param[out] VersionInfo 动态库版本信息
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_GetVersion(char* VersionInfo,char* resCode) = 0;
+	virtual int Printer_GetVersion(char* VersionInfo, char* resCode) = 0;
 	/**
 	 * @brief 打印机发卡
 	 * @prarm[in] BoxNo 卡箱号
@@ -91,7 +95,7 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Dispense(int BoxNo,int CardPos,char* resCode) = 0;
+	virtual int Printer_Dispense(int BoxNo, int CardPos, char* resCode) = 0;
 	/**
 	 * @brief 退卡到出卡口
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
@@ -104,28 +108,28 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Retract(int BoxNo,char* resCode) = 0;
+	virtual int Printer_Retract(int BoxNo, char* resCode) = 0;
 	/**
 	 * @brief 获取卡箱状态
 	 * @param[out] lpBoxInfo 返回卡箱的结构体,见定义
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_BoxStatus(Kingaotech::LPBOXINFO &lpBoxInfo,char* resCode) = 0;
+	virtual int Printer_BoxStatus(Kingaotech::LPBOXINFO& lpBoxInfo, char* resCode) = 0;
 	/**
 	 * @brief 获取打印机状态
 	 * @param[out] lpStatus 返回打印机状态的结构体,见定义
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Status(Kingaotech::LPPRINTERSTATUS &lpStatus,char* resCode) = 0;
+	virtual int Printer_Status(Kingaotech::LPPRINTERSTATUS& lpStatus, char* resCode) = 0;
 	/**
 	 * @brief 打印初始化
 	 * @param[in] SetParam 打印机参数 可为NULL
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_InitPrint(char* SetParam,char* resCode) = 0;
+	virtual int Printer_InitPrint(char* SetParam, char* resCode) = 0;
 	/**
 	 * @brief 初始化图片信息,如有多张,多次调用
 	 *@param[in] ImgPath 图片全路径
@@ -164,13 +168,13 @@ public:
 	 * @param[out] resCode 失败时返回4位错误码，成功时返回"0000"
 	 * @return 0：成功；1：失败
 	 */
-	virtual int Printer_Rotate(int Angle,char* resCode) = 0;
+	virtual int Printer_Rotate(int Angle, char* resCode) = 0;
 	/**
 	 * @brief  关闭休眠
 	 * @param[out] resCode 失败时返回4位错误码，成功时返回"0000"
 	 * @return 0：成功；1：失败
 	 */
-	virtual int Printer_CloseSleepMode(char* resCode) { return 0;}
+	virtual int Printer_CloseSleepMode(char* resCode) { var_UNUSED(resCode); return 0; }
 };
 
 #endif

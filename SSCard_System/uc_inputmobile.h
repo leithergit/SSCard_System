@@ -15,7 +15,7 @@ class uc_InputMobile : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_InputMobile(QLabel* pTitle, int nTimeout = 60, QWidget* parent = nullptr);
+    explicit uc_InputMobile(QLabel* pTitle,QString strStepImage, int nTimeout = 60, QWidget* parent = nullptr);
 	~uc_InputMobile();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;

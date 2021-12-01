@@ -26,18 +26,15 @@ UpdateCard::UpdateCard(QWidget* parent) :
 	try
 	{
 		m_pStackWidget = ui->stackedWidget;
-		// ui->stackedWidget->addWidget(new FailedWindow(nullptr));
-
-		m_pInputMobile = new uc_InputMobile(ui->label_InputMobile);
-		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_ReadCard));
-		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_FaceCompare));
-		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_EnsureInformation));
-		//ui->stackedWidget->addWidget(m_pInputMobile);
-		ui->stackedWidget->addWidget(new uc_InputMobile(ui->label_InputMobile));
-		ui->stackedWidget->addWidget(new uc_Pay(ui->label_Pay));
-		ui->stackedWidget->addWidget(new uc_MakeCard(ui->label_MakeCard));
-		ui->stackedWidget->addWidget(new uc_AdforFinance(nullptr));
-		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr));
+		SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
+		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "updatecard1.png", pSysConfig->nPageTimeout[Page_ReaderIDCard]));
+		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_step, "updatecard2.png", pSysConfig->nPageTimeout[Page_FaceCapture]));
+		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "updatecard3.png", pSysConfig->nPageTimeout[Page_EnsureInformation]));
+		ui->stackedWidget->addWidget(new uc_InputMobile(ui->label_step, "updatecard4.png", pSysConfig->nPageTimeout[Page_InputMobile]));
+		ui->stackedWidget->addWidget(new uc_Pay(ui->label_step, "updatecard5.png", pSysConfig->nPageTimeout[Page_Payment]));
+		ui->stackedWidget->addWidget(new uc_MakeCard(ui->label_step, "updatecard6.png", pSysConfig->nPageTimeout[Page_MakeCard]));
+		ui->stackedWidget->addWidget(new uc_AdforFinance(nullptr, "", pSysConfig->nPageTimeout[Page_AdforFinance]));
+		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, ""));
 		for (int i = 0; i < ui->stackedWidget->count(); i++)
 		{
 			//connect(ui->stackedWidget->widget(i),SIGNAL(SwitchNextPage),this,SLOT(on_SwitchNextPage));

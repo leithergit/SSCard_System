@@ -1,4 +1,4 @@
-#ifndef PAYMENT_H
+﻿#ifndef PAYMENT_H
 #define PAYMENT_H
 #include <QString>
 #include <QImage>

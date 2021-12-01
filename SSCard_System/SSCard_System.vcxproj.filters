@@ -223,74 +223,12 @@
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    
-    
-    
-    
-    
-    
-    
-    
     <CustomBuild Include="debug\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
     </CustomBuild>
     <CustomBuild Include="release\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
     </CustomBuild>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MaskWidget.ui">
@@ -349,18 +287,6 @@
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Image\Card1.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Image\Card2.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Image\Card3.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Image\ChangeCard.png">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Image\Homepage.png">
       <Filter>Resource Files</Filter>
     </None>

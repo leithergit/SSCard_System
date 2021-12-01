@@ -12,7 +12,8 @@ Item {
     height: 900
     Rectangle{
         id: id_bk
-        color: "white"
+        color: "#ffffff"
+
         anchors.fill: parent
 
         Rectangle {

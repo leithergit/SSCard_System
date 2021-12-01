@@ -4,8 +4,8 @@
 #include "Gloabal.h"
 //#include "mainwindow.h"
 
-uc_InputMobile::uc_InputMobile(QLabel* pTitle, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, nTimeout, parent),
+uc_InputMobile::uc_InputMobile(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nTimeout, parent),
 	ui(new Ui::InputMobile)
 {
 	ui->setupUi(this);
@@ -18,8 +18,8 @@ uc_InputMobile::~uc_InputMobile()
 
 int uc_InputMobile::ProcessBussiness()
 {
-    m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
-    m_strMobile = "";
+	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
+	m_strMobile = "";
 	return 0;
 }
 
@@ -131,43 +131,44 @@ void uc_InputMobile::on_pushButton_Backspace_clicked()
 	ui->lineEdit_Mobile->setText(m_strMobile);
 }
 
-int uc_InputMobile::QueryPayResult(QString &strMessage,int &nResult)
+// 查询支付结果
+int uc_InputMobile::QueryPayResult(QString& strMessage, int& nResult)
 {
-    nResult = 0;
+	nResult = 0;
 
-    return 0;
+	return 0;
 }
 
 void uc_InputMobile::on_pushButton_OK_clicked()
 {
-    if (m_strMobile.size() == m_nMobilePhoneSize)
-    {
-        g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
-        QString strMessage;
-        int nResult= 0;
-        if (QFailed(QueryPayResult(strMessage,nResult)))
-        {
-            gInfo()<<strMessage.toLocal8Bit().data();
-            emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
-            return ;
-        }
-        if (QSucceed(nResult))
-        {
-            QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
-            gInfo()<<strInfo.toLocal8Bit().data();
-            emit ShowMaskWidget(strInfo,Success,Skip_NextPage);
-        }
-        else
-        {
-            QString strInfo = "手机号码已确认,稍后请支付补卡费用!";
-            gInfo()<<strInfo.toLocal8Bit().data();
-            emit ShowMaskWidget(strInfo,Success,Switch_NextPage);
-        }
-    }
-    else
-    {
-        QString strInfo = QString("手机号码不足%1位,请输入正确的手机号码!").arg(m_nMobilePhoneSize);
-        gInfo()<<strInfo.toLocal8Bit().data();
-        emit ShowMaskWidget(strInfo,Error,Stay_CurrentPage);
-    }
+	if (m_strMobile.size() == m_nMobilePhoneSize)
+	{
+		g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
+		QString strMessage;
+		int nResult = 0;
+		if (QFailed(QueryPayResult(strMessage, nResult)))
+		{
+			gInfo() << strMessage.toLocal8Bit().data();
+			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			return;
+		}
+		if (QSucceed(nResult))
+		{
+			QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
+			gInfo() << strInfo.toLocal8Bit().data();
+			emit ShowMaskWidget("操作失败", strInfo, Success, Skip_NextPage);
+		}
+		else
+		{
+			QString strInfo = "手机号码已确认,稍后请支付补卡费用!";
+			gInfo() << strInfo.toLocal8Bit().data();
+			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
+		}
+	}
+	else
+	{
+		QString strInfo = QString("手机号码不足%1位,请输入正确的手机号码!").arg(m_nMobilePhoneSize);
+		gInfo() << strInfo.toLocal8Bit().data();
+		emit ShowMaskWidget("输入错误", strInfo, Error, Stay_CurrentPage);
+	}
 }

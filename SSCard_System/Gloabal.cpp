@@ -10,10 +10,11 @@
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 
+
 extern DataCenterPtr g_pDataCenter;
 DataCenter::DataCenter()
 {
-    gInfo()<<__FUNCTION__;
+	gInfo() << __FUNCTION__;
 }
 
 DataCenter::~DataCenter()
@@ -30,14 +31,14 @@ int DataCenter::LoadSysConfigure(QString& strError)
 		QFileInfo fi(strConfigPath);
 		if (!fi.isFile())
 		{
-            strError = QString("加载配置文件失败:%1!").arg(strConfigPath);
+			strError = QString("加载配置文件失败:%1!").arg(strConfigPath);
 			return -1;
 		}
 		QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
 		pConfig = make_shared<SysConfig>(&ConfigIni);
 		if (!pConfig)
 		{
-            strError = "内存不足，无法初始化数据中心!";
+			strError = "内存不足，无法初始化数据中心!";
 			return -1;
 		}
 		return 0;
@@ -47,7 +48,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 	{
 		strError = "Catch an exception:";
 		strError += e.what();
-        gError() << strError.toLatin1().data();
+		gError() << strError.toLatin1().data();
 		return -1;
 	}
 }
@@ -62,14 +63,14 @@ int DataCenter::LoadCardForm(QString& strError)
 		QFileInfo fi(strConfigPath);
 		if (!fi.isFile())
 		{
-            strError = QString("加载卡版打印版式失败:%1!").arg(strConfigPath);
+			strError = QString("加载卡版打印版式失败:%1!").arg(strConfigPath);
 			return -1;
 		}
 		QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
-        pCardForm = make_shared<CardForm>(&ConfigIni);
-        if (!pCardForm)
+		pCardForm = make_shared<CardForm>(&ConfigIni);
+		if (!pCardForm)
 		{
-            strError = "内存不足，无法初始化数据中心!";
+			strError = "内存不足，无法初始化数据中心!";
 			return -1;
 		}
 		return 0;
@@ -79,7 +80,7 @@ int DataCenter::LoadCardForm(QString& strError)
 	{
 		strError = "Catch an exception:";
 		strError += e.what();
-        gError() << strError.toLatin1().data();
+		gError() << strError.toLatin1().data();
 		return -1;
 	}
 }

@@ -15,7 +15,7 @@ class up_ChangePWD : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit up_ChangePWD(QLabel* pTitle, int nTimeout = 30, QWidget* parent = nullptr);
+    explicit up_ChangePWD(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
 	~up_ChangePWD();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;    

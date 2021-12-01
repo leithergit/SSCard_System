@@ -4,6 +4,9 @@
 #include "MaskWidget.h"
 #include "Gloabal.h"
 #include <QMessageBox>
+#include <QPaintEngine>
+#include <QPainter>
+
 #include "qmainstackpage.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -11,8 +14,10 @@ MainWindow::MainWindow(QWidget* parent)
 	, ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	setStyleSheet(QString::fromUtf8("background-image:url(./Image/backgroud.jpg);"));
+	//setStyleSheet(QString::fromUtf8("background-image:url(./Image/backgroud.jpg);"));
 	//setStyleSheet(QString::fromUtf8("background-image:url(D:/Work/Henan_shangqiu/HNBXZM/Image/backgroud.jpg);"));
+	//this->setStyleSheet(QString::fromUtf8(".QMainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
+	this->setStyleSheet(QString::fromUtf8("#MainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
 	//D:\Work\Henan_shangqiu\HNBXZM\Image
 
 	m_nDateTimer = startTimer(1000);
@@ -51,6 +56,13 @@ MainWindow::~MainWindow()
 {
 	delete ui;
 }
+
+// void MainWindow::paintEvent(QPaintEvent* event)
+// {
+//     QPainter painter(this);
+//     painter.setRenderHint(QPainter::Antialiasing, true);
+//     QMainWindow::paintEvent(event);
+// }
 
 int MainWindow::LoadConfigure(QString& strError)
 {
@@ -116,13 +128,14 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 
 void MainWindow::on_pushButton_MainPage_clicked()
 {
+	gInfo() << "Return mainPage!";
 	// 回到主页时需清空所有身份数据
 	g_pDataCenter->ResetIDData();
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
 	m_pMainpage->show();
 }
 
-void MainWindow::On_ShowMaskWidget(QString strMessage, int nStatus, int nPage)
+void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
 {
 	QPoint ptLeftTop = m_pMainpage->mapToGlobal(QPoint(0, 0));
 	m_pMaskWindow->setGeometry(m_pMainpage->geometry());
@@ -131,26 +144,32 @@ void MainWindow::On_ShowMaskWidget(QString strMessage, int nStatus, int nPage)
 	switch (nStatus)
 	{
 	case Success:
+		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Success];
+		[[fallthrough]];
 	case Information:
-		nTimeout = 2;
+		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Information];
 		break;
 	case Error:
+		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Error];
+		[[fallthrough]];
 	case Failed:
-		nTimeout = 5;
+		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Failed];
 		break;
 	case Fetal:
-		nTimeout = 10;
+		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Fetal];
+		break;
 	}
-	m_pMaskWindow->Popup(strMessage, (int)nStatus, (int)nPage, nTimeout);
+	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nPageOperation, nTimeout);
 }
-void MainWindow::On_MaskWidgetTimeout(int nOperation)
+void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 {
+	gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
 	if (m_pMaskWindow)
 	{
 		m_pMaskWindow->hide();
 	}
-    QMainStackPage *pCurPage = (QMainStackPage *)ui->stackedWidget->currentWidget();
-    pCurPage->emit SwitchNextPage(nOperation);
+	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
+	pCurPage->emit SwitchNextPage(nPageOperation);
 }
 
 void MainWindow::timerEvent(QTimerEvent* event)

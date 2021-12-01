@@ -4,7 +4,7 @@
 #include <qdesktopwidget.h>
 #include <QScreen>
 #include<QDebug>
-
+#include "Gloabal.h"
 MaskWidget::MaskWidget(QWidget* parent) :
 	QWidget(parent),
 	ui(new Ui::MaskWidget)
@@ -19,22 +19,31 @@ MaskWidget::~MaskWidget()
 	delete ui;
 }
 
-void MaskWidget::Popup(QString strTitle, int nStatus, int nPage, int nTimeout)
+
+void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPageOpteration, int nTimeout)
 {
+	gInfo() << gQStr(strTitle) << gQStr(strDesc) << gVal(nStatus) << gVal(nPageOpteration) << gVal(nTimeout);
+	QString strImage;
 	setWindowOpacity(0.8);
-    switch (nStatus)    // 设置相应图标
+	m_nPageOpteration = nPageOpteration;
+	switch (nStatus)    // 设置相应图标
 	{
-    case Success:
-        //ui->label_Image->setPixmap();
-        break;
-    default:
-    case Information:
+	case Success:
+		//ui->label_Image->setPixmap();
+
+		strImage = "Success.png";
+		break;
+	default:
+	case Information:
+		strImage = "Success.png";
 		break;
 	case Error:
-		break;
+		strImage = "failed.png";
 	case Failed:
+		strImage = "failed.png";
 		break;
 	case Fetal:
+		strImage = "exclamation.png";
 		break;
 	}
 
@@ -52,13 +61,24 @@ void MaskWidget::Popup(QString strTitle, int nStatus, int nPage, int nTimeout)
 	//        qDebug()<<"Get Screen Succeed.";
 	//    }
 	//    this->setGeometry(pScreen->geometry());
-    setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
-    show();
-    setFocus();
-    m_nTimeout = nTimeout;
-	m_nTimerID = startTimer(1000);
-
-	ui->label_FailedText->setText(strTitle);
+	QString strAppPath = QCoreApplication::applicationDirPath();
+	QString strFullImagePath = QString("%1/image/%2").arg(strAppPath).arg(strImage);
+	qDebug() << "strImagePath = " << strFullImagePath;
+	QFileInfo fi(strFullImagePath);
+	if (!fi.isFile())
+	{
+		qDebug() << strFullImagePath << "not exist!";
+	}
+	QString strMaskImage = QString("border-image: url(%1);").arg(strFullImagePath);
+	gInfo() << gQStr(strMaskImage);
+	ui->label_Image->setStyleSheet(strMaskImage);
+	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
+	show();
+	setFocus();
+	m_nTimeout = nTimeout;
+	m_nTimerID = startTimer(m_nTimerInterval);
+	ui->label_Title->setText(strTitle);
+	ui->label_Desc->setText(strDesc);
 
 }
 
@@ -66,12 +86,12 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() == m_nTimerID)
 	{
-		m_nTimeout--;
+		m_nTimeout -= m_nTimerInterval;
 		if (m_nTimeout <= 0)
 		{
 			killTimer(m_nTimerID);
 			m_nTimerID = 0;
-            emit MaskTimeout(m_nOperatorPage);
+			emit MaskTimeout(m_nPageOpteration);
 		}
 	}
 }

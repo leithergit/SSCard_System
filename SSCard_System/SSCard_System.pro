@@ -112,6 +112,7 @@ DEPENDPATH += $$PWD/glog
 DEFINES += _HAS_STD_BYTE=0
 
 DISTFILES += \
+    Image/Bkgrnd.png \
     qml/SliderPlayer.qml
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencode
