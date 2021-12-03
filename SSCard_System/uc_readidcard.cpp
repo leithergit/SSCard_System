@@ -180,7 +180,7 @@ int uc_ReadIDCard::ReaderIDCard()
 		{
 			QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);
 			ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
-			g_pDataCenter->GetSSCardInfo()->strPhotoPath = g_pDataCenter->strIDImageFile;
+#pragma Warning("社保卡头像需要使用后台数据,不能使用身份证照片！")
 		}
 
 		m_bSucceed = true;

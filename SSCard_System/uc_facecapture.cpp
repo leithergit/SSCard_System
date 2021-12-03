@@ -1,9 +1,11 @@
 ﻿#pragma execution_character_set("utf-8")
+
 #include "uc_facecapture.h"
 #include "ui_uc_facecapture.h"
 #include <QCoreApplication>
 #include <QObject>
 #include "Gloabal.h"
+
 //#include "mainwindow.h"
 
 uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :

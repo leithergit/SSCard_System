@@ -61,7 +61,6 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 			killTimer(m_nTimerID);
 			QString strMessage = "按下ESC键模拟因错误返回主页!";
 			emit ShowMaskWidget(strMessage, "", Failed, Stay_CurrentPage);
-
 			return true;
 		}
 	}

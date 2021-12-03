@@ -1,13 +1,14 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "uc_pay.h"
 #include "ui_uc_pay.h"
-#include "Gloabal.h"
+
 #include <QPainter>
 #include <QImage>
 #include <QString>
 #include <QPixmap>
 #include <QLabel>
 #include "Payment.h"
+#include "Gloabal.h"
 
 //#include "mainwindow.h"
 
@@ -27,30 +28,24 @@ uc_Pay::~uc_Pay()
 
 int uc_Pay::ProcessBussiness()
 {
-    ui->label_PaymentQRCode->setStyleSheet(QString::fromUtf8("border-image: url(:/Image/qr_pay.png);"));
+	ui->label_PaymentQRCode->setStyleSheet(QString::fromUtf8("border-image: url(:/Image/qr_pay.png);"));
 
 	//m_nWaitTime = 300;                         // 支付页面等侍时间，单位秒
 	m_nQueryPayResultInterval = g_pDataCenter->GetSysConfigure()->PaymentConfig.nQueryPayResultInterval;            // 支付结构查询时间间隔单 毫秒
 	m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount;                    // 网络失败重试次数
 	// 这里可能是个耗时的过程，应该需要一个等待画面
 	QString strMessage;
-	//    if (!QFailed(QueryPayResult(strMessage,nResult)))
-	//    {
-	//        emit ShowMaskWidget(strMessage,Fetal,Return_MainPage);
-	//        return -1;
-	//    }
 
-	//    if (QSucceed(nResult))
-	//    {
-	//        emit ShowMaskWidget("支持成功,准备开始制卡",Success,Skip_NextPage);
-	//        return 0;
-	//    }
-
-
-
-		// 获取二维码，并生成图像
+	// 获取二维码，并生成图像
 	QImage QRImage;
-	m_nPayStatus = uc_QueryPayment(strMessage);
+	QString strTitle;
+
+	if (QFailed(uc_QueryPayment(strMessage, m_nPayStatus)))
+	{
+		gError() << gQStr(strMessage);
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
 
 	switch (m_nPayStatus)
 	{
@@ -82,7 +77,7 @@ int uc_Pay::ProcessBussiness()
 	case Pay_Succeed:
 	{
 		gInfo() << strMessage.toLocal8Bit().data();
-        emit ShowMaskWidget("操作成功", "制卡费用已经成功支付,准备制卡", Success, Stay_CurrentPage);
+		emit ShowMaskWidget("操作成功", "制卡费用已经成功支付,准备制卡", Success, Stay_CurrentPage);
 		break;
 	}
 	default:
@@ -97,16 +92,16 @@ int uc_Pay::ProcessBussiness()
 	m_pWorkThread = new std::thread(&uc_Pay::ThreadWork, this);
 	if (!m_pWorkThread)
 	{
-        QString strError = QString("内存不足,创建支付查询线程失败!");
+		QString strError = QString("内存不足,创建支付查询线程失败!");
 		gError() << strError.toLocal8Bit().data();
 		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 		return -1;
 	}
 
+
+
 	return 0;
 }
-
-
 
 int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QImage& QRImage)
 {
@@ -143,7 +138,7 @@ int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QImage& QRImage)
 	return nRespond;
 }
 
-int  uc_Pay::uc_QueryPayment(QString& strMessage)
+int  uc_Pay::uc_QueryPayment(QString& strMessage, int& nPayStatus)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -154,12 +149,17 @@ int  uc_Pay::uc_QueryPayment(QString& strMessage)
 			nRespond = OverSocketFailedCont;
 			break;
 		}
-		nRespond = QueryPayment(strMessage);
+		nRespond = QueryPayment(strMessage, nPayStatus);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
 			strMessage = QString("查询支付结果失败:%1").arg(strMessage);
-			this_thread::sleep_for(chrono::milliseconds(200));
+			int nWaitTimems = 0;
+			while (m_bWorkThreadRunning && nWaitTimems < m_nQueryPayResultInterval)
+			{
+				this_thread::sleep_for(chrono::milliseconds(100));
+				m_nQueryPayResultInterval += 100;
+			}
 		}
 		else
 		{
@@ -171,7 +171,7 @@ int  uc_Pay::uc_QueryPayment(QString& strMessage)
 }
 
 
-int  uc_Pay::uc_ApplyCardReplacement(QString& strMessage)
+int  uc_Pay::uc_ApplyCardReplacement(QString& strMessage, int nStatus)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -181,7 +181,7 @@ int  uc_Pay::uc_ApplyCardReplacement(QString& strMessage)
 			strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
 			return OverSocketFailedCont;
 		}
-		int nRespond = ApplyCardReplacement(strMessage);
+		int nRespond = ApplyCardReplacement(strMessage, nStatus);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
@@ -197,7 +197,7 @@ int  uc_Pay::uc_ApplyCardReplacement(QString& strMessage)
 	return nRespond;
 }
 
-int  uc_Pay::uc_ResgisterPayment(QString& strMessage)
+int  uc_Pay::uc_ResgisterPayment(QString& strMessage, int nStatus)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -207,7 +207,7 @@ int  uc_Pay::uc_ResgisterPayment(QString& strMessage)
 			strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
 			return OverSocketFailedCont;
 		}
-		nRespond = ResgisterPayment(strMessage);
+		nRespond = ResgisterPayment(strMessage, nStatus);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
@@ -224,7 +224,7 @@ int  uc_Pay::uc_ResgisterPayment(QString& strMessage)
 }
 
 
-int   uc_Pay::uc_MarkCard(QString& strMessage)
+int   uc_Pay::uc_MarkCard(QString& strMessage, int nStatus)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -234,7 +234,8 @@ int   uc_Pay::uc_MarkCard(QString& strMessage)
 			strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
 			return OverSocketFailedCont;
 		}
-		nRespond = MarkCard(strMessage);
+		int nStatus = 0;
+		nRespond = MarkCard(strMessage, nStatus);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
@@ -250,7 +251,7 @@ int   uc_Pay::uc_MarkCard(QString& strMessage)
 	return nRespond;
 }
 
-int   uc_Pay::uc_GetDataCard(QString& strMessage)
+int   uc_Pay::uc_GetDataCard(QString& strMessage, SSCardInfoPtr& pSSCardInfo)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -260,7 +261,8 @@ int   uc_Pay::uc_GetDataCard(QString& strMessage)
 			strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
 			return OverSocketFailedCont;
 		}
-		nRespond = GetCardData(strMessage);
+
+		nRespond = GetCardData(strMessage, pSSCardInfo);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
@@ -276,7 +278,7 @@ int   uc_Pay::uc_GetDataCard(QString& strMessage)
 	return nRespond;
 }
 
-int  uc_Pay::uc_CancelMarkCard(QString& strMessage)
+int  uc_Pay::uc_CancelMarkCard(QString& strMessage, int nStatus)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -286,7 +288,7 @@ int  uc_Pay::uc_CancelMarkCard(QString& strMessage)
 			strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
 			return OverSocketFailedCont;
 		}
-		nRespond = CancelMarkCard(strMessage);
+		nRespond = CancelMarkCard(strMessage, nStatus);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
@@ -301,7 +303,7 @@ int  uc_Pay::uc_CancelMarkCard(QString& strMessage)
 	}
 	return nRespond;
 }
-int  uc_Pay::uc_CancelCardReplacement(QString& strMessage)
+int  uc_Pay::uc_CancelCardReplacement(QString& strMessage, int nStatus)
 {
 	int nRespond = -1;
 	while (m_bWorkThreadRunning)
@@ -311,7 +313,8 @@ int  uc_Pay::uc_CancelCardReplacement(QString& strMessage)
 			strMessage = QString("%1网络操作连续失败次超过限定次数,支付流程中断!").arg(__FUNCTION__);
 			return OverSocketFailedCont;
 		}
-		nRespond = CancelCardReplacement(strMessage);
+
+		nRespond = CancelCardReplacement(strMessage, nStatus);
 		if (QFailed(nRespond))
 		{
 			m_nSocketFailedCount++;
@@ -327,14 +330,14 @@ int  uc_Pay::uc_CancelCardReplacement(QString& strMessage)
 	return nRespond;
 }
 
-int uc_Pay::uc_CancelCardment(QString& strMessage)
-{
-	int nResult = uc_CancelMarkCard(strMessage);
-	if (QFailed(nResult))
-		return nResult;
-
-	return uc_CancelCardReplacement(strMessage);
-}
+// int uc_Pay::uc_CancelCardment(QString& strMessage)
+// {
+// 	int nResult = uc_CancelMarkCard(strMessage);
+// 	if (QFailed(nResult))
+// 		return nResult;
+// 
+// 	return uc_CancelCardReplacement(strMessage);
+// }
 
 void uc_Pay::ThreadWork()
 {
@@ -343,6 +346,7 @@ void uc_Pay::ThreadWork()
 	int nResult = 0;
 	QString strMessage;
 	QString strPayUrl;
+	int nStatus = 0;
 
 	while (m_bWorkThreadRunning)
 	{
@@ -353,20 +357,22 @@ void uc_Pay::ThreadWork()
 			{
 				if (m_nPayStatus == Pay_Not)                    // 初始状态为未支付
 				{
-					nResult = QueryPayment(strMessage);         // 查询支付结果
+					nResult = QueryPayment(strMessage, m_nPayStatus);         // 查询支付结果
 					if (m_nPayStatus == Pay_Not)
 					{
 						break;
 					}
 					else if (nResult == Pay_Succeed)
 					{
-						nResult = uc_ApplyCardReplacement(strMessage);     //  申请补换卡
+						nResult = uc_ApplyCardReplacement(strMessage, nStatus);     //  申请补换卡
 						if (QFailed(nResult))
 							break;
+#pragma Warning("需要处理申请被换卡状态")
 
-						nResult = uc_ResgisterPayment(strMessage);          // 缴费登记
+						nResult = uc_ResgisterPayment(strMessage, nStatus);          // 缴费登记
 						if (QFailed(nResult))
 							break;
+#pragma Warning("需要处理缴费登记状态")
 					}
 					else
 						break;
@@ -374,26 +380,30 @@ void uc_Pay::ThreadWork()
 				else
 				{
 					m_nPayStatus = nResult;
-					nResult = uc_ApplyCardReplacement(strMessage);          //  之前已经支付过，只不作缴费登录申请补换卡
+					nResult = uc_ApplyCardReplacement(strMessage, nStatus);          //  之前已经支付过，只不作缴费登录申请补换卡
 					if (QFailed(nResult))
 						break;
+#pragma Warning("需要处理申请被换卡状态")
 				}
 
-				nResult = uc_MarkCard(strMessage);
+				nResult = uc_MarkCard(strMessage, nStatus);
 				if (QFailed(nResult))
 				{
-					nResult = uc_CancelCardment(strMessage);
+					nResult = uc_CancelCardReplacement(strMessage, nStatus);
 					if (QFailed(nResult))
 						break;
 				}
-
-				nResult = uc_GetDataCard(strMessage);
+#pragma Warning("需要处理标注卡状态")
+				SSCardInfoPtr pNewSSCardInfo = make_shared<SSCardInfo>();
+				nResult = uc_GetDataCard(strMessage, pNewSSCardInfo);
 				if (QFailed(nResult))
 				{
-					nResult = uc_CancelCardment(strMessage);
+					nResult = uc_CancelCardReplacement(strMessage, nStatus);
 					if (QFailed(nResult))
 						break;
+#pragma Warning("需要取消补换卡状态")
 				}
+				g_pDataCenter->SetSSCardInfo(pNewSSCardInfo);
 
 			} while (0);
 			tLast = high_resolution_clock::now();
@@ -410,7 +420,7 @@ void uc_Pay::ThreadWork()
 			else if (QFailed(nResult))
 			{
 				gError() << strMessage.toLocal8Bit().data();
-				emit ShowMaskWidget("严重错误", strMessage, Fetal, Return_MainPage);
+				emit ShowMaskWidget("操作失败", strMessage, Failed, Return_MainPage);
 				break;
 			}
 		}
@@ -418,8 +428,6 @@ void uc_Pay::ThreadWork()
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 }
-
-
 
 int  uc_Pay::GetQRCodeStorePath(QString& strFilePath)
 {

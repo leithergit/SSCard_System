@@ -19,10 +19,11 @@ public:
 	virtual void OnTimeout() override;
 	// 待完成
 	int    ReadSSCardInfo(QString& strMessage);
-	int    QueryRegisterLost(QString& strMessage);
+	//int    QueryRegisterLost(QString& strMessage);
+	int	   QuerySSCardStatus(QString& strMessage);
 	// 待完成
-	int    RegisterLost(QString& strMessage);
-    bool   m_bTestStatus = false;       // 测试专用变量
+	int    RegisterLost(QString& strMessage, int& nStatus);
+	bool   m_bTestStatus = false;       // 测试专用变量
 
 private slots:
 	void on_pushButton_OK_clicked();

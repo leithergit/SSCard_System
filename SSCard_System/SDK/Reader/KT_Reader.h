@@ -3,23 +3,19 @@
 #define KT_READER_H
 #include <windows.h>
 
-typedef enum ReaderBrand
+enum ReaderBrand
 {
 	IN_VALID = -1,
 	DC_READER = 1,	//德卡读卡器
 	MH_READER,		//明华读卡器
 	HD_READER,		//华大读卡器
-}RT;
+};
 
-typedef enum CardPowerType
+enum CardPowerType
 {
 	READER_CONTACT = 1,		//接触式
 	READER_UNCONTACT,		//非接式
-}PowerType;
-
-#ifndef var_UNUSED
-#define var_UNUSED(x) (void)x;
-#endif
+};
 
 class KT_Reader
 {
@@ -33,7 +29,7 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_Create(RT ReaderType, char* resCode) = 0;
+	virtual int Reader_Create(ReaderBrand ReaderType, char* resCode) = 0;
 	/**
 	 * @brief 初始化读卡器端口
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
@@ -54,14 +50,14 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_PowerOn(PowerType Type, char* CardAtr, int& AtrLen, char* resCode) = 0;
+	virtual int Reader_PowerOn(CardPowerType Type, char* CardAtr, int& AtrLen, char* resCode) = 0;
 	/**
 	 * @brief 下电操作
 	 * @param[in] Type 下电类型,接触or非接
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_PowerOff(PowerType Type, char* resCode) = 0;
+	virtual int Reader_PowerOff(CardPowerType Type, char* resCode) = 0;
 	/**
 	 * @brief 执行命令操作
 	 * @param[in] Cmd 发送命令参数
@@ -78,14 +74,14 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_Beep(int TimeOut, char* resCode) { var_UNUSED(TimeOut); var_UNUSED(resCode); return 0; }
+	virtual int Reader_Beep(int TimeOut, char* resCode) { return 0; }
 	/**
 	 * @brief 获取读卡器版本信息
 	 * @param[out] Version 返回的版本信息
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_GetVersion(char* Version, char* resCode) { var_UNUSED(Version); var_UNUSED(resCode); return 0; }
+	virtual int Reader_GetVersion(char* Version, char* resCode) { return 0; }
 };
 
 #endif // !KT_READER_H

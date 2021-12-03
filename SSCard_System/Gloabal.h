@@ -1,12 +1,16 @@
 ﻿
 #ifndef GLOABAL_H
 #define GLOABAL_H
+#pragma warning(disable:4100)
+
+#include <Windows.h>
+#include <WinSock2.h>
+
 #pragma execution_character_set("utf-8")
 #include <thread>
 #include <chrono>
 #include <iostream>
 #include <errno.h>
-
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <string>
 #include <QObject>
@@ -15,19 +19,25 @@
 #include <QSettings>
 #include <QFileInfo>
 #include <QDateTime>
-#include <Windows.h>
+
 #include <winreg.h>
 #include <string>
+#include <map>
 #include <algorithm>
 #include <QCoreApplication>
 
-#include "SDK/IDCard/idcard_api.h"
-#include "SDK/PinKeybroad/XZ_F10_API.h"
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
 #include "../utility/AutoLock.h"
 #include "../SDK/Printer/KT_Printer.h"
 #include "../SDK/Reader/KT_Reader.h"
+#include "../SDK/SSCardDriver/SSCardDriver.h"
+#include "../SDK/SSCardHSM/KT_SSCardHSM.h"
+#include "../SDK/SSCardInfo/KT_SSCardInfo.h"
+#include "SDK/IDCard/idcard_api.h"
+#include "SDK/PinKeybroad/XZ_F10_API.h"
+#include "../SDK/libcurl/curl.h"
+
 
 //宏定义
 #define __STR2__(x) #x
@@ -117,7 +127,13 @@ struct DeviceConfig
 		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
 		PinKeybroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
 		nPinKeybroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
-		nDepenseBox = pSettings->value("DepenseBox", 1).toUInt();
+		nDepenseBox = pSettings->value("DepenseBox", 0).toUInt();
+		if (nDepenseBox > 8)
+		{
+			gInfo() << "进卡箱号无效:" << nDepenseBox << ",现重置为0";
+			nDepenseBox = 0;
+		}
+
 		strSSCardReadType = pSettings->value("SSCardReadType", "DC").toString().toStdString();
 
 		const char* szReaderTypeList[] =
@@ -132,7 +148,7 @@ struct DeviceConfig
 		{
 			if (strSSCardReadType == var)
 			{
-				nSSCardReaderType = (ReaderBrand)nIndex;
+				nSSCardReaderType = (ReaderBrand)nReaderIndex;
 				break;
 			}
 			nReaderIndex++;
@@ -191,20 +207,21 @@ struct RegionInfo
 		strLicense = pSettings->value("License").toString().toStdString();
 		strEMURL = pSettings->value("EMURL").toUInt();
 		strCMURL = pSettings->value("CMURL").toString().toStdString();
-
-		// 		_info() << "Region Cofnigure:\n";
-		// 		_info() << "\t\Region:" << strRegionCode;
-		// 		_info() << "\t\Area:" << strArea;
-		// 		_info() << "\t\License:" << strLicense;
-		// 		_info() << "\t\EMURL:" << strEMURL;
-		// 		_info() << "\t\CMURL:" << strCMURL;
+		strCMAccount = pSettings->value("CMAccount", "").toString().toStdString();
+		strCMPassword = pSettings->value("CMPassword", "").toString().toStdString();
+		strAgency = pSettings->value("Agency", "").toString().toStdString();
 		pSettings->endGroup();
 	}
-	string		strRegionCode;						   // 地市编码 410700
-	string		strArea;							   // 区域编码 41070000
-	string		strLicense;							   // LICENSE = STZOLdFrhbc
-	string		strEMURL;							   // 加密机ip http://10.120.6.239:7777/
-	string		strCMURL;							   // 卡管ip   http://10.120.1.18:7001/hnCardService/services/CardService
+	string		strRegionCode;						    // 地市编码 410700
+	string		strArea;							    // 区域编码 41070000
+	string		strLicense;							    // LICENSE = STZOLdFrhbc
+	string		strEMURL;							    // 加密机ip http://10.120.6.239:7777/
+	string		strEMAccount;							// 加密机帐号
+	string		strEMPassword;							// 加密机密码
+	string		strCMURL;							    // 卡管ip   http://10.120.1.18:7001/hnCardService/services/CardService
+	string		strCMAccount;							// 卡管帐号
+	string		strCMPassword;							// 卡管中心密码
+	string		strAgency;								// 经办机构
 };
 
 struct TextPosition
@@ -297,7 +314,7 @@ struct SysConfig
 {
 	SysConfig(QSettings* pSettings)
 		: DevConfig(pSettings)
-		, RegInfo(pSettings)
+		, Region(pSettings)
 		, PaymentConfig(pSettings)
 	{
 		pSettings->beginGroup("Other");
@@ -329,34 +346,34 @@ struct SysConfig
 		nMaskTimeout[Fetal] = pSettings->value("Fetal", 10000).toUInt();
 		pSettings->endGroup();
 	}
-	DeviceConfig	DevConfig;						  // 设备配置
-	RegionInfo		RegInfo;						  // 区域信息配置
-	PaymentOpt      PaymentConfig;                    // 支付相关设置
-	int				nBatchMode = 0;					  // 批量制卡 开启：0    关闭：1
-	string			strDBPath;						  // 数据存储路径
-	double          dfFaceSimilarity;                 // 人脸认别最低相似度
-	int             nMobilePhoneSize = 11;            // 手机号码长度
-	int             nSSCardPasswordSize = 6;          // 社保卡密码长度
-	int				nMaskTimeout[5];				  // 各种遮罩层的逗留时间，单位毫秒
-	int				nPageTimeout[16];				  // 各功能页面超时时间，单位秒
+	DeviceConfig	DevConfig;							// 设备配置
+	RegionInfo		Region;								// 区域信息配置
+	PaymentOpt      PaymentConfig;						// 支付相关设置
+	int				nBatchMode = 0;						// 批量制卡 开启：0    关闭：1
+	string			strDBPath;							// 数据存储路径
+	double          dfFaceSimilarity;					// 人脸认别最低相似度
+	int             nMobilePhoneSize = 11;				// 手机号码长度
+	int             nSSCardPasswordSize = 6;			// 社保卡密码长度
+	int				nMaskTimeout[5];					// 各种遮罩层的逗留时间，单位毫秒
+	int				nPageTimeout[16];					// 各功能页面超时时间，单位秒
 };
 using SysConfigPtr = shared_ptr<SysConfig>;
 
-struct SSCardInfo
-{
-	string  strName;
-	string  strIDNumber;
-	string  strSSCardNumber;
-	string  strIssuedDate;
-	string  strPhotoPath;
-	string  strBank;
-	string  strStatus;
-	void GetInfoFromIDCard(IDCardInfoPtr& pIDCardInfo)
-	{
-		strName = (const char*)pIDCardInfo->szName;
-		strIDNumber = (const char*)pIDCardInfo->szIdentify;
-	}
-};
+// struct SSCardInfo
+// {
+// 	string  strName;
+// 	string  strIDNumber;
+// 	string  strSSCardNumber;
+// 	string  strIssuedDate;
+// 	string  strPhotoPath;
+// 	string  strBank;
+// 	string  strStatus;
+// 	void GetInfoFromIDCard(IDCardInfoPtr& pIDCardInfo)
+// 	{
+// 		strName = (const char*)pIDCardInfo->szName;
+// 		strIDNumber = (const char*)pIDCardInfo->szIdentify;
+// 	}
+// };
 using SSCardInfoPtr = shared_ptr<SSCardInfo>;
 
 class DataCenter
@@ -395,15 +412,14 @@ public:
 	}
 	SSCardInfoPtr& GetSSCardInfo()
 	{
-#pragma Warning("读取社保卡信息功能尚未实现，这里只是空函数!")
 		return pSSCardInfo;
 	}
 	void FillSSCardWithIDCard()
 	{
 		if (pSSCardInfo && pIDCard)
 		{
-			pSSCardInfo->strName = (const char*)pIDCard->szName;
-			pSSCardInfo->strIDNumber = (const char*)pIDCard->szIdentify;
+			strcpy_s(pSSCardInfo->strName, (const char*)pIDCard->szName);
+			//strcpy_s(pSSCardInfo->strIDNumber = (const char*)pIDCard->szIdentify);
 		}
 	}
 
@@ -412,7 +428,35 @@ public:
 		pSSCardInfo = pCardInfo;
 	}
 
+	int GetBankName(string strBankCode, string& strBankName)
+	{
+		auto itFind = strMapBank.find(strBankCode);
+		if (itFind != strMapBank.end())
+		{
+			strBankName = itFind->second;
+			return 0;
+		}
+		else
+		{
+			strBankName = "";
+			return 1;
+		}
+	}
+
+	int GetCardStatus(string& strCardStatus)
+	{
+		if (!pSSCardInfo)
+			return -1;
+		if (strcmp(strupr(pSSCardInfo->strCardStatus), "OK") == 0)
+		{
+			strCardStatus = "正常";
+		}
+		else
+			strCardStatus = pSSCardInfo->strCardStatus;
+		return 0;
+	}
 	string         strIDImageFile;
+	string		   strSSCardPhotoFile;
 	string         strMobilePhone;
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
@@ -422,10 +466,12 @@ private:
 	SysConfigPtr	pConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardInfoPtr   pSSCardInfo = nullptr;
+	std::map<string, string> strMapBank;
 
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
+int SendHttpRequest(char* szUrl, char* szRespond);
 
 #endif // GLOABAL_H

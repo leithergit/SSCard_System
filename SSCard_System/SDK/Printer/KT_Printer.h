@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * @file        KT_Printer.h
  * @author      Pointer
  * @version     10/26/2021
@@ -7,10 +7,6 @@
 #ifndef _KT_PRINT_H_
 #define _KT_PRINT_H_
 #include <windows.h>
-
-#ifndef var_UNUSED
-#define var_UNUSED(x) (void)x;
-#endif
 
 namespace Kingaotech
 {
@@ -27,24 +23,25 @@ namespace Kingaotech
 		ENTRUCT_CD809,
 	}PT;
 
+
 	typedef struct _PRINTERBOX
 	{
-		int Type;			//å¡ç®±ç±»å‹ 0:æœªçŸ¥ï¼Œ1ï¼šå‘å¡ç®±ï¼Œ2ï¼šå›æ”¶ç®±
-		int BoxNumber;		//å¡ç®±å·
-		int BoxStatus;		//å¡ç®±çŠ¶æ€,0ï¼šæ­£å¸¸; 1ï¼šå¡å°‘; 2:æ— å¡; 3ï¼šé«˜(å¿«æ»¡)ï¼›4ï¼šæ»¡ï¼›
+		int Type;			//¿¨ÏäÀàĞÍ 0:Î´Öª£¬1£º·¢¿¨Ïä£¬2£º»ØÊÕÏä
+		int BoxNumber;		//¿¨ÏäºÅ
+		int BoxStatus;		//¿¨Ïä×´Ì¬,0£ºÕı³£; 1£º¿¨ÉÙ; 2:ÎŞ¿¨; 3£º¸ß(¿ìÂú)£»4£ºÂú£»
 	}PRINTERBOXUNIT, * LPPRINTERBOXUNIT;
 
 	typedef struct BOXINFO
 	{
-		int nCount;				//å¡ç®±æ€»ä¸ªæ•°(æ‰€æœ‰å¡ç®±)
-		LPPRINTERBOXUNIT BoxList;		//å¡ç®±ä¿¡æ¯ç»“æ„ä½“æŒ‡é’ˆ
+		int nCount;				//¿¨Ïä×Ü¸öÊı(ËùÓĞ¿¨Ïä)
+		LPPRINTERBOXUNIT BoxList;		//¿¨ÏäĞÅÏ¢½á¹¹ÌåÖ¸Õë
 	}LBOXINFO, * LPBOXINFO;
 
 	typedef struct _PRINTERSTATUS
 	{
-		WORD fwDevice;			//æ‰“å°æœºçŠ¶æ€, 0-Readyï¼›1-Busyï¼›2-Offlineï¼›3-ErrMachineï¼›4-Printing
-		WORD fwMedia;			//ä»‹è´¨çŠ¶æ€ï¼Œ0-æ— å¡ï¼›1-å¡åœ¨é—¨å£ï¼›2-å¡åœ¨å†…éƒ¨ï¼›3-å¡åœ¨ä¸Šç”µä½ï¼Œ4-å¡åœ¨é—¸é—¨å¤–ï¼›5-å µå¡ï¼›6-å¡ç‰‡æœªçŸ¥ï¼ˆæ ¹æ®ç¡¬ä»¶ç‰¹æ€§è¿”å›,å¿…é¡»æ”¯æŒæœ‰æ— å¡æ£€æµ‹ï¼‰
-		WORD fwToner;			//å¹³å°è‰²å¸¦çŠ¶æ€,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
+		WORD fwDevice;			//´òÓ¡»ú×´Ì¬, 0-Ready£»1-Busy£»2-Offline£»3-ErrMachine£»4-Printing
+		WORD fwMedia;			//½éÖÊ×´Ì¬£¬0-ÎŞ¿¨£»1-¿¨ÔÚÃÅ¿Ú£»2-¿¨ÔÚÄÚ²¿£»3-¿¨ÔÚÉÏµçÎ»£¬4-¿¨ÔÚÕ¢ÃÅÍâ£»5-¶Â¿¨£»6-¿¨Æ¬Î´Öª£¨¸ù¾İÓ²¼şÌØĞÔ·µ»Ø,±ØĞëÖ§³ÖÓĞÎŞ¿¨¼ì²â£©
+		WORD fwToner;			//Æ½Ó¡É«´ø×´Ì¬,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
 	}PRINTERSTATUS, * LPPRINTERSTATUS;
 }
 
@@ -56,125 +53,125 @@ public:
 
 public:
 	/**
-	 * @brief åˆå§‹åŒ–æ‰“å°æœº
-	 * @param[in] PrinterType æ‰“å°æœºç±»å‹   Ex: Evolis kc200
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ³õÊ¼»¯´òÓ¡»ú
+	 * @param[in] PrinterType ´òÓ¡»úÀàĞÍ   Ex: Evolis kc200
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_Init(Kingaotech::PT PrinterType, char* resCode) = 0;
+	virtual int Printer_Init(Kingaotech::PT PrinterType,char* resCode) = 0;
 	/**
-	 * @brief æ‰“å¼€æ‰“å°æœº
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ´ò¿ª´òÓ¡»ú
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
 	virtual int Printer_Open(char* resCode) = 0;
 	/**
-	 * @brief å…³é—­æ‰“å°æœº
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ¹Ø±Õ´òÓ¡»ú
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
 	virtual int Printer_Close(char* resCode) = 0;
 	/**
-	 * @brief æ‰“å°æœºå¤ä½
-	 * @param[in] Action 1-å¤ä½å¡ä¿æŒåœ¨è®¾å¤‡å†…ï¼›2-å¤ä½é€€å¡åˆ°æ‰“å°æœºå–å¡ä½ç½®ï¼›3-å¤ä½åå¡åˆ°æ‰“å°æœºå›æ”¶ç®±(è‹¥ç¡¬ä»¶æ”¯æŒéœ€å®ç°)
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ´òÓ¡»ú¸´Î»
+	 * @param[in] Action 1-¸´Î»¿¨±£³ÖÔÚÉè±¸ÄÚ£»2-¸´Î»ÍË¿¨µ½´òÓ¡»úÈ¡¿¨Î»ÖÃ£»3-¸´Î»ÍÌ¿¨µ½´òÓ¡»ú»ØÊÕÏä(ÈôÓ²¼şÖ§³ÖĞèÊµÏÖ)
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_Reset(int Action, char* resCode) = 0;
+	virtual int Printer_Reset(int Action,char* resCode) = 0;
 	/**
-	 * @brief è·å–åŠ¨æ€åº“ç‰ˆæœ¬ä¿¡æ¯
-	 * @param[out] VersionInfo åŠ¨æ€åº“ç‰ˆæœ¬ä¿¡æ¯
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief »ñÈ¡¶¯Ì¬¿â°æ±¾ĞÅÏ¢
+	 * @param[out] VersionInfo ¶¯Ì¬¿â°æ±¾ĞÅÏ¢
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_GetVersion(char* VersionInfo, char* resCode) = 0;
+	virtual int Printer_GetVersion(char* VersionInfo,char* resCode) = 0;
 	/**
-	 * @brief æ‰“å°æœºå‘å¡
-	 * @prarm[in] BoxNo å¡ç®±å·
-	 * @param[in] CardPos å‘å¡ä½ç½® 1-è¯»ç£ä½ï¼›2-æ¥è§¦ICä½;3-éæ¥ICä½;4-æ‰“å°ä½
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ´òÓ¡»ú·¢¿¨
+	 * @prarm[in] BoxNo ¿¨ÏäºÅ
+	 * @param[in] CardPos ·¢¿¨Î»ÖÃ 1-¶Á´ÅÎ»£»2-½Ó´¥ICÎ»;3-·Ç½ÓICÎ»;4-´òÓ¡Î»
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_Dispense(int BoxNo, int CardPos, char* resCode) = 0;
+	virtual int Printer_Dispense(int BoxNo,int CardPos,char* resCode) = 0;
 	/**
-	 * @brief é€€å¡åˆ°å‡ºå¡å£
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ÍË¿¨µ½³ö¿¨¿Ú
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
 	virtual int Printer_Eject(char* resCode) = 0;
 	/**
-	 * @brief æ‰“å°æœºå›æ”¶å¡
-	 * @param BoxNo å›æ”¶å¡å¡ç®±
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ´òÓ¡»ú»ØÊÕ¿¨
+	 * @param BoxNo »ØÊÕ¿¨¿¨Ïä
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_Retract(int BoxNo, char* resCode) = 0;
+	virtual int Printer_Retract(int BoxNo,char* resCode) = 0;
 	/**
-	 * @brief è·å–å¡ç®±çŠ¶æ€
-	 * @param[out] lpBoxInfo è¿”å›å¡ç®±çš„ç»“æ„ä½“,è§å®šä¹‰
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief »ñÈ¡¿¨Ïä×´Ì¬
+	 * @param[out] lpBoxInfo ·µ»Ø¿¨ÏäµÄ½á¹¹Ìå,¼û¶¨Òå
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_BoxStatus(Kingaotech::LPBOXINFO& lpBoxInfo, char* resCode) = 0;
+	virtual int Printer_BoxStatus(Kingaotech::LPBOXINFO &lpBoxInfo,char* resCode) = 0;
 	/**
-	 * @brief è·å–æ‰“å°æœºçŠ¶æ€
-	 * @param[out] lpStatus è¿”å›æ‰“å°æœºçŠ¶æ€çš„ç»“æ„ä½“,è§å®šä¹‰
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief »ñÈ¡´òÓ¡»ú×´Ì¬
+	 * @param[out] lpStatus ·µ»Ø´òÓ¡»ú×´Ì¬µÄ½á¹¹Ìå,¼û¶¨Òå
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_Status(Kingaotech::LPPRINTERSTATUS& lpStatus, char* resCode) = 0;
+	virtual int Printer_Status(Kingaotech::LPPRINTERSTATUS &lpStatus,char* resCode) = 0;
 	/**
-	 * @brief æ‰“å°åˆå§‹åŒ–
-	 * @param[in] SetParam æ‰“å°æœºå‚æ•° å¯ä¸ºNULL
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ´òÓ¡³õÊ¼»¯
+	 * @param[in] SetParam ´òÓ¡»ú²ÎÊı ¿ÉÎªNULL
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Printer_InitPrint(char* SetParam, char* resCode) = 0;
+	virtual int Printer_InitPrint(char* SetParam,char* resCode) = 0;
 	/**
-	 * @brief åˆå§‹åŒ–å›¾ç‰‡ä¿¡æ¯,å¦‚æœ‰å¤šå¼ ,å¤šæ¬¡è°ƒç”¨
-	 *@param[in] ImgPath å›¾ç‰‡å…¨è·¯å¾„
-	 * @param[in] Angle å›¾ç‰‡é¡ºæ—¶é’ˆæ—‹è½¬è§’åº¦
-	 * @param[in] Xpos æ‰“å°Xåæ ‡
-	 * @param[in] Ypos æ‰“å°Yåæ ‡
-	 * @param[in] ImgHeight æ‰“å°é«˜åº¦
-	 * @param[in] ImgWidth æ‰“å°å®½åº¦
-	 * @param[out] resCodeå¤±è´¥æ—¶è¿”å›4ä½é”™è¯¯ç ï¼ŒæˆåŠŸæ—¶è¿”å›"0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ³õÊ¼»¯Í¼Æ¬ĞÅÏ¢,ÈçÓĞ¶àÕÅ,¶à´Îµ÷ÓÃ
+	 *@param[in] ImgPath Í¼Æ¬È«Â·¾¶
+	 * @param[in] Angle Í¼Æ¬Ë³Ê±ÕëĞı×ª½Ç¶È
+	 * @param[in] Xpos ´òÓ¡X×ø±ê
+	 * @param[in] Ypos ´òÓ¡Y×ø±ê
+	 * @param[in] ImgHeight ´òÓ¡¸ß¶È
+	 * @param[in] ImgWidth ´òÓ¡¿í¶È
+	 * @param[out] resCodeÊ§°ÜÊ±·µ»Ø4Î»´íÎóÂë£¬³É¹¦Ê±·µ»Ø"0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
 	virtual int Printer_AddImage(char* ImgPath, int Angle, float Xpos, float Ypos, float ImgHeight, float ImgWidth, char* resCode) = 0;
 	/**
-	 * @brief  é¢„æ‰“å°æ–‡å­—,å¦‚æœ‰å¤šæ¡æ–‡å­—,å¤šæ¬¡è°ƒç”¨
-	 * @param[in] Text æ‰“å°çš„å†…å®¹
-	 * @param[in] Angle é¡ºæ—¶é’ˆæ—‹è½¬è§’åº¦,ç”¨äºæ‰“å°æ°´å¹³æˆ–ç«–ç›´æ–‡å­—
-	 * @param[in] Xpos æ‰“å°Xåæ ‡
-	 * @param[in] Ypos æ‰“å°Yåæ ‡
-	 * @param[in] FontName æ‰“å°å­—ä½“,ä¾‹å¦‚"å®‹ä½“"
-	 * @param[in] FontSize å­—ä½“å¤§å°
-	 * @param[in] FontStyle å­—ä½“é£æ ¼ï¼š1-å¸¸è§„ï¼›2-ç²—ä½“ï¼›4-æ–œä½“ï¼›8-é»‘ä½“
-	 * @param[in] TextColor æ‰“å°å­—ä½“é¢œè‰²,RGBé¢œè‰²å€¼
-	 * @param[out] resRcCode å¤±è´¥æ—¶è¿”å›4ä½é”™è¯¯ç ï¼ŒæˆåŠŸæ—¶è¿”å›"0000"
-	 * @return 0ï¼šæˆåŠŸï¼›1ï¼šå¤±è´¥
+	 * @brief  Ô¤´òÓ¡ÎÄ×Ö,ÈçÓĞ¶àÌõÎÄ×Ö,¶à´Îµ÷ÓÃ
+	 * @param[in] Text ´òÓ¡µÄÄÚÈİ
+	 * @param[in] Angle Ë³Ê±ÕëĞı×ª½Ç¶È,ÓÃÓÚ´òÓ¡Ë®Æ½»òÊúÖ±ÎÄ×Ö
+	 * @param[in] Xpos ´òÓ¡X×ø±ê
+	 * @param[in] Ypos ´òÓ¡Y×ø±ê
+	 * @param[in] FontName ´òÓ¡×ÖÌå,ÀıÈç"ËÎÌå"
+	 * @param[in] FontSize ×ÖÌå´óĞ¡
+	 * @param[in] FontStyle ×ÖÌå·ç¸ñ£º1-³£¹æ£»2-´ÖÌå£»4-Ğ±Ìå£»8-ºÚÌå
+	 * @param[in] TextColor ´òÓ¡×ÖÌåÑÕÉ«,RGBÑÕÉ«Öµ
+	 * @param[out] resRcCode Ê§°ÜÊ±·µ»Ø4Î»´íÎóÂë£¬³É¹¦Ê±·µ»Ø"0000"
+	 * @return 0£º³É¹¦£»1£ºÊ§°Ü
 	 */
 	virtual int Printer_AddText(char* Text, int Angle, float Xpos, float Ypos, char* FontName, int FontSize, int FontStyle, int TextColor, char* resRcCode) = 0;
 	/**
-	 * @brief  æäº¤ä»»åŠ¡,å¼€å§‹æ‰“å°
-	 * @param[out] resCode å¤±è´¥æ—¶è¿”å›4ä½é”™è¯¯ç ï¼ŒæˆåŠŸæ—¶è¿”å›"0000"
-	 * @return 0ï¼šæˆåŠŸï¼›1ï¼šå¤±è´¥
+	 * @brief  Ìá½»ÈÎÎñ,¿ªÊ¼´òÓ¡
+	 * @param[out] resCode Ê§°ÜÊ±·µ»Ø4Î»´íÎóÂë£¬³É¹¦Ê±·µ»Ø"0000"
+	 * @return 0£º³É¹¦£»1£ºÊ§°Ü
 	 */
 	virtual int Printer_StartPrint(char* resCode) = 0;
 	/**
-	 * @brief  ç¿»è½¬å¡ç‰‡
-	 * @param[in] nAngle æ—‹è½¬è§’åº¦,ä¸€èˆ¬åªæ”¯æŒ180åº¦ç¿»è½¬å¡ç‰‡
-	 * @param[out] resCode å¤±è´¥æ—¶è¿”å›4ä½é”™è¯¯ç ï¼ŒæˆåŠŸæ—¶è¿”å›"0000"
-	 * @return 0ï¼šæˆåŠŸï¼›1ï¼šå¤±è´¥
+	 * @brief  ·­×ª¿¨Æ¬
+	 * @param[in] nAngle Ğı×ª½Ç¶È,Ò»°ãÖ»Ö§³Ö180¶È·­×ª¿¨Æ¬
+	 * @param[out] resCode Ê§°ÜÊ±·µ»Ø4Î»´íÎóÂë£¬³É¹¦Ê±·µ»Ø"0000"
+	 * @return 0£º³É¹¦£»1£ºÊ§°Ü
 	 */
-	virtual int Printer_Rotate(int Angle, char* resCode) = 0;
+	virtual int Printer_Rotate(int Angle,char* resCode) = 0;
 	/**
-	 * @brief  å…³é—­ä¼‘çœ 
-	 * @param[out] resCode å¤±è´¥æ—¶è¿”å›4ä½é”™è¯¯ç ï¼ŒæˆåŠŸæ—¶è¿”å›"0000"
-	 * @return 0ï¼šæˆåŠŸï¼›1ï¼šå¤±è´¥
+	 * @brief  ¹Ø±ÕĞİÃß
+	 * @param[out] resCode Ê§°ÜÊ±·µ»Ø4Î»´íÎóÂë£¬³É¹¦Ê±·µ»Ø"0000"
+	 * @return 0£º³É¹¦£»1£ºÊ§°Ü
 	 */
-	virtual int Printer_CloseSleepMode(char* resCode) { var_UNUSED(resCode); return 0; }
+	virtual int Printer_CloseSleepMode(char* resCode) { return 0;}
 };
 
 #endif

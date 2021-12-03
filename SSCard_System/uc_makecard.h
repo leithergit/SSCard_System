@@ -3,10 +3,9 @@
 #pragma execution_character_set("utf-8")
 #include <QWidget>
 #include "qstackpage.h"
-#include "./SDK/Printer/KT_Printer.h"
-#include "./SDK/Reader/KT_Reader.h"
+
 #include <QCoreApplication>
-#include <QtDebug>
+#include <QDebug>
 #include <string.h>
 #include <exception>
 #include <Windows.h>
@@ -22,7 +21,7 @@ namespace Ui {
 using pCreateInstance = LPVOID(*)(LPVOID lpReserve);
 using pFreeInstance = void (*)(LPVOID lpDev);
 
-template<class T>
+template<typename T>
 class KTModule
 {
 public:
@@ -35,7 +34,6 @@ public:
 	{
 		// 		QString strLibPath = QCoreApplication::applicationDirPath();
 		// 		strLibPath += "/KT_Printer.dll";
-		qDebug() << "Try to load " << strLibPath;
 		hLibhandle = ::LoadLibraryA(strLibPath.c_str());
 		if (hLibhandle)
 		{
@@ -43,7 +41,7 @@ public:
 			pFreeInst = (pFreeInstance)GetProcAddress(hLibhandle, "FreeInstance");
 			if (!pCreateInst || !pFreeInst)
 			{
-				strError = QString("从动态库%1中加载‘CreateInstance’或‘FreeInstance’函数失败!").arg(strLibPath);
+				strError = QString("从动态库%1中加载‘CreateInstance’或‘FreeInstance’函数失败!").arg(strLibPath.c_str());
 				throw std::exception(strError.toStdString().c_str());
 				return;
 			}
@@ -57,7 +55,7 @@ public:
 		}
 		else
 		{
-			strError = QString("加载动态库‘%1’失败，错误码:%1").arg(strLibPath).arg(errno);
+			strError = QString("加载动态库‘%1’失败，错误码:%1").arg(strLibPath.c_str()).arg(errno);
 			throw std::exception(strError.toStdString().c_str());
 		}
 	}
@@ -95,9 +93,17 @@ public:
 	int OpenDevice(QString& strMessage);
 	int OpenPrinter(QString& strMesssage);
 	int OpenReader(QString& strMesssage);
+	string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
+	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+	int GetCA(string& strPublicKey, SSCardInfoPtr& pSSCardInfo, CAInfo& caInfo, QString& strMessage);
+	int Depense(QString& strMessage);
 	void CloseDevice();
 	void ThreadWork();
 	virtual void ShutDown() override;
+	int     m_nSocketRetryInterval = 500;            // 支付结构查询时间间隔单 毫秒
+	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
+	int     m_nSocketFailedCount = 0;
 
 private:
 	Ui::MakeCard* ui;

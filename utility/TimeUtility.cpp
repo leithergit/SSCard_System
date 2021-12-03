@@ -1,7 +1,8 @@
 ﻿#pragma execution_character_set("utf-8")
 #include <stdio.h>
 #include <assert.h>
-#include <WinSock.h>
+#include <WinSock2.h>
+#include <stdlib.h>
 #include "TimeUtility.h"
 #pragma comment (lib,"Ws2_32")
 #pragma comment(lib,"winmm")
