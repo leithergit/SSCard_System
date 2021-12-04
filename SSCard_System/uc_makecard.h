@@ -96,7 +96,7 @@ public:
 	string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
 	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
-	int GetCA(string& strPublicKey, SSCardInfoPtr& pSSCardInfo, CAInfo& caInfo, QString& strMessage);
+	//int GetCA(string& strPublicKey, SSCardInfoPtr& pSSCardInfo, CAInfo& caInfo, QString& strMessage);
 	int Depense(QString& strMessage);
 	void CloseDevice();
 	void ThreadWork();

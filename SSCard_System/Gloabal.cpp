@@ -29,6 +29,8 @@ DataCenter::DataCenter()
 	{
 		gInfo() << "Failed in InitEnv";
 	}
+
+
 }
 
 DataCenter::~DataCenter()
@@ -99,77 +101,70 @@ int DataCenter::LoadCardForm(QString& strError)
 	}
 }
 
-struct SafeBuffer
+int HttpRecv(void* buffer, size_t sz, size_t nmemb, void* ResInfo)
 {
-	unsigned int nDataLength;
-	unsigned int nBufferSize;
-	FILE* fp;
-	byte* pBuffer;
-};
-
-int WriteDate(void* buffer, size_t sz, size_t nmemb, void* ResInfo)
-{
-	SafeBuffer* pRespond = (SafeBuffer*)ResInfo;
+	HttpBuffer* pRespond = (HttpBuffer*)ResInfo;
+	if (!pRespond->pBuffer)
+		return sz * nmemb;
 	if (!pRespond || !pRespond->pBuffer || !pRespond->nBufferSize)
 		return sz * nmemb;
 	if ((pRespond->nDataLength + sz * nmemb) < pRespond->nBufferSize)
+	{
 		memcpy(&pRespond->pBuffer[pRespond->nDataLength], buffer, sz * nmemb);
-	// 	if (pRespond->fp)
-	// 	{
-	// 		fwrite(buffer, sz * nmemb, 1, pRespond->fp);
-	// 	}
+		pRespond->nDataLength += sz * nmemb;
+	}
+
+	if (pRespond->fp)
+	{
+		fwrite(buffer, sz * nmemb, 1, pRespond->fp);
+	}
 	return sz * nmemb;  //返回接受数据的多少
 }
 
-
-#define __countof(array) (sizeof(array)/sizeof(array[0]))
-#pragma warning (disable:4996)
-
-void TraceMsgLog(LPCSTR pFormat, ...)
-{
-	va_list args;
-	va_start(args, pFormat);
-	int nBuff;
-	CHAR szBuffer[8192];
-	nBuff = _vsnprintf_s(szBuffer, __countof(szBuffer), pFormat, args);
-	//::wvsprintf(szBuffer, pFormat, args);
-	//assert(nBuff >=0);
-	if (nBuff)
-	{
-		gInfo() << szBuffer;
-	}
-	else
-	{
-		gInfo() << "====================TraceMsgLog Error====================\n";
-	}
-	va_end(args);
-}
-
-int SendHttpRequest(char* szUrl, char* pRespond)
+bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage)
 {
 	CURLcode nCurResult;
 	long retcode = 0;
 	CURL* pCurl = nullptr;
-	CHAR szError[1024] = { 0 };
-	__try
+	bool bSucceed = false;
+	int nHttpCode = 200;
+	HttpBuffer hb;
+	do
 	{
-		nCurResult = curl_easy_setopt(pCurl, CURLOPT_URL, szUrl);
-		curl_easy_reset(pCurl);
-		nCurResult = curl_easy_perform(pCurl);
-		if (nCurResult != CURLE_OK)
+		pCurl = curl_easy_init();
+		if (pCurl == NULL)
+			break;
+		nCurResult = curl_easy_setopt(pCurl, CURLOPT_CUSTOMREQUEST, "GET");
+		curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5L);			//请求超时时长
+		curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT, 5L);	//连接超时时长 
+		curl_easy_setopt(pCurl, CURLOPT_FOLLOWLOCATION, 1L);	//允许重定向
+		curl_easy_setopt(pCurl, CURLOPT_HEADER, 1L);			//若启用，会将头文件的信息作为数据流输出
+		curl_easy_setopt(pCurl, CURLOPT_TCP_NODELAY, 0L);
+		curl_easy_setopt(pCurl, CURLOPT_TCP_FASTOPEN, 1L);
+
+		HttpBuffer* pHttpBuffer = (HttpBuffer*)&hb;
+		if (pHttpBuffer->pBuffer && pHttpBuffer->nBufferSize)
 		{
-			strcpy(szError, curl_easy_strerror(nCurResult));
-			TraceMsgLog("curl_easy_perform Failed:%s.\n", szError);
-			__leave;
+			curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, HttpRecv);
+			curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, pHttpBuffer);
 		}
 
-		nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &retcode);
+		curl_easy_setopt(pCurl, CURLOPT_NOSIGNAL, 1L); //关闭中断信号响应
+		curl_easy_setopt(pCurl, CURLOPT_VERBOSE, 1L); //启用时会汇报所有的信息
+		nCurResult = curl_easy_setopt(pCurl, CURLOPT_URL, szUrl.c_str());
+
+		curl_slist* pList = NULL;
+		pList = curl_slist_append(pList, "Accept-Encoding:gzip, deflate, sdch");
+		pList = curl_slist_append(pList, "Accept-Language:zh-CN,zh;q=0.8");
+		curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, pList);
+
+		nCurResult = curl_easy_perform(pCurl);
 		if (nCurResult != CURLE_OK)
-		{
-			strcpy(szError, curl_easy_strerror(nCurResult));
-			TraceMsgLog("curl_easy_perform Failed:%s.\n", szError);
-			__leave;
-		}
+			break;
+
+		nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &nHttpCode);
+		if (nCurResult != CURLE_OK)
+			break;
 
 		if (retcode == 401)
 		{
@@ -177,79 +172,44 @@ int SendHttpRequest(char* szUrl, char* pRespond)
 			nCurResult = curl_easy_getinfo(pCurl, CURLINFO_HTTPAUTH_AVAIL, &nAuthorize);
 
 			if (nCurResult != CURLE_OK)
-			{
-				strcpy(szError, curl_easy_strerror(nCurResult));
-				TraceMsgLog("curl_easy_perform Failed:%s.\n", szError);
-				__leave;
-			}
+				break;
 
 			if (!nAuthorize)
-			{
-				TraceMsgLog("%s No auth available, perhaps no 401?\n", __FUNCTION__);
-				__leave;
-			}
-			TraceMsgLog("%s Change authorize.\n", __FUNCTION__);
+				break;
 			if (nAuthorize & CURLAUTH_DIGEST)
-			{
 				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-				TraceMsgLog("%s authorize CURLAUTH_DIGEST.\n", __FUNCTION__);
-			}
 			else if (nAuthorize & CURLAUTH_BASIC)
-			{
 				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-				TraceMsgLog("%s authorize CURLAUTH_BASIC.\n", __FUNCTION__);
-			}
 			else if (nAuthorize & CURLAUTH_NEGOTIATE)
-			{
 				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_NEGOTIATE);
-				TraceMsgLog("%s authorize CURLAUTH_NEGOTIATE.\n", __FUNCTION__);
-			}
 			else if (nAuthorize & CURLAUTH_NTLM)
-			{
 				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_NTLM);
-				TraceMsgLog("%s authorize CURLAUTH_NTLM.\n", __FUNCTION__);
-			}
 			if (nCurResult != CURLE_OK)
-			{
-				strcpy(szError, curl_easy_strerror(nCurResult));
-				TraceMsgLog("curl_easy_perform Failed:%s.\n", szError);
-				__leave;
-			}
+				break;
 
 			nCurResult = curl_easy_perform(pCurl);
 			if (nCurResult != CURLE_OK)
-			{
-				strcpy(szError, curl_easy_strerror(nCurResult));
-				TraceMsgLog("curl_easy_perform Failed:%s.\n", szError);
-				__leave;
-			}
+				break;
+		}
 
-			nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &retcode);
-		}
-		if (pRespond)
-		{
-			SafeBuffer* pSafeBuffer = (SafeBuffer*)pRespond;
-			if (pSafeBuffer->pBuffer && pSafeBuffer->nBufferSize)
-			{
-				curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, WriteDate);
-				curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, pRespond);
-			}
-		}
-	}
-	__finally
+	} while (0);
+
+	if (nCurResult != CURLE_OK)
 	{
-		if (nCurResult != CURLE_OK)
-		{
-			CHAR szError[1024] = { 0 };
-			strcpy(szError, curl_easy_strerror(nCurResult));
-			TraceMsgLog("%s Error=%s.\n", __FUNCTION__, szError);
-		}
-		if (pCurl)
-		{
-			curl_easy_cleanup(pCurl);
-			pCurl = nullptr;
-		}
+		strMessage = curl_easy_strerror(nCurResult);
+	}
+	else
+	{
+		strRespond = string((const char*)hb.pBuffer, hb.nDataLength);
+		nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &nHttpCode);
+		if (nHttpCode == 200)
+			bSucceed = true;
 	}
 
-	return (UINT)retcode;
+	if (pCurl)
+	{
+		curl_easy_cleanup(pCurl);
+		pCurl = nullptr;
+	}
+	return bSucceed;
 }

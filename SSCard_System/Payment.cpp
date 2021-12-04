@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QRect>
+
 #include "./SDK/QREncode/qrencode.h"
 #include "Gloabal.h"
 
@@ -39,7 +40,7 @@ int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage)
 }
 
 // 查询支付结果不能返回支付URL，否则未支付前，每次都带会不同的URL，支付结果可能也无法确定
-int     QueryPayment(QString& strMessage, int& nPayStatus)
+int     QueryPayment(QString& strMessage, int& nStatus)
 {
 	Q_UNUSED(strMessage);
 
@@ -56,28 +57,90 @@ int     QueryPayment(QString& strMessage, int& nPayStatus)
 	}
 	QString strInfo = QString("queryPayment Succeed:%1.").arg(szStatus);
 	gInfo() << gQStr(strInfo);
+	// 	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+	// 		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	// 	{
+	// 		nStatus = strtolong(szStatus, 10, 2);
+	// 	}
+	// 	else
+	// 	{
+	// 		strMessage = szStatus;
+	// 		return -1;
+	// 	}
 	if (strcmp(_strupr(szStatus), "OK") == 0)
 	{
-		nPayStatus = Pay_Succeed;
+		nStatus = Pay_Succeed;
 	}
 	else
-		nPayStatus = Pay_Not;
-
+		nStatus = Pay_Not;
 	return 0;
 }
 
-int     RequestPaymentUrl(QString& strMessage, QString& strPaymentUrl)
+int     RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage)
 {
 	Q_UNUSED(strMessage);
-#ifdef _DEBUG
-	strPaymentUrl = "http://222.143.21.159:9003/FSPayPlatform/payinfo/pay?src=RSTSBK&data=eydwYXlDb2RlJzogJzQxMDAwMDIxMTAwMDUwNzMwNTQ5JywgJ3RyYW5zdGltZSc6ICcyMDIxLTEyLTAzIDE2OjQzOjQxJywgJ25vdGlmeV9VUkwnOiAnaHR0cDovLzIyMi4xNDMuMzQuMTgvSG5QdWJsaWNTZXJ2aWNlQ29uc29sZS9ub250YXgvc3luY1BheVJlc3VsdEpRV1kubXZjJywgJ2RldmljZVR5cGUnOiAnMid9&noise=1638521021270&sign=Z26-1V3Nf7I6O1dDLgMwj08w6nzrCA6I5WF1cZmHrs71ZOL8q5v8DY_DzzLvb823aTHUEmwi7qP5wjPmCCIu8Q";
-#endif
-	return 0;
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	if (!pIDCard)
+	{
+		strMessage = "身份证信息无效!";
+		return -1;
+	}
+	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	if (!pSSCardInfo)
+	{
+		strMessage = "社保卡信息无效!";
+		return -1;
+	}
+
+	PaymentOpt& PayOption = g_pDataCenter->GetSysConfigure()->PaymentConfig;
+	//std::string szUrl = "http://10.126.131.203:8080/paymentbusiness/getPayCode?payerName=胡杰&payerTel=13637281234&payerCard=410700199907110037&amount=16";
+	std::string strUrl = "http://";
+	strUrl += PayOption.strHost;				strUrl += ":";
+	strUrl += PayOption.strPort;				strUrl += "/";
+	strUrl += PayOption.strPayUrl;				strUrl += "?";
+	strUrl += PayOption.strFieldName;			strUrl += "=";
+	strUrl += (const char*)pIDCard->szName;		strUrl += "&";
+	strUrl += PayOption.strFieldMobile;			strUrl += "=";
+	strUrl += pSSCardInfo->strMobile;			strUrl += "&";
+	strUrl += PayOption.strFiledamount;			strUrl += "=";
+	strUrl += PayOption.strAmount;
+	gInfo() << "Payment request url = " << strUrl;
+
+	string strRespond, strMessage1;
+	if (SendHttpRequest(strUrl, strRespond, strMessage1))
+	{
+		gInfo() << strRespond;
+		QString strRes = strRespond.c_str();
+		QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
+
+		QJsonParseError jsonParseError;
+		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes[5].toLatin1(), &jsonParseError));
+		if (QJsonParseError::NoError != jsonParseError.error)
+		{
+			strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
+			gInfo() << gQStr(strMessage);
+			return -1;
+		}
+		QJsonObject rootObject = jsonDocument.object();
+		if (!rootObject.keys().contains("msg"))
+		{
+			gInfo() << "There is no  No target value in the payment respond!";
+			return -1;
+		}
+
+		QJsonValue jsonValue = rootObject.value("msg");
+		strPaymentUrl = jsonValue.toString();
+		return 0;
+	}
+	else
+	{
+		strMessage = strMessage1.c_str();
+		return -1;
+	}
 }
 
 int     ApplyCardReplacement(QString& strMessage, int& nStatus)
 {
-	Q_UNUSED(strMessage);
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
@@ -86,10 +149,10 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus)
 		Region.strCMPassword.c_str(),
 		Region.strArea.c_str(),
 		Region.strAgency.c_str(),
-		(const char*)pSSCardInfo->strBankCode,
+		Region.strBankCode.c_str(),
 		(const char*)pIDCard->szIdentify,
 		(const char*)pSSCardInfo->strCardNum,
-		(const char*)pSSCardInfo->strMobile,
+		g_pDataCenter->strMobilePhone.c_str(),
 		(char*)pIDCard->szName,
 		(char*)szStatus);
 	if (QFailed(nResult))
@@ -100,32 +163,51 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus)
 		return -1;
 	}
 	gInfo() << "applyCardReplacement:" << szStatus;
-	nStatus = strtol(szStatus, nullptr, 10);
-	return 0;
-}
-
-int     CancelCardReplacement(QString& strMessage, int& nStatus)
-{
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	char szStatus[1024] = { 0 };
-	int nResult = cancelCardReplacement(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		Region.strArea.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(char*)pIDCard->szName,
-		(char*)szStatus);
-	if (QFailed(nResult))
+	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+		(szStatus[1] >= '0' && szStatus[1] <= '9'))
 	{
-		strMessage = "撤销申请补换卡失败";
-		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		nStatus = strtolong(szStatus, 10, 2);
+		return 0;
+	}
+	else
+	{
+		strMessage = szStatus;
 		return -1;
 	}
-	gInfo() << "cancelCardReplacement:" << szStatus;
-	nStatus = strtol(szStatus, nullptr, 10);
+}
+// 目前在河南无权限 
+int     CancelCardReplacement(QString& strMessage, int& nStatus)
+{
 	return 0;
+	// 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	// 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+	// 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	// 	char szStatus[1024] = { 0 };
+	// 	int nResult = cancelCardReplacement(Region.strCMAccount.c_str(),
+	// 		Region.strCMPassword.c_str(),
+	// 		Region.strArea.c_str(),
+	// 		(const char*)pIDCard->szIdentify,
+	// 		(char*)pIDCard->szName,
+	// 		(char*)szStatus);
+	// 	if (QFailed(nResult))
+	// 	{
+	// 		strMessage = "撤销申请补换卡失败";
+	// 		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
+	// 		gInfo() << gQStr(strInfo);
+	// 		return -1;
+	// 	}
+	// 	gInfo() << "cancelCardReplacement:" << szStatus;
+	// 	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+	// 		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	// 	{
+	// 		nStatus = strtolong(szStatus, 10, 2);
+	// 		return 0;
+	// 	}
+	// 	else
+	// 	{
+	// 		strMessage = szStatus;
+	// 		return -1;
+	// 	}
 }
 
 int     ResgisterPayment(QString& strMessage, int& nStatus)
@@ -148,33 +230,45 @@ int     ResgisterPayment(QString& strMessage, int& nStatus)
 		return -1;
 	}
 	gInfo() << "registerPayment:" << szStatus;
-	nStatus = strtol(szStatus, nullptr, 10);
-	return 0;
-}
-
-int  CancelPayment(QString& strMessage, int& nStatus)
-{
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	char szStatus[1024] = { 0 };
-	int nResult = cancelPayment(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(char*)pIDCard->szName,
-		(char*)szStatus);
-	if (QFailed(nResult))
+	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+		(szStatus[1] >= '0' && szStatus[1] <= '9'))
 	{
-		strMessage = "撤销缴费登记失败";
-		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		nStatus = strtolong(szStatus, 10, 2);
+		return 0;
+	}
+	else
+	{
+		strMessage = szStatus;
 		return -1;
 	}
-	gInfo() << "cancelCardReplacement:" << szStatus;
-	nStatus = strtol(szStatus, nullptr, 10);
+}
+
+// 无须实现
+int  CancelPayment(QString& strMessage, int& nStatus)
+{
+	//IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	//RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+	//SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	//char szStatus[1024] = { 0 };
+	//int nResult = cancelPayment(Region.strCMAccount.c_str(),
+	//	Region.strCMPassword.c_str(),
+	//	(const char*)pIDCard->szIdentify,
+	//	(char*)pIDCard->szName,
+	//	(char*)szStatus);
+	//if (QFailed(nResult))
+	//{
+	//	strMessage = "撤销缴费登记失败";
+	//	QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
+	//	gInfo() << gQStr(strInfo);
+	//	return -1;
+	//}
+	//gInfo() << "cancelCardReplacement:" << szStatus;
+	//nStatus = strtolong(szStatus, 10, 2);
 	return 0;
 }
 
+// nStatus = 0	时标注成功
+//			 1	之前 已经标注
 int  MarkCard(QString& strMessage, int& nStatus)
 {
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
@@ -195,8 +289,17 @@ int  MarkCard(QString& strMessage, int& nStatus)
 		return -1;
 	}
 	gInfo() << "markCard:" << szStatus;
-	nStatus = strtol(szStatus, nullptr, 10);
-	return 0;
+	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	{
+		nStatus = strtolong(szStatus, 10, 2);
+		return 0;
+	}
+	else
+	{
+		strMessage = szStatus;
+		return -1;
+	}
 }
 
 int     CancelMarkCard(QString& strMessage, int& nStatus)
@@ -219,8 +322,17 @@ int     CancelMarkCard(QString& strMessage, int& nStatus)
 		return -1;
 	}
 	gInfo() << "cancelMarkCard:" << szStatus;
-	nStatus = strtol(szStatus, nullptr, 10);
-	return 0;
+	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	{
+		nStatus = strtolong(szStatus, 10, 2);
+		return 0;
+	}
+	else
+	{
+		strMessage = szStatus;
+		return -1;
+	}
 }
 
 int     GetCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfoOut)
@@ -228,32 +340,33 @@ int     GetCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfoOut)
 	//IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
-	char szStatus[1024] = { 0 };
+	strcpy(pSSCardInfoIn->strTransType, "5");
+	string strCountry = Region.strArea + Region.strCountry;
+	strcpy(pSSCardInfoIn->strSSQX, strCountry.c_str());
+	strcpy(pSSCardInfoIn->strCard, Region.strCardVendor.c_str());
+	strcpy(pSSCardInfoIn->strBankCode, Region.strBankCode.c_str());
 	int nResult = getCardData(Region.strCMAccount.c_str(),
 		Region.strCMPassword.c_str(),
 		*pSSCardInfoIn,
 		*pSSCardInfoOut);
 	if (QFailed(nResult))
 	{
-		strMessage = "获取制卡数据失败";
+		strMessage = "获取三代社保卡数据失败!";
 		QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
 		gInfo() << gQStr(strInfo);
 		return -1;
 	}
-	gInfo() << "getCardData:" << szStatus;
+
 	return 0;
 }
 
-int     ReturnCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfoOut)
+int     ReturnCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfo)
 {
 	//IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	int nResult = returnCardData(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		*pSSCardInfoIn,
-		*pSSCardInfoOut);
+	int nResult = returnCardData(Region.strCMAccount.c_str(), Region.strCMPassword.c_str(), *pSSCardInfo, szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "制卡回盘失败";
@@ -285,13 +398,16 @@ int     EnalbeCard(QString& strMessage, int& nStatus)
 		gInfo() << gQStr(strInfo);
 		return -1;
 	}
-	gInfo() << "returnCardData:" << szStatus;
-	return 0;
-}
-
-int     GetCA(QString& strMessage, QString& strCA)
-{
-	Q_UNUSED(strMessage);
-	Q_UNUSED(strCA);
+	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	{
+		nStatus = strtolong(szStatus, 10, 2);
+		return 0;
+	}
+	else
+	{
+		strMessage = szStatus;
+		return -1;
+	}
 	return 0;
 }

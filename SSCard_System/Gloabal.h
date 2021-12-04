@@ -19,7 +19,9 @@
 #include <QSettings>
 #include <QFileInfo>
 #include <QDateTime>
-
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <winreg.h>
 #include <string>
 #include <map>
@@ -163,7 +165,7 @@ struct DeviceConfig
 		{
 			nSSCardReaderPowerOnType = READER_CONTACT;		// 默认为接触式
 		}
-
+		strTerminalCode = pSettings->value("TerminalCode", "").toString().toStdString();
 		strSSCardReaderPort = pSettings->value("SSCardReaderPORT", "100").toString().toStdString();
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
 		strPrinterModule = pSettings->value("PrinterModule").toString().toStdString();				// 打印机驱动模块名称，如KT_Printer.dll
@@ -192,6 +194,7 @@ struct DeviceConfig
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
 	string		strPrinterModule;					   // 打印机驱动模块名称，如KT_Printer.dll
 	string		strReaderModule;					   // 读卡器驱动模块名称,如KT_Reader.dll
+	string		strTerminalCode;						// 终端唯一识别码
 };
 
 struct RegionInfo
@@ -204,16 +207,31 @@ struct RegionInfo
 		pSettings->beginGroup("Region");
 		strRegionCode = pSettings->value("Region").toString().toStdString();
 		strArea = pSettings->value("Area").toString().toStdString();
+		strCountry = pSettings->value("Country").toString().toStdString();
 		strLicense = pSettings->value("License").toString().toStdString();
 		strEMURL = pSettings->value("EMURL").toUInt();
 		strCMURL = pSettings->value("CMURL").toString().toStdString();
 		strCMAccount = pSettings->value("CMAccount", "").toString().toStdString();
 		strCMPassword = pSettings->value("CMPassword", "").toString().toStdString();
+
+		strCM_CA_Account = pSettings->value("CM_CA_Account", "").toString().toStdString();
+		strCM_CA_Password = pSettings->value("CM_CA_Password", "").toString().toStdString();
+
 		strAgency = pSettings->value("Agency", "").toString().toStdString();
+		strCardVendor = pSettings->value("CardVendor", "1").toString().toStdString();
+		/*
+
+SSCardDefaulutPin=123456
+PrimaryKey = 00112233445566778899AABBCCDDEEFF
+		*/
+		strSSCardDefaulutPin = pSettings->value("SSCardDefaulutPin", "").toString().toStdString();
+		strPrimaryKey = pSettings->value("PrimaryKey", "").toString().toStdString();
+		strBankCode = pSettings->value("BankCode", "").toString().toStdString();
 		pSettings->endGroup();
 	}
 	string		strRegionCode;						    // 地市编码 410700
-	string		strArea;							    // 区域编码 41070000
+	string		strArea;							    // 区域编码 410700
+	string		strCountry;								// 所属区县
 	string		strLicense;							    // LICENSE = STZOLdFrhbc
 	string		strEMURL;							    // 加密机ip http://10.120.6.239:7777/
 	string		strEMAccount;							// 加密机帐号
@@ -221,7 +239,14 @@ struct RegionInfo
 	string		strCMURL;							    // 卡管ip   http://10.120.1.18:7001/hnCardService/services/CardService
 	string		strCMAccount;							// 卡管帐号
 	string		strCMPassword;							// 卡管中心密码
+	string		strCM_CA_Account;						// 卡管ca帐号
+	string		strCM_CA_Password;						// 卡管ca中心密码
 	string		strAgency;								// 经办机构
+	string		strSSCardDefaulutPin;					// 社保卡默认密码，可为作oldpin
+	string		strPrimaryKey;							// 主控密钥
+	string		strBankCode;							// 银行代码
+	string		strCardVendor;							// 所属卡商
+
 };
 
 struct TextPosition
@@ -304,11 +329,29 @@ struct PaymentOpt
 		nWaitTime = pSettings->value("WaitTime").toUInt();
 		nQueryPayResultInterval = pSettings->value("QueryPayResultInterval").toUInt();
 		nSocketRetryCount = pSettings->value("SocketRetryCount").toUInt();
+		strHost = pSettings->value("Host", "").toString().toStdString();
+		strPort = pSettings->value("Port", "").toString().toStdString();
+		strPayUrl = pSettings->value("Url", "").toString().toStdString();
+		strFieldName = pSettings->value("FieldName", "").toString().toStdString();
+		strFieldMobile = pSettings->value("FieldMobile", "").toString().toStdString();
+		strFieldCardID = pSettings->value("FieldCard", "").toString().toStdString();
+		strFiledamount = pSettings->value("Filedamount", "").toString().toStdString();
+		strAmount = pSettings->value("amount", "").toString().toStdString();
+
 		pSettings->endGroup();
 	}
 	int     nWaitTime = 300;                         // 支付页面等侍时间，单位秒
 	int     nQueryPayResultInterval = 500;            // 支付结构查询时间间隔单 毫秒
 	int     nSocketRetryCount = 5;                    // 网络失败重试次数
+	string  strHost;
+	string 	strPort;
+	string 	strPayUrl;
+	string	strFieldName;
+	string	strFieldMobile;
+	string	strFieldCardID;
+	string	strFiledamount;
+	string  strAmount;
+
 };
 struct SysConfig
 {
@@ -472,6 +515,42 @@ private:
 
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
-int SendHttpRequest(char* szUrl, char* szRespond);
+bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage);
+
+struct HttpBuffer
+{
+	unsigned int nDataLength;
+	unsigned int nBufferSize;
+	FILE* fp;;
+	byte* pBuffer;
+	HttpBuffer(int nBufferSize = 8 * 1024, char* szFileName = nullptr)
+	{
+		ZeroMemory(this, sizeof(HttpBuffer));
+		pBuffer = new (std::nothrow) byte[nBufferSize];
+		if (pBuffer)
+		{
+			ZeroMemory(pBuffer, nBufferSize);
+			this->nBufferSize = nBufferSize;
+		}
+
+		if (szFileName)
+			fp = fopen(szFileName, "wb");
+	}
+	~HttpBuffer()
+	{
+		if (fp)
+		{
+			fflush(fp);
+			fclose(fp);
+			fp = nullptr;
+		}
+
+		if (pBuffer)
+		{
+			delete[]pBuffer;
+			pBuffer = nullptr;
+		}
+	}
+};
 
 #endif // GLOABAL_H

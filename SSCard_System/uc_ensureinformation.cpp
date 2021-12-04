@@ -25,7 +25,6 @@ int uc_EnsureInformation::ProcessBussiness()
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;
 	}
-
 	if (QFailed(QuerySSCardStatus(strMessage)))
 	{
 		gError() << strMessage.toLocal8Bit().data();
@@ -60,14 +59,8 @@ int uc_EnsureInformation::ProcessBussiness()
 
 	ui->label_Bank->setText(QString("服务银行:%1").arg(QString(strBankName.c_str())));
 	string strCardStatus;
-	if (QFailed(g_pDataCenter->GetCardStatus(strCardStatus)))
-	{
-		strMessage = QString("获取卡状态失败:%1").arg(pSSCardInfo->strCardStatus);
-		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-		return -1;
-	}
-	ui->label_CardStatus->setText(QString("卡片状态:%1").arg(strCardStatus.c_str()));
+
+	ui->label_CardStatus->setText(QString("卡片状态:%1").arg(pSSCardInfo->strCardStatus));
 
 	return 0;
 }
@@ -107,6 +100,7 @@ int	 uc_EnsureInformation::QuerySSCardStatus(QString& strMessage)
 		strMessage = QString("查询卡状态失败!");
 		return -1;
 	}
+
 	if (strcmp(_strupr((char*)szStatus), "OK") == 0)
 	{
 		strcpy(pSSCardInfo->strCardStatus, "正常");
@@ -136,7 +130,6 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage)
 		strMessage = QString("查询社保卡信息失败!");
 		return -1;
 	}
-
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	return 0;
 }
@@ -161,8 +154,19 @@ int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus)
 		strMessage = QString("挂失失败!");
 		return -1;
 	}
+
 	gInfo() << "reportLostCard:" << szStatus;
-	nStatus = strtol((char*)szStatus, nullptr, 10);
+	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	{
+		nStatus = strtolong(szStatus, 10, 2);
+	}
+	else
+	{
+		strMessage = szStatus;
+		return -1;
+	}
+
 	return 0;
 }
 

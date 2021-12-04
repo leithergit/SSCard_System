@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
 	google::SetStderrLogging(google::GLOG_INFO);
 	google::SetLogFilenameExtension(".log");
 
+	curl_global_init(CURL_GLOBAL_WIN32);
 
 	qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);

@@ -12,11 +12,11 @@
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage);
 
 // 已经完成
-int  QueryPayment(QString& strMessage, int& nPayStatus);
+int  QueryPayment(QString& strMessage, int& strPayStatus);
 
 //int  ReqestPaymentQR(QString &strMessage,QImage &Image);
 
-int  RequestPaymentUrl(QString& strMessage, QString& strPaymentUrl);
+int  RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage);
 
 // nStatus = 0,成功，否则失败
 int  ApplyCardReplacement(QString& strMessage, int& nStatus);
@@ -42,8 +42,5 @@ int  ReturnCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0 成功
 int  EnalbeCard(QString& strMessage, int& nStatus);
-
-int  GetCA(QString& strMessage, QString& strCA);
-
 
 #endif // PAYMENT_H

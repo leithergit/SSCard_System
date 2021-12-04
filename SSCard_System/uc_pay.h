@@ -24,12 +24,12 @@ public:
 	int     uc_ReqestPaymentQR(QString& strMessage, QImage& Image);
 	int     uc_QueryPayment(QString& strMessage, int& nPayStatus);
 	int     GetQRCodeStorePath(QString& strFilePath);
-	int     uc_ApplyCardReplacement(QString& strMessage, int nStatus);
-	int     uc_ResgisterPayment(QString& strMessage, int nStatus);
-	int     uc_MarkCard(QString& strMessage, int nStatus);
-	int     uc_GetDataCard(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
-	int     uc_CancelMarkCard(QString& strMessage, int nStatus);
-	int     uc_CancelCardReplacement(QString& strMessage, int nStatus);
+	// 	int     uc_ApplyCardReplacement(QString& strMessage, int nStatus);
+	// 	int     uc_ResgisterPayment(QString& strMessage, int nStatus);
+	// 	int     uc_MarkCard(QString& strMessage, int nStatus);
+	// 	int     uc_GetDataCard(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
+	// 	int     uc_CancelMarkCard(QString& strMessage, int nStatus);
+	// 	int     uc_CancelCardReplacement(QString& strMessage, int nStatus);
 	int     m_nWaitTime = 300;                         // 支付页面等侍时间，单位秒
 	int     m_nQueryPayResultInterval = 500;            // 支付结构查询时间间隔单 毫秒
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
