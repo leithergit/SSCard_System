@@ -53,7 +53,10 @@ int main(int argc, char* argv[])
 
 	MainWindow w;
 	//w.showFullScreen();
-	w.showMaximized();
+	//w.showMaximized();
+
+
+	w.show();
 
 	int nRes = a.exec();
 	google::ShutdownGoogleLogging();

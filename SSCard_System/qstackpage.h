@@ -115,6 +115,7 @@ public slots:
 signals:
 	void InputPin(char ch);
 	void SwitchNextPage(int nOperation);
+	void SwitchPage(int nPage);
 	void ErrorMessage(QString strMessage);
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
 

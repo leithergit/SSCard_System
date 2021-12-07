@@ -1,21 +1,21 @@
-ï»¿#pragma once
+#pragma once
 #ifndef KT_READER_H
 #define KT_READER_H
 #include <windows.h>
 
-enum ReaderBrand
+typedef enum ReaderBrand
 {
 	IN_VALID = -1,
-	DC_READER = 1,	//å¾·å¡è¯»å¡å™¨
-	MH_READER,		//æ˜åè¯»å¡å™¨
-	HD_READER,		//åå¤§è¯»å¡å™¨
-};
+	DC_READER = 1,	//µÂ¿¨¶Á¿¨Æ÷
+	MH_READER,		//Ã÷»ª¶Á¿¨Æ÷
+	HD_READER,		//»ª´ó¶Á¿¨Æ÷
+}RT;
 
-enum CardPowerType
+typedef enum CardPowerType
 {
-	READER_CONTACT = 1,		//æ¥è§¦å¼
-	READER_UNCONTACT,		//éæ¥å¼
-};
+	READER_CONTACT = 1,		//½Ó´¥Ê½
+	READER_UNCONTACT,		//·Ç½ÓÊ½
+}PowerType;
 
 class KT_Reader
 {
@@ -24,64 +24,64 @@ public:
 	virtual ~KT_Reader() {};
 public:
 	/**
-	 * @brief åˆ›å»ºè¯»å¡å™¨ç±»å‹,å‚è€ƒæšä¸¾Reader
-	 * @param[in] ReaderType è¯»å¡å™¨ç±»å‹
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ´´½¨¶Á¿¨Æ÷ÀàĞÍ,²Î¿¼Ã¶¾ÙReader
+	 * @param[in] ReaderType ¶Á¿¨Æ÷ÀàĞÍ
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Reader_Create(ReaderBrand ReaderType, char* resCode) = 0;
+	virtual int Reader_Create(RT ReaderType, char* resCode) = 0;
 	/**
-	 * @brief åˆå§‹åŒ–è¯»å¡å™¨ç«¯å£
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ³õÊ¼»¯¶Á¿¨Æ÷¶Ë¿Ú
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
 	virtual int Reader_Init(char* resCode) = 0;
 	/**
-	 * @brief è¯»å¡å™¨ç«¯å£é€€å‡º
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ¶Á¿¨Æ÷¶Ë¿ÚÍË³ö
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
 	virtual int Reader_Exit(char* resCode) = 0;
 	/**
-	 * @brief ä¸Šç”µæ“ä½œ
-	 * @param[in] Type ä¸Šç”µç±»å‹,æ¥è§¦oréæ¥
-	 * @param[out] CardAtr ATRæ•°æ®
-	 * @param[out] AtrLen  ATRæ•°æ®é•¿åº¦
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ÉÏµç²Ù×÷
+	 * @param[in] Type ÉÏµçÀàĞÍ,½Ó´¥or·Ç½Ó
+	 * @param[out] CardAtr ATRÊı¾İ
+	 * @param[out] AtrLen  ATRÊı¾İ³¤¶È
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Reader_PowerOn(CardPowerType Type, char* CardAtr, int& AtrLen, char* resCode) = 0;
+	virtual int Reader_PowerOn(PowerType Type, char* CardAtr,int &AtrLen,char* resCode) = 0;
 	/**
-	 * @brief ä¸‹ç”µæ“ä½œ
-	 * @param[in] Type ä¸‹ç”µç±»å‹,æ¥è§¦oréæ¥
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ÏÂµç²Ù×÷
+	 * @param[in] Type ÏÂµçÀàĞÍ,½Ó´¥or·Ç½Ó
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Reader_PowerOff(CardPowerType Type, char* resCode) = 0;
+	virtual int Reader_PowerOff(PowerType Type,char* resCode) = 0;
 	/**
-	 * @brief æ‰§è¡Œå‘½ä»¤æ“ä½œ
-	 * @param[in] Cmd å‘é€å‘½ä»¤å‚æ•°
-	 * @param[in] CmdLen å‘é€çš„å‘½ä»¤é•¿åº¦
-	 * @param[out] OutData è¿”å›çš„æ•°æ®
-	 * @param[out] OutLen è¿”å›çš„æ•°æ®é•¿åº¦
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief Ö´ĞĞÃüÁî²Ù×÷
+	 * @param[in] Cmd ·¢ËÍÃüÁî²ÎÊı
+	 * @param[in] CmdLen ·¢ËÍµÄÃüÁî³¤¶È
+	 * @param[out] OutData ·µ»ØµÄÊı¾İ
+	 * @param[out] OutLen ·µ»ØµÄÊı¾İ³¤¶È
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Reader_APDU(BYTE* Cmd, int CmdLen, char* OutData, int& OutLen, char* resCode) = 0;
+	virtual int Reader_APDU(BYTE* Cmd, int CmdLen, char* OutData, int &OutLen, char* resCode) = 0;
 	/**
-	 * @brief è¯»å¡å™¨èœ‚é¸£
-	 * @param[in] TimeOut è¶…æ—¶æ—¶é—´
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief ¶Á¿¨Æ÷·äÃù
+	 * @param[in] TimeOut ³¬Ê±Ê±¼ä
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Reader_Beep(int TimeOut, char* resCode) { return 0; }
+	virtual int Reader_Beep(int TimeOut, char* resCode) { return 0;}
 	/**
-	 * @brief è·å–è¯»å¡å™¨ç‰ˆæœ¬ä¿¡æ¯
-	 * @param[out] Version è¿”å›çš„ç‰ˆæœ¬ä¿¡æ¯
-	 * @param[out] resCode è¿”å›4ä½æ•°è¿”å›å€¼,æˆåŠŸè¿”å› "0000"
-	 * @return 0:æˆåŠŸ 1:å¤±è´¥
+	 * @brief »ñÈ¡¶Á¿¨Æ÷°æ±¾ĞÅÏ¢
+	 * @param[out] Version ·µ»ØµÄ°æ±¾ĞÅÏ¢
+	 * @param[out] resCode ·µ»Ø4Î»Êı·µ»ØÖµ,³É¹¦·µ»Ø "0000"
+	 * @return 0:³É¹¦ 1:Ê§°Ü
 	 */
-	virtual int Reader_GetVersion(char* Version, char* resCode) { return 0; }
+	virtual int Reader_GetVersion(char* Version, char* resCode) { return 0;}
 };
 
 #endif // !KT_READER_H

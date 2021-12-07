@@ -36,11 +36,19 @@ int  MarkCard(QString& strMessage, int& nStatus);
 // nStatus = 0 成功
 int  CancelMarkCard(QString& strMessage, int& nStatus);
 
-int  GetCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
+int  GetCardData(QString& strMessage, int& nStatus);
 
-int  ReturnCardData(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
+int  ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0 成功
 int  EnalbeCard(QString& strMessage, int& nStatus);
+
+int GetCA(QString strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo);
+
+int QueryCardProgress(QString strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo);
+
+int GetIDImageStorePath(string& strFilePath);
+
+int LoadTestData(QString& strName, QString& strCardID, QString& strMobile);
 
 #endif // PAYMENT_H

@@ -15,24 +15,24 @@ class uc_ReadIDCard : public QStackPage
 	Q_OBJECT
 
 public:
-    explicit uc_ReadIDCard(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit uc_ReadIDCard(QLabel* pTitle, QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
 	~uc_ReadIDCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-    //int     m_nTimerReaderIDCard = 0;
+	//int     m_nTimerReaderIDCard = 0;
 	virtual void timerEvent(QTimerEvent* event) override;
 	int     m_nDelayCount = 0;
-	int     m_bSucceed = false;	
-    int     GetIDImageStorePath(string &strFilePath);
-    int     ReaderIDCard();
+	int     m_bSucceed = false;
+	/*    int     GetIDImageStorePath(string &strFilePath);*/
+	int     ReaderIDCard();
 	void    ThreadWork();
-    void    ShutDown() override;
+	void    ShutDown() override;
 	string  m_strDevPort;
 	ushort  m_nBaudreate = 9600;
 
-    IDCardInfoPtr m_pIDCard = nullptr;
+	IDCardInfoPtr m_pIDCard = nullptr;
 private slots:
-    void OnErrorMessage(QString strErrorMsg);
+	void OnErrorMessage(QString strErrorMsg);
 private:
 	Ui::ReadIDCard* ui;
 };

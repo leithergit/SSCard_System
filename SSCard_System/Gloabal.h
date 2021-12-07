@@ -27,6 +27,10 @@
 #include <map>
 #include <algorithm>
 #include <QCoreApplication>
+#include <QDir>
+#include <QPainter>
+#include <QImage>
+#include <QRect>
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
@@ -115,12 +119,12 @@ struct DeviceConfig
 			Str(ENTRUCT_EM2),
 			Str(ENTRUCT_CD809)
 		};
-		int nPrinterIndex = -1;
+		int nPrinterIndex = 0;
 		for (auto& var : szPrinterTypeList)
 		{
 			if (strPrinterType == var)
 			{
-				nPrinterType = (Printer)nPrinterIndex;
+				nPrinterType = (Printer)(nPrinterIndex + 1);
 				break;
 			}
 			nPrinterIndex++;
@@ -209,7 +213,10 @@ struct RegionInfo
 		strArea = pSettings->value("Area").toString().toStdString();
 		strCountry = pSettings->value("Country").toString().toStdString();
 		strLicense = pSettings->value("License").toString().toStdString();
-		strEMURL = pSettings->value("EMURL").toUInt();
+		strEMURL = pSettings->value("EMURL").toString().toStdString();
+		strEMAccount = pSettings->value("EMAccount").toString().toStdString();							// 加密机帐号
+		strEMPassword = pSettings->value("EMPassword").toString().toStdString();						// 加密机密码
+
 		strCMURL = pSettings->value("CMURL").toString().toStdString();
 		strCMAccount = pSettings->value("CMAccount", "").toString().toStdString();
 		strCMPassword = pSettings->value("CMPassword", "").toString().toStdString();
@@ -293,10 +300,11 @@ struct CardForm
 		strTemp = pSettings->value("DatePos").toString();
 		sscanf_s(strTemp.toStdString().c_str(), "%f|%f|%d", &posIssueDate.fxPos, &posIssueDate.fyPos, &posIssueDate.nAngle);
 
-		QByteArray byteFont = pSettings->value("Font").toString().toLatin1();
+		QString strFont = "宋体";//pSettings->value("Font").toString();
+// 		char szFont[32] = { 0 };
+// 		strcpy(szFont, strFont.toLocal8Bit().data());
 
-		int nDataLength = 0;
-		strFont = UTF8StringA(byteFont.data(), nDataLength).get();
+		this->strFont = strFont.toLocal8Bit().data();
 		nFontSize = pSettings->value("FontSize").toUInt();
 
 		nFontColor = pSettings->value("FontColor").toUInt();
@@ -388,6 +396,18 @@ struct SysConfig
 		nMaskTimeout[Failed] = pSettings->value("Failed", 5000).toUInt();
 		nMaskTimeout[Fetal] = pSettings->value("Fetal", 10000).toUInt();
 		pSettings->endGroup();
+
+		pSettings->beginGroup("Bank");
+		QStringList strKeyList = pSettings->allKeys();
+		strMapBank.clear();
+		for (auto var : strKeyList)
+		{
+			QString strValue = pSettings->value(var).toString();
+			qDebug() << strValue.toStdString().c_str() << "=" << var.toStdString().c_str();
+			strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
+		}
+
+		pSettings->endGroup();
 	}
 	DeviceConfig	DevConfig;							// 设备配置
 	RegionInfo		Region;								// 区域信息配置
@@ -399,6 +419,7 @@ struct SysConfig
 	int             nSSCardPasswordSize = 6;			// 社保卡密码长度
 	int				nMaskTimeout[5];					// 各种遮罩层的逗留时间，单位毫秒
 	int				nPageTimeout[16];					// 各功能页面超时时间，单位秒
+	std::map<string, string> strMapBank;
 };
 using SysConfigPtr = shared_ptr<SysConfig>;
 
@@ -473,8 +494,8 @@ public:
 
 	int GetBankName(string strBankCode, string& strBankName)
 	{
-		auto itFind = strMapBank.find(strBankCode);
-		if (itFind != strMapBank.end())
+		auto itFind = pConfig->strMapBank.find(strBankCode);
+		if (itFind != pConfig->strMapBank.end())
 		{
 			strBankName = itFind->second;
 			return 0;
@@ -486,30 +507,30 @@ public:
 		}
 	}
 
-	int GetCardStatus(string& strCardStatus)
-	{
-		if (!pSSCardInfo)
-			return -1;
-		if (strcmp(strupr(pSSCardInfo->strCardStatus), "OK") == 0)
-		{
-			strCardStatus = "正常";
-		}
-		else
-			strCardStatus = pSSCardInfo->strCardStatus;
-		return 0;
-	}
+	// 	int GetCardStatus(string& strCardStatus)
+	// 	{
+	// 		if (!pSSCardInfo)
+	// 			return -1;
+	// 		if (strcmp(strupr(pSSCardInfo->strCardStatus), "OK") == 0)
+	// 		{
+	// 			strCardStatus = "正常";
+	// 		}
+	// 		else
+	// 			strCardStatus = pSSCardInfo->strCardStatus;
+	// 		return 0;
+	// 	}
 	string         strIDImageFile;
 	string		   strSSCardPhotoFile;
 	string         strMobilePhone;
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
+	string		   strCardMakeProgress;
 
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardInfoPtr   pSSCardInfo = nullptr;
-	std::map<string, string> strMapBank;
 
 };
 

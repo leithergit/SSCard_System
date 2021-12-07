@@ -18,7 +18,7 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	// 待完成
-	int    ReadSSCardInfo(QString& strMessage);
+	int    ReadSSCardInfo(QString& strMessage, int& nStatus);
 	//int    QueryRegisterLost(QString& strMessage);
 	int	   QuerySSCardStatus(QString& strMessage);
 	// 待完成

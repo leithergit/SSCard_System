@@ -5,6 +5,7 @@
 #include "Payment.h"
 #pragma warning(disable:4189)
 
+
 uc_MakeCard::uc_MakeCard(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
 	QStackPage(pTitle, strStepImage, nTimeout, parent),
 	ui(new Ui::MakeCard)
@@ -50,27 +51,35 @@ int uc_MakeCard::OpenPrinter(QString& strMessage)
 	{
 		do
 		{
-
-			QString strAppPath = QCoreApplication::applicationDirPath();
-			QString strPrinterMudule = strAppPath + "/" + DevConfig.strPrinterModule.c_str();
-
-			m_pPrinterlib = make_shared<KTModule<KT_Printer>>(strPrinterMudule.toStdString());
 			if (!m_pPrinterlib)
 			{
-				strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strPrinterMudule);
-				break;
-			}
-			m_pPrinter = m_pPrinterlib->Instance();
-			if (!m_pPrinter)
-			{
-				strMessage = QString("创建‘%1’实例失败!").arg(strPrinterMudule);
-				break;
-			}
+				QString strAppPath = QCoreApplication::applicationDirPath();
+				QString strPrinterMudule = strAppPath + "/" + DevConfig.strPrinterModule.c_str();
 
-			if (QFailed(nResult = m_pPrinter->Printer_Init(DevConfig.nPrinterType, szRCode)))
-			{
-				strMessage = QString("Printer_Init‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
-				break;
+				m_pPrinterlib = make_shared<KTModule<KT_Printer>>(strPrinterMudule.toStdString());
+				if (!m_pPrinterlib)
+				{
+					strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strPrinterMudule);
+					break;
+				}
+				m_pPrinter = m_pPrinterlib->Instance();
+				if (!m_pPrinter)
+				{
+					strMessage = QString("创建‘%1’实例失败!").arg(strPrinterMudule);
+					break;
+				}
+
+				if (QFailed(nResult = m_pPrinter->Printer_Init(DevConfig.nPrinterType, szRCode)))
+				{
+					strMessage = QString("Printer_Init‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+					break;
+				}
+
+				if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
+				{
+					strMessage = QString("Printer_Open‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+					break;
+				}
 			}
 
 		} while (0);
@@ -96,8 +105,8 @@ string uc_MakeCard::MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo)
 	//strCardInfo += pSSCardInfo->strOrganID;					strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strReleaseDate;				strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strValidDate;				strCardInfo += "|";
-	strCardInfo += pSSCardInfo->strCardID;					strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strCardNum;					strCardInfo += "|";
+	strCardInfo += pSSCardInfo->strCardID;					strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strName;					strCardInfo += "||";//跳过姓名拓展
 	strCardInfo += pSSCardInfo->strSex;						strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strNation;					strCardInfo += "|";
@@ -137,9 +146,14 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 	CAInfo caInfo;
 	QString strInfo;
 	HSMInfo  HsmInfo;
+	int nStatus = 0;
 
 	do
 	{
+#ifdef _DEBUG
+#pragma  Warning("直接读取社保卡数据，用于测试回盘，事后须删除！")
+		GetCardData(strMessage, nStatus);
+#endif
 		if (!m_pReader)
 		{
 			strMessage = "读卡器未就绪!";
@@ -151,6 +165,15 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 			strMessage = QString("读卡器上电失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;
 		}
+		strcpy(pSSCardInfo->strCardATR, szCardATR);
+		char szBankNum[64] = { 0 };
+		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
+		{
+			strMessage = QString("读很卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			break;
+		}
+		gInfo() << "BankNum:" << szBankNum;
+		strcpy(pSSCardInfo->strBankNum, szBankNum);
 
 		gInfo() << "CardATR:" << szCardATR;
 		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
@@ -158,6 +181,7 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;
 		}
+
 		/*
 		发卡地区行政区划代码（卡识别码前6位）、社会保障号码、 卡号、 卡识别码、 姓名、 卡复位信息（仅取历史字节）、 规范版本、 发卡日期、 卡有效期、终端机编号、终端设备号。各数据项之间以 “ | ” 分割，且最后一个数据项以 “ I,, 结尾。
 		639900|l111111198101011110|X00000019|639900D15600000500BF7C7A48FB4966|张三|00814E43238697159900BF7C7A|1.00|20101001
@@ -172,9 +196,10 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 			qDebug() << "Field[" << nIndex << "]" << var;
 			nIndex++;
 		}
+		gInfo() << "CardBaseRead:" << szCardBaseRead;
 
 		string strCardIdentify = strFieldList[3].toStdString();
-		gInfo() << "CardBaseRead:" << szCardBaseRead;
+		strcpy(pSSCardInfo->strIdentifyNum, strCardIdentify.c_str());
 
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
@@ -184,6 +209,9 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		// szCardBaseWrite输出结果为两个随机数
 		// random1|random2
 		gInfo() << "CardBaseRead:" << szCardBaseWrite;
+
+		QStringList strRomdom = QString(szCardBaseWrite).split("|", Qt::KeepEmptyParts);
+
 		strcpy(HsmInfo.strSystemID, "410700006");
 		strcpy(HsmInfo.strRegionCode, Region.strArea.c_str());
 		strcpy(HsmInfo.strCardNum, pSSCardInfo->strCardNum); //用最新的卡号	   
@@ -200,6 +228,8 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		strcpy(HsmInfo.strSex, pSSCardInfo->strSex);
 		strcpy(HsmInfo.strNation, pSSCardInfo->strNation);
 		strcpy(HsmInfo.strBirthday, pSSCardInfo->strBirthday);
+		strcpy(HsmInfo.strRandom1, strRomdom[1].toStdString().c_str());
+		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
 
 		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
 		{
@@ -211,29 +241,26 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		gInfo() << "strCardInfo = " << strCardInfo;
 		if (QFailed(nResult = iWriteCardBas_HSM_Step1((char*)szExAuthData, (char*)strCardInfo.c_str(), szWHSM1)))
 		{
-			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			strMessage = QString("iWriteCardBas_HSM_Step1,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;
 		}
 		gInfo() << "szWHSM1 = " << szWHSM1;
 		if (QFailed(nResult = iReadSignatureKey(DevConfig.nSSCardReaderPowerOnType, szSignatureKey)))
 		{
-			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			strMessage = QString("iReadSignatureKey,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;
 		}
 		gInfo() << "szSignatureKey = " << szSignatureKey;
 		string strPublicKey = szSignatureKey;
 		string strAlgorithm = "03";
-		if (QFailed(nResult = getCA(Region.strCM_CA_Account.c_str(),
-			Region.strCM_CA_Password.c_str(),
-			Region.strArea.c_str(),
-			pSSCardInfo->strCardID,
-			pSSCardInfo->strCardNum,
-			strPublicKey.c_str(),
-			pSSCardInfo->strName,
-			strAlgorithm.c_str(),
-			caInfo)))
+
+		if (QFailed(nResult = GetCA(strMessage, nStatus, pSSCardInfo, strPublicKey.c_str(), strAlgorithm.c_str(), caInfo)))
 		{
-			strMessage = QString("获取CA信息失败,%1").arg(nResult);
+			strMessage = QString("GetCA,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+		if (nStatus != 0 && nStatus != 1)
+		{
 			break;
 		}
 
@@ -244,14 +271,7 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 			break;
 		}
 		gInfo() << "szWriteCA Out = " << szWriteCARes;
-		char szBankNum[64] = { 0 };
-		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
-		{
-			strMessage = QString("读很卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
-			break;
-		}
-		gInfo() << "BankNum:" << szBankNum;
-		strcpy(pSSCardInfo->strBankNum, szBankNum);
+
 		nResult = 0;
 
 	} while (0);
@@ -278,13 +298,13 @@ int uc_MakeCard::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		}
 
 		TextPosition* pFieldPos = &pCardForm->posName;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pFieldPos->strFontName.c_str(), pFieldPos->nFontSize, pFieldPos->nFontStyle, pFieldPos->nColor, szRCode);
+		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		pFieldPos = &pCardForm->posIDNumber;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pFieldPos->strFontName.c_str(), pFieldPos->nFontSize, pFieldPos->nFontStyle, pFieldPos->nColor, szRCode);
+		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		pFieldPos = &pCardForm->posSSCardID;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pFieldPos->strFontName.c_str(), pFieldPos->nFontSize, pFieldPos->nFontStyle, pFieldPos->nColor, szRCode);
+		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		pFieldPos = &pCardForm->posIssueDate;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strValidDate, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pFieldPos->strFontName.c_str(), pFieldPos->nFontSize, pFieldPos->nFontStyle, pFieldPos->nColor, szRCode);
+		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strValidDate, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		ImagePosition& ImgPos = pCardForm->posImage;
 		m_pPrinter->Printer_AddImage((char*)g_pDataCenter->strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
 		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
@@ -307,11 +327,9 @@ int uc_MakeCard::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 int uc_MakeCard::Depense(QString& strMessage)
 {
 	int nResult = -1;
-	Kingaotech::_PRINTERBOX boxesUnit[10];
-	Kingaotech::BOXINFO boxesInfo = { 10, boxesUnit };
-	Kingaotech::LPBOXINFO lpBoxInfo = &boxesInfo;
-	Kingaotech::PRINTERSTATUS PrinterStatus;
-	Kingaotech::LPPRINTERSTATUS lpPrinterStatus = &PrinterStatus;
+
+	Kingaotech::LPBOXINFO lpBoxInfo = new Kingaotech::LBOXINFO;
+	Kingaotech::LPPRINTERSTATUS lpPrinterStatus = new Kingaotech::PRINTERSTATUS;
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	char szRCode[32] = { 0 };
 	do
@@ -369,6 +387,13 @@ int uc_MakeCard::Depense(QString& strMessage)
 		}
 		nResult = 0;
 	} while (0);
+
+	if (lpBoxInfo)
+		delete lpBoxInfo;
+
+	if (lpPrinterStatus)
+		delete lpPrinterStatus;
+
 	if (QFailed(nResult))
 	{
 		gInfo() << gQStr(strMessage);
@@ -383,36 +408,41 @@ int uc_MakeCard::OpenReader(QString& strMessage)
 	{
 		do
 		{
-			char szRCode[32] = { 0 };
-			DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-			QString strAppPath = QCoreApplication::applicationDirPath();
-			QString strReaderMudule = strAppPath + "/" + DevConfig.strPrinterModule.c_str();
 
-			m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
 			if (!m_pReaderLib)
 			{
-				strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
-				break;
+				char szRCode[32] = { 0 };
+				DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
+				QString strAppPath = QCoreApplication::applicationDirPath();
+				QString strReaderMudule = strAppPath + "/" + DevConfig.strReaderModule.c_str();
+
+				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
+				if (!m_pReaderLib)
+				{
+					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
+					break;
+				}
+				m_pReader = m_pReaderLib->Instance();
+				if (!m_pReader)
+				{
+					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
+					break;
+				}
+				if (QFailed(nResult = m_pReader->Reader_Create(DevConfig.nSSCardReaderType, szRCode)))
+				{
+					strMessage = QString("Reader_Create‘%1’失败,错误代码:%2").arg(DevConfig.strSSCardReadType.c_str()).arg(szRCode);
+					break;
+				}
+				if (QFailed(nResult = m_pReader->Reader_Init(szRCode)))
+				{
+					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
+					break;
+				}
+				RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+				char szOutInfo[1024] = { 0 };
+				DriverInit(m_pReader, (char*)Region.strArea.c_str(), (char*)Region.strSSCardDefaulutPin.c_str(), (char*)Region.strPrimaryKey.c_str(), szOutInfo);
 			}
-			m_pReader = m_pReaderLib->Instance();
-			if (!m_pReader)
-			{
-				strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
-				break;
-			}
-			if (QFailed(nResult = m_pReader->Reader_Create(DevConfig.nSSCardReaderType, szRCode)))
-			{
-				strMessage = QString("Reader_Create‘%1’失败,错误代码:%2").arg(DevConfig.strSSCardReadType.c_str()).arg(szRCode);
-				break;
-			}
-			if (QFailed(nResult = m_pReader->Reader_Init(szRCode)))
-			{
-				strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
-				break;
-			}
-			RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-			char szOutInfo[1024] = { 0 };
-			DriverInit(m_pReader, (char*)Region.strArea.c_str(), (char*)Region.strSSCardDefaulutPin.c_str(), (char*)Region.strPrimaryKey.c_str(), szOutInfo);
+
 		} while (0);
 		if (QFailed(nResult))
 			return -1;
@@ -490,10 +520,109 @@ void  uc_MakeCard::ShutDown()
 		WORD fwToner;			//平印色带状态,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
 	}PRINTERSTATUS, * LPPRINTERSTATUS;
 */
+
+int uc_MakeCard::PrepareCardData(QString& strMessage)
+{
+	gInfo() << __FUNCTION__;
+	int nStatus = 0;
+	int nResult = 0;
+	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	QString strCardProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus);
+
+#ifdef _DEBUG
+#pragma Warning("测试阶段使用测试人员身份信息")
+	QString strName, strID, strMobile;
+	if (QSucceed(LoadTestData(strName, strID, strMobile)))
+	{
+		gInfo() << "Succeed in load Test Card Data:" << gQStr(strName) << gQStr(strID) << gQStr(strMobile);
+		strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
+		strcpy((char*)pSSCardInfo->strName, strName.toLocal8Bit().data());
+		strcpy((char*)pIDCard->szIdentify, strID.toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strCardID, strID.toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strMobile, strMobile.toStdString().c_str());
+	}
+#endif
+
+	do
+	{
+		if (g_pDataCenter->strCardMakeProgress != "制卡中")
+		{
+			nResult = 0;
+			break;
+		}
+
+		nResult = MarkCard(strMessage, nStatus);
+		if (QFailed(nResult))
+		{
+			if (strMessage == "已经开始制卡")
+			{
+				nResult = GetCardData(strMessage, nStatus);
+				if (QFailed(nResult))
+				{
+					break;
+					/*nResult = CancelCardReplacement(strMessage, nStatus);
+					if (QFailed(nResult))
+						break;*/
+				}
+
+				if (nStatus != 0 && nStatus != 1)
+				{
+					nResult = -1;
+					break;
+				}
+				break;
+			}
+			else
+				break;
+			//nResult = CancelCardReplacement(strMessage, nStatus);
+			//if (QFailed(nResult))
+			//	break;
+		}
+		if (nStatus != 0 && nStatus != 1)
+		{
+			nResult = -1;
+			break;
+		}
+		if (nStatus == 1)
+		{// 尝试取消标注
+			nResult = CancelMarkCard(strMessage, nStatus);
+			if (QFailed(nResult))
+				break;
+
+			// 重新标注
+			nResult = MarkCard(strMessage, nStatus);
+			if (QFailed(nResult))
+				break;
+			if (nStatus != 0 && nStatus != 1)
+			{
+				nResult = -1;
+				break;
+			}
+		}
+
+		nResult = GetCardData(strMessage, nStatus);
+		if (QFailed(nResult))
+		{
+			break;
+			/*nResult = CancelCardReplacement(strMessage, nStatus);
+			if (QFailed(nResult))
+				break;*/
+		}
+
+		if (nStatus != 0 && nStatus != 1)
+		{
+			nResult = -1;
+			break;
+		}
+	} while (0);
+	return nResult;
+}
+
 void uc_MakeCard::ThreadWork()
 {
 	char szRCode[32] = { 0 };
-	int nResult = 0;
+	int nResult = -1;
 	QString strMessage;
 	Kingaotech::_PRINTERBOX boxesUnit[10];
 	Kingaotech::BOXINFO boxesInfo = { 10, boxesUnit };
@@ -507,17 +636,25 @@ void uc_MakeCard::ThreadWork()
 	int nBufferSize = sizeof(szBuffer);
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	int nStatus = 0;
+	QString strInfo;
 
 	do
 	{
+		if (QFailed(PrepareCardData(strMessage)))
+			break;
+
 		if (QFailed(Depense(strMessage)))
 			break;
-
+		strInfo = "进卡成功";
+		gInfo() << gQStr(strInfo);
 		if (QFailed(WriteCard(pCardInfo, strMessage)))
 			break;
-
+		strInfo = "写卡成功";
+		gInfo() << gQStr(strInfo);
 		if (QFailed(PrintCard(pCardInfo, strMessage)))
 			break;
+		strInfo = "卡片打印成功";
+		gInfo() << gQStr(strInfo);
 		nResult = 0;
 	} while (0);
 
@@ -527,8 +664,9 @@ void uc_MakeCard::ThreadWork()
 		do
 		{
 			gInfo() << "Try to CancelMarkCard";
-			if (QFailed(CancelMarkCard(strMessage, nStatus)))
+			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus)))
 			{
+				strMessage = QString("取消标注失败:%1").arg(strMessage);
 				gInfo() << gQStr(strMessage);
 				break;
 			}
@@ -549,18 +687,26 @@ void uc_MakeCard::ThreadWork()
 	nResult = -1;
 	do
 	{
+
 		// 数据回盘
-		if (QFailed(ReturnCardData(strMessage, pCardInfo)))
+		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pCardInfo)))
 		{
 			gError() << strMessage.toLocal8Bit().data();
 			break;
 		}
+#pragma Warning("回盘失败如何处理？")
+		if (nStatus != 0 && nStatus != 1)
+			break;
+
 		// 启用
-		if (QFailed(EnalbeCard(strMessage, nStatus)))
+		if (QFailed(nResult = EnalbeCard(strMessage, nStatus)))
 		{
 			gError() << strMessage.toLocal8Bit().data();
 			break;
 		}
+		if (nStatus != 0 && nStatus != 1)
+			break;
+#pragma Warning("启用卡片失败如何处理？")
 		nResult = 0;
 	} while (0);
 
@@ -571,6 +717,6 @@ void uc_MakeCard::ThreadWork()
 	}
 	else
 	{
-		emit ShowMaskWidget("提示", "制止成功,请及时取走卡片", Fetal, Return_MainPage);
+		emit ShowMaskWidget("提示", "制卡成功,请及时取走卡片", Success, Return_MainPage);
 	}
 }

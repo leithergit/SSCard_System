@@ -10,25 +10,16 @@
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 
-#pragma comment(lib, "../SDK/Printer/KT_Printer")
-#pragma comment(lib, "../SDK/Reader/KT_Reader")
-#pragma comment(lib, "../SDK/SSCardDriver/SSCardDriver")
-#pragma comment(lib, "../SDK/SSCardHSM/SSCardHSM")
-#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfo")
+#pragma comment(lib, "../SDK/Printer/KT_Printerd")
+#pragma comment(lib, "../SDK/Reader/KT_Readerd")
+#pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
+#pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
+#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
 #pragma comment(lib, "../SDK/libcurl/libcurl")
 
 extern DataCenterPtr g_pDataCenter;
 DataCenter::DataCenter()
 {
-	BaseInfo Bi;
-	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy(Bi.strEMUrl, region.strEMURL.c_str());
-	strcpy(Bi.strAccount, region.strEMAccount.c_str());
-	strcpy(Bi.strPassword, region.strEMPassword.c_str());
-	if (!InitEnv(Bi))
-	{
-		gInfo() << "Failed in InitEnv";
-	}
 
 
 }

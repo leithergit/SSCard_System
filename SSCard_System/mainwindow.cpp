@@ -14,11 +14,20 @@ MainWindow::MainWindow(QWidget* parent)
 	, ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+	BaseInfo Bi;
+	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
+	strcpy(Bi.strEMUrl, region.strEMURL.c_str());
+	strcpy(Bi.strAccount, region.strEMAccount.c_str());
+	strcpy(Bi.strPassword, region.strEMPassword.c_str());
+	if (!InitEnv(Bi))
+	{
+		gInfo() << "Failed in InitEnv";
+	}
+
 	//setStyleSheet(QString::fromUtf8("background-image:url(./Image/backgroud.jpg);"));
 	//setStyleSheet(QString::fromUtf8("background-image:url(D:/Work/Henan_shangqiu/HNBXZM/Image/backgroud.jpg);"));
 	//this->setStyleSheet(QString::fromUtf8(".QMainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
 	this->setStyleSheet(QString::fromUtf8("#MainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
-	//D:\Work\Henan_shangqiu\HNBXZM\Image
 
 	m_nDateTimer = startTimer(1000);
 	m_pMainpage = new MainPage(this);
@@ -41,9 +50,12 @@ MainWindow::MainWindow(QWidget* parent)
 	Qt::WindowMaximized     0x00000002      The window is maximized with a frame around it.
 	Qt::WindowFullScreen    0x00000004      The window fills the entire screen without any frame around it.
 	Qt::WindowActive        0x00000008      The window is the active window, i.e. it has keyboard focus.
+	flags |= Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint;
+	w.setWindowFlags(flags);
 	*/
-	//setWindowFlags((Qt::WindowFlags)(windowFlags()|Qt::WindowStaysOnTopHint));
-	//setWindowFlags((Qt::WindowFlags)(windowFlags()));
+	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
+	// Qt::WindowFlags flags = w.windowFlags();
+
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);

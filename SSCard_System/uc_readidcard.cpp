@@ -4,6 +4,7 @@
 #include "Gloabal.h"
 #include <chrono>
 #include <algorithm>
+#include "Payment.h"
 //#include "mainwindow.h"
 using namespace std;
 using namespace chrono;
@@ -102,28 +103,28 @@ void uc_ReadIDCard::ThreadWork()
 	}
 }
 
-int  uc_ReadIDCard::GetIDImageStorePath(string& strFilePath)
-{
-	QString strStorePath = QCoreApplication::applicationDirPath();
-	strStorePath += "/IDImage/";
-	strStorePath += QDateTime::currentDateTime().toString("yyyyMMdd/");
-	QFileInfo fi(strStorePath);
-	if (!fi.isDir())
-	{// 当天目录不存在？则创建目录
-		QDir storeDir;
-		if (!storeDir.mkpath(strStorePath))
-		{
-			char szError[1024] = { 0 };
-			_strerror_s(szError, 1024, nullptr);
-			QString Info = QString("创建身份证照片保存目录'%1'失败:%2").arg(strStorePath, szError);
-			gInfo() << Info.toLocal8Bit().data();
-			return -1;
-		}
-	}
-	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
-	strFilePath = strTempPath.toStdString();
-	return 0;
-}
+// int  uc_ReadIDCard::GetIDImageStorePath(string& strFilePath)
+// {
+// 	QString strStorePath = QCoreApplication::applicationDirPath();
+// 	strStorePath += "/IDImage/";
+// 	strStorePath += QDateTime::currentDateTime().toString("yyyyMMdd/");
+// 	QFileInfo fi(strStorePath);
+// 	if (!fi.isDir())
+// 	{// 当天目录不存在？则创建目录
+// 		QDir storeDir;
+// 		if (!storeDir.mkpath(strStorePath))
+// 		{
+// 			char szError[1024] = { 0 };
+// 			_strerror_s(szError, 1024, nullptr);
+// 			QString Info = QString("创建身份证照片保存目录'%1'失败:%2").arg(strStorePath, szError);
+// 			gInfo() << Info.toLocal8Bit().data();
+// 			return -1;
+// 		}
+// 	}
+// 	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+// 	strFilePath = strTempPath.toStdString();
+// 	return 0;
+// }
 
 #define    Error_Not_IDCARD         (-1)
 

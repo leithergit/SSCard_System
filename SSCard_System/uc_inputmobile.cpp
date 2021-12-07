@@ -18,6 +18,8 @@ uc_InputMobile::~uc_InputMobile()
 
 int uc_InputMobile::ProcessBussiness()
 {
+	ui->lineEdit_Mobile->setText("138-8888-8888");
+	ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	m_strMobile = "";
 	return 0;
@@ -146,7 +148,7 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
 		QString strMessage;
 		int nResult = 0;
-		if (QFailed(QueryPayResult(strMessage, nResult)))
+		/*if (QFailed(QueryPayResult(strMessage, nResult)))
 		{
 			gInfo() << strMessage.toLocal8Bit().data();
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
@@ -156,11 +158,11 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		{
 			QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
 			gInfo() << strInfo.toLocal8Bit().data();
-			emit ShowMaskWidget("操作失败", strInfo, Success, Skip_NextPage);
+			emit ShowMaskWidget("操作成功", strInfo, Success, Skip_NextPage);
 		}
-		else
+		else*/
 		{
-			QString strInfo = "手机号码已确认,稍后请支付补卡费用!";
+			QString strInfo = "手机号码已确认,稍后将进入费用支付流程!";
 			gInfo() << strInfo.toLocal8Bit().data();
 			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
 		}

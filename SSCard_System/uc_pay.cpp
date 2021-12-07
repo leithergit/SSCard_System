@@ -60,7 +60,7 @@ int uc_Pay::ProcessBussiness()
 		gInfo() << strMessage.toLocal8Bit().data();
 		// 获取二维码保存路径
 		QString strQRPath;
-		if (!GetQRCodeStorePath(strQRPath))
+		if (GetQRCodeStorePath(strQRPath))
 		{
 			gError() << strMessage.toLocal8Bit().data();
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
@@ -347,11 +347,13 @@ void uc_Pay::ThreadWork()
 				if (m_nPayStatus == Pay_Not)										// 初始状态为未支付
 				{
 					nResult = QueryPayment(strMessage, m_nPayStatus);				// 查询支付结果
+					m_nPayStatus = Pay_Succeed;
+#pragma Warning("未支付也将流程继续进行，即作测试用!")
 					if (m_nPayStatus == Pay_Not)
 					{
 						break;
 					}
-					else if (nResult == Pay_Succeed)
+					else if (m_nPayStatus == Pay_Succeed)
 					{
 						nResult = ApplyCardReplacement(strMessage, nStatus);     //  申请补换卡
 						if (QFailed(nResult))
@@ -391,6 +393,10 @@ void uc_Pay::ThreadWork()
 				nResult = MarkCard(strMessage, nStatus);
 				if (QFailed(nResult))
 				{
+					nResult = CancelMarkCard(strMessage, nStatus);
+					if (QFailed(nResult))
+						break;
+
 					nResult = CancelCardReplacement(strMessage, nStatus);
 					if (QFailed(nResult))
 						break;
@@ -401,15 +407,22 @@ void uc_Pay::ThreadWork()
 					break;
 				}
 
-				SSCardInfoPtr pNewSSCardInfo = make_shared<SSCardInfo>();
-				nResult = GetCardData(strMessage, pNewSSCardInfo);
+				nResult = GetCardData(strMessage, nStatus);
 				if (QFailed(nResult))
 				{
+					nResult = CancelMarkCard(strMessage, nStatus);
+					if (QFailed(nResult))
+						break;
+
 					nResult = CancelCardReplacement(strMessage, nStatus);
 					if (QFailed(nResult))
 						break;
 				}
-				g_pDataCenter->SetSSCardInfo(pNewSSCardInfo);
+				if (nStatus != 0 && nStatus != 1)
+				{
+					nResult = -1;
+					break;
+				}
 
 			} while (0);
 			tLast = high_resolution_clock::now();

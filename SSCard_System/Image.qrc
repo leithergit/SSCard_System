@@ -41,6 +41,7 @@
         <file>Image/Registerlost_Pressed.png</file>
         <file>Image/UpdateCard_hover.png</file>
         <file>Image/UpdateCard_Pressed.png</file>
+        <file>qml/SliderPlayer.qml</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

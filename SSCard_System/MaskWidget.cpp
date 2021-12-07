@@ -95,3 +95,9 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 		}
 	}
 }
+
+void MaskWidget::on_pushButton_OK_clicked()
+{
+    hide();
+}
+

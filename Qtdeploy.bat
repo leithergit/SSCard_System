@@ -1,1 +1,1 @@
-D:\Qt\5.15.2\msvc2019\bin\windeployqt  %1  -qmldir  D:\Qt\5.15.2\msvc2019\qml
+D:\Qt\5.15.2\msvc2019\bin\windeployqt %1 -qmldir  D:\Qt\5.15.2\msvc2019\qml 

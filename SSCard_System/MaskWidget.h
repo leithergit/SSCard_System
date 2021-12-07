@@ -21,6 +21,9 @@ public:
 	void Popup(QString strTitle, QString strDesc, int nStatus, int nPageOpteration, int nTimeout);
 signals:
 	void MaskTimeout(int nOperationPage);
+private slots:
+    void on_pushButton_OK_clicked();
+
 private:
 	QString m_strFailedText = "";
 	int m_nTimerID = 0;

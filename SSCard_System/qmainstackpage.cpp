@@ -16,6 +16,7 @@ QMainStackPage::QMainStackPage(QWidget* parent)
 		if ((w = qobject_cast<QMainWindow*>(w)))
 			m_pMainWindow = w;
 	}
+
 	installEventFilter(this);
 }
 
@@ -125,6 +126,7 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 			pCurPage->ShutDown();
 
 			int nNewPage = nCurIndex + nPageOperation - Switch_NextPage + 1;
+
 			gInfo() << __FUNCTION__ << " nNewPage = " << nNewPage;
 			if (nNewPage < m_pStackWidget->count() - 1)
 			{
@@ -141,7 +143,11 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 			}
 			break;
 		}
-
 		}
 	}
+}
+
+void QMainStackPage::on_SwitchPage(int nPage)
+{
+	QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
 }

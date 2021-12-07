@@ -35,6 +35,7 @@ public:
 public slots:
 	void on_pushButton_MainPage_clicked();
 	virtual void on_SwitchNextPage(int nPageOperation);
+	virtual void on_SwitchPage(int nPage);
 	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
 	{
 		qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nPageOperation;
@@ -43,6 +44,7 @@ public slots:
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation);
 	void SwitchNextPage(int nOperation);
+	void SwitchPage(int nPage);
 };
 
 #endif // QMAINSTACKPAGE_H
