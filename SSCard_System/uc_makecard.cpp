@@ -521,7 +521,7 @@ void  uc_MakeCard::ShutDown()
 	}PRINTERSTATUS, * LPPRINTERSTATUS;
 */
 
-int uc_MakeCard::PrepareCardData(QString& strMessage)
+int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 {
 	gInfo() << __FUNCTION__;
 	int nStatus = 0;
@@ -546,23 +546,14 @@ int uc_MakeCard::PrepareCardData(QString& strMessage)
 
 	do
 	{
-		if (g_pDataCenter->strCardMakeProgress != "制卡中")
-		{
-			nResult = 0;
-			break;
-		}
-
-		nResult = MarkCard(strMessage, nStatus);
-		if (QFailed(nResult))
+		if (QFailed(nResult = MarkCard(strMessage, nStatus)))
 		{
 			if (strMessage == "已经开始制卡")
 			{
-				nResult = GetCardData(strMessage, nStatus);
-				if (QFailed(nResult))
+				if (QFailed(nResult = GetCardData(strMessage, nStatus)))
 				{
 					break;
-					/*nResult = CancelCardReplacement(strMessage, nStatus);
-					if (QFailed(nResult))
+					/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
 						break;*/
 				}
 
@@ -575,8 +566,7 @@ int uc_MakeCard::PrepareCardData(QString& strMessage)
 			}
 			else
 				break;
-			//nResult = CancelCardReplacement(strMessage, nStatus);
-			//if (QFailed(nResult))
+			//if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
 			//	break;
 		}
 		if (nStatus != 0 && nStatus != 1)
@@ -584,29 +574,25 @@ int uc_MakeCard::PrepareCardData(QString& strMessage)
 			nResult = -1;
 			break;
 		}
-		if (nStatus == 1)
-		{// 尝试取消标注
-			nResult = CancelMarkCard(strMessage, nStatus);
-			if (QFailed(nResult))
-				break;
+		//if (nStatus == 1)
+		//{// 尝试取消标注
+		//	if (QFailed(nResult = CancelMarkCard(strMessage, nStatus)))
+		//		break;
 
-			// 重新标注
-			nResult = MarkCard(strMessage, nStatus);
-			if (QFailed(nResult))
-				break;
-			if (nStatus != 0 && nStatus != 1)
-			{
-				nResult = -1;
-				break;
-			}
-		}
+		//	// 重新标注
+		//	if (QFailed(nResult = MarkCard(strMessage, nStatus)))
+		//		break;
+		//	if (nStatus != 0 && nStatus != 1)
+		//	{
+		//		nResult = -1;
+		//		break;
+		//	}
+		//}
 
-		nResult = GetCardData(strMessage, nStatus);
-		if (QFailed(nResult))
+		if (QFailed(nResult = GetCardData(strMessage, nStatus)))
 		{
 			break;
-			/*nResult = CancelCardReplacement(strMessage, nStatus);
-			if (QFailed(nResult))
+			/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
 				break;*/
 		}
 
@@ -619,6 +605,102 @@ int uc_MakeCard::PrepareCardData(QString& strMessage)
 	return nResult;
 }
 
+
+int uc_MakeCard::PrepareMakeCard(QString& strMessage)
+{
+	int nStatus = 0;
+	int nResult = -1;
+	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	int nPayStatus = Pay_Not;
+	do
+	{
+#ifndef _DEBUG
+		if (QFailed(nResult = QueryPayment(strMessage, nPayStatus)))
+			break;
+		if (nPayStatus == Pay_Not)
+		{
+			strMessage = "补卡费用尚未支付!";
+			nResult = -1;
+			break;
+		}
+#endif
+
+		nResult = ApplyCardReplacement(strMessage, nStatus);     //  申请补换卡
+		if (QFailed(nResult))
+			break;
+		if (nStatus != 0 && nStatus != 1)
+		{
+			nResult = -1;
+			break;
+		}
+
+		nResult = ResgisterPayment(strMessage, nStatus);          // 缴费登记
+		if (QFailed(nResult))
+			break;
+
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = QString("缴费登记失败:%1!").arg(nStatus);
+			nResult = -1;
+			break;
+		}
+
+		nResult = MarkCard(strMessage, nStatus);
+		if (QFailed(nResult))
+		{
+			if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
+				break;
+			if (nStatus != 0 && nStatus != 1)
+			{
+				strMessage = QString("取消补换卡失败:%1!").arg(nStatus);
+				nResult = -1;
+				break;
+			}
+		}
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = QString("即制卡标注失败:%1!").arg(nStatus);
+			nResult = -1;
+			break;
+		}
+
+		if (QFailed(nResult = GetCardData(strMessage, nStatus)))
+		{
+			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus)))
+			{
+				strMessage = "因获取制卡数据失败,尝试取消即制卡标注时再次失败!";
+				break;
+			}
+			if (nStatus != 0 && nStatus != 1)
+			{
+				strMessage = QString("因获取制卡数据失败,尝试取消即制卡标失败:%1!").arg(strMessage);
+				nResult = -1;
+				break;
+			}
+
+			if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
+			{
+				strMessage = "因获取制卡数据失败,尝试取消补卡申请时再次失败!";
+				break;
+			}
+
+			if (nStatus != 0 && nStatus != 1)
+			{
+				strMessage = QString("因获取制卡数据失败,尝试取消补换卡失败:%1!").arg(nStatus);
+				nResult = -1;
+				break;
+			}
+		}
+		if (nStatus != 0 && nStatus != 1)
+		{
+			nResult = -1;
+			break;
+		}
+	} while (0);
+	return nResult;
+
+}
 void uc_MakeCard::ThreadWork()
 {
 	char szRCode[32] = { 0 };
@@ -640,8 +722,18 @@ void uc_MakeCard::ThreadWork()
 
 	do
 	{
-		if (QFailed(PrepareCardData(strMessage)))
-			break;
+		if (g_pDataCenter->strCardMakeProgress == "制卡中")
+		{
+			if (QFailed(PrecessCardInMaking(strMessage)))
+				break;
+		}
+		else
+		{
+			if (QFailed(PrepareMakeCard(strMessage)))
+			{
+				break;
+			}
+		}
 
 		if (QFailed(Depense(strMessage)))
 			break;
@@ -687,7 +779,6 @@ void uc_MakeCard::ThreadWork()
 	nResult = -1;
 	do
 	{
-
 		// 数据回盘
 		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pCardInfo)))
 		{

@@ -53,7 +53,8 @@ MainWindow::MainWindow(QWidget* parent)
 	flags |= Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint;
 	w.setWindowFlags(flags);
 	*/
-	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
+	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
+	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowMaximizeButtonHint));
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));

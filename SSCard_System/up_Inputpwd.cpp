@@ -76,6 +76,13 @@ void  up_InputPWD::ShutDown()
 		m_pWorkThread = nullptr;
 	}
 	m_pPinKeybroad = nullptr;
+	QString strMessage;
+	if (m_pPinKeybroad)
+	{
+		m_pPinKeybroad->CloseDevice(strMessage);
+		m_pPinKeybroad = nullptr;
+	}
+
 }
 
 void up_InputPWD::OnInputPin(char ch)

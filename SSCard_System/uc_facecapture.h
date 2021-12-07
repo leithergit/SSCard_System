@@ -14,24 +14,25 @@ class uc_FaceCapture : public QStackPage
 	Q_OBJECT
 
 public:
-    explicit uc_FaceCapture(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit uc_FaceCapture(QLabel* pTitle, QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
 	~uc_FaceCapture();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-    DVTLDCamOCXLib::DVTLDCamOCX*m_pFaceDetectOcx = nullptr;
-    QImage  *m_pImageFaceDetected = nullptr;
-    void    ShutDownDevice();
-    int    OpenCamara(QString &strError);
-    int    CloseCamera(QString &strError);
-    bool   m_bOuputProductInfo = false;
-    int    GetFaceCaptureStorePath(QString &strFilePath);
-    bool   m_bFaceDetectSucceed = false;
+	DVTLDCamOCXLib::DVTLDCamOCX* m_pFaceDetectOcx = nullptr;
+	QImage* m_pImageFaceDetected = nullptr;
+	void    ShutDownDevice();
+	virtual void ShutDown() override;
+	int    OpenCamara(QString& strError);
+	int    CloseCamera(QString& strError);
+	bool   m_bOuputProductInfo = false;
+	int    GetFaceCaptureStorePath(QString& strFilePath);
+	bool   m_bFaceDetectSucceed = false;
 
 signals:
-    void   FaceCaptureSucceed();
+	void   FaceCaptureSucceed();
 private slots:
-    void   OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
-    void   OnFaceCaptureSucceed();
+	void   OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
+	void   OnFaceCaptureSucceed();
 
 private:
 	Ui::FaceCapture* ui;

@@ -595,11 +595,11 @@ int     GetCardData(QString& strMessage, int& nStatus)
 	{
 		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-		}
+	}
 #endif
 
 	return 0;
-	}
+}
 
 int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
@@ -738,6 +738,7 @@ int LoadTestData(QString& strName, QString& strCardID, QString& strMobile)
 	QFileInfo fi(strAppPath);
 	if (!fi.isFile())
 		return -1;
+
 	strName = "韩晓丽";
 	strCardID = "412726198206150140";
 	strMobile = "13673888580";

@@ -31,6 +31,10 @@ void  uc_FaceCapture::ShutDownDevice()
 	}
 
 }
+void uc_FaceCapture::ShutDown()
+{
+	ShutDownDevice();
+}
 
 int uc_FaceCapture::ProcessBussiness()
 {
@@ -115,13 +119,13 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 		if (!m_pFaceDetectOcx)
 			break;
 		nResult = m_pFaceDetectOcx->EndLiveDectection();
-		if (!nResult)
+		if (nResult)
 		{
 			strError = QString("停止人脸检测失败,错误代码:%1!").arg(nResult);
 			break;
 		}
 		nResult = m_pFaceDetectOcx->CloseCamera();
-		if (!nResult)
+		if (nResult)
 		{
 			strError = QString("关闭摄像机失败,错误代码:%1!").arg(nResult);
 			break;

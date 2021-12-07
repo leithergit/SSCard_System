@@ -59,9 +59,11 @@ UpdateCard::~UpdateCard()
 void UpdateCard::OnTimerEvent()
 {
 	ui->label_CountDown->setText(QString("%1").arg(--m_nTimeout));
+	qDebug() << __FUNCTION__ << "m_nTimeout:" << m_nTimeout;
 	if (!m_nTimeout)
 	{
 		killTimer(m_nTimerID);
+		qDebug() << "KillTimer:" << m_nTimerID;
 		m_nTimerID = 0;
 		((QStackPage*)ui->stackedWidget->currentWidget())->OnTimeout();
 		((MainWindow*)m_pMainWindow)->on_pushButton_MainPage_clicked();

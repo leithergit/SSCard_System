@@ -98,7 +98,8 @@ public:
 	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 	//int GetCA(string& strPublicKey, SSCardInfoPtr& pSSCardInfo, CAInfo& caInfo, QString& strMessage);
 	int Depense(QString& strMessage);
-	int PrepareCardData(QString& strMessage);
+	int PrecessCardInMaking(QString& strMessage);
+	int PrepareMakeCard(QString& strMessage);
 	void CloseDevice();
 	void ThreadWork();
 	virtual void ShutDown() override;

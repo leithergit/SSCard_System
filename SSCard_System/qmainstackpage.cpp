@@ -43,6 +43,7 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 	//        return true;
 	//    }
 	//    else
+#ifdef _DEBUG
 	if (event->type() == QEvent::KeyRelease)
 	{
 		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
@@ -54,7 +55,7 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 		}
 		else if (keyEvent->key() == Qt::Key_Backspace)
 		{
-			on_pushButton_MainPage_clicked();
+			//on_pushButton_MainPage_clicked();
 			return true;
 		}
 		else if (keyEvent->key() == Qt::Key_Escape)
@@ -65,6 +66,7 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -81,8 +83,13 @@ void QMainStackPage::on_pushButton_MainPage_clicked()
 void QMainStackPage::ResetAllPages()
 {
 	if (m_nTimerID)
+	{
 		killTimer(m_nTimerID);
+		qDebug() << "KillTimer:" << m_nTimerID;
+	}
+
 	m_nTimerID = startTimer(1000);
+	qDebug() << "m_nTimerID:" << m_nTimerID;
 	if (m_pStackWidget)
 	{
 		int nPageCount = m_pStackWidget->count();
@@ -120,7 +127,11 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 		default:
 		{
 			if (m_nTimerID)
+			{
 				killTimer(m_nTimerID);
+				qDebug() << "KillTimer:" << m_nTimerID;
+			}
+
 			int nCurIndex = m_pStackWidget->currentIndex();
 			QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
 			pCurPage->ShutDown();
@@ -134,8 +145,10 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 				QStackPage* pNewPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
 				pNewPage->ActiveTitle();
 				pNewPage->ProcessBussiness();
-				m_nTimeout = pNewPage->m_nTimeout;
+				qDebug() << __FUNCTION__ << "m_nTimeout=" << m_nTimeout;
+				m_nTimeout = 300;// pNewPage->m_nTimeout;
 				m_nTimerID = startTimer(1000);
+				qDebug() << "m_nTimerID:" << m_nTimerID;
 			}
 			else
 			{
@@ -149,5 +162,5 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 
 void QMainStackPage::on_SwitchPage(int nPage)
 {
-	QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
+	///QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
 }

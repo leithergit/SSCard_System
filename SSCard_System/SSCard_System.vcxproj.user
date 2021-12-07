@@ -4,7 +4,7 @@
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
     <RemoteDebuggerCommand>D:\SSCardSystem\SSCard_System.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerServerName>192.168.10.10</RemoteDebuggerServerName>
+    <RemoteDebuggerServerName>192.168.137.65</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
     <RemoteDebuggerWorkingDirectory>D:\SSCardSystem\</RemoteDebuggerWorkingDirectory>
