@@ -6,8 +6,9 @@
 #include <QMessageBox>
 #include <QPaintEngine>
 #include <QPainter>
-
+#include "SystemManager.h"
 #include "qmainstackpage.h"
+#include "CheckPassword.h"
 MaskWidget* g_pMaskWindow = nullptr;
 
 MainWindow::MainWindow(QWidget* parent)
@@ -58,18 +59,54 @@ MainWindow::MainWindow(QWidget* parent)
 	w.setWindowFlags(flags);
 	*/
 	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
-	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint));
+	setWindowFlags((Qt::WindowFlags)(windowFlags()/* | Qt::WindowStaysOnTopHint*/ | Qt::FramelessWindowHint));
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
+}
+
+void MainWindow::On_LoadSystemManager()
+{
+	CheckPassword checkpwd;
+	if (checkpwd.exec() == QDialog::Accepted)
+	{
+		SystemManager d;
+		d.exec();
+	}
+
 }
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
 {
 	qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
+
+	if ((e->x() >= 1880 && e->y() >= 960) ||
+		(e->x() <= 1920 && e->y() <= 990))
+	{
+		auto tNow = chrono::high_resolution_clock::now();
+		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - m_tLastPress);
+		if (tDuration.count() < 1000)
+		{
+			m_nContinuePressCount++;
+			if (m_nContinuePressCount >= 6)
+			{
+				emit LoadSystemManager();
+			}
+		}
+		else
+		{
+			m_nContinuePressCount = 0;
+		}
+	}
+	else
+	{
+		m_nContinuePressCount = 0;
+	}
+	m_tLastPress = chrono::high_resolution_clock::now();
 	/*
  Mouse X= 1887  Mouse Y= 959
 Mouse X= 1887  Mouse Y= 959
@@ -217,6 +254,7 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	}
 	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nPageOperation, nTimeout);
 }
+
 void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 {
 	gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];

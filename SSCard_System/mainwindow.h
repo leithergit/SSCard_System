@@ -13,6 +13,8 @@
 //#include "operatorfailed.h"
 
 #include "Gloabal.h"
+using namespace std;
+using namespace chrono;
 
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +35,8 @@ public:
 	UpdatePassword* m_pUpdatePassword = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
 	MaskWidget* m_pMaskWindow = nullptr;
+	high_resolution_clock::time_point	m_tLastPress = high_resolution_clock::now();
+	int		m_nContinuePressCount = 0;
 
 	void mousePressEvent(QMouseEvent* e);
 
@@ -44,6 +48,8 @@ public:
 
 	void on_pushButton_MainPage_clicked();
 
+	void On_LoadSystemManager();
+
 	int m_nDateTimer = 0;
 	virtual void timerEvent(QTimerEvent* event) override;
 	int LoadConfigure(QString& strError);
@@ -51,6 +57,7 @@ public:
 
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
+	void LoadSystemManager();
 
 private slots:
 	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);

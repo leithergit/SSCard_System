@@ -141,6 +141,18 @@
     <ClCompile Include="imageviewlabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SystemManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemConfigure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckPassword.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -288,6 +300,18 @@
     <QtUic Include="updatepassword.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="SystemManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="DeviceManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="SystemConfigure.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="CheckPassword.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Homepage.png">
@@ -340,6 +364,18 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="imageviewlabel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SystemManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="DeviceManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SystemConfigure.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CheckPassword.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

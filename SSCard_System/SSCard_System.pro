@@ -11,11 +11,16 @@ CONFIG += c++17
 SOURCES += \
     ../utility/TimeUtility.cpp \
     ../utility/Utility.cpp \
+    CheckPassword.cpp \
+    DeviceManager.cpp \
     Gloabal.cpp \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
     Payment.cpp \
     SDK/dvtldcamocx/dvtldcamocxlib.cpp \
+    SystemConfigure.cpp \
+    SystemManager.cpp \
+    imageviewlabel.cpp \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
@@ -38,11 +43,16 @@ SOURCES += \
     updatepassword.cpp \
 
 HEADERS += \
+    CheckPassword.h \
+    DeviceManager.h \
     Gloabal.h \
     MaskWidget.h \
     OperatorSucceed.h \
     Payment.h \
     SDK/dvtldcamocx/dvtldcamocxlib.h \
+    SystemConfigure.h \
+    SystemManager.h \
+    imageviewlabel.h \
     mainpage.h \
     mainwindow.h \
     qmainstackpage.h \
@@ -67,8 +77,12 @@ HEADERS += \
     ../utility/Utility.h
 
 FORMS += \
+    CheckPassword.ui \
+    DeviceManager.ui \
     MaskWidget.ui \
     OperatorSucceed.ui \
+    SystemConfigure.ui \
+    SystemManager.ui \
     mainpage.ui \
     mainwindow.ui \
     registerlost.ui \
