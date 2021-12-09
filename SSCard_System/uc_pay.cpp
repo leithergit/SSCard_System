@@ -8,6 +8,8 @@
 #include <QPixmap>
 #include <QLabel>
 #include "Payment.h"
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 #include "Gloabal.h"
 
 //#include "mainwindow.h"
@@ -28,6 +30,8 @@ uc_Pay::~uc_Pay()
 
 int uc_Pay::ProcessBussiness()
 {
+	/*if (g_pMaskWindow)
+		g_pMaskWindow->hide();*/
 	ui->label_PaymentQRCode->setStyleSheet(QString::fromUtf8("border-image: url(:/Image/qr_pay.png);"));
 
 	//m_nWaitTime = 300;                         // 支付页面等侍时间，单位秒
@@ -131,9 +135,8 @@ void uc_Pay::ThreadWork()
 	int nResult = 0;
 	QString strMessage;
 	QString strPayUrl;
-	int nStatus = 0;
 #ifdef _DEBUG
-	int nDelay = 15000;
+	int nDelay = 20000;
 	auto tStart = high_resolution_clock::now();
 #endif
 

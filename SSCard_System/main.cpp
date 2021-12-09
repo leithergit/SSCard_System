@@ -54,8 +54,8 @@ int main(int argc, char* argv[])
 	MainWindow w;
 	//w.showFullScreen();
 	//w.showMaximized();
-
-
+	QRect size(1, 1, 1918, 1078);
+	w.setGeometry(size);
 	w.show();
 
 	int nRes = a.exec();

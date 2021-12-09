@@ -374,6 +374,7 @@ struct SysConfig
 		dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
+		bDebug = pSettings->value("EnableDebug", false).toBool();
 		pSettings->endGroup();
 
 		pSettings->beginGroup("PageTimeOut");
@@ -419,6 +420,7 @@ struct SysConfig
 	int             nSSCardPasswordSize = 6;			// 社保卡密码长度
 	int				nMaskTimeout[5];					// 各种遮罩层的逗留时间，单位毫秒
 	int				nPageTimeout[16];					// 各功能页面超时时间，单位秒
+	bool			bDebug;
 	std::map<string, string> strMapBank;
 };
 using SysConfigPtr = shared_ptr<SysConfig>;
@@ -525,13 +527,12 @@ public:
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
 	string		   strCardMakeProgress;
-
+	bool		   bDebug;
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardInfoPtr   pSSCardInfo = nullptr;
-
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;

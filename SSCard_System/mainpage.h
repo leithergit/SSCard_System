@@ -7,6 +7,12 @@ namespace Ui {
 	class MainPage;
 }
 
+struct ServiceDesc
+{
+	QString		strQR_Photo;
+	QString		strService[3];
+};
+
 class MainPage : public QWidget
 {
 	Q_OBJECT
@@ -15,6 +21,8 @@ public:
 	explicit MainPage(QWidget* parent = nullptr);
 	~MainPage();
 	QWidget* m_pMainWindow = nullptr;
+	ServiceDesc	m_ServiceDescription[2];
+	bool LoadServiceDescription();
 
 private slots:
 	void on_pushButton_Updatecard_clicked();

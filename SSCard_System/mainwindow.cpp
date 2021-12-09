@@ -8,12 +8,14 @@
 #include <QPainter>
 
 #include "qmainstackpage.h"
+MaskWidget* g_pMaskWindow = nullptr;
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 	, ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+	installEventFilter(this);
 	BaseInfo Bi;
 	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
 	strcpy(Bi.strEMUrl, region.strEMURL.c_str());
@@ -28,6 +30,7 @@ MainWindow::MainWindow(QWidget* parent)
 	//setStyleSheet(QString::fromUtf8("background-image:url(D:/Work/Henan_shangqiu/HNBXZM/Image/backgroud.jpg);"));
 	//this->setStyleSheet(QString::fromUtf8(".QMainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
 	this->setStyleSheet(QString::fromUtf8("#MainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
+	ui->label_logo->setStyleSheet("border-image: url(./Image/banklogo.png);");
 
 	m_nDateTimer = startTimer(1000);
 	m_pMainpage = new MainPage(this);
@@ -35,6 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
 	m_pUpdatePassword = new UpdatePassword(this);
 	m_pRegiserLost = new RegisterLost(this);
 	m_pMaskWindow = new MaskWidget(this);
+	g_pMaskWindow = m_pMaskWindow;
 	//m_pOperatorFailed = new OperatorFailed();
 	ui->stackedWidget->addWidget(m_pMainpage);
 	ui->stackedWidget->addWidget(m_pUpdateCard);
@@ -54,15 +58,40 @@ MainWindow::MainWindow(QWidget* parent)
 	w.setWindowFlags(flags);
 	*/
 	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
-	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowMaximizeButtonHint));
+	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint));
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
-	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
+}
 
+void MainWindow::mousePressEvent(QMouseEvent* e)
+{
+	qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
+	/*
+ Mouse X= 1887  Mouse Y= 959
+Mouse X= 1887  Mouse Y= 959
+Mouse X= 1887  Mouse Y= 959
+Mouse X= 1887  Mouse Y= 959
+Mouse X= 1887  Mouse Y= 959
+Mouse X= 1887  Mouse Y= 959
+The thread 0xb9c has exited with code 0 (0x0).
+The thread 0xc08 has exited with code 0 (0x0).
+The thread 0x838 has exited with code 0 (0x0).
+The thread 0x1328 has exited with code 0 (0x0).
+Mouse X= 1887  Mouse Y= 959
+Mouse X= 1849  Mouse Y= 924
+Mouse X= 1849  Mouse Y= 924
+Mouse X= 1849  Mouse Y= 924
+Mouse X= 1849  Mouse Y= 924
+Mouse X= 1915  Mouse Y= 985
+Mouse X= 1915  Mouse Y= 985
+Mouse X= 1915  Mouse Y= 985
+Mouse X= 1915  Mouse Y= 985
+
+	*/
 }
 
 MainWindow::~MainWindow()
@@ -108,6 +137,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	}
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
+	//m_pUpdateCard->OpenCamera();
 	m_pUpdateCard->show();
 }
 
@@ -150,6 +180,8 @@ void MainWindow::on_pushButton_MainPage_clicked()
 
 void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
 {
+	m_pMaskWindow = new MaskWidget(this);
+	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 	QPoint ptLeftTop = m_pMainpage->mapToGlobal(QPoint(0, 0));
 	m_pMaskWindow->setGeometry(m_pMainpage->geometry());
 	m_pMaskWindow->move(ptLeftTop);
@@ -179,7 +211,9 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 	gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
 	if (m_pMaskWindow)
 	{
-		m_pMaskWindow->hide();
+		//m_pMaskWindow->hide();
+		disconnect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
+		delete m_pMaskWindow;
 	}
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
 	pCurPage->emit SwitchNextPage(nPageOperation);

@@ -135,6 +135,7 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 			int nCurIndex = m_pStackWidget->currentIndex();
 			QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
 			pCurPage->ShutDown();
+			pCurPage->hide();
 
 			int nNewPage = nCurIndex + nPageOperation - Switch_NextPage + 1;
 
@@ -144,9 +145,11 @@ void QMainStackPage::on_SwitchNextPage(int nPageOperation)
 				m_pStackWidget->setCurrentIndex(nNewPage);
 				QStackPage* pNewPage = dynamic_cast<QStackPage*>(m_pStackWidget->currentWidget());
 				pNewPage->ActiveTitle();
+				pNewPage->show();
 				pNewPage->ProcessBussiness();
 				qDebug() << __FUNCTION__ << "m_nTimeout=" << m_nTimeout;
-				m_nTimeout = 300;// pNewPage->m_nTimeout;
+				//m_nTimeout = 300;
+				m_nTimeout = pNewPage->m_nTimeout;
 				m_nTimerID = startTimer(1000);
 				qDebug() << "m_nTimerID:" << m_nTimerID;
 			}

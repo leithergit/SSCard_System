@@ -22,7 +22,7 @@ public:
 signals:
 	void MaskTimeout(int nOperationPage);
 private slots:
-    void on_pushButton_OK_clicked();
+	void on_pushButton_OK_clicked();
 
 private:
 	QString m_strFailedText = "";
@@ -30,7 +30,7 @@ private:
 	int m_nTimeout = 0;
 	Ui::MaskWidget* ui;
 	int m_nPageOpteration = 0;
-	int m_nTimerInterval = 200;	//ms
+	int m_nTimerInterval = 1000;	//ms
 };
 
 #endif // MASKWIDGET_H

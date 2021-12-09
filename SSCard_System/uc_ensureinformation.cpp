@@ -4,6 +4,8 @@
 #include "Gloabal.h"
 #include "Payment.h"
 //#include "mainwindow.h"
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 
 uc_EnsureInformation::uc_EnsureInformation(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
 	QStackPage(pTitle, strStepImage, nTimeout, parent),
@@ -19,29 +21,31 @@ uc_EnsureInformation::~uc_EnsureInformation()
 
 int uc_EnsureInformation::ProcessBussiness()
 {
+	/*if (g_pMaskWindow)
+		g_pMaskWindow->hide();*/
 	QString strMessage;
 	int nStatus = 0;
 	int nResult = -1;
 	QString strCardProgress;
+	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	do
 	{
-		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
-#ifdef _DEBUG
-#pragma Warning("测试阶段使用测试人员身份信息")
-		QString strName, strID, strMobile;
-		if (QSucceed(LoadTestData(strName, strID, strMobile)))
-		{
-
-			gInfo() << "Succeed in load Test Card Data:" << gQStr(strName) << gQStr(strID) << gQStr(strMobile);
-			strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
-			strcpy((char*)pSSCardInfo->strName, strName.toLocal8Bit().data());
-			strcpy((char*)pIDCard->szIdentify, strID.toStdString().c_str());
-			strcpy((char*)pSSCardInfo->strCardID, strID.toStdString().c_str());
-			strcpy((char*)pSSCardInfo->strMobile, strMobile.toStdString().c_str());
-		}
-#endif
+		//#ifdef _DEBUG
+		//#pragma Warning("测试阶段使用测试人员身份信息")
+		//		QString strName, strID, strMobile;
+		//		if (QSucceed(LoadTestData(strName, strID, strMobile)))
+		//		{
+		//
+		//			gInfo() << "Succeed in load Test Card Data:" << gQStr(strName) << gQStr(strID) << gQStr(strMobile);
+		//			strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
+		//			strcpy((char*)pSSCardInfo->strName, strName.toLocal8Bit().data());
+		//			strcpy((char*)pIDCard->szIdentify, strID.toStdString().c_str());
+		//			strcpy((char*)pSSCardInfo->strCardID, strID.toStdString().c_str());
+		//			strcpy((char*)pSSCardInfo->strMobile, strMobile.toStdString().c_str());
+		//		}
+		//#endif
 		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();//QString strName = "韩娜娜";
 
 		//strcpy((char*)pIDCard->szIdentify, "412726198006120043");
@@ -74,11 +78,11 @@ int uc_EnsureInformation::ProcessBussiness()
 		if (QFailed(QuerySSCardStatus(strMessage)))
 			break;
 
-
 		if (nStatus != 0)
 		{
 			break;
 		}
+
 		strcpy((char*)pSSCardInfo->strBankCode, pTempSSCardInfo->strBankCode);
 
 		ui->label_Hello->setText(QString("您好，%1").arg(QString::fromLocal8Bit(pSSCardInfo->strName)));
@@ -101,6 +105,14 @@ int uc_EnsureInformation::ProcessBussiness()
 	{
 		gError() << gQStr(strMessage);
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+	}
+	QString strCardStatus = pSSCardInfo->strCardStatus;
+	if (strCardStatus == "正式挂失")
+	{
+		QString strInfo = QString("卡片状态:正式挂失,稍后请输入手机号码!");
+		gInfo() << gQStr(strInfo);
+
+		emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
 	}
 	if (g_pDataCenter->strCardMakeProgress == "制卡中")
 	{

@@ -5,6 +5,8 @@
 #include <chrono>
 #include <algorithm>
 #include "Payment.h"
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 //#include "mainwindow.h"
 using namespace std;
 using namespace chrono;
@@ -31,6 +33,10 @@ uc_ReadIDCard::~uc_ReadIDCard()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
+	/*if (g_pMaskWindow)
+		g_pMaskWindow->hide();*/
+	QSize WindowsSize = size();
+	qDebug() << "Height = " << WindowsSize.height() << "Width = " << WindowsSize.width();
 	m_bSucceed = false;
 
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();

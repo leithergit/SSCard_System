@@ -30,10 +30,20 @@ MainPage::MainPage(QWidget* parent) :
 	ui->pushButton_Updatecard->setStyleSheet(strUpdateCard);
 	ui->pushButton_RegisterLost->setStyleSheet(strRegisterLost);
 	ui->pushButton_ChangePWD->setStyleSheet(strChangePassword);
-	//    QUrl source("D:/Work/Henan_shangqiu/HNBXZM/SliderPlayer.qml");
-	//    //ui->quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView );
-	//    ui->quickWidget->setSource(source);
-	//    ui->quickWidget->setClearColor(QColor(Qt::transparent));
+	if (LoadServiceDescription())
+	{
+		QString strStyle = QString("border-image: url(./Image/%1);").arg(m_ServiceDescription[0].strQR_Photo);
+		ui->label_QR1->setStyleSheet(strStyle);
+		ui->label_QR1_Service->setText(m_ServiceDescription[0].strService[0]);
+		ui->label_QR1_Service_Text1->setText(m_ServiceDescription[0].strService[1]);
+		ui->label_QR1_Service_Text2->setText(m_ServiceDescription[0].strService[2]);
+
+		strStyle = QString("border-image: url(./Image/%1);").arg(m_ServiceDescription[1].strQR_Photo);
+		ui->label_QR2->setStyleSheet(strStyle);
+		ui->label_QR2_Service->setText(m_ServiceDescription[1].strService[0]);
+		ui->label_QR2_Service_Text1->setText(m_ServiceDescription[1].strService[1]);
+		ui->label_QR2_Service_Text2->setText(m_ServiceDescription[1].strService[2]);
+	}
 }
 
 MainPage::~MainPage()
@@ -43,6 +53,8 @@ MainPage::~MainPage()
 
 void MainPage::on_pushButton_Updatecard_clicked()
 {
+    QRect rt = this->geometry();
+    qDebug()<<__FUNCTION__<<rt;
 	g_pDataCenter->ResetIDData();
 	((MainWindow*)m_pMainWindow)->on_pushButton_Updatecard_clicked();
 }
@@ -57,4 +69,73 @@ void MainPage::on_pushButton_RegisterLost_clicked()
 {
 	g_pDataCenter->ResetIDData();
 	((MainWindow*)m_pMainWindow)->on_pushButton_RegisterLost_clicked();
+}
+
+bool MainPage::LoadServiceDescription()
+{
+	QString strAppPath = QCoreApplication::applicationDirPath();
+	strAppPath += "/ServicesDescription.json";
+	QFileInfo fi(strAppPath);
+	QString strInfo;
+	if (!fi.isFile())
+	{
+		strInfo = QString("找不到服务描述文件:%1").arg(strAppPath);
+		gInfo() << gQStr(strInfo);
+		return false;
+	}
+	QFile fileService(strAppPath);
+	if (!fileService.open(QIODevice::ReadOnly))
+	{
+		strInfo = QString("打开到服务描述文件失败:%1").arg(strAppPath);
+		gInfo() << gQStr(strInfo);
+		return false;
+	}
+
+	QByteArray FileContent = fileService.readAll();
+
+	QJsonParseError jsonError;
+	QJsonDocument jsonDoc(QJsonDocument::fromJson(FileContent, &jsonError));
+
+	if (jsonError.error != QJsonParseError::NoError)
+	{
+		qDebug() << jsonError.errorString();
+		return false;
+	}
+
+	QJsonObject rootObject = jsonDoc.object();
+	/*
+	{
+		"Wechat1": [{
+			"QR_Photo":"qr_wechat1.png",
+			"FolowWechat": "关注周口农商银行",
+			"SocialService": "提供查询社保服务",
+			"PayService": "提供缴费通知服务"
+		}],
+		"Wechat2": [{
+			"QR_Photo":"qr_wechat2.png",
+			"FolowWechat": "关注周口农商银行",
+			"SocialService": "提供查询社保服务",
+			"PayService": "提供缴费通知服务"
+		}]
+	}
+	*/
+	if (rootObject.contains("Wechat1"))
+	{
+		QJsonObject ServiceObj = rootObject.value("Wechat1").toObject();
+		m_ServiceDescription[0].strQR_Photo = ServiceObj["QR_Photo"].toString();
+		m_ServiceDescription[0].strService[0] = ServiceObj["FolowWechat"].toString();
+		m_ServiceDescription[0].strService[1] = ServiceObj["SocialService"].toString();
+		m_ServiceDescription[0].strService[2] = ServiceObj["PayService"].toString();
+
+	}
+	if (rootObject.contains("Wechat2"))
+	{
+		QJsonObject ServiceObj = rootObject.value("Wechat2").toObject();
+		m_ServiceDescription[1].strQR_Photo = ServiceObj["QR_Photo"].toString();
+		m_ServiceDescription[1].strService[0] = ServiceObj["FolowWechat"].toString();
+		m_ServiceDescription[1].strService[1] = ServiceObj["SocialService"].toString();
+		m_ServiceDescription[1].strService[2] = ServiceObj["PayService"].toString();
+	}
+
+	return true;
 }

@@ -19,7 +19,7 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	DVTLDCamOCXLib::DVTLDCamOCX* m_pFaceDetectOcx = nullptr;
-	QImage* m_pImageFaceDetected = nullptr;
+	//QImage* m_pImageFaceDetected = nullptr;
 	void    ShutDownDevice();
 	virtual void ShutDown() override;
 	int    OpenCamara(QString& strError);

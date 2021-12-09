@@ -2,6 +2,8 @@
 #include "up_changepwd.h"
 #include "ui_up_changepwd.h"
 #include "Gloabal.h"
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 //#include "mainwindow.h"
 
 up_ChangePWD::up_ChangePWD(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :

@@ -4,6 +4,8 @@
 #include "Gloabal.h"
 #include <QString>
 #include <chrono>
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 //#include "mainwindow.h"
 
 up_InputPWD::up_InputPWD(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :

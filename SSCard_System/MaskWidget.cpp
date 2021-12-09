@@ -10,7 +10,7 @@ MaskWidget::MaskWidget(QWidget* parent) :
 	ui(new Ui::MaskWidget)
 {
 	ui->setupUi(this);
-
+    ui->pushButton_OK->hide();
 	hide();
 }
 
@@ -30,7 +30,6 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	{
 	case Success:
 		//ui->label_Image->setPixmap();
-
 		strImage = "Success.png";
 		break;
 	default:
@@ -46,7 +45,6 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 		strImage = "exclamation.png";
 		break;
 	}
-
 
 	//   以下代码为下设置全屏遮罩，暂弃用
 	//    QPoint pos = QWidget::mapToGlobal(this->pos()); //获取窗口在桌面上的绝对位置
@@ -89,6 +87,7 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 		m_nTimeout -= m_nTimerInterval;
 		if (m_nTimeout <= 0)
 		{
+			hide();
 			killTimer(m_nTimerID);
 			m_nTimerID = 0;
 			emit MaskTimeout(m_nPageOpteration);
@@ -98,6 +97,6 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 
 void MaskWidget::on_pushButton_OK_clicked()
 {
-    hide();
+	hide();
 }
 

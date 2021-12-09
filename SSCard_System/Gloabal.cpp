@@ -9,18 +9,31 @@
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
-
+#ifdef _DEBUG
 #pragma comment(lib, "../SDK/Printer/KT_Printerd")
 #pragma comment(lib, "../SDK/Reader/KT_Readerd")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
 #pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
+#pragma comment(lib, "../SDK/libcurl/libcurld")
+#pragma comment(lib, "../SDK/QREncode/qrencoded")
+#else
+#pragma comment(lib, "../SDK/Printer/KT_Printer")
+#pragma comment(lib, "../SDK/Reader/KT_Reader")
+#pragma comment(lib, "../SDK/SSCardDriver/SSCardDriver")
+#pragma comment(lib, "../SDK/SSCardHSM/SSCardHSM")
+#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfo")
 #pragma comment(lib, "../SDK/libcurl/libcurl")
+#pragma comment(lib, "../SDK/QREncode/qrencode")
+#pragma comment(lib, "../SDK/IDCard/IDCard_API")
+#pragma comment(lib, "../SDK/glog/glog")
+#pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
+
+#endif
 
 extern DataCenterPtr g_pDataCenter;
 DataCenter::DataCenter()
 {
-
 
 }
 
@@ -49,6 +62,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			strError = "内存不足，无法初始化DataCenter类实例!";
 			return -1;
 		}
+		bDebug = GetSysConfigure()->bDebug;
 		return 0;
 	}
 

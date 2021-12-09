@@ -1,6 +1,8 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "uc_makecard.h"
 #include "ui_uc_makecard.h"
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 #include "Gloabal.h"
 #include "Payment.h"
 #pragma warning(disable:4189)
@@ -21,6 +23,8 @@ uc_MakeCard::~uc_MakeCard()
 
 int uc_MakeCard::ProcessBussiness()
 {
+	/*if (g_pMaskWindow)
+		g_pMaskWindow->hide();*/
 	m_nSocketRetryInterval = g_pDataCenter->GetSysConfigure()->PaymentConfig.nQueryPayResultInterval;            // 支付结构查询时间间隔单 毫秒
 	m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount;
 
@@ -530,19 +534,19 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	QString strCardProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus);
 
-#ifdef _DEBUG
-#pragma Warning("测试阶段使用测试人员身份信息")
-	QString strName, strID, strMobile;
-	if (QSucceed(LoadTestData(strName, strID, strMobile)))
-	{
-		gInfo() << "Succeed in load Test Card Data:" << gQStr(strName) << gQStr(strID) << gQStr(strMobile);
-		strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
-		strcpy((char*)pSSCardInfo->strName, strName.toLocal8Bit().data());
-		strcpy((char*)pIDCard->szIdentify, strID.toStdString().c_str());
-		strcpy((char*)pSSCardInfo->strCardID, strID.toStdString().c_str());
-		strcpy((char*)pSSCardInfo->strMobile, strMobile.toStdString().c_str());
-	}
-#endif
+	//#ifdef _DEBUG
+	//#pragma Warning("测试阶段使用测试人员身份信息")
+	//	QString strName, strID, strMobile;
+	//	if (QSucceed(LoadTestData(strName, strID, strMobile)))
+	//	{
+	//		gInfo() << "Succeed in load Test Card Data:" << gQStr(strName) << gQStr(strID) << gQStr(strMobile);
+	//		strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
+	//		strcpy((char*)pSSCardInfo->strName, strName.toLocal8Bit().data());
+	//		strcpy((char*)pIDCard->szIdentify, strID.toStdString().c_str());
+	//		strcpy((char*)pSSCardInfo->strCardID, strID.toStdString().c_str());
+	//		strcpy((char*)pSSCardInfo->strMobile, strMobile.toStdString().c_str());
+	//	}
+	//#endif
 
 	do
 	{

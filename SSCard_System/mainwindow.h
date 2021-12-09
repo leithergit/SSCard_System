@@ -9,6 +9,7 @@
 #include "updatepassword.h"
 #include "registerlost.h"
 #include "MaskWidget.h"
+#include <chrono>
 //#include "operatorfailed.h"
 
 #include "Gloabal.h"
@@ -17,6 +18,8 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+
 
 class MainWindow : public QMainWindow
 {
@@ -31,6 +34,8 @@ public:
 	RegisterLost* m_pRegiserLost = nullptr;
 	MaskWidget* m_pMaskWindow = nullptr;
 
+	void mousePressEvent(QMouseEvent* e);
+
 	void on_pushButton_Updatecard_clicked();
 
 	void on_pushButton_ChangePWD_clicked();
@@ -38,6 +43,7 @@ public:
 	void on_pushButton_RegisterLost_clicked();
 
 	void on_pushButton_MainPage_clicked();
+
 	int m_nDateTimer = 0;
 	virtual void timerEvent(QTimerEvent* event) override;
 	int LoadConfigure(QString& strError);

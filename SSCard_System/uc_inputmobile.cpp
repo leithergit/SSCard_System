@@ -1,6 +1,8 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "uc_inputmobile.h"
 #include "ui_uc_inputmobile.h"
+#include "MaskWidget.h"
+extern MaskWidget* g_pMaskWindow;
 #include "Gloabal.h"
 //#include "mainwindow.h"
 
@@ -18,7 +20,9 @@ uc_InputMobile::~uc_InputMobile()
 
 int uc_InputMobile::ProcessBussiness()
 {
-	ui->lineEdit_Mobile->setText("138-8888-8888");
+	/*if (g_pMaskWindow)
+		g_pMaskWindow->hide();*/
+	ui->lineEdit_Mobile->setText("");
 	ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	m_strMobile = "";
@@ -147,8 +151,8 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 	{
 		g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
 		QString strMessage;
-		int nResult = 0;
-		/*if (QFailed(QueryPayResult(strMessage, nResult)))
+		/*int nResult = 0;
+		if (QFailed(QueryPayResult(strMessage, nResult)))
 		{
 			gInfo() << strMessage.toLocal8Bit().data();
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
