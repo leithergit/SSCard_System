@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget* parent)
 	m_pUpdateCard = new UpdateCard(this);
 	m_pUpdatePassword = new UpdatePassword(this);
 	m_pRegiserLost = new RegisterLost(this);
-	m_pMaskWindow = new MaskWidget(this);
-	g_pMaskWindow = m_pMaskWindow;
+	//m_pMaskWindow = new MaskWidget(this);
+
 	//m_pOperatorFailed = new OperatorFailed();
 	ui->stackedWidget->addWidget(m_pMainpage);
 	ui->stackedWidget->addWidget(m_pUpdateCard);
@@ -137,7 +137,6 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	}
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
-	//m_pUpdateCard->OpenCamera();
 	m_pUpdateCard->show();
 }
 
@@ -180,11 +179,23 @@ void MainWindow::on_pushButton_MainPage_clicked()
 
 void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
 {
+	QMainStackPage* pCurPageSender = qobject_cast<QMainStackPage*>(sender());
+	//if (m_pMaskWindow)
+	//{
+	//	delete m_pMaskWindow;
+	//}
+
 	m_pMaskWindow = new MaskWidget(this);
+	g_pMaskWindow = m_pMaskWindow;
+	if (pCurPageSender)
+	{
+		m_pMaskWindow->setGeometry(pCurPageSender->geometry());
+		QPoint ptLeftTop = pCurPageSender->mapToGlobal(QPoint(0, 0));
+		m_pMaskWindow->move(ptLeftTop);
+	}
+
 	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
-	QPoint ptLeftTop = m_pMainpage->mapToGlobal(QPoint(0, 0));
-	m_pMaskWindow->setGeometry(m_pMainpage->geometry());
-	m_pMaskWindow->move(ptLeftTop);
+
 	int nTimeout = 2;
 	switch (nStatus)
 	{

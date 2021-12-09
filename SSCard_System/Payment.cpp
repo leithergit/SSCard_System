@@ -686,7 +686,7 @@ int     EnalbeCard(QString& strMessage, int& nStatus)
 }
 
 
-int GetCA(QString strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
+int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
 {
 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
@@ -723,7 +723,7 @@ int GetCA(QString strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const ch
 }
 
 
-int QueryCardProgress(QString strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo)
+int QueryCardProgress(QString& strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo)
 {
 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	int nResult = -1;

@@ -43,9 +43,9 @@ int  ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 // nStatus = 0 成功
 int  EnalbeCard(QString& strMessage, int& nStatus);
 
-int GetCA(QString strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo);
+int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo);
 
-int QueryCardProgress(QString strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo);
+int QueryCardProgress(QString& strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo);
 
 int GetIDImageStorePath(string& strFilePath);
 

@@ -84,6 +84,7 @@ FORMS += \
     up_changepwd.ui \
     up_readsscard.ui \
     updatecard.ui \
+    updatecard_copy.ui \
     updatepassword.ui
 
 # Default rules for deployment.

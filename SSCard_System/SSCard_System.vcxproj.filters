@@ -138,6 +138,9 @@
     <ClCompile Include="updatepassword.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="imageviewlabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -334,5 +337,10 @@
     <None Include="qml\SliderPlayer.qml">
       <Filter>Distribution Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="imageviewlabel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

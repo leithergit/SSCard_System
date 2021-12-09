@@ -14,6 +14,7 @@ uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, QString strStepImage, int nTimeou
 {
 	ui->setupUi(this);
 	connect(this, &uc_FaceCapture::FaceCaptureSucceed, this, &uc_FaceCapture::OnFaceCaptureSucceed);
+	connect(this, &uc_FaceCapture::FaceCaptureFailed, this, &uc_FaceCapture::OnFaceCaptureFailed);
 }
 
 uc_FaceCapture::~uc_FaceCapture()
@@ -87,12 +88,12 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 			m_pFaceDetectOcx->show();
 			connect(m_pFaceDetectOcx, SIGNAL(LiveDetectStatusEvent(int, int)), this, SLOT(OnLiveDetectStatusEvent(int, int)));
 
-			//        QString strDoc = m_pFaceDetectOcx->generateDocumentation();//导出所有ocx控件的所有信号、函数、属性等，可供开发参考
-			//        QString strFaceDetectDoc = QDir::currentPath() +  "/axHelp.html";
-			//        QFile file(strFaceDetectDoc);
-			//        file.open(QIODevice::WriteOnly);
-			//        file.write(strDoc.toLatin1(),strDoc.size());
-			//        file.close();
+			//QString strDoc = m_pFaceDetectOcx->generateDocumentation();//导出所有ocx控件的所有信号、函数、属性等，可供开发参考
+			//QString strFaceDetectDoc = QDir::currentPath() +  "/axHelp.html";
+			//QFile file(strFaceDetectDoc);
+			//file.open(QIODevice::WriteOnly);
+			//file.write(strDoc.toLatin1(),strDoc.size());
+			//file.close();
 			int nResult = m_pFaceDetectOcx->OpenCamera();
 			if (nResult)
 			{
@@ -149,14 +150,18 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
 	QString strError;
 	m_pFaceDetectOcx->EndLiveDectection();
-	// 	if (QFailed(CloseCamera(strError)))
-	// 	{
-	// 		gInfo() << strError.toLocal8Bit().data();
-	// 	}
 
 	gInfo() << "OnFaceCaptureSucceed!";
 	emit ShowMaskWidget("操作成功", "人脸识别成功,稍后请确认卡信息!", Success, Switch_NextPage);
 	//emit SwitchNextPage();
+}
+
+void uc_FaceCapture::OnFaceCaptureFailed()
+{
+	QString strError;
+	m_pFaceDetectOcx->EndLiveDectection();
+	gInfo() << "OnFaceCaptureFailed!";
+	emit ShowMaskWidget("操作失败", "身份证照片与当前人脸对比相似度太低,匹配失败!", Failed, Return_MainPage);
 }
 
 int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath)
@@ -189,51 +194,70 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 
 	if (eventID == 1)
 	{
-		strEvent = "活体检测成功!";
-		gInfo() << strEvent.toLocal8Bit().data();
-		//if (m_bFaceDetectSucceed)
-		//{
-		//	QString strInfo = "活体检测成功,并且切换信号已经发送!";
-		//	gInfo() << gQStr(strInfo);
-		//	return;
-		//}
-
-		QString strFaceImageFile;
-		if (QFailed(GetFaceCaptureStorePath(strFaceImageFile)))
+		try
 		{
-			gError() << QString("无法访问人脸数据目录!").toLocal8Bit().data();
-			return;
-		}
+			strEvent = "活体检测成功!";
+			gInfo() << gQStr(strEvent);
+			//if (m_bFaceDetectSucceed)
+			//{
+			//	QString strInfo = "活体检测成功,并且切换信号已经发送!";
+			//	gInfo() << gQStr(strInfo);
+			//	return;
+			//}
 
-		gInfo() << QString("准备生成临时文件:%1").arg(strFaceImageFile).toLocal8Bit().data();
-		//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
-		QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(1);
-		if (!strPhotoBase64.size())
-		{
-			gError() << QString("获取人脸数据失败!").toLocal8Bit().data();
-			return;
-		}
-
-		QImage ImageFace = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));
-		ImageFace.save(strFaceImageFile);
-		QFileInfo fi(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
-		if (!fi.isFile())
-		{
-			QString strTemp = QString("身份证照片'%1'丢失!").arg(g_pDataCenter->strIDImageFile.c_str());
-			gError() << strTemp.toLocal8Bit().data();
-			return;
-		}
-
-		double dfSimilarity = m_pFaceDetectOcx->FaceCompareByImage(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()), strFaceImageFile);
-		if (dfSimilarity >= g_pDataCenter->GetSysConfigure()->dfFaceSimilarity)
-		{
-			gInfo() << QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
-			if (!m_bFaceDetectSucceed)
+			QString strFaceImageFile;
+			if (QFailed(GetFaceCaptureStorePath(strFaceImageFile)))
 			{
-				gInfo() << QString("切换到下一页面!").toStdString().c_str();
-				emit FaceCaptureSucceed();
-				m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
+				gError() << QString("无法访问人脸数据目录!").toLocal8Bit().data();
+				return;
 			}
+			strEvent = QString("准备生成临时文件:%1").arg(strFaceImageFile);
+			gInfo() << gQStr(strEvent);
+			//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
+			QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(1);
+			if (!strPhotoBase64.size())
+			{
+				gError() << QString("获取人脸数据失败!").toLocal8Bit().data();
+				return;
+			}
+			strEvent = QString("准备生成人脸比对文件:%1").arg(strFaceImageFile);
+			gInfo() << gQStr(strEvent);
+
+			QImage ImageFace = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));
+			ImageFace.save(strFaceImageFile);
+			QFileInfo fi(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
+			if (!fi.isFile())
+			{
+				strEvent = QString("加载身份证照片'%1'失败!").arg(g_pDataCenter->strIDImageFile.c_str());
+				gInfo() << gQStr(strEvent);
+				return;
+			}
+
+			strEvent = QString("尝试对身份证照片与识别人脸匹配!");
+			gInfo() << gQStr(strEvent);
+
+			double dfSimilarity = m_pFaceDetectOcx->FaceCompareByImage(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()), strFaceImageFile);
+			if (dfSimilarity >= g_pDataCenter->GetSysConfigure()->dfFaceSimilarity)
+			{
+				gInfo() << QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
+				if (!m_bFaceDetectSucceed)
+				{
+					gInfo() << QString("切换到下一页面!").toStdString().c_str();
+					emit FaceCaptureSucceed();
+					m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
+				}
+			}
+			else
+			{
+				emit FaceCaptureFailed();
+				strEvent = QString("身份证照片与识别人脸对比相似度:%1,未达到设置最低匹配要求").arg(dfSimilarity);/*.arg(g_pDataCenter->GetSysConfigure()->dfFaceSimilarity);*/
+				gInfo() << gQStr(strEvent);
+			}
+		}
+		catch (std::exception& e)
+		{
+			QString strException = e.what();
+			gError() << gQStr(strException);
 		}
 	}
 	else if (eventID == 0)

@@ -10,7 +10,7 @@ MaskWidget::MaskWidget(QWidget* parent) :
 	ui(new Ui::MaskWidget)
 {
 	ui->setupUi(this);
-    ui->pushButton_OK->hide();
+	ui->pushButton_OK->hide();
 	hide();
 }
 
@@ -26,22 +26,28 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	QString strImage;
 	setWindowOpacity(0.8);
 	m_nPageOpteration = nPageOpteration;
+	QString strQSS;
 	switch (nStatus)    // 设置相应图标
 	{
 	case Success:
-		//ui->label_Image->setPixmap();
+		strQSS = QString("color: #20b759;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "Success.png";
 		break;
 	default:
 	case Information:
+		strQSS = QString("color: #20b759;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "Success.png";
 		break;
 	case Error:
+		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
+		ui->label_Title->setStyleSheet(strQSS);
 		strImage = "failed.png";
 	case Failed:
+		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "failed.png";
 		break;
 	case Fetal:
+		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "exclamation.png";
 		break;
 	}
@@ -76,6 +82,7 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	m_nTimeout = nTimeout;
 	m_nTimerID = startTimer(m_nTimerInterval);
 	ui->label_Title->setText(strTitle);
+	ui->label_Title->setStyleSheet(strQSS);
 	ui->label_Desc->setText(strDesc);
 
 }
@@ -99,4 +106,3 @@ void MaskWidget::on_pushButton_OK_clicked()
 {
 	hide();
 }
-

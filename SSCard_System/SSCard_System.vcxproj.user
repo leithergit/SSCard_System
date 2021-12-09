@@ -4,7 +4,7 @@
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
     <RemoteDebuggerCommand>D:\SSCardSystem\SSCard_System.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerServerName>172.20.10.7</RemoteDebuggerServerName>
+    <RemoteDebuggerServerName>192.168.137.65</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
     <RemoteDebuggerWorkingDirectory>D:\SSCardSystem\</RemoteDebuggerWorkingDirectory>
@@ -17,6 +17,9 @@
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2021-11-21T13:11:48.5859607Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2021-12-09T12:49:23.2859057Z</QtLastBackgroundBuild>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <QtLastBackgroundBuild>2021-12-09T12:49:38.4609548Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

@@ -30,9 +30,11 @@ public:
 
 signals:
 	void   FaceCaptureSucceed();
+	void   FaceCaptureFailed();
 private slots:
 	void   OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
 	void   OnFaceCaptureSucceed();
+	void   OnFaceCaptureFailed();
 
 private:
 	Ui::FaceCapture* ui;

@@ -24,7 +24,10 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_6">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0,0">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item>
       <spacer name="verticalSpacer_2">
        <property name="orientation">
@@ -36,29 +39,24 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>43</height>
+         <height>10</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="QQuickWidget" name="quickWidget">
+      <widget class="ImageViewLabel" name="label_Image">
        <property name="minimumSize">
         <size>
-         <width>1186</width>
-         <height>626</height>
+         <width>1276</width>
+         <height>680</height>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">border-radius: 5 px;</string>
        </property>
-       <property name="resizeMode">
-        <enum>QQuickWidget::SizeRootObjectToView</enum>
-       </property>
-       <property name="source">
-        <url>
-         <string>qrc:/qml/SliderPlayer.qml</string>
-        </url>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -73,7 +71,7 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>43</height>
+         <height>5</height>
         </size>
        </property>
       </spacer>
@@ -98,6 +96,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,2">
+         <property name="spacing">
+          <number>6</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_QR1">
            <property name="minimumSize">
@@ -295,7 +296,7 @@ color: #414141;</string>
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
+      <enum>QSizePolicy::Expanding</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -453,9 +454,9 @@ color: #414141;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QQuickWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QtQuickWidgets/QQuickWidget</header>
+   <class>ImageViewLabel</class>
+   <extends>QLabel</extends>
+   <header>imageviewlabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
