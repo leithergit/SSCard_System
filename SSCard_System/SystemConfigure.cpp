@@ -1,6 +1,6 @@
-#include "SystemConfigure.h"
+﻿#include "SystemConfigure.h"
 
-SystemConfigure::SystemConfigure(QWidget *parent)
+SystemConfigure::SystemConfigure(QWidget* parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);

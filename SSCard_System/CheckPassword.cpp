@@ -11,11 +11,10 @@ CheckPassword::~CheckPassword()
 
 }
 
-
 void CheckPassword::on_pushButton_OK_clicked()
 {
 	strPassword = ui.lineEdit_Password->text();
-	if (strPassword == "1qazXSW@")
+	if (strPassword == "12345678")
 		QDialog::accept();
 	else
 		QDialog::reject();

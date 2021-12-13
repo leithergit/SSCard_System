@@ -96,10 +96,11 @@
           <string notr="true">font: 57 64px &quot;思源黑体 CN Medium&quot;;
 font-weight: bold;
 line-height: 49px;
-letter-spacing: 1px;
+letter-spacing: 2px;
 color: #707070;
 background-color: #ffffff;
-border-image: url(:/Image/InputMobile_BK.png);</string>
+border-image: url(:/Image/InputMobile_BK.png);
+border: solid 4px #638cff;</string>
          </property>
          <property name="inputMask">
           <string>000-0000-0000</string>
@@ -147,21 +148,170 @@ border-image: url(:/Image/InputMobile_BK.png);</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="leftMargin">
-           <number>9</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
            <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>9</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>9</number>
+           <number>6</number>
           </property>
           <property name="spacing">
            <number>0</number>
           </property>
-          <item row="2" column="2">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="pushButton_1">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_1{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border-top-left-radius:24px;
+border:2px solid #638cff;}
+#pushButton_1:pressed{
+	background:#357a37;
+}</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_2{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border:2px solid #638cff;}
+#pushButton_2:pressed{
+	background:#357a37;
+}</string>
+            </property>
+            <property name="text">
+             <string>2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="pushButton_3">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_3{font: 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border-top-right-radius:24px;
+border:2px solid #638cff;}
+#pushButton_3:pressed{
+	background:#357a37;
+}
+</string>
+            </property>
+            <property name="text">
+             <string>3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="pushButton_4">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_4{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border:2px solid #638cff;}
+#pushButton_4:pressed{
+	background:#357a37;
+}
+</string>
+            </property>
+            <property name="text">
+             <string>4</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pushButton_5">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_5{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border:2px solid #638cff;}
+#pushButton_5:pressed{
+	background:#357a37;
+}</string>
+            </property>
+            <property name="text">
+             <string>5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
            <widget class="QPushButton" name="pushButton_6">
             <property name="minimumSize">
              <size>
@@ -176,18 +326,108 @@ border-image: url(:/Image/InputMobile_BK.png);</string>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
+             <string notr="true">#pushButton_6{font: 49px &quot;思源黑体 CN Medium&quot;;
 font-weight: bold;
 color: #707070;
 background-color: #ffffff;
-border:2px solid #638cff;</string>
+border:2px solid #638cff;}
+#pushButton_6:pressed{
+	background:#357a37;
+}</string>
             </property>
             <property name="text">
              <string>6</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="2" column="0">
+           <widget class="QPushButton" name="pushButton_7">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_7{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border:2px solid #638cff;}
+#pushButton_7:pressed{
+	background:#357a37;
+}</string>
+            </property>
+            <property name="text">
+             <string>7</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="pushButton_8">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_8{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border:2px solid #638cff;}
+#pushButton_8:pressed{
+	background:#357a37;
+}</string>
+            </property>
+            <property name="text">
+             <string>8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="pushButton_9">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>113</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">#pushButton_9{font: 49px &quot;思源黑体 CN Medium&quot;;
+font-weight: bold;
+color: #707070;
+background-color: #ffffff;
+border:2px solid #638cff;}
+#pushButton_9:pressed{
+	background:#357a37;
+}</string>
+            </property>
+            <property name="text">
+             <string>9</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
            <widget class="QPushButton" name="pushButton_Clear">
             <property name="minimumSize">
              <size>
@@ -214,217 +454,7 @@ border:2px solid #638cff;</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>4</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QPushButton" name="pushButton_9">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>9</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="pushButton_5">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>5</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="pushButton_1">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border-top-left-radius:24px;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>1</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="1">
-           <widget class="QPushButton" name="pushButton_8">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>8</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border-top-right-radius:24px;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>3</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QPushButton" name="pushButton_7">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>113</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: bold;
-color: #707070;
-background-color: #ffffff;
-border:2px solid #638cff;</string>
-            </property>
-            <property name="text">
-             <string>7</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
            <widget class="QPushButton" name="pushButton_0">
             <property name="minimumSize">
              <size>
@@ -450,7 +480,7 @@ border:2px solid #638cff;</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
+          <item row="3" column="2">
            <widget class="QPushButton" name="pushButton_Backspace">
             <property name="minimumSize">
              <size>
@@ -476,19 +506,6 @@ border:2px solid #638cff;</string>
              <string>删除</string>
             </property>
            </widget>
-          </item>
-          <item row="0" column="0">
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>

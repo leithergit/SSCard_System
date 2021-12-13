@@ -99,12 +99,12 @@ void MainWindow::mousePressEvent(QMouseEvent* e)
 		}
 		else
 		{
-			m_nContinuePressCount = 0;
+			m_nContinuePressCount = 1;
 		}
 	}
 	else
 	{
-		m_nContinuePressCount = 0;
+		m_nContinuePressCount = 1;
 	}
 	m_tLastPress = chrono::high_resolution_clock::now();
 	/*
