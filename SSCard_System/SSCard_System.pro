@@ -126,9 +126,7 @@ DEPENDPATH += $$PWD/glog
 #用以避免C++17中std::byte与windows 定义的byte冲突
 DEFINES += _HAS_STD_BYTE=0
 
-DISTFILES += \
-    Image/Bkgrnd.png \
-    qml/SliderPlayer.qml
+DISTFILES +=
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencode
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencoded

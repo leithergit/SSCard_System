@@ -17,6 +17,9 @@
 #pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
 #pragma comment(lib, "../SDK/libcurl/libcurld")
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
+#pragma comment(lib, "../SDK/IDCard/IDCard_API")
+#pragma comment(lib, "../SDK/glog/glog")
+#pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
 #else
 #pragma comment(lib, "../SDK/Printer/KT_Printer")
 #pragma comment(lib, "../SDK/Reader/KT_Reader")
@@ -28,7 +31,6 @@
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
 #pragma comment(lib, "../SDK/glog/glog")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
-
 #endif
 
 extern DataCenterPtr g_pDataCenter;

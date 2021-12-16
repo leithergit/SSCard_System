@@ -86,7 +86,7 @@ class uc_MakeCard : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_MakeCard(QLabel* pTitle, QString strStepImage, int nTimeout = 300, QWidget* parent = nullptr);
+	explicit uc_MakeCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_MakeCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;

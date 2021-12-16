@@ -358,11 +358,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="qml\SliderPlayer.qml">
-      <Filter>Distribution Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <QtMoc Include="imageviewlabel.h">
       <Filter>Header Files</Filter>
     </QtMoc>

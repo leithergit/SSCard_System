@@ -8,8 +8,8 @@
 extern MaskWidget* g_pMaskWindow;
 //#include "mainwindow.h"
 
-up_InputPWD::up_InputPWD(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+up_InputPWD::up_InputPWD(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::InputPWD)
 {
 	ui->setupUi(this);

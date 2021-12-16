@@ -56,7 +56,6 @@
 #define QSucceed(x)      (x == 0)
 #define QFailed(x)       (x != 0)
 using namespace std;
-
 using namespace chrono;
 using namespace Kingaotech;
 
@@ -75,7 +74,7 @@ enum MaskStatus
 	Fetal
 };
 
-enum Page_Function
+enum Page_Index
 {
 	Page_ReaderIDCard,				//读取身份证
 	Page_FaceCapture,				//读取社保卡	
@@ -87,7 +86,8 @@ enum Page_Function
 	Page_InputSSCardPWD,			//输入社保卡密码	
 	Page_ChangeSSCardPWD,			//修改社保卡密码	
 	Page_RegisterLost,				//挂失 / 解挂
-	Page_AdforFinance				//开通金融页面
+	Page_AdforFinance,				//开通金融页面
+	Page_Succeed					//操作成功
 };
 
 #define gInfo()      LOG(INFO)
@@ -227,9 +227,8 @@ struct RegionInfo
 		strAgency = pSettings->value("Agency", "").toString().toStdString();
 		strCardVendor = pSettings->value("CardVendor", "1").toString().toStdString();
 		/*
-
-SSCardDefaulutPin=123456
-PrimaryKey = 00112233445566778899AABBCCDDEEFF
+		SSCardDefaulutPin=123456
+		PrimaryKey = 00112233445566778899AABBCCDDEEFF
 		*/
 		strSSCardDefaulutPin = pSettings->value("SSCardDefaulutPin", "").toString().toStdString();
 		strPrimaryKey = pSettings->value("PrimaryKey", "").toString().toStdString();
@@ -335,8 +334,9 @@ struct PaymentOpt
 		gInfo() << "Try to read Payment configure";
 		pSettings->beginGroup("Payment");
 		nWaitTime = pSettings->value("WaitTime").toUInt();
-		nQueryPayResultInterval = pSettings->value("QueryPayResultInterval").toUInt();
-		nSocketRetryCount = pSettings->value("SocketRetryCount").toUInt();
+		nQueryPayResultInterval = pSettings->value("QueryPayResultInterval", 1000).toUInt();
+		nSocketRetryCount = pSettings->value("SocketRetryCount", 5).toUInt();
+		nQueryPayFailedInterval = pSettings->value("nQueryPayFailedInterval", "5000").toUInt();
 		strHost = pSettings->value("Host", "").toString().toStdString();
 		strPort = pSettings->value("Port", "").toString().toStdString();
 		strPayUrl = pSettings->value("Url", "").toString().toStdString();
@@ -344,13 +344,15 @@ struct PaymentOpt
 		strFieldMobile = pSettings->value("FieldMobile", "").toString().toStdString();
 		strFieldCardID = pSettings->value("FieldCard", "").toString().toStdString();
 		strFiledamount = pSettings->value("Filedamount", "").toString().toStdString();
+		strPayResultUrl = pSettings->value("PayResultUrl", "").toString().toStdString();
 		strAmount = pSettings->value("amount", "").toString().toStdString();
 
 		pSettings->endGroup();
 	}
 	int     nWaitTime = 300;                         // 支付页面等侍时间，单位秒
-	int     nQueryPayResultInterval = 500;            // 支付结构查询时间间隔单 毫秒
-	int     nSocketRetryCount = 5;                    // 网络失败重试次数
+	int     nQueryPayResultInterval = 1000;          // 支付结构查询时间间隔单 毫秒
+	int     nSocketRetryCount = 5;                   // 网络失败重试次数
+	int		nQueryPayFailedInterval = 5000;
 	string  strHost;
 	string 	strPort;
 	string 	strPayUrl;
@@ -359,7 +361,7 @@ struct PaymentOpt
 	string	strFieldCardID;
 	string	strFiledamount;
 	string  strAmount;
-
+	string  strPayResultUrl;
 };
 struct SysConfig
 {
@@ -405,7 +407,8 @@ struct SysConfig
 		{
 			QString strValue = pSettings->value(var).toString();
 			qDebug() << strValue.toStdString().c_str() << "=" << var.toStdString().c_str();
-			strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
+			//strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
+			auto [it, Inserted] = strMapBank.try_emplace(var.toStdString(), strValue.toStdString());
 		}
 
 		pSettings->endGroup();
@@ -473,6 +476,8 @@ public:
 		strIDImageFile = "";
 		strSSCardOldPassword = "";
 		strSSCardNewPassword = "";
+		strCardMakeProgress = "";
+		strPayCode = "";
 		pIDCard.reset();
 		pSSCardInfo.reset();
 	}
@@ -527,6 +532,7 @@ public:
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
 	string		   strCardMakeProgress;
+	string		   strPayCode;
 	bool		   bDebug;
 private:
 	IDCardInfoPtr	pIDCard = nullptr;

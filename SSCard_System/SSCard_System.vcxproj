@@ -150,7 +150,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -203,7 +203,7 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath)  remote device...
-::copy /y $(TargetPath) z:\</Command>
+copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -371,9 +371,6 @@
     <None Include="Image\qr_wechat1.png" />
     <None Include="Image\qr_wechat2.png" />
     <None Include="Image\todo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="qml\SliderPlayer.qml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

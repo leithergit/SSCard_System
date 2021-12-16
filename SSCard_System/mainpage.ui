@@ -129,12 +129,13 @@
            <item>
             <widget class="QLabel" name="label_QR1_Service">
              <property name="styleSheet">
-              <string notr="true">font-family: &quot;思源黑体 CN Bold&quot;;
+              <string notr="true">font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 25px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
-color: #414141;</string>
+color: #414141;
+</string>
              </property>
              <property name="text">
               <string>关注驻马店人社公众号</string>
@@ -144,7 +145,7 @@ color: #414141;</string>
            <item>
             <widget class="QLabel" name="label_QR1_Service_Text1">
              <property name="styleSheet">
-              <string notr="true">font-family: &quot;思源黑体 CN Bold&quot;;
+              <string notr="true">font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 25px;
 font-weight: bold;
 line-height: 49px;
@@ -159,7 +160,7 @@ color: #414141;</string>
            <item>
             <widget class="QLabel" name="label_QR1_Service_Text2">
              <property name="styleSheet">
-              <string notr="true">font-family: &quot;思源黑体 CN Bold&quot;;
+              <string notr="true">font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 25px;
 font-weight: bold;
 line-height: 49px;
@@ -225,12 +226,13 @@ color: #414141;</string>
              <item>
               <widget class="QLabel" name="label_QR2_Service">
                <property name="styleSheet">
-                <string notr="true">font-family: &quot;思源黑体 CN Bold&quot;;
+                <string notr="true">font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 25px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
-color: #414141;</string>
+color: #414141;
+</string>
                </property>
                <property name="text">
                 <string>关注驻马店人社公众号</string>
@@ -240,12 +242,13 @@ color: #414141;</string>
              <item>
               <widget class="QLabel" name="label_QR2_Service_Text1">
                <property name="styleSheet">
-                <string notr="true">font-family: &quot;思源黑体 CN Bold&quot;;
+                <string notr="true">font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 25px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
-color: #414141;</string>
+color: #414141;
+</string>
                </property>
                <property name="text">
                 <string>提供查询社保服务</string>
@@ -255,12 +258,13 @@ color: #414141;</string>
              <item>
               <widget class="QLabel" name="label_QR2_Service_Text2">
                <property name="styleSheet">
-                <string notr="true">font-family: &quot;思源黑体 CN Bold&quot;;
+                <string notr="true">font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 25px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
-color: #414141;</string>
+color: #414141;
+</string>
                </property>
                <property name="text">
                 <string>提供缴费通知服务</string>

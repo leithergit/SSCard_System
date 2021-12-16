@@ -14,8 +14,8 @@ extern MaskWidget* g_pMaskWindow;
 
 //#include "mainwindow.h"
 
-uc_Pay::uc_Pay(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+uc_Pay::uc_Pay(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::Pay)
 {
 	ui->setupUi(this);
@@ -49,12 +49,12 @@ int uc_Pay::ProcessBussiness()
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;
 	}
-
+	QString strPayCode;
 	switch (m_nPayStatus)
 	{
 	case Pay_Not:
 	{
-		int nRespond = uc_ReqestPaymentQR(strMessage, QRImage);
+		int nRespond = uc_ReqestPaymentQR(strMessage, strPayCode, QRImage);
 		if (QFailed(nRespond))
 		{
 			gError() << strMessage.toLocal8Bit().data();
@@ -69,13 +69,12 @@ int uc_Pay::ProcessBussiness()
 			gError() << strMessage.toLocal8Bit().data();
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 			return -1;
-
 		}
+		g_pDataCenter->strPayCode = strPayCode.toStdString();
 		// 保存二维码图像，并显示
 		QRImage.save(strQRPath);
 		QString strQSS = QString("border-image: url(%1)").arg(strQRPath);
 		ui->label_PaymentQRCode->setStyleSheet(strQSS);
-
 		break;
 		//[[fallthrough]];
 	}
@@ -83,7 +82,7 @@ int uc_Pay::ProcessBussiness()
 	{
 		gInfo() << strMessage.toLocal8Bit().data();
 		emit ShowMaskWidget("操作成功", "制卡费用已经成功支付,准备制卡", Success, Stay_CurrentPage);
-		break;
+		return 0;
 	}
 	default:
 	{
@@ -106,12 +105,12 @@ int uc_Pay::ProcessBussiness()
 	return 0;
 }
 
-int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QImage& QRImage)
+int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QString& strPayCode, QImage& QRImage)
 {
 	int nRespond = -1;
 	QString strPaymentUrl;
 
-	nRespond = RequestPaymentUrl(strPaymentUrl, strMessage);
+	nRespond = RequestPaymentUrl(strPaymentUrl, strPayCode, strMessage);
 	if (QSucceed(nRespond))
 	{
 		if (QFailed(QREnncodeImage(strPaymentUrl, 2, QRImage)))
@@ -128,53 +127,91 @@ int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QImage& QRImage)
 	}
 }
 
+bool Delay(bool& bFlag, int nDelay, int nStep = 100)
+{
+	if (nDelay <= nStep)
+	{
+		this_thread::sleep_for(chrono::milliseconds(nDelay));
+		return bFlag;
+	}
+	auto tStart = high_resolution_clock::now();
+	while (bFlag)
+	{
+		this_thread::sleep_for(chrono::milliseconds(nStep));
+		auto tDuration = high_resolution_clock::now() - tStart;
+		if (tDuration.count() >= nDelay)
+		{
+			break;
+		}
+	}
+	return bFlag;
+}
+
 void uc_Pay::ThreadWork()
 {
 	auto tLast = high_resolution_clock::now();
-
 	int nResult = 0;
 	QString strMessage;
 	QString strPayUrl;
-#ifdef _DEBUG
-	int nDelay = 20000;
+	SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
+	int nDelay = pSysConfig->nPageTimeout[Page_Payment];
+	if (g_pDataCenter->bDebug)
+		nDelay = 20000;
 	auto tStart = high_resolution_clock::now();
-#endif
+
+	PayResult nPayResult = PayResult::WaitforPay;
 
 	while (m_bWorkThreadRunning)
 	{
-		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
-		if (tDuration.count() >= m_nQueryPayResultInterval)
+		nResult = queryPayResult(g_pDataCenter->strPayCode, strMessage, nPayResult);				// 查询支付结果
+		if (QFailed(nResult))
 		{
-			if (m_nPayStatus == Pay_Succeed)										// 初始状态为未支付
+			if (!Delay(m_bWorkThreadRunning, pSysConfig->PaymentConfig.nQueryPayFailedInterval))
 				break;
-
-			nResult = QueryPayment(strMessage, m_nPayStatus);				// 查询支付结果
-#ifdef _DEBUG
+			continue;
+		}
+		if (g_pDataCenter->bDebug)
+		{
+#pragma Warning("未支付也将流程继续进行，即作演示用!")
 			auto tDelay = duration_cast<milliseconds>(high_resolution_clock::now() - tStart);
 			if (tDelay.count() >= nDelay)
-				m_nPayStatus = Pay_Succeed;
-#pragma Warning("未支付也将流程继续进行，即作测试用!")
-#endif
-			if (m_nPayStatus == Pay_Succeed)
-				break;
-
-			tLast = high_resolution_clock::now();
-			this_thread::sleep_for(chrono::milliseconds(100));
+				nPayResult = PayResult::PaySucceed;
 		}
-		this_thread::sleep_for(chrono::milliseconds(100));
+
+		if (nPayResult == PayResult::PaySucceed)
+			break;
+		if (!Delay(m_bWorkThreadRunning, pSysConfig->PaymentConfig.nQueryPayResultInterval))
+			break;
 	}
 
-	if (m_nPayStatus == Pay_Succeed)
+	if (QFailed(nResult))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Failed, Return_MainPage);
+		return;
+	}
+	if (nPayResult == PayResult::PaySucceed)
 	{
 		strMessage = "费用已支付,现将进入制卡流程!";
 		emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
 	}
-	else if (QFailed(nResult))
+	else
 	{
+		QString strPayResultString[] =
+		{
+			"待支付",
+			"待确认",
+			"支付完成",
+			"支付失败",
+			"订单不存在",
+			"订单取消"
+		};
+		if (nPayResult >= PayResult::WaitforPay && nPayResult <= PayResult::OrderCanceled)
+			strMessage = QString("支付结果状态:%1").arg(strPayResultString[(int)nPayResult]);
+		else
+			strMessage = QString("非预期的支付结果状态:%1").arg((int)nPayResult);
 		gError() << strMessage.toLocal8Bit().data();
 		emit ShowMaskWidget("操作失败", strMessage, Failed, Return_MainPage);
 	}
-
 }
 
 int  uc_Pay::GetQRCodeStorePath(QString& strFilePath)

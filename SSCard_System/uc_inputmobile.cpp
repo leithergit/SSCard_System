@@ -6,8 +6,8 @@ extern MaskWidget* g_pMaskWindow;
 #include "Gloabal.h"
 //#include "mainwindow.h"
 
-uc_InputMobile::uc_InputMobile(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+uc_InputMobile::uc_InputMobile(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::InputMobile)
 {
 	ui->setupUi(this);

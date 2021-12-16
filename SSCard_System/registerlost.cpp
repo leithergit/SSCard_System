@@ -3,7 +3,7 @@
 #include "ui_registerlost.h"
 #include "mainwindow.h"
 #include "uc_readidcard.h"
-#include "rl_ensureinformation.h"
+#include "uc_ensureinformation.h"
 #include "OperatorSucceed.h"
 #include <array>
 using namespace std;
@@ -19,10 +19,10 @@ RegisterLost::RegisterLost(QWidget* parent) :
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", pSysConfig->nPageTimeout[Page_ReaderIDCard]));
-		ui->stackedWidget->addWidget(new rl_EnsureInformation(ui->label_step, "Registerlost2.png", pSysConfig->nPageTimeout[Page_RegisterLost]));
-		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, ""));
-		for (int i = 0; i < ui->stackedWidget->count(); i++)
+		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard));
+		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "Registerlost2.png", Page_RegisterLost));
+		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, "", Page_Succeed));
+		for (int i = 0; i < m_pStackWidget->count(); i++)
 		{
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
 			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);

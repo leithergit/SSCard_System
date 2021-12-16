@@ -19,7 +19,7 @@
 #include <QPainter>
 #include "SDK/IDCard/idcard_api.h"
 #include "SDK/PinKeybroad/XZ_F10_API.h"
-
+#include "Gloabal.h"
 
 
 enum PageOperation
@@ -36,11 +36,17 @@ class QStackPage : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit QStackPage(QLabel* pTitle, QString& strStepImage, int nTimeout = 30, QWidget* parent = nullptr) :
+	explicit QStackPage(QLabel* pTitle, QString& strStepImage, Page_Index  nPageIndex, QWidget* parent = nullptr) :
 		QWidget(parent),
 		m_pTitle(pTitle),
-		m_nTimeout(nTimeout)
+		m_nPageIndex(nPageIndex)
 	{
+		SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
+		if (nPageIndex < Page_ReaderIDCard ||
+			nPageIndex > Page_AdforFinance)
+			m_nTimeout = 30;
+		else
+			m_nTimeout = pSysConfig->nPageTimeout[nPageIndex];
 		if (strStepImage.size())
 		{
 			QString strAppPath = QCoreApplication::applicationDirPath();
@@ -92,6 +98,7 @@ public:
 	int     m_nCountDown = 0;
 	bool    m_bWorkThreadRunning = false;
 	std::thread* m_pWorkThread = nullptr;
+	Page_Index m_nPageIndex;
 	// 	virtual void paintEvent(QPaintEvent* event) override
 	// 	{
 	// 		QPainter painter(this);

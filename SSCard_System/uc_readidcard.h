@@ -15,7 +15,7 @@ class uc_ReadIDCard : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_ReadIDCard(QLabel* pTitle, QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_ReadIDCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;

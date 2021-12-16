@@ -38,7 +38,7 @@
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">#label_DateTime{font-family: &quot;思源黑体 CN Bold&quot;;
+         <string notr="true">#label_DateTime{font-family: &quot;思源黑体 CN Medium&quot;;
 font-size: 32px;
 font-weight: bold;
 line-height: 49px;
@@ -172,14 +172,16 @@ color: #ffffff;}</string>
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="label_Support">
         <property name="styleSheet">
-         <string notr="true">	font-family: &quot;思源黑体 CN Bold&quot;;
-	font-size: 25px;
-	font-weight: bold;
-	line-height: 49px;
-	letter-spacing: 1px;
-	color: #ffffff;</string>
+         <string notr="true">#label_Support{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
         </property>
         <property name="text">
          <string>技术支持：金乔炜煜上海智能科技有限公司   服务电话：4008-917-928</string>

@@ -6,8 +6,8 @@
 extern MaskWidget* g_pMaskWindow;
 //#include "mainwindow.h"
 
-up_ChangePWD::up_ChangePWD(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+up_ChangePWD::up_ChangePWD(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::up_ChangePWD)
 {
 	ui->setupUi(this);

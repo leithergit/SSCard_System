@@ -13,12 +13,12 @@ class rl_EnsureInformation : public QStackPage
 	Q_OBJECT
 
 public:
-    explicit rl_EnsureInformation(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit rl_EnsureInformation(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~rl_EnsureInformation();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 private slots:
-    void on_pushButton_OK_clicked();
+	void on_pushButton_OK_clicked();
 
 private:
 	Ui::rl_EnsureInformation* ui;

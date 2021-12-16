@@ -13,7 +13,7 @@ class up_ReadSSCard : public QStackPage
 	Q_OBJECT
 
 public:
-    explicit up_ReadSSCard(QLabel* pTitle,QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit up_ReadSSCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~up_ReadSSCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;

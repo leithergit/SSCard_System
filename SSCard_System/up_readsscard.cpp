@@ -2,8 +2,8 @@
 #include "up_readsscard.h"
 #include "ui_up_readsscard.h"
 
-up_ReadSSCard::up_ReadSSCard(QLabel* pTitle, QString strStepImage,int nTimeout, QWidget* parent) :
-    QStackPage(pTitle, strStepImage,nTimeout, parent),
+up_ReadSSCard::up_ReadSSCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::ReadSSCard)
 {
 	ui->setupUi(this);

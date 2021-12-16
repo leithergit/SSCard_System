@@ -8,8 +8,8 @@
 
 //#include "mainwindow.h"
 
-uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::FaceCapture)
 {
 	ui->setupUi(this);

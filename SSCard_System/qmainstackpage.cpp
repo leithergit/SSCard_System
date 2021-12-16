@@ -18,6 +18,8 @@ QMainStackPage::QMainStackPage(QWidget* parent)
 	}
 
 	installEventFilter(this);
+	connect(this, &QMainStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+	connect(this, &QMainStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 }
 
 void QMainStackPage::timerEvent(QTimerEvent* event)

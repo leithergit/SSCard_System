@@ -13,7 +13,7 @@ class uc_EnsureInformation : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_EnsureInformation(QLabel* pTitle, QString strStepImage, int nTimeout = 30, QWidget* parent = nullptr);
+	explicit uc_EnsureInformation(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_EnsureInformation();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
@@ -23,7 +23,9 @@ public:
 	int	   QuerySSCardStatus(QString& strMessage);
 	// 待完成
 	int    RegisterLost(QString& strMessage, int& nStatus);
+	int	   UnRegisterLost(QString& strMessage, int& nStatus);
 	bool   m_bTestStatus = false;       // 测试专用变量
+	bool   m_bRegisterLost = false;
 
 private slots:
 	void on_pushButton_OK_clicked();

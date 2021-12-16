@@ -15,12 +15,12 @@ class uc_InputMobile : public QStackPage
 	Q_OBJECT
 
 public:
-    explicit uc_InputMobile(QLabel* pTitle,QString strStepImage, int nTimeout = 60, QWidget* parent = nullptr);
+	explicit uc_InputMobile(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_InputMobile();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	QString  m_strMobile = "";
-    int      m_nMobilePhoneSize = 11;
+	int      m_nMobilePhoneSize = 11;
 private slots:
 	void on_pushButton_0_clicked();
 	void on_pushButton_1_clicked();
@@ -34,8 +34,8 @@ private slots:
 	void on_pushButton_9_clicked();
 	void on_pushButton_Clear_clicked();
 	void on_pushButton_Backspace_clicked();
-    void on_pushButton_OK_clicked();
-    int     QueryPayResult(QString &strMessage,int &nResult);
+	void on_pushButton_OK_clicked();
+	int     QueryPayResult(QString& strMessage, int& nResult);
 
 private:
 	Ui::InputMobile* ui;

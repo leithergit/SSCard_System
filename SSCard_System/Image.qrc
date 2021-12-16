@@ -13,17 +13,6 @@
         <file>Image/Countdown.png</file>
         <file>Image/OP_ReadID.png</file>
         <file>Image/Bkgrnd.png</file>
-        <file>Image/changepassword1.png</file>
-        <file>Image/changepassword2.png</file>
-        <file>Image/changepassword3.png</file>
-        <file>Image/Registerlost1.png</file>
-        <file>Image/Registerlost2.png</file>
-        <file>Image/updatecard1.png</file>
-        <file>Image/updatecard2.png</file>
-        <file>Image/updatecard3.png</file>
-        <file>Image/updatecard4.png</file>
-        <file>Image/updatecard5.png</file>
-        <file>Image/updatecard6.png</file>
         <file>Image/zhifubao.png</file>
         <file>Image/Kingaotech_QR.png</file>
         <file>Image/InputMobile_BK.png</file>
@@ -38,7 +27,6 @@
         <file>Image/Registerlost_Pressed.png</file>
         <file>Image/UpdateCard_hover.png</file>
         <file>Image/UpdateCard_Pressed.png</file>
-        <file>qml/SliderPlayer.qml</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

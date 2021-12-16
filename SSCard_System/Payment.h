@@ -9,6 +9,16 @@
 #define Pay_Not                 2         // 尚未支付
 #define Failed_QREnocode        3         // 生成支付二维码失败
 
+enum class PayResult
+{
+	WaitforPay = 0,
+	WairforConfirm,
+	PaySucceed,
+	PayFailed,
+	InvalidOrder,
+	OrderCanceled
+};
+
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage);
 
 // 已经完成
@@ -16,7 +26,13 @@ int  QueryPayment(QString& strMessage, int& strPayStatus);
 
 //int  ReqestPaymentQR(QString &strMessage,QImage &Image);
 
-int  RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage);
+int  RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& strMessage);
+
+// 0-待支付 1-待确认 2-支付完成 3-支付失败 4-订单不存在 5-订单取消
+int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus);
+
+// nStatus = 0,成功，1 已缴费
+int  ResgisterPayment(QString& strMessage, int& nStatus);
 
 // nStatus = 0,成功，否则失败
 int  ApplyCardReplacement(QString& strMessage, int& nStatus);
@@ -24,8 +40,7 @@ int  ApplyCardReplacement(QString& strMessage, int& nStatus);
 // nStatus = 0,成功，否则失败
 int  CancelCardReplacement(QString& strMessage, int& nStatus);
 
-// nStatus = 0,成功，1 已缴费
-int  ResgisterPayment(QString& strMessage, int& nStatus);
+
 
 // nStatus = 0，撤销成功
 int  CancelPayment(QString& strMessage, int& nStatus);

@@ -5,8 +5,8 @@
 #include "MaskWidget.h"
 extern MaskWidget* g_pMaskWindow;
 
-uc_AdforFinance::uc_AdforFinance(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+uc_AdforFinance::uc_AdforFinance(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::AdforFinance)
 {
 	ui->setupUi(this);

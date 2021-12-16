@@ -8,8 +8,8 @@ extern MaskWidget* g_pMaskWindow;
 #pragma warning(disable:4189)
 
 
-uc_MakeCard::uc_MakeCard(QLabel* pTitle, QString strStepImage, int nTimeout, QWidget* parent) :
-	QStackPage(pTitle, strStepImage, nTimeout, parent),
+uc_MakeCard::uc_MakeCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+	QStackPage(pTitle, strStepImage, nIndex, parent),
 	ui(new Ui::MakeCard)
 {
 	ui->setupUi(this);
@@ -154,10 +154,6 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 	do
 	{
-#ifdef _DEBUG
-#pragma  Warning("直接读取社保卡数据，用于测试回盘，事后须删除！")
-		GetCardData(strMessage, nStatus);
-#endif
 		if (!m_pReader)
 		{
 			strMessage = "读卡器未就绪!";
@@ -501,7 +497,6 @@ void uc_MakeCard::CloseDevice()
 
 void uc_MakeCard::OnTimeout()
 {
-#pragma Warning("需要处理超时未取走卡片,把卡片放回收箱吗？")
 	ShutDown();
 }
 
@@ -516,14 +511,6 @@ void  uc_MakeCard::ShutDown()
 	}
 }
 
-/*
-	typedef struct _PRINTERSTATUS
-	{
-		WORD fwDevice;			//打印机状态, 0-Ready；1-Busy；2-Offline；3-ErrMachine；4-Printing
-		WORD fwMedia;			//介质状态，0-无卡；1-卡在门口；2-卡在内部；3-卡在上电位，4-卡在闸门外；5-堵卡；6-卡片未知（根据硬件特性返回,必须支持有无卡检测）
-		WORD fwToner;			//平印色带状态,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
-	}PRINTERSTATUS, * LPPRINTERSTATUS;
-*/
 
 int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 {
@@ -620,7 +607,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 	do
 	{
 #ifndef _DEBUG
-		if (QFailed(nResult = QueryPayment(strMessage, nPayStatus)))
+		if (QFailed(nResult = queryPayResult(strMessage, nPayStatus)))
 			break;
 		if (nPayStatus == Pay_Not)
 		{

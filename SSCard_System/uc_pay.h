@@ -14,14 +14,14 @@ class uc_Pay : public QStackPage
 	Q_OBJECT
 
 public:
-	explicit uc_Pay(QLabel* pTitle, QString strStepImage, int nTimeout = 300, QWidget* parent = nullptr);
+	explicit uc_Pay(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_Pay();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	void    ShutDownDevice();
 	int     Pay(QString& strError);
 	void    ThreadWork();
-	int     uc_ReqestPaymentQR(QString& strMessage, QImage& Image);
+	int     uc_ReqestPaymentQR(QString& strMessage, QString& strPayCode, QImage& Image);
 	int     uc_QueryPayment(QString& strMessage, int& nPayStatus);
 	int     GetQRCodeStorePath(QString& strFilePath);
 	// 	int     uc_ApplyCardReplacement(QString& strMessage, int nStatus);
@@ -35,9 +35,6 @@ public:
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
 	int     m_nSocketFailedCount = 0;
 	int     m_nPayStatus = Pay_Not;
-	int     uc_ProcessNotPay(QString& strMessage);
-	int     uc_ProcessPayed(QString& strMessage);
-	//int     uc_CancelCardment(QString& strMessage);
 private:
 	Ui::Pay* ui;
 };

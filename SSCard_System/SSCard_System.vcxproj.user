@@ -2,9 +2,9 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
     <RemoteDebuggerCommand>D:\SSCardSystem\SSCard_System.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerServerName>192.168.137.65</RemoteDebuggerServerName>
+    <RemoteDebuggerServerName>10.0.0.114</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
     <RemoteDebuggerWorkingDirectory>D:\SSCardSystem\</RemoteDebuggerWorkingDirectory>

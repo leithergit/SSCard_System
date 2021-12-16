@@ -92,7 +92,7 @@ void	GBKStringtoUrlString(const char* szGBKString, string& strUrlString)
 }
 
 
-int     RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage)
+int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& strMessage)
 {
 	Q_UNUSED(strMessage);
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
@@ -132,7 +132,6 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage)
 		gInfo() << strRespond;
 		QString strRes = strRespond.c_str();
 		QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
-
 		QJsonParseError jsonParseError;
 		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes[5].toLatin1(), &jsonParseError));
 		if (QJsonParseError::NoError != jsonParseError.error)
@@ -142,14 +141,25 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage)
 			return -1;
 		}
 		QJsonObject rootObject = jsonDocument.object();
-		if (!rootObject.keys().contains("msg"))
+		if (!rootObject.keys().contains("msg") ||
+			!rootObject.keys().contains("code") ||
+			!rootObject.keys().contains("payCode"))
 		{
 			gInfo() << "There is no  No target value in the payment respond!";
 			return -1;
 		}
-
-		QJsonValue jsonValue = rootObject.value("msg");
-		strPaymentUrl = jsonValue.toString();
+		QJsonValue jsCode = rootObject.value("code");
+		QJsonValue jsMsg = rootObject.value("msg");
+		QJsonValue jsPayCode = rootObject.value("payCode");
+		int nCode = jsCode.toInt();
+		if (nCode != 0)
+		{
+			strMessage = QString("查询结果,code = %1").arg(nCode);
+			gInfo() << gQStr(strMessage);
+			return -1;
+		}
+		strPayCode = jsPayCode.toString();
+		strPaymentUrl = jsMsg.toString();
 		gInfo() << gQStr(strPaymentUrl);
 		return 0;
 	}
@@ -161,6 +171,54 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strMessage)
 	}
 }
 
+// 查询支付结果
+// nStatus:0 - 待支付 1 - 待确认 2 - 支付完成 3 - 支付失败 4 - 订单不存在 5 - 订单取消
+int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
+{
+	// http://ip:port/paymentbusiness/pollForPayResult?payCode=code
+	PaymentOpt& PayOption = g_pDataCenter->GetSysConfigure()->PaymentConfig;
+	//std::string szUrl = "http://10.126.131.203:8080/paymentbusiness/getPayCode?payerName=胡杰&payerTel=13637281234&payerCard=410700199907110037&amount=16";
+	std::string strUrl = "http://";
+	strUrl += PayOption.strHost;				strUrl += ":";
+	strUrl += PayOption.strPort;				strUrl += "/";
+	strUrl += PayOption.strPayResultUrl;		//strUrl += "?";
+	strUrl += strPayCode;
+
+	gInfo() << "PayResult request url = " << strUrl.c_str();
+
+	string strRespond, strMessage1;
+	if (SendHttpRequest(strUrl, strRespond, strMessage1))
+	{
+		gInfo() << strRespond;
+		QString strRes = strRespond.c_str();
+		QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
+		QJsonParseError jsonParseError;
+		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes[5].toLatin1(), &jsonParseError));
+		if (QJsonParseError::NoError != jsonParseError.error)
+		{
+			strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
+			gInfo() << gQStr(strMessage);
+			return -1;
+		}
+		QJsonObject rootObject = jsonDocument.object();
+		if (!rootObject.keys().contains("msg") ||
+			!rootObject.keys().contains("code"))
+		{
+			gInfo() << "There is no  No target value in the PayResult respond!";
+			return -1;
+		}
+		nStatus = (PayResult)rootObject.value("code").toInt();
+		strMessage = rootObject.value("msg").toString();
+		gInfo() << "code=" << (int)nStatus << gQStr(strMessage);
+		return 0;
+	}
+	else
+	{
+		strMessage = strMessage1.c_str();
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+}
 int     ApplyCardReplacement(QString& strMessage, int& nStatus)
 {
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
