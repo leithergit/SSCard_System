@@ -22,7 +22,7 @@ UpdatePassword::UpdatePassword(QWidget* parent) :
 	{
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
-		SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
+		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
 		ui->stackedWidget->addWidget(new up_ReadSSCard(ui->label_step, "changepassword1.png", Page_ReadSSCard));
 		ui->stackedWidget->addWidget(new up_InputPWD(ui->label_step, "changepassword2.png", Page_InputSSCardPWD));
 		ui->stackedWidget->addWidget(new up_ChangePWD(ui->label_step, "changepassword3.png", Page_ChangeSSCardPWD));

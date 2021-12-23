@@ -13,6 +13,15 @@
   <property name="windowTitle">
    <string>SystemManager</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget"/>
@@ -40,19 +49,21 @@
          <height>80</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 36px &quot;思源黑体 CN Medium&quot;;
-font-weight: normal;
-line-height: 49px;
-letter-spacing: 1px;
-color: #ffffff;}
-QPushButton:pressed{background:#38a357;}
-</string>
-       </property>
        <property name="text">
         <string>保存配置</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Close">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>关闭</string>
        </property>
       </widget>
      </item>
@@ -63,17 +74,6 @@ QPushButton:pressed{background:#38a357;}
          <width>240</width>
          <height>80</height>
         </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 36px &quot;思源黑体 CN Medium&quot;;
-font-weight: normal;
-line-height: 49px;
-letter-spacing: 1px;
-color: #ffffff;}
-QPushButton:pressed{background:#38a357;}
-</string>
        </property>
        <property name="text">
         <string>退出系统</string>

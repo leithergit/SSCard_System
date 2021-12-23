@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PageConfigure</class>
+ <widget class="QWidget" name="PageConfigure">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1179</width>
+    <height>807</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="5,2">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>页面设置</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked</set>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="gridStyle">
+         <enum>Qt::NoPen</enum>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>120</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>240</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <row>
+         <property name="text">
+          <string>读取身份证</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>人脸识别</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>信息确认</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>输入手机号码</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>支付</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>制卡</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>读取社保卡</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>输入社保卡密码</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>修改社保卡密码</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>挂失/解挂</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>开通金融功能提醒</string>
+         </property>
+        </row>
+        <column>
+         <property name="text">
+          <string>页面或功能</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>超时返回时间</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>是否启用</string>
+         </property>
+        </column>
+        <item row="0" column="0">
+         <property name="text">
+          <string>读取身份证</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="text">
+          <string>人脸识别</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsUserCheckable|ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="text">
+          <string>信息确认</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="text">
+          <string>输入手机号码</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="text">
+          <string>支付</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="text">
+          <string>300</string>
+         </property>
+        </item>
+        <item row="5" column="0">
+         <property name="text">
+          <string>制卡</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="5" column="1">
+         <property name="text">
+          <string>300</string>
+         </property>
+        </item>
+        <item row="6" column="0">
+         <property name="text">
+          <string>读取社保卡</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="6" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="7" column="0">
+         <property name="text">
+          <string>输入社保卡密码</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="7" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="8" column="0">
+         <property name="text">
+          <string>修改社保卡密码</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="8" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="9" column="0">
+         <property name="text">
+          <string>挂失/解挂</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsUserCheckable|ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="9" column="1">
+         <property name="text">
+          <string>30</string>
+         </property>
+        </item>
+        <item row="10" column="0">
+         <property name="text">
+          <string>开通金融功能提醒</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="10" column="1">
+         <property name="text">
+          <string>10</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>信息提示页面设置</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTableWidget" name="tableWidget_2">
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked</set>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="gridStyle">
+         <enum>Qt::NoPen</enum>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>120</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>240</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <row>
+         <property name="text">
+          <string>操作成功</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>一般提示</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>操作错误</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>严重错误</string>
+         </property>
+        </row>
+        <column>
+         <property name="text">
+          <string>页面或功能</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>逗留时间(毫秒)</string>
+         </property>
+        </column>
+        <item row="0" column="0">
+         <property name="text">
+          <string>操作成功</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>2000</string>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="text">
+          <string>一般提示</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsUserCheckable|ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="text">
+          <string>2000</string>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="text">
+          <string>操作错误</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="text">
+          <string>5000</string>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="text">
+          <string>严重错误</string>
+         </property>
+         <property name="flags">
+          <set>ItemIsEnabled</set>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="text">
+          <string>5000</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

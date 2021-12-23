@@ -16,6 +16,8 @@ private slots:
 
     void on_pushButton_Save_clicked();
 
+    void on_pushButton_Close_clicked();
+
 private:
 	Ui::SystemManager ui;
 };

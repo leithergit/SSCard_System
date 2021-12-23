@@ -390,6 +390,7 @@ struct SysConfig
 		nPageTimeout[Page_InputSSCardPWD] = pSettings->value("InputSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_ChangeSSCardPWD] = pSettings->value("ChangeSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_RegisterLost] = pSettings->value("RegisterLost", 30).toUInt();
+        nPageTimeout[Page_AdforFinance] = pSettings->value("AdforFinance", 30).toUInt();
 		pSettings->endGroup();
 
 		pSettings->beginGroup("MaskPageTimeout");

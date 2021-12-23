@@ -18,7 +18,7 @@ RegisterLost::RegisterLost(QWidget* parent) :
 	{
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
-		SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
+		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
 		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard));
 		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "Registerlost2.png", Page_RegisterLost));
 		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, "", Page_Succeed));

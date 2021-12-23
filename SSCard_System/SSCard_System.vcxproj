@@ -67,18 +67,18 @@
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets</QtModules>
+    <QtModules>core;network;gui;axcontainer;widgets;qml;quickwidgets;quick</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets;quickwidgets;</QtModules>
+    <QtModules>core;network;gui;axcontainer;widgets;qml;quickwidgets;quick</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;SDK\Reader;release;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;SDK\Reader;release;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -88,7 +88,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>release\</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;NDEBUG;QT_NO_DEBUG;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>
       </ProgramDataBaseFileName>
@@ -99,7 +99,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;$(QTDIR)\lib\Qt5QmlModels.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>.\SDK\IDCard\IDCard_API.lib;.\glog\glog.lib;.\SDK\PinKeybroad\XZ_F10_API.lib;.\SDK\QREncode\qrencode.lib;.\SDK\Printer\KT_Printer.lib;.\SDK\Reader\KT_Reader.lib;ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;$(QTDIR)\lib\Qt5QmlModels.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -118,7 +118,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;NDEBUG;QT_NO_DEBUG;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <QtMoc>
       <CompilerFlavor>msvc</CompilerFlavor>
@@ -129,7 +129,6 @@
       <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
     </QtMoc>
     <QtRcc>
-      <InitFuncName>Image</InitFuncName>
       <Compression>default</Compression>
       <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <QtRccDir>$(Configuration)</QtRccDir>
@@ -143,17 +142,17 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;SDK\Reader;debug;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;SDK\Reader;debug;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -179,7 +178,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;QT_QUICKWIDGETS_LIB;QT_QUICK_LIB;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_QMLMODELS_LIB;QT_QML_LIB;QT_NETWORK_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <QtMoc>
       <CompilerFlavor>msvc</CompilerFlavor>
@@ -187,46 +186,54 @@
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <DynamicSource>output</DynamicSource>
       <QtMocDir>$(Configuration)</QtMocDir>
-      <QtMocFileName>$(Configuration)/moc_%(Filename).cpp</QtMocFileName>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
     </QtMoc>
     <QtRcc>
-      <InitFuncName>Image</InitFuncName>
       <Compression>default</Compression>
       <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <QtRccDir>$(Configuration)</QtRccDir>
-      <QtRccFileName>$(Configuration)/qrc_%(Filename).cpp</QtRccFileName>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <QtUic>
       <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
       <QtUicDir>$(ProjectDir)</QtUicDir>
-      <QtUicFileName>$(Configuration)/ui_%(Filename).h</QtUicFileName>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
     </QtUic>
     <PostBuildEvent>
-      <Command>@echo copy $(TargetPath)  remote device...
+      <Command>@echo copy $(TargetPath) to remote device
 copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cardmanger.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
     <ClCompile Include="Gloabal.cpp" />
-    <ClCompile Include="imageviewlabel.cpp" />
+    <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
+    <ClCompile Include="pageconfigure.cpp" />
     <ClCompile Include="Payment.cpp" />
+    <ClCompile Include="regionconfigure.cpp" />
+    <ClCompile Include="SystemConfigure.cpp" />
+    <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="..\utility\TimeUtility.cpp" />
     <ClCompile Include="..\utility\Utility.cpp" />
     <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
+    <ClCompile Include="imageviewlabel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainpage.cpp" />
     <ClCompile Include="mainwindow.cpp" />
     <ClCompile Include="qmainstackpage.cpp" />
     <ClCompile Include="qpinkeybroad.cpp" />
     <ClCompile Include="qstackpage.cpp" />
+    <ClCompile Include="qtpropertybrowser\qtbuttonpropertybrowser.cpp" />
+    <ClCompile Include="qtpropertybrowser\qtgroupboxpropertybrowser.cpp" />
+    <ClCompile Include="qtpropertybrowser\qtpropertybrowser.cpp" />
+    <ClCompile Include="qtpropertybrowser\qtpropertybrowserutils.cpp" />
+    <ClCompile Include="qtpropertybrowser\qtvariantproperty.cpp" />
     <ClCompile Include="registerlost.cpp" />
     <ClCompile Include="rl_ensureinformation.cpp" />
-    <ClCompile Include="SystemConfigure.cpp" />
-    <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="uc_adforfinance.cpp" />
     <ClCompile Include="uc_ensureinformation.cpp" />
     <ClCompile Include="uc_facecapture.cpp" />
@@ -242,20 +249,29 @@ copy /y $(TargetPath) z:\</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h" />
-    <QtMoc Include="SystemConfigure.h" />
-    <QtMoc Include="DeviceManager.h" />
-    <QtMoc Include="CheckPassword.h" />
+    <QtMoc Include="CheckPassword.h">
+    </QtMoc>
+    <QtMoc Include="DeviceManager.h">
+    </QtMoc>
+    <QtMoc Include="cardmanger.h" />
     <ClInclude Include="Gloabal.h" />
-    <QtMoc Include="SystemManager.h" />
     <QtMoc Include="MaskWidget.h">
     </QtMoc>
     <QtMoc Include="OperatorSucceed.h">
     </QtMoc>
-    <QtMoc Include="imageviewlabel.h" />
+    <QtMoc Include="pageconfigure.h" />
+    <QtMoc Include="logmanager.h" />
     <ClInclude Include="Payment.h" />
+    <QtMoc Include="SystemConfigure.h">
+    </QtMoc>
+    <QtMoc Include="SystemManager.h">
+    </QtMoc>
     <ClInclude Include="..\utility\TimeUtility.h" />
     <ClInclude Include="..\utility\Utility.h" />
+    <QtMoc Include="regionconfigure.h" />
     <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h" />
+    <QtMoc Include="imageviewlabel.h">
+    </QtMoc>
     <QtMoc Include="mainpage.h">
     </QtMoc>
     <QtMoc Include="mainwindow.h">
@@ -265,6 +281,36 @@ copy /y $(TargetPath) z:\</Command>
     <QtMoc Include="qpinkeybroad.h">
     </QtMoc>
     <QtMoc Include="qstackpage.h">
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtbuttonpropertybrowser.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qteditorfactory.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtgroupboxpropertybrowser.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertybrowser.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertybrowserutils_p.h">
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertymanager.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qttreepropertybrowser.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtvariantproperty.h">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DynamicSource>
     </QtMoc>
     <QtMoc Include="registerlost.h">
     </QtMoc>
@@ -312,13 +358,44 @@ copy /y $(TargetPath) z:\</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\moc_predefs.h;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
+    <QtMoc Include="qtpropertybrowser\qteditorfactory.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">input</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">input</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>%(Filename).moc</QtMocFileName>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertymanager.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">input</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">input</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>%(Filename).moc</QtMocFileName>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qttreepropertybrowser.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">input</DynamicSource>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">input</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>%(Filename).moc</QtMocFileName>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="CheckPassword.ui" />
-    <QtUic Include="DeviceManager.ui" />
+    <None Include="SSCardSystem_zh_CN.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="cardmanger.ui" />
+    <QtUic Include="CheckPassword.ui">
+    </QtUic>
+    <QtUic Include="DeviceManager.ui">
+    </QtUic>
+    <QtUic Include="logmanager.ui" />
     <QtUic Include="MaskWidget.ui">
     </QtUic>
     <QtUic Include="OperatorSucceed.ui">
+    </QtUic>
+    <QtUic Include="pageconfigure.ui" />
+    <QtUic Include="regionconfigure.ui" />
+    <QtUic Include="SystemConfigure.ui">
+    </QtUic>
+    <QtUic Include="SystemManager.ui">
     </QtUic>
     <QtUic Include="mainpage.ui">
     </QtUic>
@@ -328,8 +405,6 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="rl_ensureinformation.ui">
     </QtUic>
-    <QtUic Include="SystemConfigure.ui" />
-    <QtUic Include="SystemManager.ui" />
     <QtUic Include="uc_adforfinance.ui">
     </QtUic>
     <QtUic Include="uc_ensureinformation.ui">
@@ -352,25 +427,66 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="updatecard.ui">
     </QtUic>
+    <QtUic Include="updatecard_copy.ui">
+    </QtUic>
     <QtUic Include="updatepassword.ui">
     </QtUic>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Image\Bkgrnd.png" />
+    <None Include="Image\ChangePassword.png" />
+    <None Include="Image\ChangePassword_Pressed.png" />
+    <None Include="Image\ChangePassword_hover.png" />
+    <None Include="Image\Countdown.png" />
     <None Include="Image\Homepage.png" />
     <QtRcc Include="Image.qrc">
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Image</InitFuncName>
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Image</InitFuncName>
     </QtRcc>
+    <None Include="Image\InputMobile_BK.png" />
+    <None Include="Image\Kingaotech_QR.png" />
+    <None Include="Image\Mobile_Keybroad_BK.png" />
     <None Include="Image\OK.png" />
+    <None Include="Image\OP_ReadID.png" />
     <None Include="Image\Registerlost.png" />
+    <None Include="Image\Registerlost_Pressed.png" />
+    <None Include="Image\Registerlost_hover.png" />
     <None Include="Image\Status_Finish.png" />
+    <None Include="Image\Success.png" />
     <None Include="Image\UpdateCard.png" />
-    <None Include="Image\Wait_Cursor.png" />
+    <None Include="Image\UpdateCard_Pressed.png" />
+    <None Include="Image\UpdateCard_hover.png" />
     <None Include="Image\backgroud.jpg" />
     <None Include="Image\banklogo.png" />
+    <None Include="qtpropertybrowser\images\cursor-arrow.png" />
+    <None Include="qtpropertybrowser\images\cursor-busy.png" />
+    <None Include="qtpropertybrowser\images\cursor-closedhand.png" />
+    <None Include="qtpropertybrowser\images\cursor-cross.png" />
+    <None Include="qtpropertybrowser\images\cursor-forbidden.png" />
+    <None Include="qtpropertybrowser\images\cursor-hand.png" />
+    <None Include="qtpropertybrowser\images\cursor-hsplit.png" />
+    <None Include="qtpropertybrowser\images\cursor-ibeam.png" />
+    <None Include="qtpropertybrowser\images\cursor-openhand.png" />
+    <None Include="qtpropertybrowser\images\cursor-sizeall.png" />
+    <None Include="qtpropertybrowser\images\cursor-sizeb.png" />
+    <None Include="qtpropertybrowser\images\cursor-sizef.png" />
+    <None Include="qtpropertybrowser\images\cursor-sizeh.png" />
+    <None Include="qtpropertybrowser\images\cursor-sizev.png" />
+    <None Include="qtpropertybrowser\images\cursor-uparrow.png" />
+    <None Include="qtpropertybrowser\images\cursor-vsplit.png" />
+    <None Include="qtpropertybrowser\images\cursor-wait.png" />
+    <None Include="qtpropertybrowser\images\cursor-whatsthis.png" />
     <None Include="Image\error.png" />
+    <None Include="Image\exclamation.png" />
+    <None Include="Image\failed.png" />
     <None Include="Image\qr_pay.png" />
-    <None Include="Image\qr_wechat1.png" />
-    <None Include="Image\qr_wechat2.png" />
+    <None Include="qt.conf" />
+    <QtRcc Include="qtpropertybrowser\qtpropertybrowser.qrc">
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">qtpropertybrowser</InitFuncName>
+      <InitFuncName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">qtpropertybrowser</InitFuncName>
+    </QtRcc>
     <None Include="Image\todo.png" />
+    <None Include="Image\zhifubao.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -82,11 +82,10 @@ void MainWindow::On_LoadSystemManager()
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
 {
-	qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
-
-	if ((e->x() >= 1880 && e->y() >= 960) ||
+	if ((e->x() >= 1880 && e->y() >= 960) &&
 		(e->x() <= 1920 && e->y() <= 990))
 	{
+		qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
 		auto tNow = chrono::high_resolution_clock::now();
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - m_tLastPress);
 		if (tDuration.count() < 1000)
@@ -107,28 +106,6 @@ void MainWindow::mousePressEvent(QMouseEvent* e)
 		m_nContinuePressCount = 1;
 	}
 	m_tLastPress = chrono::high_resolution_clock::now();
-	/*
- Mouse X= 1887  Mouse Y= 959
-Mouse X= 1887  Mouse Y= 959
-Mouse X= 1887  Mouse Y= 959
-Mouse X= 1887  Mouse Y= 959
-Mouse X= 1887  Mouse Y= 959
-Mouse X= 1887  Mouse Y= 959
-The thread 0xb9c has exited with code 0 (0x0).
-The thread 0xc08 has exited with code 0 (0x0).
-The thread 0x838 has exited with code 0 (0x0).
-The thread 0x1328 has exited with code 0 (0x0).
-Mouse X= 1887  Mouse Y= 959
-Mouse X= 1849  Mouse Y= 924
-Mouse X= 1849  Mouse Y= 924
-Mouse X= 1849  Mouse Y= 924
-Mouse X= 1849  Mouse Y= 924
-Mouse X= 1915  Mouse Y= 985
-Mouse X= 1915  Mouse Y= 985
-Mouse X= 1915  Mouse Y= 985
-Mouse X= 1915  Mouse Y= 985
-
-	*/
 }
 
 MainWindow::~MainWindow()

@@ -310,6 +310,7 @@ int uc_EnsureInformation::UnRegisterLost(QString& strMessage, int& nStatus)
 		strMessage = szStatus;
 		return -1;
 	}
+	return 0;
 }
 
 void uc_EnsureInformation::on_pushButton_OK_clicked()

@@ -26,7 +26,7 @@ UpdateCard::UpdateCard(QWidget* parent) :
 	try
 	{
 		m_pStackWidget = ui->stackedWidget;
-		SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
+		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
 		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "updatecard1.png", Page_ReaderIDCard));				// step 0
 		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_step, "updatecard2.png", Page_FaceCapture));				// step 1
 		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "updatecard3.png", Page_EnsureInformation));	// step 2

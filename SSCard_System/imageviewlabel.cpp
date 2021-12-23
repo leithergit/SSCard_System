@@ -107,7 +107,7 @@ void ImageViewLabel::onbuttonClicked(int index)
 
 	m_preIndex = m_curIndex;
 	m_curIndex = index;
-	qDebug("m_preIndex=%d,m_curIndex=%d,idx=%d", m_preIndex, m_curIndex, index);
+	//qDebug("m_preIndex=%d,m_curIndex=%d,idx=%d", m_preIndex, m_curIndex, index);
 
 	//图片切换
 	if (m_preIndex < m_curIndex) {
@@ -151,7 +151,7 @@ void ImageViewLabel::paintEvent(QPaintEvent* event)
 	painter.setFont(font);
 
 	if (m_blefttoright) {
-		qDebug("m_preIndex1=%d", m_preIndex);
+		//qDebug("m_preIndex1=%d", m_preIndex);
 		painter.drawPixmap(m_offset, 0, QPixmap(m_imagepathpairlst.at(m_preIndex).first).scaled(width(), height(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 		painter.drawPixmap(m_offset - width(), 0, QPixmap(m_imagepathpairlst.at(m_curIndex).first).scaled(width(), height(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
@@ -192,6 +192,6 @@ void ImageViewLabel::addImage(const QList<std::pair<QString, QString>>& imagepat
 
 void ImageViewLabel::onImageShowTimeOut()
 {
-	qDebug("m_curIndex1=%d", m_curIndex);
+	//qDebug("m_curIndex1=%d", m_curIndex);
 	onbuttonClicked(m_curIndex + 1);
 }

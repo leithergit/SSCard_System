@@ -6,7 +6,7 @@
 #include "Gloabal.h"
 
 DataCenterPtr g_pDataCenter;
-extern const char* g_szPageOperation[4] =
+const char* g_szPageOperation[4] =
 {
 	Str(Return_MainPage),
 	Str(Stay_CurrentPage),

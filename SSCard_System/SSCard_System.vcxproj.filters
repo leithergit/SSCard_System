@@ -45,18 +45,24 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Distribution Files">
-      <UniqueIdentifier>{B83CAF91-C7BF-462F-B76C-EA11631F866C}</UniqueIdentifier>
-      <Extensions>*</Extensions>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts;xlf</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="Distribution Files">
-      <UniqueIdentifier>{B83CAF91-C7BF-462F-B76C-EA11631F866C}</UniqueIdentifier>
-      <Extensions>*</Extensions>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts;xlf</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CheckPassword.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Gloabal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,6 +75,12 @@
     <ClCompile Include="Payment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SystemConfigure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\utility\TimeUtility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,6 +88,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imageviewlabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -94,6 +109,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="qstackpage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qtpropertybrowser\qtbuttonpropertybrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <QtMoc Include="qtpropertybrowser\qteditorfactory.cpp">
+      <Filter>Source Files</Filter>
+    </QtMoc>
+    <ClCompile Include="qtpropertybrowser\qtgroupboxpropertybrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qtpropertybrowser\qtpropertybrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qtpropertybrowser\qtpropertybrowserutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <QtMoc Include="qtpropertybrowser\qtpropertymanager.cpp">
+      <Filter>Source Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qttreepropertybrowser.cpp">
+      <Filter>Source Files</Filter>
+    </QtMoc>
+    <ClCompile Include="qtpropertybrowser\qtvariantproperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="registerlost.cpp">
@@ -138,19 +177,16 @@
     <ClCompile Include="updatepassword.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="imageviewlabel.cpp">
+    <ClCompile Include="cardmanger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SystemManager.cpp">
+    <ClCompile Include="logmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DeviceManager.cpp">
+    <ClCompile Include="pageconfigure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SystemConfigure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CheckPassword.cpp">
+    <ClCompile Include="regionconfigure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,6 +194,12 @@
     <ClInclude Include="..\utility\AutoLock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <QtMoc Include="CheckPassword.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="DeviceManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <ClInclude Include="Gloabal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -170,6 +212,12 @@
     <ClInclude Include="Payment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <QtMoc Include="SystemConfigure.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SystemManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <ClInclude Include="..\utility\TimeUtility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -179,6 +227,9 @@
     <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <QtMoc Include="imageviewlabel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <QtMoc Include="mainpage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -192,6 +243,30 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="qstackpage.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtbuttonpropertybrowser.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qteditorfactory.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtgroupboxpropertybrowser.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertybrowser.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertybrowserutils_p.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtpropertymanager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qttreepropertybrowser.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qtpropertybrowser\qtvariantproperty.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="registerlost.h">
@@ -239,17 +314,34 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
-      <Filter>Generated Files</Filter>
+      <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="release\moc_predefs.h.cbt">
-      <Filter>Generated Files</Filter>
+      <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="SSCardSystem_zh_CN.ts">
+      <Filter>Translation Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="CheckPassword.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="DeviceManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
     <QtUic Include="MaskWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="OperatorSucceed.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="SystemConfigure.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="SystemManager.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="mainpage.ui">
@@ -297,42 +389,84 @@
     <QtUic Include="updatecard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="updatecard_copy.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
     <QtUic Include="updatepassword.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="SystemManager.ui">
+    <QtUic Include="pageconfigure.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="DeviceManager.ui">
+    <QtUic Include="logmanager.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="SystemConfigure.ui">
+    <QtUic Include="regionconfigure.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="CheckPassword.ui">
+    <QtUic Include="cardmanger.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Image\Bkgrnd.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\ChangePassword.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\ChangePassword_Pressed.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\ChangePassword_hover.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\Countdown.png">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="Image\Homepage.png">
       <Filter>Resource Files</Filter>
     </None>
     <QtRcc Include="Image.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
+    <None Include="Image\InputMobile_BK.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\Kingaotech_QR.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\Mobile_Keybroad_BK.png">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="Image\OK.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\OP_ReadID.png">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Image\Registerlost.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Image\Registerlost_Pressed.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\Registerlost_hover.png">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="Image\Status_Finish.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\Success.png">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Image\UpdateCard.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Image\Wait_Cursor.png">
+    <None Include="Image\UpdateCard_Pressed.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\UpdateCard_hover.png">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Image\backgroud.jpg">
@@ -341,36 +475,96 @@
     <None Include="Image\banklogo.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="qtpropertybrowser\images\cursor-arrow.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-busy.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-closedhand.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-cross.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-forbidden.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-hand.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-hsplit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-ibeam.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-openhand.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-sizeall.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-sizeb.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-sizef.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-sizeh.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-sizev.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-uparrow.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-vsplit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-wait.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="qtpropertybrowser\images\cursor-whatsthis.png">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="Image\error.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\exclamation.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\failed.png">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Image\qr_pay.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Image\qr_wechat1.png">
+    <None Include="qt.conf">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Image\qr_wechat2.png">
+    <QtRcc Include="qtpropertybrowser\qtpropertybrowser.qrc">
       <Filter>Resource Files</Filter>
-    </None>
+    </QtRcc>
     <None Include="Image\todo.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Image\zhifubao.png">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="imageviewlabel.h">
+    <QtMoc Include="regionconfigure.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="SystemManager.h">
+    <QtMoc Include="pageconfigure.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="DeviceManager.h">
+    <QtMoc Include="logmanager.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="SystemConfigure.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="CheckPassword.h">
+    <QtMoc Include="cardmanger.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

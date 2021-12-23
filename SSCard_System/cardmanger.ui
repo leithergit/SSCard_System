@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CardManger</class>
+ <widget class="QWidget" name="CardManger">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1358</width>
+    <height>695</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="3,1">
+     <item>
+      <widget class="QTableWidget" name="tableWidget">
+       <property name="editTriggers">
+        <set>QAbstractItemView::DoubleClicked</set>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="gridStyle">
+        <enum>Qt::NoPen</enum>
+       </property>
+       <attribute name="horizontalHeaderVisible">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="horizontalHeaderMinimumSectionSize">
+        <number>120</number>
+       </attribute>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>240</number>
+       </attribute>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderStretchLastSection">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>序号</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>姓名</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>身份证号</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>社保卡号</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>卡片状态</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>320</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>80</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>挂失/解挂</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>卡片标注/取消标注</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>交费登记/取消登记</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>数据写入</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>卡片打印</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>数据回盘</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>启用卡片</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>出卡</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>执行</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

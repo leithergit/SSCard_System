@@ -8,6 +8,17 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+#用以避免C++17中std::byte与windows 定义的byte冲突
+DEFINES += _HAS_STD_BYTE=0
+DEFINES += _WINDOWS
+DEFINES += WIN32
+DEFINES += _ENABLE_EXTENDED_ALIGNED_STORAGE
+DEFINES += WIN32_LEAN_AND_MEAN
+
+include($$PWD/qtpropertybrowser/qtpropertybrowser.pri)
+
+TRANSLATIONS += SSCardSystem_zh_CN.ts
+
 SOURCES += \
     ../utility/TimeUtility.cpp \
     ../utility/Utility.cpp \
@@ -20,13 +31,17 @@ SOURCES += \
     SDK/dvtldcamocx/dvtldcamocxlib.cpp \
     SystemConfigure.cpp \
     SystemManager.cpp \
+    cardmanger.cpp \
     imageviewlabel.cpp \
+    logmanager.cpp \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
+    pageconfigure.cpp \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
+    regionconfigure.cpp \
     registerlost.cpp \
     rl_ensureinformation.cpp \
     uc_adforfinance.cpp \
@@ -52,12 +67,16 @@ HEADERS += \
     SDK/dvtldcamocx/dvtldcamocxlib.h \
     SystemConfigure.h \
     SystemManager.h \
+    cardmanger.h \
     imageviewlabel.h \
+    logmanager.h \
     mainpage.h \
     mainwindow.h \
+    pageconfigure.h \
     qmainstackpage.h \
     qpinkeybroad.h \
     qstackpage.h \
+    regionconfigure.h \
     registerlost.h \
     rl_ensureinformation.h \
     uc_adforfinance.h \
@@ -83,8 +102,12 @@ FORMS += \
     OperatorSucceed.ui \
     SystemConfigure.ui \
     SystemManager.ui \
+    cardmanger.ui \
+    logmanager.ui \
     mainpage.ui \
     mainwindow.ui \
+    pageconfigure.ui \
+    regionconfigure.ui \
     registerlost.ui \
     rl_ensureinformation.ui \
     uc_adforfinance.ui \
@@ -123,10 +146,6 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/PinKeybroad -lXZ_F1
 
 INCLUDEPATH += $$PWD/glog
 DEPENDPATH += $$PWD/glog
-#用以避免C++17中std::byte与windows 定义的byte冲突
-DEFINES += _HAS_STD_BYTE=0
-
-DISTFILES +=
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencode
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencoded
