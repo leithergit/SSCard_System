@@ -35,8 +35,8 @@
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
 #include "../utility/AutoLock.h"
-#include "../SDK/Printer/KT_Printer.h"
-#include "../SDK/Reader/KT_Reader.h"
+#include "../SDK/KT_Printer/KT_Printer.h"
+#include "../SDK/KT_Reader/KT_Reader.h"
 #include "../SDK/SSCardDriver/SSCardDriver.h"
 #include "../SDK/SSCardHSM/KT_SSCardHSM.h"
 #include "../SDK/SSCardInfo/KT_SSCardInfo.h"
@@ -57,7 +57,7 @@
 #define QFailed(x)       (x != 0)
 using namespace std;
 using namespace chrono;
-using namespace Kingaotech;
+//using namespace Kingaotech;
 
 enum FaceDetectStatus
 {
@@ -124,7 +124,7 @@ struct DeviceConfig
 		{
 			if (strPrinterType == var)
 			{
-				nPrinterType = (Printer)(nPrinterIndex + 1);
+				nPrinterType = (PrinterType)(nPrinterIndex + 1);
 				break;
 			}
 			nPrinterIndex++;
@@ -185,7 +185,7 @@ struct DeviceConfig
 		pSettings->endGroup();
 	}
 	string		strPrinter;							   // 打印机名
-	Printer     nPrinterType;                          // 打印机型号代码
+	PrinterType nPrinterType;                          // 打印机型号代码
 	string      strPrinterType;                        // 打印机型号名
 	int			nDepenseBox;						   // 发卡箱号
 	string		strDPI;								   // 打印机DPI，300*300,300*600
@@ -198,7 +198,7 @@ struct DeviceConfig
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
 	string		strPrinterModule;					   // 打印机驱动模块名称，如KT_Printer.dll
 	string		strReaderModule;					   // 读卡器驱动模块名称,如KT_Reader.dll
-	string		strTerminalCode;						// 终端唯一识别码
+	string		strTerminalCode;					   // 终端唯一识别码
 };
 
 struct RegionInfo
@@ -390,7 +390,7 @@ struct SysConfig
 		nPageTimeout[Page_InputSSCardPWD] = pSettings->value("InputSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_ChangeSSCardPWD] = pSettings->value("ChangeSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_RegisterLost] = pSettings->value("RegisterLost", 30).toUInt();
-        nPageTimeout[Page_AdforFinance] = pSettings->value("AdforFinance", 30).toUInt();
+		nPageTimeout[Page_AdforFinance] = pSettings->value("AdforFinance", 30).toUInt();
 		pSettings->endGroup();
 
 		pSettings->beginGroup("MaskPageTimeout");

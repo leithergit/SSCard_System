@@ -20,11 +20,11 @@ uc_InputMobile::~uc_InputMobile()
 
 int uc_InputMobile::ProcessBussiness()
 {
-	/*if (g_pMaskWindow)
-		g_pMaskWindow->hide();*/
 	ui->lineEdit_Mobile->setText("");
 	ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
+	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
 	m_strMobile = "";
 	return 0;
 }

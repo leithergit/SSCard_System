@@ -50,7 +50,10 @@ int main(int argc, char* argv[])
 		gError() << QString("加载卡版打印模块失败:%1").arg(strError).toLocal8Bit().data();
 		return -1;
 	}
+	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
+	char szOutInfo[1024] = { 0 };
 
+	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strRegionCode.c_str(), szOutInfo);
 	MainWindow w;
 	w.showFullScreen();
 	//w.showMaximized();

@@ -18,12 +18,12 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	// 待完成
-	int    ReadSSCardInfo(QString& strMessage, int& nStatus);
-	//int    QueryRegisterLost(QString& strMessage);
-	int	   QuerySSCardStatus(QString& strMessage);
+	int    ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
+	//int  QueryRegisterLost(QString& strMessage);
+	int	   QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
 	// 待完成
-	int    RegisterLost(QString& strMessage, int& nStatus);
-	int	   UnRegisterLost(QString& strMessage, int& nStatus);
+	int    RegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
+	int	   UnRegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 	bool   m_bTestStatus = false;       // 测试专用变量
 	bool   m_bRegisterLost = false;
 

@@ -12,7 +12,7 @@
 #include "Gloabal.h"
 
 using namespace std;
-using namespace Kingaotech;
+//using namespace Kingaotech;
 
 namespace Ui {
 	class MakeCard;

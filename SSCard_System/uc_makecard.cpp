@@ -28,6 +28,9 @@ int uc_MakeCard::ProcessBussiness()
 	m_nSocketRetryInterval = g_pDataCenter->GetSysConfigure()->PaymentConfig.nQueryPayResultInterval;            // 支付结构查询时间间隔单 毫秒
 	m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount;
 
+
+
+
 	QString strMessage;
 	if (QFailed(OpenDevice(strMessage)))
 	{
@@ -44,11 +47,6 @@ int uc_MakeCard::ProcessBussiness()
 int uc_MakeCard::OpenPrinter(QString& strMessage)
 {
 	int nResult = -1;
-	Kingaotech::_PRINTERBOX boxesUnit[10];
-	Kingaotech::BOXINFO boxesInfo = { 10, boxesUnit };
-	Kingaotech::LPBOXINFO lpBoxInfo = &boxesInfo;
-	Kingaotech::PRINTERSTATUS PrinterStatus;
-	Kingaotech::LPPRINTERSTATUS lpPrinterStatus = &PrinterStatus;
 	char szRCode[32] = { 0 };
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	try
@@ -328,8 +326,8 @@ int uc_MakeCard::Depense(QString& strMessage)
 {
 	int nResult = -1;
 
-	Kingaotech::LPBOXINFO lpBoxInfo = new Kingaotech::LBOXINFO;
-	Kingaotech::LPPRINTERSTATUS lpPrinterStatus = new Kingaotech::PRINTERSTATUS;
+	BOXINFO BoxInfo;
+	PRINTERSTATUS PrinterStatus;
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	char szRCode[32] = { 0 };
 	do
@@ -339,41 +337,41 @@ int uc_MakeCard::Depense(QString& strMessage)
 			strMessage = "打印机未初始化";
 			break;
 		}
-		if (QFailed(m_pPrinter->Printer_BoxStatus(lpBoxInfo, szRCode)))
+		if (QFailed(m_pPrinter->Printer_BoxStatus(BoxInfo, szRCode)))
 		{
 			strMessage = QString("Printer_BoxStatus失败:%1").arg(szRCode);
 			break;
 		}
 
-		if (lpBoxInfo->BoxList[DevConfig.nDepenseBox].BoxStatus == 2)
+		if (BoxInfo.BoxList[DevConfig.nDepenseBox].BoxStatus == 2)
 		{
-			strMessage = QString("卡箱[%1]:BoxStatus = %2,无卡!").arg(DevConfig.nDepenseBox).arg(lpBoxInfo->BoxList[DevConfig.nDepenseBox].BoxStatus);
+			strMessage = QString("卡箱[%1]:BoxStatus = %2,无卡!").arg(DevConfig.nDepenseBox).arg(BoxInfo.BoxList[DevConfig.nDepenseBox].BoxStatus);
 			break;
 		}
 
-		if (QFailed(m_pPrinter->Printer_Status(lpPrinterStatus, szRCode)))
+		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
 		{
 			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
-		if (lpPrinterStatus->fwDevice != 0)
+		if (PrinterStatus.fwDevice != 0)
 		{
-			strMessage = QString("打印机未就绪,状态代码:%1!").arg(lpPrinterStatus->fwDevice);
+			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
 			break;
 		}
 
-		if (lpPrinterStatus->fwMedia != 0)
+		if (PrinterStatus.fwMedia != 0)
 		{
-			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(lpPrinterStatus->fwToner);
+			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(PrinterStatus.fwToner);
 			if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
 			{
 				strMessage = QString("打印机尚有未取走卡片,尝试将其移动到回收箱失败，错误代码:%1!").arg(szRCode);
 				break;
 			}
 		}
-		if (lpPrinterStatus->fwToner == 2)
+		if (PrinterStatus.fwToner == 2)
 		{
-			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(lpPrinterStatus->fwToner);
+			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(PrinterStatus.fwToner);
 			break;
 		}
 		int nDepensePos = 2;	// 1-读磁位；2-接触IC位;3-非接IC位;4-打印位， 默认为接触位
@@ -387,12 +385,6 @@ int uc_MakeCard::Depense(QString& strMessage)
 		}
 		nResult = 0;
 	} while (0);
-
-	if (lpBoxInfo)
-		delete lpBoxInfo;
-
-	if (lpPrinterStatus)
-		delete lpPrinterStatus;
 
 	if (QFailed(nResult))
 	{
@@ -537,11 +529,11 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 
 	do
 	{
-		if (QFailed(nResult = MarkCard(strMessage, nStatus)))
+		if (QFailed(nResult = MarkCard(strMessage, nStatus, pSSCardInfo)))
 		{
 			if (strMessage == "已经开始制卡")
 			{
-				if (QFailed(nResult = GetCardData(strMessage, nStatus)))
+				if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 				{
 					break;
 					/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
@@ -580,7 +572,7 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 		//	}
 		//}
 
-		if (QFailed(nResult = GetCardData(strMessage, nStatus)))
+		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 		{
 			break;
 			/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
@@ -617,7 +609,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 		}
 #endif
 
-		nResult = ApplyCardReplacement(strMessage, nStatus);     //  申请补换卡
+		nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
 		if (QFailed(nResult))
 			break;
 		if (nStatus != 0 && nStatus != 1)
@@ -626,7 +618,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 			break;
 		}
 
-		nResult = ResgisterPayment(strMessage, nStatus);          // 缴费登记
+		nResult = ResgisterPayment(strMessage, nStatus, pSSCardInfo);          // 缴费登记
 		if (QFailed(nResult))
 			break;
 
@@ -637,17 +629,18 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 			break;
 		}
 
-		nResult = MarkCard(strMessage, nStatus);
+		nResult = MarkCard(strMessage, nStatus, pSSCardInfo);
 		if (QFailed(nResult))
 		{
-			if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
+			strMessage = QString("即制卡标注失败,Result:%1!").arg(nResult);
+			/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus, pSSCardInfo)))
 				break;
 			if (nStatus != 0 && nStatus != 1)
 			{
 				strMessage = QString("取消补换卡失败:%1!").arg(nStatus);
 				nResult = -1;
 				break;
-			}
+			}*/
 		}
 		if (nStatus != 0 && nStatus != 1)
 		{
@@ -656,9 +649,9 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 			break;
 		}
 
-		if (QFailed(nResult = GetCardData(strMessage, nStatus)))
+		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 		{
-			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus)))
+			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
 			{
 				strMessage = "因获取制卡数据失败,尝试取消即制卡标注时再次失败!";
 				break;
@@ -670,7 +663,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 				break;
 			}
 
-			if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
+			/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus, pSSCardInfo)))
 			{
 				strMessage = "因获取制卡数据失败,尝试取消补卡申请时再次失败!";
 				break;
@@ -681,7 +674,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 				strMessage = QString("因获取制卡数据失败,尝试取消补换卡失败:%1!").arg(nStatus);
 				nResult = -1;
 				break;
-			}
+			}*/
 		}
 		if (nStatus != 0 && nStatus != 1)
 		{
@@ -697,13 +690,8 @@ void uc_MakeCard::ThreadWork()
 	char szRCode[32] = { 0 };
 	int nResult = -1;
 	QString strMessage;
-	Kingaotech::_PRINTERBOX boxesUnit[10];
-	Kingaotech::BOXINFO boxesInfo = { 10, boxesUnit };
-	Kingaotech::LPBOXINFO lpBoxInfo = &boxesInfo;
-	Kingaotech::PRINTERSTATUS PrinterStatus;
-	Kingaotech::LPPRINTERSTATUS lpPrinterStatus = &PrinterStatus;
 
-	SSCardInfoPtr& pCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 
 	char szBuffer[1024] = { 0 };
 	int nBufferSize = sizeof(szBuffer);
@@ -730,11 +718,11 @@ void uc_MakeCard::ThreadWork()
 			break;
 		strInfo = "进卡成功";
 		gInfo() << gQStr(strInfo);
-		if (QFailed(WriteCard(pCardInfo, strMessage)))
+		if (QFailed(WriteCard(pSSCardInfo, strMessage)))
 			break;
 		strInfo = "写卡成功";
 		gInfo() << gQStr(strInfo);
-		if (QFailed(PrintCard(pCardInfo, strMessage)))
+		if (QFailed(PrintCard(pSSCardInfo, strMessage)))
 			break;
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
@@ -747,7 +735,7 @@ void uc_MakeCard::ThreadWork()
 		do
 		{
 			gInfo() << "Try to CancelMarkCard";
-			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus)))
+			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
 			{
 				strMessage = QString("取消标注失败:%1").arg(strMessage);
 				gInfo() << gQStr(strMessage);
@@ -771,7 +759,7 @@ void uc_MakeCard::ThreadWork()
 	do
 	{
 		// 数据回盘
-		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pCardInfo)))
+		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo)))
 		{
 			gError() << strMessage.toLocal8Bit().data();
 			break;
@@ -781,7 +769,7 @@ void uc_MakeCard::ThreadWork()
 			break;
 
 		// 启用
-		if (QFailed(nResult = EnalbeCard(strMessage, nStatus)))
+		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
 		{
 			gError() << strMessage.toLocal8Bit().data();
 			break;

@@ -8,42 +8,39 @@
 #define _KT_PRINT_H_
 #include <windows.h>
 
-namespace Kingaotech
+enum PrinterType
 {
-	typedef enum class Printer
-	{
-		EVOLIS_KC200 = 1,
-		EVOLIS_ZENIUS,
-		EVOLIS_AVANSIA,
-		HITI_CS200,
-		HITI_CS220,
-		HITI_CS290,
-		ENTRUCT_EM1,
-		ENTRUCT_EM2,
-		ENTRUCT_CD809,
-	}PT;
+	EVOLIS_KC200 = 1,
+	EVOLIS_ZENIUS,
+	EVOLIS_AVANSIA,
+	HITI_CS200,
+	HITI_CS220,
+	HITI_CS290,
+	ENTRUCT_EM1,
+	ENTRUCT_EM2,
+	ENTRUCT_CD809,
+};
 
 
-	typedef struct _PRINTERBOX
-	{
-		int Type;			//卡箱类型 0:未知，1：发卡箱，2：回收箱
-		int BoxNumber;		//卡箱号
-		int BoxStatus;		//卡箱状态,0：正常; 1：卡少; 2:无卡; 3：高(快满)；4：满；
-	}PRINTERBOXUNIT, * LPPRINTERBOXUNIT;
+struct _PRINTERBOX
+{
+	int Type;			//卡箱类型 0:未知，1：发卡箱，2：回收箱
+	int BoxNumber;		//卡箱号
+	int BoxStatus;		//卡箱状态,0：正常; 1：卡少; 2:无卡; 3：高(快满)；4：满；
+};
 
-	typedef struct BOXINFO
-	{
-		int nCount;				//卡箱总个数(所有卡箱)
-		LPPRINTERBOXUNIT BoxList;		//卡箱信息结构体指针
-	}LBOXINFO, * LPBOXINFO;
+struct BOXINFO
+{
+	int nCount;					//卡箱总个数(所有卡箱)
+	_PRINTERBOX* BoxList;		//卡箱信息结构体指针
+};
 
-	typedef struct _PRINTERSTATUS
-	{
-		WORD fwDevice;			//打印机状态, 0-Ready；1-Busy；2-Offline；3-ErrMachine；4-Printing
-		WORD fwMedia;			//介质状态，0-无卡；1-卡在门口；2-卡在内部；3-卡在上电位，4-卡在闸门外；5-堵卡；6-卡片未知（根据硬件特性返回,必须支持有无卡检测）
-		WORD fwToner;			//平印色带状态,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
-	}PRINTERSTATUS, * LPPRINTERSTATUS;
-}
+struct PRINTERSTATUS
+{
+	WORD fwDevice;			//打印机状态, 0-Ready；1-Busy；2-Offline；3-ErrMachine；4-Printing
+	WORD fwMedia;			//介质状态，0-无卡；1-卡在门口；2-卡在内部；3-卡在上电位，4-卡在闸门外；5-堵卡；6-卡片未知（根据硬件特性返回,必须支持有无卡检测）
+	WORD fwToner;			//平印色带状态,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
+};
 
 class KT_Printer
 {
@@ -58,7 +55,7 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Init(Kingaotech::PT PrinterType,char* resCode) = 0;
+	virtual int Printer_Init(PrinterType type,char* resCode) = 0;
 	/**
 	 * @brief 打开打印机
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
@@ -112,14 +109,14 @@ public:
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_BoxStatus(Kingaotech::LPBOXINFO &lpBoxInfo,char* resCode) = 0;
+	virtual int Printer_BoxStatus(BOXINFO &lpBoxInfo,char* resCode) = 0;
 	/**
 	 * @brief 获取打印机状态
 	 * @param[out] lpStatus 返回打印机状态的结构体,见定义
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Printer_Status(Kingaotech::LPPRINTERSTATUS &lpStatus,char* resCode) = 0;
+	virtual int Printer_Status(PRINTERSTATUS& lpStatus,char* resCode) = 0;
 	/**
 	 * @brief 打印初始化
 	 * @param[in] SetParam 打印机参数 可为NULL

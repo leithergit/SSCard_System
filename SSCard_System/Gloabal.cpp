@@ -10,8 +10,8 @@
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 #ifdef _DEBUG
-#pragma comment(lib, "../SDK/Printer/KT_Printerd")
-#pragma comment(lib, "../SDK/Reader/KT_Readerd")
+#pragma comment(lib, "../SDK/KT_Printer/KT_Printerd")
+#pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
 #pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
@@ -21,8 +21,8 @@
 #pragma comment(lib, "../SDK/glog/glog")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
 #else
-#pragma comment(lib, "../SDK/Printer/KT_Printer")
-#pragma comment(lib, "../SDK/Reader/KT_Reader")
+#pragma comment(lib, "../SDK/KT_Printer/KT_Printer")
+#pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriver")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSM")
 #pragma comment(lib, "../SDK/SSCardInfo/SSCardInfo")
@@ -33,15 +33,14 @@
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
 #endif
 
+
 extern DataCenterPtr g_pDataCenter;
 DataCenter::DataCenter()
 {
-
 }
 
 DataCenter::~DataCenter()
 {
-
 }
 // 
 int DataCenter::LoadSysConfigure(QString& strError)

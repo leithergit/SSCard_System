@@ -47,9 +47,11 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 	Q_UNUSED(strMessage);
 
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+	strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 	char szStatus[1024] = { 0 };
-	int nResult = queryPayment(Region.strCMAccount.c_str(), Region.strCMPassword.c_str(), (char*)pIDCard->szIdentify, (char*)pIDCard->szName, (char*)szStatus);
+	int nResult = queryPayment(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "查询付费状态失败";
@@ -219,22 +221,10 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 		return -1;
 	}
 }
-int     ApplyCardReplacement(QString& strMessage, int& nStatus)
+int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	int nResult = applyCardReplacement(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		Region.strArea.c_str(),
-		Region.strAgency.c_str(),
-		Region.strBankCode.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(const char*)pSSCardInfo->strCardNum,
-		g_pDataCenter->strMobilePhone.c_str(),
-		(char*)pIDCard->szName,
-		(char*)szStatus);
+	int nResult = applyCardReplacement(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "申请补换卡失败";
@@ -290,18 +280,10 @@ int     CancelCardReplacement(QString& strMessage, int& nStatus)
 	// 	}
 }
 
-int     ResgisterPayment(QString& strMessage, int& nStatus)
+int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	//SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	int nResult = registerPayment(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(char*)pIDCard->szName,
-		Region.strArea.c_str(),
-		(char*)szStatus);
+	int nResult = registerPayment(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "交费登记失败";
@@ -349,21 +331,12 @@ int  CancelPayment(QString& strMessage, int& nStatus)
 
 // nStatus = 0	时标注成功
 //			 1	之前 已经标注
-int  MarkCard(QString& strMessage, int& nStatus)
+int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	//IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	//SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	QString strInfo = QString("Try to markCard(%1,%2,%3,%4,%5)").arg(Region.strCMAccount.c_str()).arg(Region.strCMPassword.c_str()).arg(Region.strArea.c_str()).arg((const char*)pIDCard->szIdentify).arg((char*)pIDCard->szName);
+	QString strInfo = QString("Try to markCard(%1,%2)").arg((const char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
 	gInfo() << gQStr(strInfo);
-	int nResult = markCard(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		Region.strArea.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(char*)pIDCard->szName,
-		(char*)szStatus);
+	int nResult = markCard(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "即制卡标注失败";
@@ -385,18 +358,10 @@ int  MarkCard(QString& strMessage, int& nStatus)
 	}
 }
 
-int     CancelMarkCard(QString& strMessage, int& nStatus)
+int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	//SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	int nResult = cancelMarkCard(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		Region.strArea.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(char*)pIDCard->szName,
-		(char*)szStatus);
+	int nResult = cancelMarkCard(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "即制卡撤销标注失败";
@@ -421,7 +386,6 @@ int     CancelMarkCard(QString& strMessage, int& nStatus)
 int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 #define AddCardFiled(x,s)	x.setValue(#s,pSSCardInfoOut->s);
-
 
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
 	CardIni.beginGroup("CardData");
@@ -546,21 +510,8 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 }
 
 // nStatus 返回0为成功，其它都为失败
-int     GetCardData(QString& strMessage, int& nStatus)
+int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
-	SSCardInfoPtr pSSCardInfoOut = make_shared<SSCardInfo>();
-	strcpy(pSSCardInfoIn->strName, (char*)pIDCard->szName);
-	strcpy(pSSCardInfoIn->strCardID, (char*)pIDCard->szIdentify);
-	strcpy(pSSCardInfoIn->strTransType, "5");
-	strcpy(pSSCardInfoIn->strCity, Region.strArea.c_str());
-	string strCountry = Region.strArea + Region.strCountry;
-	strcpy(pSSCardInfoIn->strSSQX, strCountry.c_str());
-	strcpy(pSSCardInfoIn->strCard, Region.strCardVendor.c_str());
-	strcpy(pSSCardInfoIn->strBankCode, Region.strBankCode.c_str());
-
 	QString strAppPath = QCoreApplication::applicationDirPath();
 	strAppPath += "/Debug";
 	QFileInfo fdir(strAppPath);
@@ -578,22 +529,22 @@ int     GetCardData(QString& strMessage, int& nStatus)
 		dir.mkdir(strAppPath);
 	}
 
-	strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfoIn->strCardID);
+	strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
 	QFileInfo ffile(strAppPath);
 	//#ifdef _DEBUG
 	//	if (ffile.isFile())
 	//	{
 	//#pragma Warning("使用预存制卡数据")
 	//		LoadCardData(pSSCardInfoOut, strAppPath);
-	//		strcpy(pSSCardInfoIn->strPCH, pSSCardInfoOut->strPCH);
-	//		strcpy(pSSCardInfoIn->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
-	//		strcpy(pSSCardInfoIn->strNation, pSSCardInfoOut->strNation);
-	//		strcpy(pSSCardInfoIn->strSex, pSSCardInfoOut->strSex);
-	//		strcpy(pSSCardInfoIn->strBirthday, pSSCardInfoOut->strBirthday);
-	//		strcpy(pSSCardInfoIn->strReleaseDate, pSSCardInfoOut->strReleaseDate);
-	//		strcpy(pSSCardInfoIn->strValidDate, pSSCardInfoOut->strValidDate);
+	//		strcpy(pSSCardInfo->strPCH, pSSCardInfoOut->strPCH);
+	//		strcpy(pSSCardInfo->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
+	//		strcpy(pSSCardInfo->strNation, pSSCardInfoOut->strNation);
+	//		strcpy(pSSCardInfo->strSex, pSSCardInfoOut->strSex);
+	//		strcpy(pSSCardInfo->strBirthday, pSSCardInfoOut->strBirthday);
+	//		strcpy(pSSCardInfo->strReleaseDate, pSSCardInfoOut->strReleaseDate);
+	//		strcpy(pSSCardInfo->strValidDate, pSSCardInfoOut->strValidDate);
 	//		pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
-	//		SaveSSCardPhoto(strMessage, pSSCardInfoIn->strPhoto);
+	//		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 	//	}
 	//	else
 	//	{
@@ -617,13 +568,13 @@ int     GetCardData(QString& strMessage, int& nStatus)
 	//			nStatus = strtolong(szStatus, 10, 2);
 	//			if (nStatus == 0)
 	//			{
-	//				strcpy(pSSCardInfoIn->strPCH, pSSCardInfoOut->strPCH);
-	//				strcpy(pSSCardInfoIn->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
-	//				strcpy(pSSCardInfoIn->strNation, pSSCardInfoOut->strNation);
-	//				strcpy(pSSCardInfoIn->strSex, pSSCardInfoOut->strSex);
-	//				strcpy(pSSCardInfoIn->strBirthday, pSSCardInfoOut->strBirthday);
-	//				strcpy(pSSCardInfoIn->strReleaseDate, pSSCardInfoOut->strReleaseDate);
-	//				strcpy(pSSCardInfoIn->strValidDate, pSSCardInfoOut->strValidDate);
+	//				strcpy(pSSCardInfo->strPCH, pSSCardInfoOut->strPCH);
+	//				strcpy(pSSCardInfo->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
+	//				strcpy(pSSCardInfo->strNation, pSSCardInfoOut->strNation);
+	//				strcpy(pSSCardInfo->strSex, pSSCardInfoOut->strSex);
+	//				strcpy(pSSCardInfo->strBirthday, pSSCardInfoOut->strBirthday);
+	//				strcpy(pSSCardInfo->strReleaseDate, pSSCardInfoOut->strReleaseDate);
+	//				strcpy(pSSCardInfo->strValidDate, pSSCardInfoOut->strValidDate);
 	//				pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
 	//				SaveCardData(pSSCardInfoIn, strAppPath);
 	//				SaveSSCardPhoto(strMessage, pSSCardInfoIn->strPhoto);
@@ -638,11 +589,7 @@ int     GetCardData(QString& strMessage, int& nStatus)
 	//	}
 	//#else
 	char szStatus[1014] = { 0 };
-	int nResult = getCardData(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		*pSSCardInfoIn,
-		*pSSCardInfoOut,
-		szStatus);
+	int nResult = getCardData(*pSSCardInfo, szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "获取三代社保卡数据失败!";
@@ -657,16 +604,8 @@ int     GetCardData(QString& strMessage, int& nStatus)
 		nStatus = strtolong(szStatus, 10, 2);
 		if (nStatus == 0)
 		{
-			strcpy(pSSCardInfoIn->strPCH, pSSCardInfoOut->strPCH);
-			strcpy(pSSCardInfoIn->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
-			strcpy(pSSCardInfoIn->strNation, pSSCardInfoOut->strNation);
-			strcpy(pSSCardInfoIn->strSex, pSSCardInfoOut->strSex);
-			strcpy(pSSCardInfoIn->strBirthday, pSSCardInfoOut->strBirthday);
-			strcpy(pSSCardInfoIn->strReleaseDate, pSSCardInfoOut->strReleaseDate);
-			strcpy(pSSCardInfoIn->strValidDate, pSSCardInfoOut->strValidDate);
-			pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
-			SaveCardData(pSSCardInfoIn, strAppPath);
-			SaveSSCardPhoto(strMessage, pSSCardInfoIn->strPhoto);
+			SaveCardData(pSSCardInfo, strAppPath);
+			SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 		}
 		return 0;
 	}
@@ -676,17 +615,13 @@ int     GetCardData(QString& strMessage, int& nStatus)
 		return -1;
 	}
 	//#endif
-
 	return 0;
 }
 
 int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	//IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	int nResult = returnCardData(Region.strCMAccount.c_str(), Region.strCMPassword.c_str(), *pSSCardInfo, szStatus);
+	int nResult = returnCardData(*pSSCardInfo, szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "制卡回盘失败";
@@ -709,19 +644,10 @@ int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 	return 0;
 }
 
-int     EnalbeCard(QString& strMessage, int& nStatus)
+int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
 	char szStatus[1024] = { 0 };
-	int nResult = enableCard(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		Region.strArea.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(const char*)pSSCardInfoIn->strCardNum,
-		(const char*)pIDCard->szName,
-		szStatus);
+	int nResult = enableCard(*pSSCardInfo, szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "领卡启用失败";
@@ -742,7 +668,6 @@ int     EnalbeCard(QString& strMessage, int& nStatus)
 	}
 	return 0;
 }
-
 
 int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
 {
@@ -781,15 +706,11 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 }
 
 
-int QueryCardProgress(QString& strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo)
+int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	int nResult = -1;
 	char szStatus[1024] = { 0 };
-	if (QFailed(nResult = queryCardProgress(Region.strCMAccount.c_str(),
-		Region.strCMPassword.c_str(),
-		(const char*)pIDCard->szIdentify,
-		(const char*)pIDCard->szName, Region.strArea.c_str(), *pSSCardInfo, szStatus)))
+	if (QFailed(nResult = queryCardProgress(*pSSCardInfo, szStatus)))
 	{
 		strMessage = "获取制卡进度信息失败!";
 		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);

@@ -32,35 +32,33 @@ int  RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& str
 int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus);
 
 // nStatus = 0,成功，1 已缴费
-int  ResgisterPayment(QString& strMessage, int& nStatus);
+int  ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0,成功，否则失败
-int  ApplyCardReplacement(QString& strMessage, int& nStatus);
+int  ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0,成功，否则失败
-int  CancelCardReplacement(QString& strMessage, int& nStatus);
-
-
+int  CancelCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0，撤销成功
-int  CancelPayment(QString& strMessage, int& nStatus);
+int  CancelPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0，标注成功
-int  MarkCard(QString& strMessage, int& nStatus);
+int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0 成功
-int  CancelMarkCard(QString& strMessage, int& nStatus);
+int  CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
-int  GetCardData(QString& strMessage, int& nStatus);
+int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 int  ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0 成功
-int  EnalbeCard(QString& strMessage, int& nStatus);
+int  EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo);
 
-int QueryCardProgress(QString& strMessage, int& nStatus, IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo);
+int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 int GetIDImageStorePath(string& strFilePath);
 
