@@ -1,0 +1,14 @@
+{
+	"Wechat1": [{
+		"QR_Photo":"qr_wechat1.png",
+		"FolowWechat": "关注周口农商银行",
+		"SocialService": "提供查询社保服务",
+		"PayService": "提供缴费通知服务"
+	}],
+	"Wechat2": [{
+		"QR_Photo":"qr_wechat2.png",
+		"FolowWechat": "关注周口农商银行",
+		"SocialService": "提供查询社保服务",
+		"PayService": "提供缴费通知服务"
+	}]
+}
