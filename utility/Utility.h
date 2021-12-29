@@ -491,3 +491,7 @@ DWORD GetOsMajorVersion();
 
 BOOL ModifyWndStyle(HWND hWnd, int nStyleOffset, DWORD dwRemove, DWORD dwAdd, UINT nFlags);
 BOOL IsCancelDialogMessage(MSG* pMsg);
+
+bool EnumSerialPortW(WCHAR *szBuffer,WORD nBufferSize, WORD & nPortCount);
+bool EnumSerialPortW(HWND hComboBox ,WORD &nPortCount);
+bool EnumSerialPortA(HWND hComboBox ,WORD &nPortCount);

@@ -85,6 +85,8 @@ public:
 
     int GetErorrMessage(IDCard_Status nCode,char *szMessage,int nBufferSize);
 
+    const int GetCurrentPort();
+
 };
 
 #endif // IDCARDSDK_H

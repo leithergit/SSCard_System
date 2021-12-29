@@ -196,11 +196,11 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 	{
 		try
 		{
-			strEvent = "活体检测成功!";
+			strEvent = "人脸检测成功!";
 			gInfo() << gQStr(strEvent);
 			//if (m_bFaceDetectSucceed)
 			//{
-			//	QString strInfo = "活体检测成功,并且切换信号已经发送!";
+			//	QString strInfo = "人脸检测成功,并且切换信号已经发送!";
 			//	gInfo() << gQStr(strInfo);
 			//	return;
 			//}
@@ -265,50 +265,50 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 		switch (nFrameStatus)
 		{
 		case 1:
-			strEvent = "活体检测正在进行:没有检测到人脸";
+			strEvent = "人脸检测正在进行:没有检测到人脸";
 			break;
 		case 2:
-			strEvent = "活体检测正在进行:人脸超出蒙层";
+			strEvent = "人脸检测正在进行:人脸超出蒙层";
 			break;
 		case 3:
-			strEvent = "活体检测正在进行:人脸角度不对、属于低头， 抬头， 左右转情况";
+			strEvent = "人脸检测正在进行:人脸角度不对,请正视摄像头!";
 			break;
 		case 4:
-			strEvent = "活体检测正在进行:人脸太大";
+			strEvent = "人脸检测正在进行:人脸太大";
 			break;
 		case 5:
-			strEvent = "活体检测正在进行:人脸太小";
+			strEvent = "人脸检测正在进行:人脸太小";
 			break;
 		case 6:
-			strEvent = "活体检测正在进行:人脸靠近边界";
+			strEvent = "人脸检测正在进行:人脸靠近边界";
 			break;
 		case 7:
-			strEvent = "活体检测正在进行:额头被遮挡";
+			strEvent = "人脸检测正在进行:额头被遮挡";
 			break;
 		case 8:
-			strEvent = "活体检测正在进行:眼睛被遮挡";
+			strEvent = "人脸检测正在进行:眼睛被遮挡";
 			break;
 		case 9:
-			strEvent = "活体检测正在进行:嘴巴被遮挡";
+			strEvent = "人脸检测正在进行:嘴巴被遮挡";
 			break;
 		case 10:
-			strEvent = "活体检测正在进行:人脸质量不合格";
+			strEvent = "人脸检测正在进行:人脸质量不合格";
 			break;
 		case 11:
-			strEvent = "活体检测正在进行:非活体";
+			strEvent = "人脸检测正在进行:非真实人物";
 			break;
 		default:
 			break;
 		}
 	}
-	else if (eventID == -1) //活体检测失败，超时
+	else if (eventID == -1) //人脸检测失败，超时
 	{
 		strEvent = "检测超时";
 
 	}
-	else if (eventID == -2)//活体检测取消
+	else if (eventID == -2)//人脸检测取消
 	{
-		strEvent = "活体检测取消";
+		strEvent = "人脸检测取消";
 	}
 	ui->label_Text->setText(strEvent);
 }

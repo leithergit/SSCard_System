@@ -1,14 +1,17 @@
 ﻿#pragma execution_character_set("utf-8")
 #include <QSettings>
 #include <QDir>
+#include <QApplication>
 #include <QCoreApplication>
 #include <QSettings>
 #include <QFileInfo>
+#include <QTextCodec>
 #include "Gloabal.h"
 
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
+#pragma comment(lib,"Version.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printerd")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")
@@ -32,6 +35,42 @@
 #pragma comment(lib, "../SDK/glog/glog")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
 #endif
+
+const char* szPrinterTypeList[PRINTER_MAX] =
+{
+	Str(EVOLIS_KC200),
+	Str(EVOLIS_ZENIUS),
+	Str(EVOLIS_AVANSIA),
+	Str(HITI_CS200),
+	Str(HITI_CS220),
+	Str(HITI_CS290),
+	Str(ENTRUCT_EM1),
+	Str(ENTRUCT_EM2),
+	Str(ENTRUCT_CD809)
+};
+
+const char* szReaderTypeList[READER_MAX + 1] =
+{
+	Str(IN_VALID),
+	Str(DC_READER),//德卡读卡器
+	Str(MH_READER),//明华读卡器
+	Str(HD_READER),//华大读卡器
+};
+QWaitCursor::QWaitCursor()
+{
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	bStart = true;
+}
+void QWaitCursor::RestoreCursor()
+{
+	QApplication::restoreOverrideCursor();
+	bStart = false;
+}
+QWaitCursor::~QWaitCursor()
+{
+	if (bStart)
+		QApplication::restoreOverrideCursor();
+}
 
 
 extern DataCenterPtr g_pDataCenter;
@@ -218,4 +257,74 @@ bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage)
 		pCurl = nullptr;
 	}
 	return bSucceed;
+}
+
+
+int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent)
+{
+	QMessageBox Msgbox(nIcon, strTitle, strText, stdButtons, parent);
+	Msgbox.setStandardButtons(stdButtons);
+	struct ButtonInfo
+	{
+		QMessageBox::StandardButton nBtn;
+		QString     strText;
+	};
+
+	static std::map<QMessageBox::StandardButton, QString>  ButtonMap =
+	{
+		{QMessageBox::NoButton          ,""},
+		{QMessageBox::Ok                ,QObject::tr("确定")},
+		{QMessageBox::Save              ,QObject::tr("保存")},
+		{QMessageBox::SaveAll           ,QObject::tr("全部保存")},
+		{QMessageBox::Open              ,QObject::tr("打开")},
+		{QMessageBox::Yes               ,QObject::tr("是")},
+		{QMessageBox::YesToAll          ,QObject::tr("全部是")},
+		{QMessageBox::No                ,QObject::tr("否")},
+		{QMessageBox::NoToAll           ,QObject::tr("全都不")},
+		{QMessageBox::Abort             ,QObject::tr("中止")},
+		{QMessageBox::Retry             ,QObject::tr("重试")},
+		{QMessageBox::Ignore            ,QObject::tr("忽略")},
+		{QMessageBox::Close             ,QObject::tr("关闭")},
+		{QMessageBox::Cancel            ,QObject::tr("取消")},
+		{QMessageBox::Discard           ,QObject::tr("放弃")},
+		{QMessageBox::Help              ,QObject::tr("帮忙")},
+		{QMessageBox::Apply             ,QObject::tr("应用")},
+		{QMessageBox::Reset             ,QObject::tr("复位")},
+		{QMessageBox::RestoreDefaults   ,QObject::tr("恢复默认")},
+		{QMessageBox::FirstButton       ,QObject::tr("首个按钮")},
+		{QMessageBox::LastButton        ,QObject::tr("末尾按钮")},
+		{QMessageBox::YesAll            ,QObject::tr("全部是")},
+		{QMessageBox::NoAll             ,QObject::tr("全部否")},
+		{QMessageBox::Default           ,QObject::tr("默认")},
+		{QMessageBox::Escape            ,QObject::tr("取消操作")},
+		{QMessageBox::FlagMask          ,""},
+		{QMessageBox::ButtonMask        ,""}         // obsolete
+	};
+
+	for (auto btnType : ButtonMap)
+	{
+		if ((btnType.first & stdButtons) == btnType.first)
+		{
+			Msgbox.setButtonText(btnType.first, btnType.second);
+		}
+	}
+	return Msgbox.exec();
+}
+
+string UTF8_GBK(const char* strUtf8)
+{
+	QTextCodec* utf8Codec = QTextCodec::codecForName("utf-8");
+	QTextCodec* GBKCodec = QTextCodec::codecForName("GB18030");
+	QString strUnicode = utf8Codec->toUnicode(strUtf8);
+	QByteArray ByteGb2312 = GBKCodec->fromUnicode(strUnicode);
+	return string(ByteGb2312.data(), ByteGb2312.size());
+}
+
+string GBK_UTF8(const char* strGBK)
+{
+	QTextCodec* utf8Codec = QTextCodec::codecForName("utf-8");
+	QTextCodec* GBKCodec = QTextCodec::codecForName("GB18030");
+	QString strUnicode = GBKCodec->toUnicode(strGBK);
+	QByteArray ByteUTF8 = utf8Codec->fromUnicode(strUnicode);
+	return string(ByteUTF8.data(), ByteUTF8.size());
 }

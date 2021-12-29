@@ -272,6 +272,11 @@ int IDCardSDK::LoadCardInfo(IDCardInfo & IDCard)
     return IDCard_Succeed;
 }
 
+const int IDCardSDK::GetCurrentPort()
+{
+    return m_nPort;
+}
+
 int IDCardSDK::GetErorrMessage(IDCard_Status nCode,char *szMessage,int nBufferSize)
 {
     switch(nCode)

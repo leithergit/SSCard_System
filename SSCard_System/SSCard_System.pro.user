@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 5.0.1, 2021-12-15T09:30:24. -->
+<!-- Written by QtCreator 5.0.1, 2021-12-28T18:26:16. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -73,8 +73,8 @@
    <valuelist type="QVariantList" key="ClangCodeModel.CustomCommandLineKey">
     <value type="QString">-fno-delayed-template-parsing</value>
    </valuelist>
-   <value type="bool" key="ClangCodeModel.UseGlobalConfig">true</value>
-   <value type="QString" key="ClangCodeModel.WarningConfigId">Builtin.BuildSystem</value>
+   <value type="bool" key="ClangCodeModel.UseGlobalConfig">false</value>
+   <value type="QString" key="ClangCodeModel.WarningConfigId">{9bbc8a64-218a-4e4b-915c-0aecb89c9448}</value>
    <valuemap type="QVariantMap" key="ClangTools">
     <value type="bool" key="ClangTools.AnalyzeOpenFiles">true</value>
     <value type="bool" key="ClangTools.BuildBeforeAnalysis">true</value>

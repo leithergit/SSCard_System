@@ -32,6 +32,8 @@ SOURCES += \
     SystemConfigure.cpp \
     SystemManager.cpp \
     cardmanger.cpp \
+    dialogcameratest.cpp \
+    dialogidcardinfo.cpp \
     imageviewlabel.cpp \
     logmanager.cpp \
     main.cpp \
@@ -41,6 +43,7 @@ SOURCES += \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
+    qwidgetreadidcard.cpp \
     regionconfigure.cpp \
     registerlost.cpp \
     rl_ensureinformation.cpp \
@@ -59,15 +62,20 @@ SOURCES += \
 
 HEADERS += \
     CheckPassword.h \
+    ConfigurePage.h \
+    DevBase.h \
     DeviceManager.h \
     Gloabal.h \
     MaskWidget.h \
     OperatorSucceed.h \
     Payment.h \
+    SDK/KT_Define.h \
     SDK/dvtldcamocx/dvtldcamocxlib.h \
     SystemConfigure.h \
     SystemManager.h \
     cardmanger.h \
+    dialogcameratest.h \
+    dialogidcardinfo.h \
     imageviewlabel.h \
     logmanager.h \
     mainpage.h \
@@ -76,6 +84,7 @@ HEADERS += \
     qmainstackpage.h \
     qpinkeybroad.h \
     qstackpage.h \
+    qwidgetreadidcard.h \
     regionconfigure.h \
     registerlost.h \
     rl_ensureinformation.h \
@@ -93,7 +102,8 @@ HEADERS += \
     updatepassword.h \
     ../utility/AutoLock.h \
     ../utility/TimeUtility.h \
-    ../utility/Utility.h
+    ../utility/Utility.h\
+    ./SDK/KT_Define.h
 
 FORMS += \
     CheckPassword.ui \
@@ -103,10 +113,13 @@ FORMS += \
     SystemConfigure.ui \
     SystemManager.ui \
     cardmanger.ui \
+    dialogcameratest.ui \
+    dialogidcardinfo.ui \
     logmanager.ui \
     mainpage.ui \
     mainwindow.ui \
     pageconfigure.ui \
+    qwidgetreadidcard.ui \
     regionconfigure.ui \
     registerlost.ui \
     rl_ensureinformation.ui \
@@ -162,3 +175,6 @@ win32: LIBS += -L$$PWD/SDK/Reader/ -lKT_Reader
 
 INCLUDEPATH += $$PWD/SDK/Reader
 DEPENDPATH += $$PWD/SDK/Reader
+
+INCLUDEPATH += $$PWD/SDK
+DEPENDPATH += $$PWD/SDK

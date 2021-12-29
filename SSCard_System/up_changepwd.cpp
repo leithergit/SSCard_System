@@ -69,8 +69,8 @@ int up_ChangePWD::ProcessBussiness()
 	m_nInputFocus = 0;
 	m_nSSCardPWDSize = g_pDataCenter->GetSysConfigure()->nSSCardPasswordSize;
 	m_pLineEdit[0]->setFocus();
-	m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.PinKeybroadPort.c_str();
-	m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.nPinKeybroadBaudrate.c_str()).toUShort();
+	m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadPort.c_str();
+	m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadBaudrate.c_str()).toUShort();
 	m_pPinKeybroad = make_shared<QPinKeybroad>(m_strDevPort, m_nBaudreate);
 	QString strError;
 	if (!m_pPinKeybroad)

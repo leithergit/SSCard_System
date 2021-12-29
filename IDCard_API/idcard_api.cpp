@@ -46,8 +46,20 @@ int  OpenReader(IN const char *szPortIn)
         return IDCard_Invalid_Parameter;
 }
 
-int IDCARD_API_EXPORT GetCurrentPort(IN const char *szPort,int nBufferSize)
+int IDCARD_API_EXPORT GetCurrentPort(OUT char *szPort,int nBufferSize)
 {
+    if (!g_pIDCardSDK)
+        return IDCard_Reader_NotOpen;
+
+    int nPort = g_pIDCardSDK->GetCurrentPort();
+    if (nPort >= ComPort1 && nPort <= ComPort16)
+    {
+        sprintf_s(szPort,nBufferSize,"COM%d",nPort);
+    }
+    else if (nPort >= UsbPort1 && nPort <= UsbPort16)
+    {
+        sprintf_s(szPort,nBufferSize,"USB%d",nPort - UsbPort1 + 1);
+    }
     return 0;
 }
 

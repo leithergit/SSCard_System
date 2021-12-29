@@ -189,6 +189,12 @@
     <ClCompile Include="regionconfigure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dialogidcardinfo.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogcameratest.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -311,6 +317,9 @@
     <QtMoc Include="updatepassword.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <ClInclude Include="resource.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -405,6 +414,15 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="cardmanger.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="qwidgetreadidcard.ui">
+      <Filter>Source Files</Filter>
+    </QtUic>
+    <QtUic Include="dialogidcardinfo.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="dialogcameratest.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -567,5 +585,21 @@
     <QtMoc Include="cardmanger.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="dialogidcardinfo.h">
+      <Filter>Generated Files</Filter>
+    </QtMoc>
+    <QtMoc Include="dialogcameratest.h">
+      <Filter>Generated Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SSCard_System.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="SSCard_System.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

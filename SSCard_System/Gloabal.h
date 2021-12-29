@@ -31,6 +31,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QRect>
+#include <QMessageBox>
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
@@ -51,6 +52,8 @@
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)")"
 #define Warning(strMessage) message( __LOC__ " Warning: " strMessage)
 
+#define CardBox_Min  (1)
+#define CardBox_Max  (8)
 
 #include "logging.h"
 #define QSucceed(x)      (x == 0)
@@ -58,6 +61,9 @@
 using namespace std;
 using namespace chrono;
 //using namespace Kingaotech;
+
+extern const char* szPrinterTypeList[PRINTER_MAX];
+extern const char* szReaderTypeList[READER_MAX + 1];
 
 enum FaceDetectStatus
 {
@@ -90,6 +96,12 @@ enum Page_Index
 	Page_Succeed					//操作成功
 };
 
+enum class Manager_Level
+{
+	SuperVisor = 0,
+	Manager = 1,
+};
+
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
@@ -102,23 +114,19 @@ struct DeviceConfig
 	{
 		if (!pSettings)
 			return;
+		Load(pSettings);
+	}
+	bool Load(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return false;
 		gInfo() << "Try to read device configure";
 		pSettings->beginGroup("Device");
 		strPrinter = pSettings->value("Printer").toString().toStdString();
+		strPrinterModule = pSettings->value("PrinterModule").toString().toStdString();
 		strPrinterType = pSettings->value("PrinterType").toString().toStdString();
 		transform(strPrinterType.begin(), strPrinterType.end(), strPrinterType.begin(), ::toupper);
-		const char* szPrinterTypeList[] =
-		{
-			Str(EVOLIS_KC200),
-			Str(EVOLIS_ZENIUS),
-			Str(EVOLIS_AVANSIA),
-			Str(HITI_CS200),
-			Str(HITI_CS220),
-			Str(HITI_CS290),
-			Str(ENTRUCT_EM1),
-			Str(ENTRUCT_EM2),
-			Str(ENTRUCT_CD809)
-		};
+
 		int nPrinterIndex = 0;
 		for (auto& var : szPrinterTypeList)
 		{
@@ -129,26 +137,21 @@ struct DeviceConfig
 			}
 			nPrinterIndex++;
 		}
-
+		// 打印机驱动模块名称，如KT_Printer.dll
 		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
-		PinKeybroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
-		nPinKeybroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
+		strPinBroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
+		strPinBroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
 		nDepenseBox = pSettings->value("DepenseBox", 0).toUInt();
-		if (nDepenseBox > 8)
+		if (nDepenseBox < CardBox_Min || nDepenseBox > CardBox_Max)
 		{
-			gInfo() << "进卡箱号无效:" << nDepenseBox << ",现重置为0";
-			nDepenseBox = 0;
+			QString strInfo = QString("进卡箱号无效:%1,现重置为1").arg(nDepenseBox);
+			gError() << gQStr(strInfo);
+			nDepenseBox = 1;
 		}
 
-		strSSCardReadType = pSettings->value("SSCardReadType", "DC").toString().toStdString();
-
-		const char* szReaderTypeList[] =
-		{
-			Str(IN_VALID),
-			Str(DC_READER),//德卡读卡器
-			Str(MH_READER),//明华读卡器
-			Str(HD_READER),//华大读卡器
-		};
+		// 制卡读卡器配置
+		strReaderModule = pSettings->value("ReaderModule").toString().toStdString();				// 读卡器驱动模块名称,如KT_Reader.dll
+		strSSCardReadType = pSettings->value("SSCardReadType", "DC_READER").toString().toStdString();
 		int nReaderIndex = 0;
 		for (auto var : szReaderTypeList)
 		{
@@ -159,7 +162,6 @@ struct DeviceConfig
 			}
 			nReaderIndex++;
 		}
-
 		QString strSSCardPowerOnType = pSettings->value("SSCardReaderPowerOnType", "Contact").toString();
 		if (strSSCardPowerOnType == "Contact")
 			nSSCardReaderPowerOnType = READER_CONTACT;
@@ -169,35 +171,173 @@ struct DeviceConfig
 		{
 			nSSCardReaderPowerOnType = READER_CONTACT;		// 默认为接触式
 		}
+		strSSCardReaderPort = pSettings->value("SSCardReaderPORT", "USB").toString().toStdString();
+
+		// 桌面读卡器配置
+		strDesktopReaderModule = pSettings->value("DesktopReaderModule").toString().toStdString();				// 读卡器驱动模块名称,如KT_Reader.dll
+		strDesktopSSCardReadType = pSettings->value("DesktopSSCardReadType", "DC_READER").toString().toStdString();
+		nReaderIndex = 0;
+		for (auto var : szReaderTypeList)
+		{
+			if (strDesktopSSCardReadType == var)
+			{
+				nDesktopSSCardReaderType = (ReaderBrand)nReaderIndex;
+				break;
+			}
+			nReaderIndex++;
+		}
+
+		strSSCardPowerOnType = pSettings->value("DesktopSSCardReaderPowerOnType", "Contact").toString();
+		if (strSSCardPowerOnType == "Contact")
+			nDesktopSSCardReaderPowerOnType = READER_CONTACT;
+		else if (strSSCardPowerOnType == "Contactless")
+			nDesktopSSCardReaderPowerOnType = READER_UNCONTACT;
+		else
+		{
+			nDesktopSSCardReaderPowerOnType = READER_CONTACT;		// 默认为接触式
+		}
+		strDesktopSSCardReaderPort = pSettings->value("DesktopSSCardReaderPort", "USB").toString().toStdString();
+
 		strTerminalCode = pSettings->value("TerminalCode", "").toString().toStdString();
-		strSSCardReaderPort = pSettings->value("SSCardReaderPORT", "100").toString().toStdString();
+
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
-		strPrinterModule = pSettings->value("PrinterModule").toString().toStdString();				// 打印机驱动模块名称，如KT_Printer.dll
-		strReaderModule = pSettings->value("ReaderModule").toString().toStdString();				// 读卡器驱动模块名称,如KT_Reader.dll
-			// 		Info() << "Device Cofnigure:\n";
-			// 		Info() << "\t\Printer:" << strPrinter;
-			// 		Info() << "\t\PrinterDPI:" << strPrinter;
-			// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
-			// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
-			// 		Info() << "\t\SSCardReadType:" << strPrinter;
-			// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
-			// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
+
+		// 		Info() << "Device Cofnigure:\n";
+		// 		Info() << "\t\Printer:" << strPrinter;
+		// 		Info() << "\t\PrinterDPI:" << strPrinter;
+		// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
+		// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
+		// 		Info() << "\t\SSCardReadType:" << strPrinter;
+		// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
+		// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
 		pSettings->endGroup();
+		return true;
+	}
+	bool Save(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return false;
+		gInfo() << "Try to save device configure";
+		pSettings->beginGroup("Device");
+		pSettings->setValue("Printer", strPrinter.c_str());
+		pSettings->setValue("PrinterModule", strPrinterModule.c_str());
+		int nPrinterIndex = 0;
+		for (auto& var : szPrinterTypeList)
+		{
+			if (strPrinterType == var)
+			{
+				nPrinterType = (PrinterType)(nPrinterIndex + 1);
+				break;
+			}
+			nPrinterIndex++;
+		}
+		if (nPrinterType >= PRINTER_MIN && nPrinterType <= PRINTER_MAX)
+			strPrinterType = szPrinterTypeList[nPrinterType];
+		else
+		{
+			strPrinterType = "";
+			QString strInfo = QString("打印机类型值无效:%1").arg(nPrinterType);
+			gError() << gQStr(strInfo);
+		}
+		pSettings->setValue("PrinterType", strPrinterType.c_str());
+		pSettings->setValue("PrinterDPI", strDPI.c_str());
+		pSettings->setValue("PinKeybroadPort", strPinBroadPort.c_str());
+		pSettings->setValue("PinKeybroadBaudrate", strPinBroadBaudrate.c_str());
+		if (nDepenseBox < CardBox_Min || nDepenseBox > CardBox_Max)
+		{
+			nDepenseBox = 1;
+			QString strInfo = QString("进卡箱值设置无效:%1,重置为1").arg(nDepenseBox);
+			gError() << gQStr(strInfo);
+		}
+		pSettings->setValue("DepenseBox", nDepenseBox);
+
+		// 制卡读卡器配置
+		strReaderModule = pSettings->value("ReaderModule").toString().toStdString();
+		if (nSSCardReaderType >= READER_MIN && nSSCardReaderType >= READER_MAX)
+			strSSCardReadType = szReaderTypeList[nSSCardReaderType];
+		else
+		{
+			strSSCardReadType = "";
+			QString strInfo = QString("制卡读卡器类型值无效:%1").arg(nSSCardReaderType);
+			gError() << gQStr(strInfo);
+		}
+		pSettings->setValue("SSCardReadType", strSSCardReadType.c_str());
+		QString strSSCardPowerOnType = "";
+		if (nSSCardReaderPowerOnType == READER_CONTACT)
+			strSSCardPowerOnType = "Contact";
+		else if (nSSCardReaderPowerOnType == READER_CONTACT)
+			strSSCardPowerOnType = "Contactless";
+		else
+		{
+			QString strInfo = QString("制卡读卡器上电类型值无效:%1").arg(nSSCardReaderPowerOnType);
+			gError() << gQStr(strInfo);
+			strSSCardPowerOnType = "";
+		}
+		pSettings->setValue("SSCardReaderPowerOnType", strSSCardPowerOnType);
+		pSettings->setValue("SSCardReaderPort", strSSCardReaderPort.c_str());
+
+		// 桌面读卡器配置
+		pSettings->setValue("DesktopReaderModule", strDesktopReaderModule.c_str());
+		if (nDesktopSSCardReaderType >= READER_MIN && nDesktopSSCardReaderType >= READER_MAX)
+			strDesktopSSCardReadType = szReaderTypeList[nDesktopSSCardReaderType];
+		else
+		{
+			strDesktopSSCardReadType = "";
+			QString strInfo = QString("制卡读卡器类型值无效:%1").arg(nDesktopSSCardReaderType);
+			gError() << gQStr(strInfo);
+		}
+		pSettings->setValue("DesktopSSCardReadType", strDesktopSSCardReadType.c_str());
+		QString strDesktopSSCardPowerOnType = "";
+		if (nDesktopSSCardReaderPowerOnType == READER_CONTACT)
+			strDesktopSSCardPowerOnType = "Contact";
+		else if (nDesktopSSCardReaderPowerOnType == READER_CONTACT)
+			strDesktopSSCardPowerOnType = "Contactless";
+		else
+		{
+			QString strInfo = QString("制卡读卡器上电类型值无效:%1").arg(nDesktopSSCardReaderPowerOnType);
+			gError() << gQStr(strInfo);
+			strSSCardPowerOnType = "";
+		}
+		pSettings->setValue("DesktopSSCardReaderPowerOnType", strDesktopSSCardPowerOnType);
+		pSettings->setValue("DesktopSSCardReaderPort", strDesktopSSCardReaderPort.c_str());
+		pSettings->setValue("TerminalCode", strTerminalCode.c_str());
+		pSettings->setValue("IDCardReaderPort", strIDCardReaderPort.c_str());
+		// 打印机驱动模块名称，如KT_Printer.dll
+		// 		Info() << "Device Cofnigure:\n";
+		// 		Info() << "\t\Printer:" << strPrinter;
+		// 		Info() << "\t\PrinterDPI:" << strPrinter;
+		// 		Info() << "\t\PinKeybroadPort:" << strPrinter;
+		// 		Info() << "\t\PinKeybroadBaudrate:" << strPrinter;
+		// 		Info() << "\t\SSCardReadType:" << strPrinter;
+		// 		Info() << "\t\SSCardReaderPORT:" << strPrinter;
+		// 		Info() << "\t\IDCardReaderPort:" << strPrinter;
+		pSettings->endGroup();
+		return true;
 	}
 	string		strPrinter;							   // 打印机名
+	string		strPrinterModule;					   // 打印机驱动模块名称，如KT_Printer.dll
 	PrinterType nPrinterType;                          // 打印机型号代码
 	string      strPrinterType;                        // 打印机型号名
 	int			nDepenseBox;						   // 发卡箱号
 	string		strDPI;								   // 打印机DPI，300*300,300*600
-	string		PinKeybroadPort;					   // 密码键盘串口和波特率
-	string		nPinKeybroadBaudrate;				   // 9600
-	string		strSSCardReadType;					   // 读卡器	DC || HD
-	ReaderBrand nSSCardReaderType;					   // 读卡器类型
-	CardPowerType nSSCardReaderPowerOnType;			   // 上电方式  1:接触 2 : 非接
-	string		strSSCardReaderPort;				   // 读卡器端口 COM1 = 0，COM2 = 1.....USB = 100
+
+	string		strReaderModule;					   // 制卡读卡器驱动模块名称,如KT_Reader.dll
+	string		strSSCardReadType;					   // 制卡读卡器	DC || HD
+	ReaderBrand nSSCardReaderType;					   // 制卡读卡器类型
+	CardPowerType nSSCardReaderPowerOnType;			   // 制卡上电方式  1:接触 2 : 非接
+	string		strSSCardReaderPort;				   // 制卡读卡器端口 COM1 = 0，COM2 = 1.....USB = 100
+
+	string		strDesktopReaderModule;				   // 桌面读卡器驱动模块名称,如KT_Reader.dll
+	string		strDesktopSSCardReadType;			   // 桌面读卡器	DC || HD
+	ReaderBrand nDesktopSSCardReaderType;			   // 桌面读卡器类型
+	CardPowerType nDesktopSSCardReaderPowerOnType;	   // 桌面上电方式  1:接触 2 : 非接
+	string		strDesktopSSCardReaderPort;			   // 桌面读卡器端口 COM1 = 0，COM2 = 1.....USB = 100
+
+	string		strPinBroadPort;					   // 密码键盘串口和波特率
+	string		strPinBroadBaudrate;				   // 9600
+
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
-	string		strPrinterModule;					   // 打印机驱动模块名称，如KT_Printer.dll
-	string		strReaderModule;					   // 读卡器驱动模块名称,如KT_Reader.dll
+
 	string		strTerminalCode;					   // 终端唯一识别码
 };
 
@@ -205,13 +345,18 @@ struct RegionInfo
 {
 	RegionInfo(QSettings* pSettings)
 	{
+		Load(pSettings);
+	}
+	bool Load(QSettings* pSettings)
+	{
 		if (!pSettings)
-			return;
+			return false;
 		gInfo() << "Try to read Region configure";
 		pSettings->beginGroup("Region");
-		strRegionCode = pSettings->value("Region").toString().toStdString();
-		strArea = pSettings->value("Area").toString().toStdString();
+		strCityCode = pSettings->value("City").toString().toStdString();
 		strCountry = pSettings->value("Country").toString().toStdString();
+		strAgency = pSettings->value("Agency").toString().toStdString();
+
 		strLicense = pSettings->value("License").toString().toStdString();
 		strEMURL = pSettings->value("EMURL").toString().toStdString();
 		strEMAccount = pSettings->value("EMAccount").toString().toStdString();							// 加密机帐号
@@ -224,7 +369,6 @@ struct RegionInfo
 		strCM_CA_Account = pSettings->value("CM_CA_Account", "").toString().toStdString();
 		strCM_CA_Password = pSettings->value("CM_CA_Password", "").toString().toStdString();
 
-		strAgency = pSettings->value("Agency", "").toString().toStdString();
 		strCardVendor = pSettings->value("CardVendor", "1").toString().toStdString();
 		/*
 		SSCardDefaulutPin=123456
@@ -234,10 +378,46 @@ struct RegionInfo
 		strPrimaryKey = pSettings->value("PrimaryKey", "").toString().toStdString();
 		strBankCode = pSettings->value("BankCode", "").toString().toStdString();
 		pSettings->endGroup();
+		return true;
 	}
-	string		strRegionCode;						    // 地市编码 410700
-	string		strArea;							    // 区域编码 410700
-	string		strCountry;								// 所属区县
+	bool Save(QSettings* pSettings, bool bSupervisor = false)
+	{
+		if (!pSettings)
+			return false;
+		gInfo() << "Try to read Region configure";
+		pSettings->beginGroup("Region");
+		pSettings->setValue("Region", strCityCode.c_str());
+		pSettings->setValue("Area", strCountry.c_str());
+		//pSettings->setValue("Country", strCountry.c_str());
+		pSettings->setValue("BankCode", strBankCode.c_str());
+		pSettings->setValue("Agency", strAgency.c_str());
+		pSettings->setValue("CardVendor", strCardVendor.c_str());
+		if (bSupervisor)
+		{
+			pSettings->setValue("License", strLicense.c_str());
+			pSettings->setValue("EMURL", strEMURL.c_str());
+			pSettings->setValue("EMAccount", strEMAccount.c_str());							// 加密机帐号
+			pSettings->setValue("EMPassword", strEMPassword.c_str());						// 加密机密码
+
+			pSettings->setValue("CMURL", strCMURL.c_str());
+			pSettings->setValue("CMAccount", strCMAccount.c_str());
+			pSettings->setValue("CMPassword", strCMPassword.c_str());
+
+			pSettings->setValue("CM_CA_Account", strCM_CA_Account.c_str());
+			pSettings->setValue("CM_CA_Password", strCM_CA_Password.c_str());
+			/*
+			SSCardDefaulutPin=123456
+			PrimaryKey = 00112233445566778899AABBCCDDEEFF
+			*/
+			pSettings->setValue("SSCardDefaulutPin", strSSCardDefaulutPin.c_str());
+			pSettings->setValue("PrimaryKey", strPrimaryKey.c_str());
+		}
+		pSettings->endGroup();
+		return true;
+	}
+	string		strCityCode;						    // 地市编码 410700
+	string		strCountry;							    // 所属区县 410700
+	string		strAgency;								// 经办机构
 	string		strLicense;							    // LICENSE = STZOLdFrhbc
 	string		strEMURL;							    // 加密机ip http://10.120.6.239:7777/
 	string		strEMAccount;							// 加密机帐号
@@ -247,12 +427,10 @@ struct RegionInfo
 	string		strCMPassword;							// 卡管中心密码
 	string		strCM_CA_Account;						// 卡管ca帐号
 	string		strCM_CA_Password;						// 卡管ca中心密码
-	string		strAgency;								// 经办机构
 	string		strSSCardDefaulutPin;					// 社保卡默认密码，可为作oldpin
 	string		strPrimaryKey;							// 主控密钥
 	string		strBankCode;							// 银行代码
 	string		strCardVendor;							// 所属卡商
-
 };
 
 struct TextPosition
@@ -331,7 +509,14 @@ struct PaymentOpt
 	{
 		if (!pSettings)
 			return;
-		gInfo() << "Try to read Payment configure";
+		Load(pSettings);
+	}
+
+	void Load(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		gInfo() << "Try to load Payment configure";
 		pSettings->beginGroup("Payment");
 		nWaitTime = pSettings->value("WaitTime").toUInt();
 		nQueryPayResultInterval = pSettings->value("QueryPayResultInterval", 1000).toUInt();
@@ -346,8 +531,12 @@ struct PaymentOpt
 		strFiledamount = pSettings->value("Filedamount", "").toString().toStdString();
 		strPayResultUrl = pSettings->value("PayResultUrl", "").toString().toStdString();
 		strAmount = pSettings->value("amount", "").toString().toStdString();
-
 		pSettings->endGroup();
+	}
+
+	bool Save(QSettings* pSettings)
+	{
+		return true;
 	}
 	int     nWaitTime = 300;                         // 支付页面等侍时间，单位秒
 	int     nQueryPayResultInterval = 1000;          // 支付结构查询时间间隔单 毫秒
@@ -370,6 +559,79 @@ struct SysConfig
 		, Region(pSettings)
 		, PaymentConfig(pSettings)
 	{
+		if (!pSettings)
+			return;
+		Load(pSettings);
+	}
+
+	void Load(QSettings* pSettings)
+	{
+		LoadOther(pSettings);
+		LoadPageTimeout(pSettings);
+		LoadMaskPageTimeout(pSettings);
+		LoadBanks(pSettings);
+	}
+	void SaveOther(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		pSettings->beginGroup("Other");
+		pSettings->setValue("BATCHMODE", nBatchMode);
+		pSettings->setValue("DBPATH", strDBPath.c_str());
+		pSettings->setValue("FaceSimilarity", dfFaceSimilarity);
+		pSettings->setValue("MobilePhoneNumberLength", nMobilePhoneSize);
+		pSettings->setValue("SSCardPasswordLength", nSSCardPasswordSize);
+		pSettings->setValue("EnableDebug", bDebug);
+		pSettings->endGroup();
+	}
+	void SavePageTimeout(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		pSettings->beginGroup("PageTimeOut");
+		pSettings->setValue("ReaderIDCard", nPageTimeout[Page_ReaderIDCard]);
+		pSettings->setValue("FaceCapture", nPageTimeout[Page_FaceCapture]);
+		pSettings->setValue("EnsureInformation", nPageTimeout[Page_EnsureInformation]);
+		pSettings->setValue("InputMobile", nPageTimeout[Page_InputMobile]);
+		pSettings->setValue("Payment", nPageTimeout[Page_Payment]);
+		pSettings->setValue("MakeCard", nPageTimeout[Page_MakeCard]);
+		pSettings->setValue("ReadSSCard", nPageTimeout[Page_ReadSSCard]);
+		pSettings->setValue("InputSSCardPWD", nPageTimeout[Page_InputSSCardPWD]);
+		pSettings->setValue("ChangeSSCardPWD", nPageTimeout[Page_ChangeSSCardPWD]);
+		pSettings->setValue("RegisterLost", nPageTimeout[Page_RegisterLost]);
+		pSettings->setValue("AdforFinance", nPageTimeout[Page_AdforFinance]);
+		pSettings->endGroup();
+	}
+
+	void SaveMaskPageTimeout(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		pSettings->beginGroup("MaskPageTimeout");
+		pSettings->setValue("Success", nMaskTimeout[Success]);
+		pSettings->setValue("Information", nMaskTimeout[Information]);
+		pSettings->setValue("Error", nMaskTimeout[Error]);
+		pSettings->setValue("Failed", nMaskTimeout[Failed]);
+		pSettings->setValue("Fetal", nMaskTimeout[Fetal]);
+		pSettings->endGroup();
+	}
+
+	void SaveBanks(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		pSettings->beginGroup("Bank");
+		for (auto var : strMapBank)
+		{
+			pSettings->setValue(var.first.c_str(), var.second.c_str());
+		}
+		pSettings->endGroup();
+	}
+
+	void LoadOther(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
 		pSettings->beginGroup("Other");
 		nBatchMode = pSettings->value("BATCHMODE").toInt();
 		strDBPath = pSettings->value("DBPATH").toString().toStdString();
@@ -378,7 +640,11 @@ struct SysConfig
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
 		pSettings->endGroup();
-
+	}
+	void LoadPageTimeout(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
 		pSettings->beginGroup("PageTimeOut");
 		nPageTimeout[Page_ReaderIDCard] = pSettings->value("ReaderIDCard", 30).toUInt();
 		nPageTimeout[Page_FaceCapture] = pSettings->value("FaceCapture", 30).toUInt();
@@ -392,7 +658,12 @@ struct SysConfig
 		nPageTimeout[Page_RegisterLost] = pSettings->value("RegisterLost", 30).toUInt();
 		nPageTimeout[Page_AdforFinance] = pSettings->value("AdforFinance", 30).toUInt();
 		pSettings->endGroup();
+	}
 
+	void LoadMaskPageTimeout(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
 		pSettings->beginGroup("MaskPageTimeout");
 		nMaskTimeout[Success] = pSettings->value("Success", 1000).toUInt();
 		nMaskTimeout[Information] = pSettings->value("Information", 1000).toUInt();
@@ -400,7 +671,12 @@ struct SysConfig
 		nMaskTimeout[Failed] = pSettings->value("Failed", 5000).toUInt();
 		nMaskTimeout[Fetal] = pSettings->value("Fetal", 10000).toUInt();
 		pSettings->endGroup();
+	}
 
+	void LoadBanks(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
 		pSettings->beginGroup("Bank");
 		QStringList strKeyList = pSettings->allKeys();
 		strMapBank.clear();
@@ -411,7 +687,6 @@ struct SysConfig
 			//strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
 			auto [it, Inserted] = strMapBank.try_emplace(var.toStdString(), strValue.toStdString());
 		}
-
 		pSettings->endGroup();
 	}
 	DeviceConfig	DevConfig;							// 设备配置
@@ -445,6 +720,7 @@ using SysConfigPtr = shared_ptr<SysConfig>;
 // 	}
 // };
 using SSCardInfoPtr = shared_ptr<SSCardInfo>;
+using IDCardInfoPtr = shared_ptr<IDCardInfo>;
 
 class DataCenter
 {
@@ -515,6 +791,15 @@ public:
 		}
 	}
 
+	void SetMannagerLevel(Manager_Level nLevel)
+	{
+		nManagerLevel = nLevel;
+	}
+
+	Manager_Level GetManagerLevel()
+	{
+		return nManagerLevel;
+	}
 	// 	int GetCardStatus(string& strCardStatus)
 	// 	{
 	// 		if (!pSSCardInfo)
@@ -540,6 +825,7 @@ private:
 	SysConfigPtr	pConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardInfoPtr   pSSCardInfo = nullptr;
+	Manager_Level	nManagerLevel = Manager_Level::Manager;
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;
@@ -581,5 +867,22 @@ struct HttpBuffer
 		}
 	}
 };
+
+int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
+
+class QWaitCursor
+{
+	bool bStart = false;
+public:
+	QWaitCursor();
+
+	void RestoreCursor();
+
+	~QWaitCursor();
+};
+
+string UTF8_GBK(const char* strUtf8);
+string GBK_UTF8(const char* strGBK);
+#define WaitCursor()  QWaitCursor qWait;
 
 #endif // GLOABAL_H

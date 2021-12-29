@@ -677,7 +677,7 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 	char szStatus[1024] = { 0 };
 	if (QFailed(nResult = getCA(Region.strCM_CA_Account.c_str(),
 		Region.strCM_CA_Password.c_str(),
-		Region.strArea.c_str(),
+		Region.strCountry.c_str(),
 		pSSCardInfo->strCardID,
 		pSSCardInfo->strCardNum,
 		QMGY,

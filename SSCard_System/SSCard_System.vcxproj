@@ -208,6 +208,8 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="cardmanger.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="dialogcameratest.cpp" />
+    <ClCompile Include="dialogidcardinfo.cpp" />
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
@@ -254,6 +256,8 @@ copy /y $(TargetPath) z:\</Command>
     <QtMoc Include="DeviceManager.h">
     </QtMoc>
     <QtMoc Include="cardmanger.h" />
+    <QtMoc Include="dialogidcardinfo.h" />
+    <QtMoc Include="dialogcameratest.h" />
     <ClInclude Include="Gloabal.h" />
     <QtMoc Include="MaskWidget.h">
     </QtMoc>
@@ -269,6 +273,7 @@ copy /y $(TargetPath) z:\</Command>
     <ClInclude Include="..\utility\TimeUtility.h" />
     <ClInclude Include="..\utility\Utility.h" />
     <QtMoc Include="regionconfigure.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h" />
     <QtMoc Include="imageviewlabel.h">
     </QtMoc>
@@ -386,12 +391,15 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="DeviceManager.ui">
     </QtUic>
+    <QtUic Include="dialogcameratest.ui" />
+    <QtUic Include="dialogidcardinfo.ui" />
     <QtUic Include="logmanager.ui" />
     <QtUic Include="MaskWidget.ui">
     </QtUic>
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
     <QtUic Include="pageconfigure.ui" />
+    <QtUic Include="qwidgetreadidcard.ui" />
     <QtUic Include="regionconfigure.ui" />
     <QtUic Include="SystemConfigure.ui">
     </QtUic>
@@ -487,6 +495,12 @@ copy /y $(TargetPath) z:\</Command>
     </QtRcc>
     <None Include="Image\todo.png" />
     <None Include="Image\zhifubao.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SSCard_System.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="SSCard_System.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -123,7 +123,7 @@ struct IDCardInfo
 // 成功时返回0，否则返加相应的错误代码，GetErrorMessage可取得进一步的描述信息
 int IDCARD_API_EXPORT OpenReader(IN const char *szPort = nullptr);
 
-int IDCARD_API_EXPORT GetCurrentPort(IN const char *szPort,int nBufferSize);
+int IDCARD_API_EXPORT GetCurrentPort(OUT char *szPort,int nBufferSize);
 
 //关闭读卡器
 void IDCARD_API_EXPORT CloseReader();

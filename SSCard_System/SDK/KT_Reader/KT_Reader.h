@@ -6,9 +6,11 @@
 enum ReaderBrand
 {
 	IN_VALID = -1,
+	READER_MIN = 1,
 	DC_READER = 1,	//µÂ¿¨¶Á¿¨Æ÷
 	MH_READER,		//Ã÷»ª¶Á¿¨Æ÷
 	HD_READER,		//»ª´ó¶Á¿¨Æ÷
+	READER_MAX = HD_READER
 };
 
 enum CardPowerType

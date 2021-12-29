@@ -174,15 +174,6 @@ int uc_ReadIDCard::ReaderIDCard()
 		}
 		g_pDataCenter->SetIDCardInfo(m_pIDCard);
 
-		//            ui->label_Name->setText(QString::fromLocal8Bit((const char *)IDCard.szName));
-		//            ui->label_Gender->setText(QString::fromLocal8Bit((const char *)IDCard.szGender));
-		//            ui->label_Nation->setText(QString::fromLocal8Bit((const char *)IDCard.szNation));
-		//            ui->label_Birthday->setText(QString::fromLocal8Bit((const char *)IDCard.szBirthday));
-		//            ui->label_Identify->setText(QString::fromLocal8Bit((const char *)IDCard.szIdentify));
-		//            ui->label_Address->setText(QString::fromLocal8Bit((const char *)IDCard.szAddress));
-		//            ui->label_IssueAuthority->setText(QString::fromLocal8Bit((const char *)IDCard.szIszssueAuthority));
-		//            ui->label_ExpirationDate->setText(QString::fromLocal8Bit((const char *)IDCard.szExpirationDate1) + "-" + QString::fromLocal8Bit((const char *)IDCard.szExpirationDate2));
-
 		if (QSucceed(GetIDImageStorePath(g_pDataCenter->strIDImageFile)))
 		{
 			QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);

@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
 	char szOutInfo[1024] = { 0 };
 
-	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strRegionCode.c_str(), szOutInfo);
+	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strCityCode.c_str(), szOutInfo);
 	MainWindow w;
 	w.showFullScreen();
 	//w.showMaximized();

@@ -37,9 +37,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 		strcpy((char*)pSSCardInfo->strTransType, "5");
-		strcpy((char*)pSSCardInfo->strCity, Reginfo.strArea.c_str());
-		string strCountry = Reginfo.strArea + Reginfo.strCountry;
-		strcpy((char*)pSSCardInfo->strSSQX, strCountry.c_str());
+		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
 		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 

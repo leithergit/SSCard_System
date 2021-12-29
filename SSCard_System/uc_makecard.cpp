@@ -20,16 +20,12 @@ uc_MakeCard::~uc_MakeCard()
 	delete ui;
 }
 
-
 int uc_MakeCard::ProcessBussiness()
 {
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
 	m_nSocketRetryInterval = g_pDataCenter->GetSysConfigure()->PaymentConfig.nQueryPayResultInterval;            // 支付结构查询时间间隔单 毫秒
 	m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount;
-
-
-
 
 	QString strMessage;
 	if (QFailed(OpenDevice(strMessage)))
@@ -101,7 +97,7 @@ int uc_MakeCard::OpenPrinter(QString& strMessage)
 string uc_MakeCard::MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo)
 {
 	string strCardInfo = "";
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+	//RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	//卡识别码|初始化机构编码|发卡日期|卡有效期|卡号|社会保障号码|姓名|姓名拓展|性别|民族|出生日期|
 	strCardInfo = "||";	// 卡识别码|初始化机构编码 两者为空
 	//strCardInfo += pSSCardInfo->strOrganID;					strCardInfo += "|";
@@ -115,19 +111,6 @@ string uc_MakeCard::MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo)
 	strCardInfo += pSSCardInfo->strBirthday;				strCardInfo += "|";
 	return strCardInfo;
 }
-
-//int uc_MakeCard::GetCA(string& strPublicKey, SSCardInfoPtr& pSSCardInfo, CAInfo& caInfo, QString& strMessage)
-//{
-//	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-//	// *@param[in]  user		接口用户
-//	// * @param[in]  pwd		接口密码
-//	// * @param[in]  city		城市代码
-//	// * @param[in]  cardID		身份证号(社会保障号码)
-//	// * @param[in]  cardNum	社保卡号
-//	// * @param[in]  QMGY		签名公钥
-//	// * @param[in]  name		姓名
-//	// * @param[in]  SF			算法
-//}
 
 int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 {
@@ -211,7 +194,7 @@ int uc_MakeCard::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		QStringList strRomdom = QString(szCardBaseWrite).split("|", Qt::KeepEmptyParts);
 
 		strcpy(HsmInfo.strSystemID, "410700006");
-		strcpy(HsmInfo.strRegionCode, Region.strArea.c_str());
+		strcpy(HsmInfo.strRegionCode, Region.strCountry.c_str());
 		strcpy(HsmInfo.strCardNum, pSSCardInfo->strCardNum); //用最新的卡号	   
 		strcpy(HsmInfo.strTerminalCode, DevConfig.strTerminalCode.c_str());	// 
 		strcpy(HsmInfo.strCardID, pSSCardInfo->strCardID);
@@ -302,7 +285,12 @@ int uc_MakeCard::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		pFieldPos = &pCardForm->posSSCardID;
 		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		pFieldPos = &pCardForm->posIssueDate;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strValidDate, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+		int nYear, nMonth, nDay;
+
+		sscanf_s(pSSCardInfo->strValidDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
+		char szValidate[32] = { 0 };
+		sprintf_s(szValidate, 32, "%d年%d月%d日", nYear, nMonth, nDay);
+		m_pPrinter->Printer_AddText((char*)UTF8_GBK(szValidate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		ImagePosition& ImgPos = pCardForm->posImage;
 		m_pPrinter->Printer_AddImage((char*)g_pDataCenter->strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
 		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
@@ -432,7 +420,7 @@ int uc_MakeCard::OpenReader(QString& strMessage)
 				}
 				RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 				char szOutInfo[1024] = { 0 };
-				DriverInit(m_pReader, (char*)Region.strArea.c_str(), (char*)Region.strSSCardDefaulutPin.c_str(), (char*)Region.strPrimaryKey.c_str(), szOutInfo);
+				DriverInit(m_pReader, (char*)Region.strCountry.c_str(), (char*)Region.strSSCardDefaulutPin.c_str(), (char*)Region.strPrimaryKey.c_str(), szOutInfo);
 			}
 
 		} while (0);
