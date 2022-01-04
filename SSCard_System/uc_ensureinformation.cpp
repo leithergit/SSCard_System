@@ -32,16 +32,15 @@ int uc_EnsureInformation::ProcessBussiness()
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	do
 	{
-		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
-		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-		strcpy((char*)pSSCardInfo->strTransType, "5");
-		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-
+        strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
+        strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+        strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+        strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+        strcpy((char*)pSSCardInfo->strTransType, "5");
+        strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+        strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+        strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+        strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 		//#ifdef _DEBUG

@@ -16,7 +16,21 @@ CheckPassword::~CheckPassword()
 void CheckPassword::on_pushButton_OK_clicked()
 {
 	strPassword = ui.lineEdit_Password->text();
-	if (strPassword == "3edcBGT%")
+#ifdef _DEBUG
+	if (strPassword == "1")
+	{
+		g_pDataCenter->SetMannagerLevel(Manager_Level::Manager);
+		QDialog::accept();
+	}
+	else if (strPassword == "2")
+	{
+		g_pDataCenter->SetMannagerLevel(Manager_Level::SuperVisor);
+		QDialog::accept();
+	}
+	else
+		QDialog::reject();
+#else
+	if (strPassword == "#edcVFR$")
 	{
 		g_pDataCenter->SetMannagerLevel(Manager_Level::Manager);
 		QDialog::accept();
@@ -28,6 +42,7 @@ void CheckPassword::on_pushButton_OK_clicked()
 	}
 	else
 		QDialog::reject();
+#endif
 }
 
 

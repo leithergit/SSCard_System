@@ -1,6 +1,6 @@
 ﻿#pragma execution_character_set("utf-8")
-#include "pageconfigure.h"
-#include "ui_pageconfigure.h"
+#include "Sys_pageconfigure.h"
+#include "ui_Sys_pageconfigure.h"
 #include <QCheckBox>
 #include <QStyleFactory>
 #include <QBrush>
@@ -18,11 +18,6 @@ PageConfigure::PageConfigure(QWidget* parent) :
     }
 	ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-	nCols = ui->tableWidget_2->columnCount();
-	for (int nIndex = 0; nIndex < nCols; nIndex++)
-		ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(nIndex, QHeaderView::ResizeToContents);
-	ui->tableWidget_2->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
 	int nRows = ui->tableWidget->rowCount();
 	m_pCheckBoxGroup = new QButtonGroup;
 	m_pCheckBoxGroup->setExclusive(false);
@@ -32,9 +27,9 @@ PageConfigure::PageConfigure(QWidget* parent) :
         pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
         //pItem->setBackground(QBrush(Qt::lightGray));
 
-        pItem = ui->tableWidget->item(nItem,1);
-        pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
-        pItem->setBackground(QBrush(Qt::lightGray));
+//        pItem = ui->tableWidget->item(nItem,1);
+//        pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
+//        pItem->setBackground(QBrush(Qt::lightGray));
 
 		QWidget* pCellWidget = new QWidget(ui->tableWidget);
 		QHBoxLayout* pHLayout = new QHBoxLayout();
@@ -55,6 +50,22 @@ PageConfigure::PageConfigure(QWidget* parent) :
 		ui->tableWidget->setCellWidget(nItem, 3, pCellWidget);
 		connect(m_pCheckBoxGroup, &QButtonGroup::idClicked, this, &PageConfigure::on_TableCheckBoxStateChanged);
 	}
+    nCols = ui->tableWidget_2->columnCount();
+    for (int nIndex = 0; nIndex < nCols; nIndex++)
+        ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(nIndex, QHeaderView::ResizeToContents);
+    ui->tableWidget_2->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    nRows = ui->tableWidget_2->rowCount();
+    for (int nItem = 0; nItem < nRows; nItem++)
+    {
+        QTableWidgetItem *pItem = ui->tableWidget->item(nItem,0);
+        pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
+        //pItem->setBackground(QBrush(Qt::lightGray));
+
+        pItem = ui->tableWidget->item(nItem,1);
+        pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
+        pItem->setBackground(QBrush(Qt::lightGray));
+    }
 }
 
 PageConfigure::~PageConfigure()

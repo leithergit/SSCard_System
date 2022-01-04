@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <QWidget>
-#include "ui_DeviceManager.h"
+#include "ui_Sys_DeviceManager.h"
 #include "Gloabal.h"
 #include "DevBase.h"
 #include "ConfigurePage.h"
@@ -29,7 +29,7 @@ public:
 
 	bool TryOpenPinKeyBroadPort(int nPort, int nBaudrate);
 
-	bool CheckPrinter(QString strPrinterLib, PrinterType nType, int& nDepenseBox, QString& strDPI, QString& strMessage);
+	bool CheckPrinter(QString& strPrinterLib, PrinterType& nType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
 	enum ReaderUsage
 	{

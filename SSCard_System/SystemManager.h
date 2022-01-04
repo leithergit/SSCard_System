@@ -12,7 +12,6 @@ public:
 	SystemManager(QWidget* parent = Q_NULLPTR);
 	~SystemManager();
 	Manager_Level m_nManagerType = Manager_Level::Manager;
-
 private slots:
 	void on_pushButton_Exit_clicked();
 

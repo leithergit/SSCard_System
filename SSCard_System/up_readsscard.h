@@ -3,6 +3,8 @@
 #pragma execution_character_set("utf-8")
 #include <QWidget>
 #include "qstackpage.h"
+#include "Gloabal.h"
+#include "DevBase.h"
 
 namespace Ui {
 	class ReadSSCard;

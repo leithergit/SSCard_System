@@ -60,9 +60,6 @@
     <ClCompile Include="CheckPassword.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DeviceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Gloabal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,7 +72,28 @@
     <ClCompile Include="Payment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SystemConfigure.cpp">
+    <ClCompile Include="Sys_DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_cardmanger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_dialogcameratest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_dialogidcardinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_logmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_otheroptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_pageconfigure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_regionconfigure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SystemManager.cpp">
@@ -111,34 +129,7 @@
     <ClCompile Include="qstackpage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="qtpropertybrowser\qtbuttonpropertybrowser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <QtMoc Include="qtpropertybrowser\qteditorfactory.cpp">
-      <Filter>Source Files</Filter>
-    </QtMoc>
-    <ClCompile Include="qtpropertybrowser\qtgroupboxpropertybrowser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="qtpropertybrowser\qtpropertybrowser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="qtpropertybrowser\qtpropertybrowserutils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <QtMoc Include="qtpropertybrowser\qtpropertymanager.cpp">
-      <Filter>Source Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qttreepropertybrowser.cpp">
-      <Filter>Source Files</Filter>
-    </QtMoc>
-    <ClCompile Include="qtpropertybrowser\qtvariantproperty.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="registerlost.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rl_ensureinformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="uc_adforfinance.cpp">
@@ -177,23 +168,8 @@
     <ClCompile Include="updatepassword.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cardmanger.cpp">
+    <ClCompile Include="Sys_qwidgetreadidcard.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="logmanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pageconfigure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="regionconfigure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dialogidcardinfo.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dialogcameratest.cpp">
-      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,10 +179,16 @@
     <QtMoc Include="CheckPassword.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="DeviceManager.h">
+    <QtMoc Include="ConfigurePage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <ClInclude Include="DevBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Gloabal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\KT_Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <QtMoc Include="MaskWidget.h">
@@ -218,7 +200,28 @@
     <ClInclude Include="Payment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <QtMoc Include="SystemConfigure.h">
+    <QtMoc Include="Sys_DeviceManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_cardmanger.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_dialogcameratest.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_dialogidcardinfo.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_logmanager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_otheroptions.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_pageconfigure.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_regionconfigure.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="SystemManager.h">
@@ -251,34 +254,7 @@
     <QtMoc Include="qstackpage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qtbuttonpropertybrowser.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qteditorfactory.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qtgroupboxpropertybrowser.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qtpropertybrowser.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qtpropertybrowserutils_p.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qtpropertymanager.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qttreepropertybrowser.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="qtpropertybrowser\qtvariantproperty.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="registerlost.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="rl_ensureinformation.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="uc_adforfinance.h">
@@ -317,16 +293,13 @@
     <QtMoc Include="updatepassword.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClInclude Include="resource.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
-      <Filter>Source Files</Filter>
+      <Filter>Generated Files</Filter>
     </CustomBuild>
     <CustomBuild Include="release\moc_predefs.h.cbt">
-      <Filter>Source Files</Filter>
+      <Filter>Generated Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -338,16 +311,34 @@
     <QtUic Include="CheckPassword.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="DeviceManager.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="MaskWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="OperatorSucceed.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="SystemConfigure.ui">
+    <QtUic Include="Sys_DeviceManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_cardmanger.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_dialogcameratest.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_dialogidcardinfo.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_logmanager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_otheroptions.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_pageconfigure.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_regionconfigure.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="SystemManager.ui">
@@ -360,9 +351,6 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="registerlost.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="rl_ensureinformation.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="uc_adforfinance.ui">
@@ -392,6 +380,9 @@
     <QtUic Include="up_changepwd.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="up_readsscard.bak.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
     <QtUic Include="up_readsscard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
@@ -404,25 +395,7 @@
     <QtUic Include="updatepassword.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="pageconfigure.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="logmanager.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="regionconfigure.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="cardmanger.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="qwidgetreadidcard.ui">
-      <Filter>Source Files</Filter>
-    </QtUic>
-    <QtUic Include="dialogidcardinfo.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="dialogcameratest.ui">
+    <QtUic Include="Sys_qwidgetreadidcard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -573,33 +546,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="regionconfigure.h">
+    <QtMoc Include="Sys_qwidgetreadidcard.h">
       <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="pageconfigure.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="logmanager.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="cardmanger.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="dialogidcardinfo.h">
-      <Filter>Generated Files</Filter>
-    </QtMoc>
-    <QtMoc Include="dialogcameratest.h">
-      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SSCard_System.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="SSCard_System.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

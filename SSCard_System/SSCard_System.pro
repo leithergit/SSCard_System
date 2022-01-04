@@ -15,38 +15,35 @@ DEFINES += WIN32
 DEFINES += _ENABLE_EXTENDED_ALIGNED_STORAGE
 DEFINES += WIN32_LEAN_AND_MEAN
 
-include($$PWD/qtpropertybrowser/qtpropertybrowser.pri)
-
 TRANSLATIONS += SSCardSystem_zh_CN.ts
 
 SOURCES += \
     ../utility/TimeUtility.cpp \
     ../utility/Utility.cpp \
     CheckPassword.cpp \
-    DeviceManager.cpp \
     Gloabal.cpp \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
     Payment.cpp \
     SDK/dvtldcamocx/dvtldcamocxlib.cpp \
-    SystemConfigure.cpp \
+    Sys_DeviceManager.cpp \
+    Sys_cardmanger.cpp \
+    Sys_dialogcameratest.cpp \
+    Sys_dialogidcardinfo.cpp \
+    Sys_logmanager.cpp \
+    Sys_otheroptions.cpp \
+    Sys_pageconfigure.cpp \
+    Sys_qwidgetreadidcard.cpp \
+    Sys_regionconfigure.cpp \
     SystemManager.cpp \
-    cardmanger.cpp \
-    dialogcameratest.cpp \
-    dialogidcardinfo.cpp \
     imageviewlabel.cpp \
-    logmanager.cpp \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
-    pageconfigure.cpp \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
-    qwidgetreadidcard.cpp \
-    regionconfigure.cpp \
     registerlost.cpp \
-    rl_ensureinformation.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -64,30 +61,29 @@ HEADERS += \
     CheckPassword.h \
     ConfigurePage.h \
     DevBase.h \
-    DeviceManager.h \
     Gloabal.h \
     MaskWidget.h \
     OperatorSucceed.h \
     Payment.h \
     SDK/KT_Define.h \
     SDK/dvtldcamocx/dvtldcamocxlib.h \
-    SystemConfigure.h \
+    Sys_DeviceManager.h \
+    Sys_cardmanger.h \
+    Sys_dialogcameratest.h \
+    Sys_dialogidcardinfo.h \
+    Sys_logmanager.h \
+    Sys_otheroptions.h \
+    Sys_pageconfigure.h \
+    Sys_qwidgetreadidcard.h \
+    Sys_regionconfigure.h \
     SystemManager.h \
-    cardmanger.h \
-    dialogcameratest.h \
-    dialogidcardinfo.h \
     imageviewlabel.h \
-    logmanager.h \
     mainpage.h \
     mainwindow.h \
-    pageconfigure.h \
     qmainstackpage.h \
     qpinkeybroad.h \
     qstackpage.h \
-    qwidgetreadidcard.h \
-    regionconfigure.h \
     registerlost.h \
-    rl_ensureinformation.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -107,22 +103,21 @@ HEADERS += \
 
 FORMS += \
     CheckPassword.ui \
-    DeviceManager.ui \
     MaskWidget.ui \
     OperatorSucceed.ui \
-    SystemConfigure.ui \
+    Sys_DeviceManager.ui \
+    Sys_cardmanger.ui \
+    Sys_dialogcameratest.ui \
+    Sys_dialogidcardinfo.ui \
+    Sys_logmanager.ui \
+    Sys_otheroptions.ui \
+    Sys_pageconfigure.ui \
+    Sys_qwidgetreadidcard.ui \
+    Sys_regionconfigure.ui \
     SystemManager.ui \
-    cardmanger.ui \
-    dialogcameratest.ui \
-    dialogidcardinfo.ui \
-    logmanager.ui \
     mainpage.ui \
     mainwindow.ui \
-    pageconfigure.ui \
-    qwidgetreadidcard.ui \
-    regionconfigure.ui \
     registerlost.ui \
-    rl_ensureinformation.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \
@@ -132,6 +127,7 @@ FORMS += \
     uc_readidcard.ui \
     up_Inputpwd.ui \
     up_changepwd.ui \
+    up_readsscard.bak.ui \
     up_readsscard.ui \
     updatecard.ui \
     updatecard_copy.ui \
@@ -154,8 +150,6 @@ DEPENDPATH += $$PWD/SDK/IDCard
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/glog/ -lglog
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/glog/ -lglogd
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/PinKeybroad -lXZ_F10_API
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/PinKeybroad -lXZ_F10_API
 
 INCLUDEPATH += $$PWD/glog
 DEPENDPATH += $$PWD/glog
@@ -166,15 +160,15 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencod
 INCLUDEPATH += $$PWD/SDK/QREncode
 DEPENDPATH += $$PWD/SDK/QREncode
 
-win32: LIBS += -L$$PWD/SDK/Printer/ -lKT_Printer
+win32: LIBS += -L$$PWD/SDK/KT_Printer/ -lKT_Printer
 
-INCLUDEPATH += $$PWD/SDK/Printer
-DEPENDPATH += $$PWD/SDK/Printer
+INCLUDEPATH += $$PWD/SDK/KT_Printer
+DEPENDPATH += $$PWD/SDK/KT_Printer
 
-win32: LIBS += -L$$PWD/SDK/Reader/ -lKT_Reader
+win32: LIBS += -L$$PWD/SDK/KT_Reader/ -lKT_Reader
 
-INCLUDEPATH += $$PWD/SDK/Reader
-DEPENDPATH += $$PWD/SDK/Reader
+INCLUDEPATH += $$PWD/SDK/KT_Reader
+DEPENDPATH += $$PWD/SDK/KT_Reader
 
 INCLUDEPATH += $$PWD/SDK
 DEPENDPATH += $$PWD/SDK

@@ -287,10 +287,10 @@ int uc_MakeCard::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		pFieldPos = &pCardForm->posIssueDate;
 		int nYear, nMonth, nDay;
 
-		sscanf_s(pSSCardInfo->strValidDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
-		char szValidate[32] = { 0 };
-		sprintf_s(szValidate, 32, "%d年%d月%d日", nYear, nMonth, nDay);
-		m_pPrinter->Printer_AddText((char*)UTF8_GBK(szValidate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+		sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
+		char szReleaseDate[32] = { 0 };
+		sprintf_s(szReleaseDate, 32, "%d年%d月", nYear, nMonth);
+		m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		ImagePosition& ImgPos = pCardForm->posImage;
 		m_pPrinter->Printer_AddImage((char*)g_pDataCenter->strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
 		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))

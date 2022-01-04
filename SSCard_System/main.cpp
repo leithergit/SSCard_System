@@ -2,8 +2,11 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QString>
+#include <QDesktopWidget>
+#include <QScreen>
 
 #include "Gloabal.h"
+extern QScreen* g_pCurScreen;
 
 DataCenterPtr g_pDataCenter;
 const char* g_szPageOperation[4] =
@@ -16,22 +19,62 @@ const char* g_szPageOperation[4] =
 
 int main(int argc, char* argv[])
 {
+    //qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    //QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+	QApplication a(argc, argv);
 	google::InitGoogleLogging(argv[0]);
 	//font.setStyleStrategy(QFont::PreferAntialias);
+//    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
+//    qDebug()<<"fi.absoluteDir()="<<fi.absoluteDir();
+//    qDebug()<<"fi.absoluteFilePath()="<<fi.absoluteFilePath();
+//    qDebug()<<"fi.baseName()="<<fi.baseName();
+//    qDebug()<<"fi.bundleName()="<<fi.bundleName();
+//    qDebug()<<"fi.canonicalPath()="<<fi.canonicalPath();
+//    qDebug()<<"fi.canonicalFilePath()="<<fi.canonicalFilePath();
+//    qDebug()<<"fi.completeBaseName()="<<fi.completeBaseName();
+//    qDebug()<<"fi.completeSuffix()="<<fi.completeSuffix();
+//    qDebug()<<"fi.fileName()="<<fi.fileName();
+//    qDebug()<<"fi.filePath()="<<fi.filePath();
+//    qDebug()<<"fi.path()="<<fi.path();
+//    string strFilePath = "D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log";
+//    string strPath = "D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log";
+//    int nPos = strFilePath.find(strPath);
+//    nPos += strPath.size();
+//    string strlogPath = strFilePath.substr(nPos,strFilePath.size() - nPos);
+//    qDebug()<< strlogPath.c_str();
 
 	// 日志目录必须存在才会生成日志
 	//FLAGS_log_dir = "./log/";                             // 使用该设定时，默认情况下，不同级别日志使用不同的文件名
-	google::SetLogDestination(google::GLOG_INFO, "./log/");	// 使用该设定时，默认情况下，所有级别日志都用同一的文件名
+	QString strLogPath = QCoreApplication::applicationDirPath();
+	QDir::setCurrent(strLogPath);
+	qDebug() << QDir::currentPath();
+	strLogPath += "/log";
+	QDateTime curDate = QDateTime::currentDateTime();
+	QString strLogDate = curDate.toString("yyyy_MM_dd");
+	QString strLogDatePath = QString("%1/%2/").arg(strLogPath).arg(strLogDate);
+	vector<QString> vecDir = { strLogPath,strLogDatePath };
+	for (auto var : vecDir)
+	{
+		QFileInfo fidir(var);
+		if (!fidir.isDir())
+		{
+			gInfo() << "Directory " << var.toStdString() << "not exist,try to create...!";
+			QDir dir;
+			if (!dir.mkpath(var))
+			{
+				gInfo() << "************Failed in creating directory '" << var.toStdString() << "',may cause some exception!************";
+			}
+		}
+	}
+	FLAGS_max_log_size = 256;
+	google::SetLogDestination(google::GLOG_INFO, strLogDatePath.toLocal8Bit().data());	// 使用该设定时，默认情况下，所有级别日志都用同一的文件名
 	google::SetStderrLogging(google::GLOG_INFO);
 	google::SetLogFilenameExtension(".log");
 
 	curl_global_init(CURL_GLOBAL_WIN32);
-
-	qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
-	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-	QApplication a(argc, argv);
 
 	g_pDataCenter = make_shared<DataCenter>();
 	if (!g_pDataCenter)
@@ -47,7 +90,7 @@ int main(int argc, char* argv[])
 	}
 	if (g_pDataCenter->LoadCardForm(strError))
 	{
-		gError() << QString("加载卡版打印模块失败:%1").arg(strError).toLocal8Bit().data();
+        gError() << QString("加载卡片打印模板失败:%1").arg(strError).toLocal8Bit().data();
 		return -1;
 	}
 	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
@@ -55,13 +98,30 @@ int main(int argc, char* argv[])
 
 	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strCityCode.c_str(), szOutInfo);
 	MainWindow w;
-	w.showFullScreen();
+
+    auto listScreens = QApplication::screens();
+    g_pCurScreen = listScreens.at(0);
+    if (listScreens.size() > 1)
+    {
+        for (auto Screen : listScreens)
+        {
+            if (Screen->size().height() == 1080 && Screen->size().width() == 1920)
+            {
+                g_pCurScreen = Screen;
+                break;
+            }
+        }
+    }
+
+    w.showFullScreen();
+    w.setGeometry(g_pCurScreen->geometry());
 	//w.showMaximized();
 	//QRect size(1, 1, 1918, 1078);
 	//w.setGeometry(size);
 	//w.show();
-
 	int nRes = a.exec();
+	QString strInfo = "系统正常关闭!";
+	gInfo() << gQStr(strInfo);
 	google::ShutdownGoogleLogging();
 	return nRes;
 }

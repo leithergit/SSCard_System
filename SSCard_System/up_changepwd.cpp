@@ -142,8 +142,6 @@ void up_ChangePWD::OnInputPin(uchar ch)
 	case 0x0d:		// confirm
 	{
 		ui->pushButton_OK->emit click();
-
-
 		break;
 	}
 	case 0x41:

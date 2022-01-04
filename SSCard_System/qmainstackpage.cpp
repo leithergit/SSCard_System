@@ -22,6 +22,15 @@ QMainStackPage::QMainStackPage(QWidget* parent)
 	connect(this, &QMainStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 }
 
+QMainStackPage::~QMainStackPage()
+{
+	if (m_nTimerID)
+	{
+		killTimer(m_nTimerID);
+		m_nTimerID = 0;
+	}
+
+}
 void QMainStackPage::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() == m_nTimerID)
@@ -87,6 +96,7 @@ void QMainStackPage::ResetAllPages()
 	if (m_nTimerID)
 	{
 		killTimer(m_nTimerID);
+		m_nTimerID = 0;
 		qDebug() << "KillTimer:" << m_nTimerID;
 	}
 

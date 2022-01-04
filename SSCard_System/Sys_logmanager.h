@@ -1,5 +1,5 @@
-﻿#ifndef LOGMANAGER_H
-#define LOGMANAGER_H
+﻿#ifndef SYS_LOGMANAGER_H
+#define SYS_LOGMANAGER_H
 
 #include <QWidget>
 #include "ConfigurePage.h"
@@ -14,16 +14,19 @@ class logManager : public QWidget
 
 public:
 	explicit logManager(QWidget* parent = nullptr);
+	void Showlog(QStringList& strLogList);
 	~logManager();
 	bool Save(QString& strMessage) { return true; }
 
 private slots:
-	void on_pushButton_clicked();
+	void on_pushButton_Search_clicked();
 
-	void on_pushButton_2_clicked();
+	void on_pushButton_Export_clicked();
+
+	void on_pushButton_Del_clicked();
 
 private:
 	Ui::logManager* ui;
 };
 
-#endif // LOGMANAGER_H
+#endif // SYS_LOGMANAGER_H

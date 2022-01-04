@@ -52,6 +52,7 @@ void UpdatePassword::OnTimerEvent()
 	if (!m_nTimeout)
 	{
 		killTimer(m_nTimerID);
+		m_nTimerID = 0;
 		((QStackPage*)ui->stackedWidget->currentWidget())->OnTimeout();
 		((MainWindow*)m_pMainWindow)->on_pushButton_MainPage_clicked();
 	}

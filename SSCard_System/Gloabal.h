@@ -32,6 +32,8 @@
 #include <QImage>
 #include <QRect>
 #include <QMessageBox>
+#include <QScreen>
+#include <QFileDialog>
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
@@ -41,10 +43,12 @@
 #include "../SDK/SSCardDriver/SSCardDriver.h"
 #include "../SDK/SSCardHSM/KT_SSCardHSM.h"
 #include "../SDK/SSCardInfo/KT_SSCardInfo.h"
-#include "SDK/IDCard/idcard_api.h"
-#include "SDK/PinKeybroad/XZ_F10_API.h"
+#include "../SDK/IDCard/idcard_api.h"
+#include "../SDK/PinKeybroad/XZ_F31_API.h"
 #include "../SDK/libcurl/curl.h"
-
+#include "./SDK/7Z/include/bitarchiveinfo.hpp"
+#include "./SDK/7Z/include/bitcompressor.hpp"
+#include "./SDK/7Z/include/bitexception.hpp"
 
 //宏定义
 #define __STR2__(x) #x
@@ -60,10 +64,12 @@
 #define QFailed(x)       (x != 0)
 using namespace std;
 using namespace chrono;
+using namespace bit7z;
 //using namespace Kingaotech;
 
 extern const char* szPrinterTypeList[PRINTER_MAX];
 extern const char* szReaderTypeList[READER_MAX + 1];
+extern QScreen* g_pCurScreen;
 
 enum FaceDetectStatus
 {
@@ -699,7 +705,10 @@ struct SysConfig
 	int             nSSCardPasswordSize = 6;			// 社保卡密码长度
 	int				nMaskTimeout[5];					// 各种遮罩层的逗留时间，单位毫秒
 	int				nPageTimeout[16];					// 各功能页面超时时间，单位秒
-	bool			bDebug;
+	bool			bDebug = false;
+	bool            bDeletelogUploaded = true;          // 上传成功后删除日志
+	int             MinFreeDiskSpace = 10;                // 保留磁盘空间，超过时，删除最早一天的日志
+	int             nSavelogDays;                       // 日志保存天数
 	std::map<string, string> strMapBank;
 };
 using SysConfigPtr = shared_ptr<SysConfig>;

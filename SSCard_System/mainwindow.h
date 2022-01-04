@@ -52,16 +52,23 @@ public:
 
 	int m_nDateTimer = 0;
 	virtual void timerEvent(QTimerEvent* event) override;
+	virtual void closeEvent(QCloseEvent* event) override;
 	int LoadConfigure(QString& strError);
 	//virtual void paintEvent(QPaintEvent* event) override;
+
+	void fnThreadUploadlog();
+	std::thread ThreadUploadlog;
+	bool  bThreadUploadlogRunning = false;
 
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
 	void LoadSystemManager();
+	void Shutdown();
 
 private slots:
 	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);
 	void On_MaskWidgetTimeout(int nOperation);
+	void on_Shutdown();
 
 private:
 	Ui::MainWindow* ui;

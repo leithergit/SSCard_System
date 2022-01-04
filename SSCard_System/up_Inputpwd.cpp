@@ -154,7 +154,7 @@ void up_InputPWD::ThreadWork()
 	while (m_bWorkThreadRunning)
 	{
 		nRet = SUNSON_ScanKeyPress(szTemp);
-		if (nRet == 0)
+		if (nRet > 0)
 			emit InputPin(szTemp[0]);
 		this_thread::sleep_for(std::chrono::milliseconds(50));
 	}

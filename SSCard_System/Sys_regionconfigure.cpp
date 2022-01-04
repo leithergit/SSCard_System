@@ -1,5 +1,5 @@
-﻿#include "regionconfigure.h"
-#include "ui_regionconfigure.h"
+﻿#include "Sys_regionconfigure.h"
+#include "ui_Sys_regionconfigure.h"
 
 RegionConfigure::RegionConfigure(QWidget* parent) :
 	QWidget(parent),
@@ -43,6 +43,17 @@ RegionConfigure::RegionConfigure(QWidget* parent) :
 	int nCols = ui->tableWidget->columnCount();
 	for (int nIndex = 0; nIndex < nCols - 1; nIndex++)
 		ui->tableWidget->horizontalHeader()->setSectionResizeMode(nIndex, QHeaderView::ResizeToContents);
+    int nRows = ui->tableWidget->rowCount();
+    for (int nItem = 0;nItem < nRows;nItem ++)
+    {
+        QTableWidgetItem *pItem = ui->tableWidget->item(nItem,0);
+        pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
+        //pItem->setBackground(QBrush(Qt::lightGray));
+
+        pItem = ui->tableWidget->item(nItem,1);
+        pItem->setFlags(pItem->flags() &(~Qt::ItemIsEditable));
+        pItem->setBackground(QBrush(Qt::lightGray));
+    }
 }
 
 RegionConfigure::~RegionConfigure()

@@ -3,6 +3,7 @@
 #pragma execution_character_set("utf-8")
 #include <QWidget>
 #include "imageviewlabel.h"
+#include "Gloabal.h"
 
 namespace Ui {
 	class MainPage;

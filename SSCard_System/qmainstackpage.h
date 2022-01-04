@@ -16,6 +16,7 @@ class QMainStackPage : public QWidget
 	Q_OBJECT
 public:
 	explicit QMainStackPage(QWidget* parent = nullptr);
+	~QMainStackPage();
 	int     m_nTimerID = 0;
 	int     m_nTimeout = 0;
 	int     m_nCurPageIndex = 0;

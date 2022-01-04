@@ -54,7 +54,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">#label_Swipecard{border-image: url(:/Image/OP_ReadID.png);}</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string/>

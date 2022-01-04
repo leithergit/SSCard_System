@@ -22,7 +22,8 @@
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
 #pragma comment(lib, "../SDK/glog/glog")
-#pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
+#pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
+#pragma comment(lib, "../SDK/7Z/lib/bit7z_d.lib")
 #else
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printer")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
@@ -33,7 +34,8 @@
 #pragma comment(lib, "../SDK/QREncode/qrencode")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
 #pragma comment(lib, "../SDK/glog/glog")
-#pragma comment(lib, "../SDK/PinKeybroad/XZ_F10_API")
+#pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
+#pragma comment(lib, "../SDK/7Z/lib/bit7z.lib")
 #endif
 
 const char* szPrinterTypeList[PRINTER_MAX] =
@@ -74,6 +76,7 @@ QWaitCursor::~QWaitCursor()
 
 
 extern DataCenterPtr g_pDataCenter;
+QScreen* g_pCurScreen = nullptr;
 DataCenter::DataCenter()
 {
 }

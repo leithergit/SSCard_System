@@ -1,6 +1,6 @@
 ﻿#pragma execution_character_set("utf-8")
-#include "dialogcameratest.h"
-#include "ui_dialogcameratest.h"
+#include "Sys_dialogcameratest.h"
+#include "ui_Sys_dialogcameratest.h"
 #include "Gloabal.h"
 #include <QDir>
 #include <QMessageBox>

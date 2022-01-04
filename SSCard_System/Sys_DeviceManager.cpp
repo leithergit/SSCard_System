@@ -1,12 +1,12 @@
 ﻿#pragma execution_character_set("utf-8")
-#include "DeviceManager.h"
+#include "Sys_DeviceManager.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include "Gloabal.h"
 #include "DevBase.h"
 #include "Payment.h"
-#include "dialogidcardinfo.h"
-#include "dialogcameratest.h"
+#include "Sys_dialogidcardinfo.h"
+#include "Sys_dialogcameratest.h"
 
 DWORD GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, WORD& nBuildNum, WORD& nRevsion)
 {
@@ -114,7 +114,19 @@ DeviceManager::DeviceManager(QWidget* parent)
 
 	/*for (int nIndex = 0; nIndex < nRows; nIndex++)
 		ui.tableWidget->verticalHeader()->setSectionResizeMode(nIndex, QHeaderView::ResizeToContents);*/
+	QTableWidgetItem* pItem = nullptr;
+	for (int nItem = 0; nItem < nRows; nItem++)
+	{
+		pItem = ui.tableWidget->item(nItem, 0);
+		pItem->setFlags(pItem->flags() & (~Qt::ItemIsEditable));
+		//pItem->setBackground(QBrush(Qt::lightGray));
 
+		pItem = ui.tableWidget->item(nItem, 1);
+		pItem->setFlags(pItem->flags() & (~Qt::ItemIsEditable));
+		pItem->setBackground(QBrush(Qt::lightGray));
+	}
+	pItem = ui.tableWidget->item(1, 2);
+	pItem->setFlags(pItem->flags() & (Qt::ItemIsEditable));
 }
 
 DeviceManager::~DeviceManager()
@@ -122,7 +134,7 @@ DeviceManager::~DeviceManager()
 
 }
 
-bool DeviceManager::CheckPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
+bool DeviceManager::CheckPrinter(QString& strPrinterLib, PrinterType& nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
 {
 	strPrinterLib = ui.lineEdit_PrinterModule->text();
 	if (strPrinterLib.isEmpty())
@@ -261,7 +273,7 @@ int DeviceManager::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strPhoto, QStr
 
 		sscanf_s(pSSCardInfo->strValidDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
 		char szValidate[32] = { 0 };
-		sprintf_s(szValidate, 16, "%d年%d月%d日", nYear, nMonth, nDay);
+		sprintf(szValidate, "%d年%d月", nYear, nMonth);
 
 		m_pPrinter->Printer_AddText((char*)UTF8_GBK(szValidate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		ImagePosition& ImgPos = pCardForm->posImage;
@@ -618,7 +630,7 @@ void DeviceManager::fnThreadReadPin()
 	while (bThreadReadPinRunning)
 	{
 		nRet = SUNSON_ScanKeyPress(szTemp);
-		if (nRet == 0)
+		if (nRet > 0)
 			emit InputPin(szTemp[0]);
 		this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
@@ -855,11 +867,11 @@ bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate)
 	bool bSucceed = false;
 	do
 	{
-		if (SUNSON_OpenCom(nPort, nBaudrate))
+		if (!SUNSON_OpenCom(nPort, nBaudrate))
 			break;
 
 		unsigned char szRetInfo[255] = { 0 };
-		if (SUNSON_UseEppPlainTextMode(0x03, szRetInfo))
+		if (!SUNSON_UseEppPlainTextMode(0x06, 1, szRetInfo))
 			break;
 
 		bSucceed = true;
@@ -870,13 +882,13 @@ bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate)
 
 bool DeviceManager::DetectPinBroadPort(QString& strPort)
 {
-	int nUsbPort = 0;
-	if (TryOpenPinKeyBroadPort(nUsbPort, 9600))
-	{
-		strPort = "USB";
-		return true;
-	}
-	else
+	// 	int nUsbPort = 0;
+	// 	if (TryOpenPinKeyBroadPort(nUsbPort, 9600))
+	// 	{
+	// 		strPort = "USB";
+	// 		return true;
+	// 	}
+	// 	else
 	{
 		wchar_t szPortsList[4096] = { 0 };
 		WORD nSerialPorts = 0;
@@ -886,7 +898,8 @@ bool DeviceManager::DetectPinBroadPort(QString& strPort)
 			wchar_t szPort[8] = { 0 };
 			wcscpy_s(szPort, 8, (wchar_t*)&szPortsList[i * 8]);
 			long nPort = wcstol(&szPort[3], nullptr, 10);
-
+			if (nPort < 1)
+				continue;
 			if (TryOpenPinKeyBroadPort(nPort, 9600))
 			{
 				strPort = QString::fromStdWString(szPort);

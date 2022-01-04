@@ -1,11 +1,10 @@
-﻿#include "dialogidcardinfo.h"
-#include "ui_dialogidcardinfo.h"
-
+﻿#include "Sys_qwidgetreadidcard.h"
+#include "ui_Sys_qwidgetreadidcard.h"
 #include "Payment.h"
 
-DialogIDCardInfo::DialogIDCardInfo(IDCardInfo& IDCard, QWidget* parent) :
-	QDialog(parent),
-	ui(new Ui::DialogIDCardInfo)
+QWidgetReadIDCard::QWidgetReadIDCard(IDCardInfo& IDCard, QWidget* parent) :
+	QWidget(parent),
+	ui(new Ui::QWidgetReadIDCard)
 {
 	ui->setupUi(this);
 	ui->label_Name->setText(QString::fromLocal8Bit((const char*)IDCard.szName));
@@ -16,19 +15,20 @@ DialogIDCardInfo::DialogIDCardInfo(IDCardInfo& IDCard, QWidget* parent) :
 	ui->label_Address->setText(QString::fromLocal8Bit((const char*)IDCard.szAddress));
 	ui->label_IssueAuthority->setText(QString::fromLocal8Bit((const char*)IDCard.szIszssueAuthority));
 	ui->label_ExpirationDate->setText(QString::fromLocal8Bit((const char*)IDCard.szExpirationDate1) + "-" + QString::fromLocal8Bit((const char*)IDCard.szExpirationDate2));
+	QImage ImagePhoto;
 	QString strImage = "./Image/TempPhoto.bmp";
-	QImage ImagePhoto = QImage::fromData(IDCard.szPhoto, IDCard.nPhotoSize);
 	ImagePhoto.save(strImage);
 	QString strQSS = QString("border-image: url(%1);").arg(strImage);
 	ui->label_Photo->setStyleSheet(strQSS);
+
 }
 
-DialogIDCardInfo::~DialogIDCardInfo()
+QWidgetReadIDCard::~QWidgetReadIDCard()
 {
 	delete ui;
 }
 
-void DialogIDCardInfo::on_pushButton_OK_clicked()
+void QWidgetReadIDCard::on_pushButton_OK_clicked()
 {
-	QDialog::accept();
+	close();
 }

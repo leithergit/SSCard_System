@@ -17,8 +17,6 @@
 #include <QCoreApplication>
 #include <QPaintEvent>
 #include <QPainter>
-#include "SDK/IDCard/idcard_api.h"
-#include "SDK/PinKeybroad/XZ_F10_API.h"
 #include "Gloabal.h"
 
 

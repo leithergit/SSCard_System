@@ -66,7 +66,10 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+	connect(this, &MainWindow::Shutdown, this, &MainWindow::on_Shutdown);
 	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
+	bThreadUploadlogRunning = true;
+	ThreadUploadlog = std::thread(&MainWindow::fnThreadUploadlog, this);
 }
 
 void MainWindow::On_LoadSystemManager()
@@ -74,10 +77,10 @@ void MainWindow::On_LoadSystemManager()
 	CheckPassword checkpwd;
 	if (checkpwd.exec() == QDialog::Accepted)
 	{
-		SystemManager d;
+		SystemManager d(this);
+        d.setGeometry(g_pCurScreen->geometry());
 		d.exec();
 	}
-
 }
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
@@ -86,7 +89,6 @@ void MainWindow::mousePressEvent(QMouseEvent* e)
 		(e->x() <= 1920 && e->y() <= 990))
 	{
 		qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
-		auto tNow = chrono::high_resolution_clock::now();
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - m_tLastPress);
 		if (tDuration.count() < 1000)
 		{
@@ -245,11 +247,49 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 	pCurPage->emit SwitchNextPage(nPageOperation);
 }
 
+void MainWindow::on_Shutdown()
+{
+	if (m_nDateTimer)
+	{
+		killTimer(m_nDateTimer);
+		m_nDateTimer = 0;
+	}
+
+	if (bThreadUploadlogRunning)
+	{
+		bThreadUploadlogRunning = false;
+		ThreadUploadlog.join();
+	}
+	close();
+}
 void MainWindow::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() == m_nDateTimer)
 	{
 		QDateTime   tNow = QDateTime::currentDateTime();
 		ui->label_DateTime->setText(tNow.toString("yyyy-MM-dd HH:mm:ss"));
+	}
+}
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+	if (m_nDateTimer)
+	{
+		killTimer(m_nDateTimer);
+		m_nDateTimer = 0;
+	}
+	if (bThreadUploadlogRunning)
+	{
+		bThreadUploadlogRunning = false;
+		ThreadUploadlog.join();
+	}
+}
+
+void MainWindow::fnThreadUploadlog()
+{
+	auto tStart = chrono::high_resolution_clock::now();
+	while (bThreadUploadlogRunning)
+	{
+#pragma Warning("日志上传功能尚未完成!")
+		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 }

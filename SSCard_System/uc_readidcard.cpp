@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "Payment.h"
 #include "MaskWidget.h"
+#include <QMovie>
 extern MaskWidget* g_pMaskWindow;
 //#include "mainwindow.h"
 using namespace std;
@@ -21,6 +22,9 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 	ui(new Ui::ReadIDCard)
 {
 	ui->setupUi(this);
+    QMovie *movie = new QMovie("./Image/SwipeIDCard.gif");
+    ui->label_Swipecard->setMovie(movie);
+    movie->start();
 	connect(this, &QStackPage::ErrorMessage, this, &uc_ReadIDCard::OnErrorMessage);
 }
 
