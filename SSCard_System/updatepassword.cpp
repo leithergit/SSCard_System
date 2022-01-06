@@ -20,6 +20,7 @@ UpdatePassword::UpdatePassword(QWidget* parent) :
 
 	try
 	{
+
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();

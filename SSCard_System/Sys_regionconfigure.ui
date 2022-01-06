@@ -155,7 +155,7 @@ color: 0
      </item>
      <item row="0" column="1">
       <property name="text">
-       <string>地市编码</string>
+       <string>地市代码</string>
       </property>
       <property name="flags">
        <set>ItemIsEnabled</set>
@@ -173,7 +173,7 @@ color: 0
      </item>
      <item row="1" column="1">
       <property name="text">
-       <string>所属区县</string>
+       <string>区县代码</string>
       </property>
       <property name="flags">
        <set>ItemIsUserCheckable|ItemIsEnabled</set>
@@ -335,7 +335,7 @@ color: 0
      </item>
      <item row="10" column="1">
       <property name="text">
-       <string>卡和地址</string>
+       <string>卡管地址</string>
       </property>
       <property name="flags">
        <set>ItemIsEnabled</set>

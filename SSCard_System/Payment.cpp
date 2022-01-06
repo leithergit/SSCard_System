@@ -736,14 +736,14 @@ int LoadTestData(QString& strName, QString& strCardID, QString& strMobile)
 	if (g_pDataCenter->bDebug)
 	{
 		QString strAppPath = QCoreApplication::applicationDirPath();
-		strAppPath += "/Debug/CardData.ini";
+		strAppPath += "/Debug/PersonData.ini";
 		QFileInfo fi(strAppPath);
 		if (!fi.isFile())
 			return -1;
 
-		strName = "韩晓丽";
-		strCardID = "412726198206150140";
-		strMobile = "13673888580";
+		strName = "高香慧";
+		strCardID = "411421199107250045";
+		strMobile = "18017348763";
 	}
 
 	/*QSettings CardTest(strAppPath);

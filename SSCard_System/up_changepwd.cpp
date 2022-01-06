@@ -55,12 +55,102 @@ int  up_ChangePWD::CheckPassword(QString& strError)
 		return -1;
 	}
 	else
+	{
 		return 0;
+	}
+
 }
+
+int up_ChangePWD::OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
+{
+	int nResult = -1;
+	try
+	{
+		m_pReaderLib = nullptr;
+		do
+		{
+			if (!m_pReaderLib)
+			{
+				char szRCode[32] = { 0 };
+				QString strAppPath = QCoreApplication::applicationDirPath();
+				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
+
+				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
+				if (!m_pReaderLib)
+				{
+					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
+					break;
+				}
+				m_pReader = m_pReaderLib->Instance();
+				if (!m_pReader)
+				{
+					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
+					break;
+				}
+				if (QFailed(nResult = m_pReader->Reader_Create(nReaderType, szRCode)))
+				{
+					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
+					break;
+				}
+				if (QFailed(nResult = m_pReader->Reader_Init(szRCode)))
+				{
+					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
+					break;
+				}
+			}
+
+		} while (0);
+		if (QFailed(nResult))
+			return -1;
+		else
+			return 0;
+	}
+	catch (std::exception& e)
+	{
+		strMessage = e.what();
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+	return 0;
+}
+
+void up_ChangePWD::CloseReader()
+{
+	char szRCode[32] = { 0 };
+
+	if (m_pReader)
+	{
+		m_pReader->Reader_Exit(szRCode);
+		m_pReader = nullptr;
+	}
+	m_pReaderLib = nullptr;
+}
+
 
 int  up_ChangePWD::ChangePassword(QString& strError)
 {
-	return 0;
+	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
+	char szRCode[1024] = { 0 };
+
+	if (QFailed(iChangePin(DevConfig.nDesktopSSCardReaderPowerOnType, (char*)g_pDataCenter->strSSCardOldPassword.c_str(), (char*)m_szPin, szRCode)))
+	{
+		strError = "密码校验失败";
+		return -1;
+	}
+	if (strcmp(szRCode, "0000") == 0)
+	{
+		strError = "密码修改成功!";
+		return 0;
+	}
+	else
+	{
+		int iRemainChange = strtol(szRCode, nullptr, 10);
+		if (iRemainChange == 0)
+			strError = QString("修改密码失败,卡片已锁定!").arg(iRemainChange);
+		else
+			strError = QString("修改密码失败,剩余机会:%1").arg(iRemainChange);
+		return -1;
+	}
 }
 
 int up_ChangePWD::ProcessBussiness()
@@ -68,7 +158,7 @@ int up_ChangePWD::ProcessBussiness()
 	ClearPassword();
 	m_nInputFocus = 0;
 	m_nSSCardPWDSize = g_pDataCenter->GetSysConfigure()->nSSCardPasswordSize;
-	m_pLineEdit[0]->setFocus();
+
 	m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadPort.c_str();
 	m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadBaudrate.c_str()).toUShort();
 	m_pPinKeybroad = make_shared<QPinKeybroad>(m_strDevPort, m_nBaudreate);
@@ -87,6 +177,35 @@ int up_ChangePWD::ProcessBussiness()
 		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 		return -1;
 	}
+	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
+	QString strMessage;
+	if (QFailed(OpenReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+
+	char szRCode[1024] = { 0 };
+	char szATR[1024] = { 0 };
+	int nATRLen = 0;
+	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
+	if (DriverInit((HANDLE)m_pReader, (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+	{
+		strMessage = QString("DriverInit失败:%1").arg(szRCode);
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+	if (QFailed(m_pReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szATR, nATRLen, szRCode)))
+	{
+		emit ShowMaskWidget("操作失败", "卡片上电失败!", Fetal, Return_MainPage);
+		return -1;
+	}
+	if (DriverInit((HANDLE)m_pReader, (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+	{
+		strMessage = QString("DriverInit失败:%1").arg(szRCode);
+		return -1;
+	}
+	m_pLineEdit[0]->setFocus();
 	m_bWorkThreadRunning = true;
 	m_pWorkThread = new std::thread(&up_ChangePWD::ThreadWork, this);
 	if (!m_pWorkThread)
@@ -114,6 +233,11 @@ void  up_ChangePWD::ShutDown()
 		m_pWorkThread = nullptr;
 	}
 	m_pPinKeybroad = nullptr;
+	if (m_pReader)
+	{
+		CloseReader();
+		m_pReaderLib = nullptr;
+	}
 }
 
 void up_ChangePWD::OnInputPin(uchar ch)
@@ -159,6 +283,9 @@ void up_ChangePWD::OnInputPin(uchar ch)
 	case 0xaa:
 	{
 		qDebug("Input end...");
+		QString strMessage;
+		m_pPinKeybroad->CloseDevice(strMessage);
+		m_pPinKeybroad->OpenDevice(strMessage);
 		break;
 	}
 	default:
@@ -181,7 +308,7 @@ void up_ChangePWD::ThreadWork()
 	while (m_bWorkThreadRunning)
 	{
 		nRet = SUNSON_ScanKeyPress(szTemp);
-		if (nRet == 0)
+		if (nRet > 0)
 			emit InputPin(szTemp[0]);
 		this_thread::sleep_for(std::chrono::milliseconds(50));
 	}

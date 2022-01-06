@@ -118,7 +118,7 @@ public slots:
 	}
 
 signals:
-	void InputPin(char ch);
+	void InputPin(unsigned char ch);
 	void SwitchNextPage(int nOperation);
 	void SwitchPage(int nPage);
 	void ErrorMessage(QString strMessage);

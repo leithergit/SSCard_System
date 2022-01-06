@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "qstackpage.h"
 #include "qpinkeybroad.h"
+#include "DevBase.h"
 #include <QLineEdit>
 
 namespace Ui {
@@ -20,12 +21,16 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	void    ThreadWork();
-	void    OpenDevice();
-	void    CloseDevice();
+	// 	void    OpenDevice();
+	// 	void    CloseDevice();
 	virtual void ShutDown() override;
 	void    ClearPassword();
 	int     CheckPassword(QString& strError);
 	int     ChangePassword(QString& strError);
+	int		OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
+	void	CloseReader();
+	KT_ReaderLibPtr	m_pReaderLib = nullptr;
+	KT_Reader* m_pReader = nullptr;
 	uchar   m_szPin[2][16] = { {0} };
 	int     m_nPinSize[2] = { 0 };
 	QLineEdit* m_pLineEdit[2] = { nullptr };

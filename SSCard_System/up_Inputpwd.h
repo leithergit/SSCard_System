@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "qstackpage.h"
 #include "qpinkeybroad.h"
+#include "DevBase.h"
 
 namespace Ui {
 	class InputPWD;
@@ -30,8 +31,13 @@ public:
 	ushort  m_nBaudreate = 9600;
 	QPinKeybroadPtr m_pPinKeybroad = nullptr;
 	int     CheckPassword(QString& strError);
+	int		OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
+	void	CloseReader();
+	KT_ReaderLibPtr	m_pReaderLib = nullptr;
+	KT_Reader* m_pReader = nullptr;
+
 private slots:
-	void OnInputPin(char ch);
+	void OnInputPin(unsigned char ch);
 	void on_pushButton_OK_clicked();
 private:
 	Ui::InputPWD* ui;

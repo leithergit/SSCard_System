@@ -950,7 +950,7 @@ color: 0
                </size>
               </property>
               <property name="text">
-               <string>上电测试</string>
+               <string>读卡测试</string>
               </property>
              </widget>
             </item>
@@ -1243,7 +1243,7 @@ color: 0
                </size>
               </property>
               <property name="text">
-               <string>上电测试</string>
+               <string>读卡测试</string>
               </property>
              </widget>
             </item>

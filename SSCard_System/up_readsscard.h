@@ -19,8 +19,17 @@ public:
 	~up_ReadSSCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
+	void    ThreadWork();
+	int OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
+	void CloseReader();
+	KT_ReaderLibPtr	m_pReaderLib = nullptr;
+	KT_Reader* m_pReader = nullptr;
+
+	std::thread* pThreadReaderSSCard = nullptr;
+	bool bThreadReaderSSCard = false;
 private:
 	Ui::ReadSSCard* ui;
+
 };
 
 #endif // UP_READSSCARD_H

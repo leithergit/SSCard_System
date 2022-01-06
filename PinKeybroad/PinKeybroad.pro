@@ -3,6 +3,11 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
+DEFINES += _HAS_STD_BYTE=0
+DEFINES += _WINDOWS
+DEFINES += WIN32
+DEFINES += _ENABLE_EXTENDED_ALIGNED_STORAGE
+DEFINES += WIN32_LEAN_AND_MEAN
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -25,8 +30,14 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/ -lXZ_F10_API
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/ -lXZ_F10_API
+#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/ -lXZ_F10_API
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/ -lXZ_F10_API
+
+INCLUDEPATH += $$PWD/SDK
+DEPENDPATH += $$PWD/SDK
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/ -lXZ_F31_API
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/ -lXZ_F31_API
 
 INCLUDEPATH += $$PWD/SDK
 DEPENDPATH += $$PWD/SDK

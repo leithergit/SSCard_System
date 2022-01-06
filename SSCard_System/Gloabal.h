@@ -34,6 +34,14 @@
 #include <QMessageBox>
 #include <QScreen>
 #include <QFileDialog>
+#include <QCheckBox>
+#include <QButtonGroup>
+#include <QTableWidget>
+#include <QStyleFactory>
+#include <QColor>
+#include <QCheckBox>
+#include <QBrush>
+#include <QHBoxLayout>
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
@@ -146,7 +154,7 @@ struct DeviceConfig
 		// 打印机驱动模块名称，如KT_Printer.dll
 		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
 		strPinBroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
-		strPinBroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toUInt();
+		strPinBroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toString().toStdString();
 		nDepenseBox = pSettings->value("DepenseBox", 0).toUInt();
 		if (nDepenseBox < CardBox_Min || nDepenseBox > CardBox_Max)
 		{
@@ -572,24 +580,12 @@ struct SysConfig
 
 	void Load(QSettings* pSettings)
 	{
-		LoadOther(pSettings);
+		LoadOthers(pSettings);
 		LoadPageTimeout(pSettings);
 		LoadMaskPageTimeout(pSettings);
 		LoadBanks(pSettings);
 	}
-	void SaveOther(QSettings* pSettings)
-	{
-		if (!pSettings)
-			return;
-		pSettings->beginGroup("Other");
-		pSettings->setValue("BATCHMODE", nBatchMode);
-		pSettings->setValue("DBPATH", strDBPath.c_str());
-		pSettings->setValue("FaceSimilarity", dfFaceSimilarity);
-		pSettings->setValue("MobilePhoneNumberLength", nMobilePhoneSize);
-		pSettings->setValue("SSCardPasswordLength", nSSCardPasswordSize);
-		pSettings->setValue("EnableDebug", bDebug);
-		pSettings->endGroup();
-	}
+
 	void SavePageTimeout(QSettings* pSettings)
 	{
 		if (!pSettings)
@@ -634,19 +630,47 @@ struct SysConfig
 		pSettings->endGroup();
 	}
 
-	void LoadOther(QSettings* pSettings)
+	void SaveOthers(QSettings* pSettings)
 	{
 		if (!pSettings)
 			return;
 		pSettings->beginGroup("Other");
-		nBatchMode = pSettings->value("BATCHMODE").toInt();
+		//nBatchMode = pSettings->value("BATCHMODE").toInt();
+		pSettings->setValue("DBPATH", strDBPath.c_str());
+		pSettings->setValue("FaceSimilarity", dfFaceSimilarity);
+
+		pSettings->setValue("logUpload", bUpoadlog);
+		pSettings->setValue("DeltelogUploaded", bDeletelogUploaded);  // 上传成功后删除日志
+		pSettings->setValue("EnableDebug", nDiskFreeSpace);               // 保留磁盘空间，超过时，删除最早一天的日志
+		pSettings->setValue("logServer", strLogServer.c_str());  // 日志服务器
+		pSettings->setValue("logServerPort", nLogServerPort);            // 日志服务器端口
+		pSettings->setValue("logSavePeroid", nLogSavePeroid);            // 日志保存天数
+		pSettings->setValue("EnableDebug", bDebug);
+		pSettings->endGroup();
+	}
+
+	void LoadOthers(QSettings* pSettings)
+	{
+		if (!pSettings)
+			return;
+		pSettings->beginGroup("Other");
+		//nBatchMode = pSettings->value("BATCHMODE").toInt();
 		strDBPath = pSettings->value("DBPATH").toString().toStdString();
 		dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
+
+		bUpoadlog = pSettings->value("logUpload", false).toBool();;
+		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
+		nDiskFreeSpace = pSettings->value("DiskFreeSpace", 10).toInt();;                  // 保留磁盘空间，超过时，删除最早一天的日志
+		strLogServer = pSettings->value("logServer", "").toString().toStdString();   // 日志服务器
+		nLogServerPort = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
+		nLogSavePeroid = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
+
 		pSettings->endGroup();
 	}
+
 	void LoadPageTimeout(QSettings* pSettings)
 	{
 		if (!pSettings)
@@ -705,10 +729,14 @@ struct SysConfig
 	int             nSSCardPasswordSize = 6;			// 社保卡密码长度
 	int				nMaskTimeout[5];					// 各种遮罩层的逗留时间，单位毫秒
 	int				nPageTimeout[16];					// 各功能页面超时时间，单位秒
-	bool			bDebug = false;
+	bool            bPageEnable[16];
+	bool            bUpoadlog = false;
 	bool            bDeletelogUploaded = true;          // 上传成功后删除日志
-	int             MinFreeDiskSpace = 10;                // 保留磁盘空间，超过时，删除最早一天的日志
-	int             nSavelogDays;                       // 日志保存天数
+	int             nDiskFreeSpace = 10;                // 保留磁盘空间，超过时，删除最早一天的日志
+	string          strLogServer = "";                  // 日志服务器
+	int             nLogServerPort = 80;                // 日志服务器端口
+	int             nLogSavePeroid = 30;                // 日志保存天数
+	bool			bDebug = false;
 	std::map<string, string> strMapBank;
 };
 using SysConfigPtr = shared_ptr<SysConfig>;
@@ -892,6 +920,7 @@ public:
 
 string UTF8_GBK(const char* strUtf8);
 string GBK_UTF8(const char* strGBK);
+void SetTableWidgetItemChecked(QTableWidget* pTableWidget, int nRow, int nCol, QButtonGroup* pButtonGrp, int nItemID, bool bChecked = false);
 #define WaitCursor()  QWaitCursor qWait;
 
 #endif // GLOABAL_H

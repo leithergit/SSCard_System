@@ -27,20 +27,28 @@ int uc_EnsureInformation::ProcessBussiness()
 	int nStatus = 0;
 	int nResult = -1;
 	QString strCardProgress;
+
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	do
 	{
-        strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
-        strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
-        strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-        strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-        strcpy((char*)pSSCardInfo->strTransType, "5");
-        strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-        strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-        strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-        strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		if (g_pDataCenter->bDebug)
+		{
+			QString strCardID, strName, strMobile;
+			LoadTestData(strName, strCardID, strMobile);
+			strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
+			strcpy((char*)pIDCard->szIdentify, strCardID.toStdString().c_str());
+		}
+		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
+		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		strcpy((char*)pSSCardInfo->strTransType, "5");
+		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 		//#ifdef _DEBUG
@@ -61,10 +69,6 @@ int uc_EnsureInformation::ProcessBussiness()
 		strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
 
-		//QString strName = "韩娜娜";
-		//strcpy((char*)pIDCard->szIdentify, "412726198006120043");
-		//strcpy((char*)pSSCardInfo->strMobile, "15895349880");
-		//strcpy((char*)pSSCardInfo->strCardID, "412726198006120043");
 
 		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
 		{

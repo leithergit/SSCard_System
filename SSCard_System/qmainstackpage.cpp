@@ -64,11 +64,11 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 			on_SwitchNextPage(Switch_NextPage);
 			return true;
 		}
-		else if (keyEvent->key() == Qt::Key_Backspace)
-		{
-			//on_pushButton_MainPage_clicked();
-			return true;
-		}
+		//else if (keyEvent->key() == Qt::Key_Backspace)
+		//{
+		//	//on_pushButton_MainPage_clicked();
+		//	return true;
+		//}
 		else if (keyEvent->key() == Qt::Key_Escape)
 		{
 			killTimer(m_nTimerID);

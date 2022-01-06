@@ -2,9 +2,10 @@
 #define SYS_PAGECONFIGURE_H
 
 #include <QWidget>
-#include <QButtonGroup>
-#include "ConfigurePage.h"
 #include <map>
+#include "Gloabal.h"
+#include "ConfigurePage.h"
+
 using namespace std;
 
 namespace Ui {

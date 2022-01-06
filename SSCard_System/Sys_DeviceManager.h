@@ -27,7 +27,7 @@ public:
 
 	bool Save(QString& strMessage);
 
-	bool TryOpenPinKeyBroadPort(int nPort, int nBaudrate);
+	bool TryOpenPinKeyBroadPort(int nPort, int nBaudrate, bool bClose = true);
 
 	bool CheckPrinter(QString& strPrinterLib, PrinterType& nType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
@@ -36,7 +36,7 @@ public:
 		Usage_MakeCard,
 		Usage_Desktop
 	};
-	bool CheckReader(QString strReaderLib, ReaderBrand nType, CardPowerType nPowerType, QString strMessage, ReaderUsage nUsage = Usage_MakeCard);
+	bool CheckReader(QString& strReaderLib, ReaderBrand& nType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage = Usage_MakeCard);
 signals:
 	void ShowIDCardInfo(bool bSuccceed, QString strMessage);
 	void InputPin(char ch);
@@ -71,8 +71,8 @@ private slots:
 private:
 	Ui::DeviceManager ui;
 	KT_PrinterLibPtr	m_pPrinterlib = nullptr;
-	KT_ReaderLibPtr		m_pReaderLib = nullptr;
 	KT_Printer* m_pPrinter = nullptr;
+	KT_ReaderLibPtr		m_pReaderLib = nullptr;
 	KT_Reader* m_pReader = nullptr;
 	bool bThreadReadIDCardRunning = false;
 	bool bThreadReadPinRunning = false;

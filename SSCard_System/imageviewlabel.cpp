@@ -81,11 +81,13 @@ void ImageViewLabel::onImagevalueChanged(const QVariant& variant)
 
 void ImageViewLabel::onBtnExpvalueChanged(const QVariant& variant)
 {
+	Q_UNUSED(variant);
 	//m_btnGroup->button(m_curIndex)->setFixedWidth(variant.toInt());
 }
 
 void ImageViewLabel::onBtnShrikvalueChanged(const QVariant& variant)
 {
+	Q_UNUSED(variant);
 	//for (int index = 0; index < m_imagepathpairlst.size(); index++) {
 	//	if (m_curIndex != index && m_btnGroup->button(index)->width() > btn_shrik_width) {
 	//		m_btnGroup->button(index)->setFixedWidth(variant.toInt());

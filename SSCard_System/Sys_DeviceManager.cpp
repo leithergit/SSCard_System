@@ -77,6 +77,7 @@ DeviceManager::DeviceManager(QWidget* parent)
 
 	ui.lineEdit_SSCardReaderModule->setText(DevConfig.strReaderModule.c_str());
 
+	// 制卡读卡器信息
 	nIndex = ui.comboBox_SSCardReaderPort->findText(DevConfig.strSSCardReaderPort.c_str());
 	ui.comboBox_SSCardReaderPort->setCurrentIndex(nIndex);
 
@@ -91,6 +92,23 @@ DeviceManager::DeviceManager(QWidget* parent)
 	else
 		ui.comboBox_PoweronType->setCurrentIndex(-1);
 	ui.comboBox_PoweronType->setCurrentIndex(nIndex);
+
+	// 桌面读卡器信息
+	ui.lineEdit_DesktopSSCardReaderModule->setText(DevConfig.strDesktopReaderModule.c_str());
+	nIndex = ui.comboBox_DesktopSSCardReaderPort->findText(DevConfig.strDesktopSSCardReaderPort.c_str());
+	ui.comboBox_DesktopSSCardReaderPort->setCurrentIndex(nIndex);
+	if (DevConfig.nDesktopSSCardReaderType >= READER_MIN && DevConfig.nDesktopSSCardReaderType <= READER_MAX)
+		nIndex = DevConfig.nDesktopSSCardReaderType - 1;
+	else
+		nIndex = -1;
+	ui.comboBox_DesktopSSCardReaderType->setCurrentIndex(nIndex);
+
+	if (DevConfig.nDesktopSSCardReaderPowerOnType >= READER_CONTACT && DevConfig.nDesktopSSCardReaderPowerOnType <= READER_UNCONTACT)
+		nIndex = DevConfig.nDesktopSSCardReaderPowerOnType - 1;
+	else
+		nIndex = -1;
+	ui.comboBox_DesktopPoweronType->setCurrentIndex(nIndex);
+
 
 	ui.lineEdit_IDCardReaderPort->setText(DevConfig.strIDCardReaderPort.c_str());
 	ui.lineEdit_PinBroadPort->setText(DevConfig.strPinBroadPort.c_str());
@@ -159,7 +177,7 @@ bool DeviceManager::CheckPrinter(QString& strPrinterLib, PrinterType& nPrinterTy
 	return true;
 }
 
-bool DeviceManager::CheckReader(QString strReaderLib, ReaderBrand nSSCardReaderType, CardPowerType nPowerType, QString strMessage, ReaderUsage nUsage)
+bool DeviceManager::CheckReader(QString& strReaderLib, ReaderBrand& nSSCardReaderType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage)
 {
 	if (nUsage == DeviceManager::Usage_MakeCard)
 	{
@@ -271,7 +289,7 @@ int DeviceManager::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strPhoto, QStr
 
 		int nYear, nMonth, nDay;
 
-		sscanf_s(pSSCardInfo->strValidDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
+		sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
 		char szValidate[32] = { 0 };
 		sprintf(szValidate, "%d年%d月", nYear, nMonth);
 
@@ -545,6 +563,9 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	if (nRes == QMessageBox::Cancel)
 		return;
 	char szRCode[128] = { 0 };
+	bool bSucceed = false;
+	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
 	do
 	{
 		QWaitCursor Wait;
@@ -557,19 +578,34 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 		if (Depense(nDepenseBox, nPowerType, strMessage))
 			break;
 
-		char szCardATR[128] = { 0 };
-		char szRCode[128] = { 0 };
+		char szCardATR[1024] = { 0 };
+		char szRCode[1024] = { 0 };
 		int nCardATRLen = 0;
-
 		QString strPowerType = ui.comboBox_PoweronType->currentText();
+
+		if (DriverInit((HANDLE)m_pReader, (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+		{
+			strMessage = QString("DriverInit失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+			break;
+		}
+
 		if (QFailed(m_pReader->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("读卡器上电失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
-		strMessage = QString("上电测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
+		if (QFailed(iReadCardBas(nPowerType, szCardATR)))
+		{
+			strMessage = QString("iReadCardBas失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+			break;
+		}
+		bSucceed = true;
+		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
 	} while (0);
-	QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	if (!bSucceed)
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+	else
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 	m_pPrinter->Printer_Eject(szRCode);
 }
 
@@ -606,21 +642,28 @@ void DeviceManager::on_pushButton_DesktopReaderTest_clicked()
 	int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到桌面插卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
 	if (nRes == QMessageBox::Cancel)
 		return;
+	bool bSucceed = false;
 	do
 	{
 		QWaitCursor Wait;
 		char szCardATR[128] = { 0 };
 		char szRCode[128] = { 0 };
 		int nCardATRLen = 0;
+		if (OpenReader(strReaderLib, nSSCardReaderType, strMessage))
+			break;
 		QString strPowerType = ui.comboBox_DesktopPoweronType->currentText();
 		if (QFailed(m_pReader->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("读卡器上电失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
-		strMessage = QString("上电测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
+		bSucceed = true;
+		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
 	} while (0);
-	QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+	if (!bSucceed)
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+	else
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 }
 
 void DeviceManager::fnThreadReadPin()
@@ -631,7 +674,14 @@ void DeviceManager::fnThreadReadPin()
 	{
 		nRet = SUNSON_ScanKeyPress(szTemp);
 		if (nRet > 0)
+		{
 			emit InputPin(szTemp[0]);
+		}
+		else
+		{
+			qDebug() << "nRet = " << nRet;
+		}
+
 		this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
@@ -756,6 +806,7 @@ void DeviceManager::EnableUI(QObject* pUIObj, bool bEnable)
 		qDebug() << pObj->metaObject()->className();
 		EnableUI(pObj, bEnable);
 	}
+	this->setEnabled(true);
 }
 void DeviceManager::on_pushButton_IDCardReaderTest_clicked()
 {
@@ -862,7 +913,7 @@ void DeviceManager::on_InputPin(char ch)
 
 }
 
-bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate)
+bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate, bool bClose)
 {
 	bool bSucceed = false;
 	do
@@ -871,12 +922,13 @@ bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate)
 			break;
 
 		unsigned char szRetInfo[255] = { 0 };
-		if (!SUNSON_UseEppPlainTextMode(0x06, 1, szRetInfo))
+		if (!SUNSON_UseEppPlainTextMode(0x06, 0, szRetInfo))
 			break;
 
 		bSucceed = true;
 	} while (0);
-	SUNSON_CloseCom();
+	if (bClose)
+		SUNSON_CloseCom();
 	return bSucceed;
 }
 
@@ -989,7 +1041,7 @@ void DeviceManager::on_pushButton_DetectIDPinBroadPort_clicked()
 
 void DeviceManager::on_pushButton_PinBroadTest_clicked()
 {
-	string strPinPort = ui.lineEdit_PinBroadPort->text().toStdString();
+	wstring strPinPort = ui.lineEdit_PinBroadPort->text().toStdWString();
 	if (!strPinPort.size())
 	{
 		if (QMessageBox::No == QMessageBox_CN(QMessageBox::Question, tr("提示"), "密码键盘端口为空,是否要自动检测键盘端口?", QMessageBox::Yes | QMessageBox::No, this))
@@ -1006,7 +1058,15 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 	}
 	if (!bThreadReadPinRunning)
 	{
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), "请在密码键上进行输入，按'确认'或'取消'键结束测试!", QMessageBox::Ok, this);
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "请在密码键盘上进行输入，按'确认'或'取消'键结束测试!", QMessageBox::Ok, this);
+
+		int nPort = wcstol(&strPinPort.c_str()[3], nullptr, 10);
+		if (!TryOpenPinKeyBroadPort(nPort, 9600, false))
+		{
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), "打开密码键盘失败!", QMessageBox::Ok, this);
+			return;
+		}
+		ZeroMemory(szPin, sizeof(szPin));
 		EnableUI(this, false);
 		ui.lineEdit_PinBroadPort->setEnabled(true);
 		ui.pushButton_PinBroadTest->setEnabled(true);
@@ -1020,5 +1080,6 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 		bThreadReadPinRunning = false;
 		ui.pushButton_PinBroadTest->setText("输入测试");
 		ThreadReadPin.join();
+		SUNSON_CloseCom();
 	}
 }

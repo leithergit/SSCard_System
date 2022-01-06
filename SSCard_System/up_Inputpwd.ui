@@ -6,20 +6,39 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1016</width>
-    <height>638</height>
+    <width>1161</width>
+    <height>652</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="6,2,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,6,2,1,0">
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item>
     <widget class="QLabel" name="label_Swipecard">
      <property name="minimumSize">
       <size>
        <width>600</width>
-       <height>300</height>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>100</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -28,7 +47,7 @@ border-image: url(:/Image/card3.jpg);
 color: rgb(0, 0, 0);</string>
      </property>
      <property name="text">
-      <string>输入六位社保密码动作示意图</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -73,13 +92,13 @@ color: rgb(0, 0, 0);</string>
         <widget class="QLineEdit" name="lineEdit_OldPassword">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>400</width>
            <height>72</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>280</width>
+           <width>400</width>
            <height>72</height>
           </size>
          </property>
@@ -106,7 +125,7 @@ color: rgb(0, 0, 0);</string>
           <enum>QLineEdit::Password</enum>
          </property>
          <property name="cursorPosition">
-          <number>0</number>
+          <number>6</number>
          </property>
         </widget>
        </item>

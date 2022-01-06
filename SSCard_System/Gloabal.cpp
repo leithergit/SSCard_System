@@ -21,7 +21,7 @@
 #pragma comment(lib, "../SDK/libcurl/libcurld")
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
-#pragma comment(lib, "../SDK/glog/glog")
+#pragma comment(lib, "../SDK/glog/glogd")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z_d.lib")
 #else
@@ -281,9 +281,9 @@ int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, Q
 		{QMessageBox::SaveAll           ,QObject::tr("全部保存")},
 		{QMessageBox::Open              ,QObject::tr("打开")},
 		{QMessageBox::Yes               ,QObject::tr("是")},
-		{QMessageBox::YesToAll          ,QObject::tr("全部是")},
+		{QMessageBox::YesToAll          ,QObject::tr("所有都是")},
 		{QMessageBox::No                ,QObject::tr("否")},
-		{QMessageBox::NoToAll           ,QObject::tr("全都不")},
+		{QMessageBox::NoToAll           ,QObject::tr("所有都不")},
 		{QMessageBox::Abort             ,QObject::tr("中止")},
 		{QMessageBox::Retry             ,QObject::tr("重试")},
 		{QMessageBox::Ignore            ,QObject::tr("忽略")},
@@ -296,8 +296,8 @@ int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, Q
 		{QMessageBox::RestoreDefaults   ,QObject::tr("恢复默认")},
 		{QMessageBox::FirstButton       ,QObject::tr("首个按钮")},
 		{QMessageBox::LastButton        ,QObject::tr("末尾按钮")},
-		{QMessageBox::YesAll            ,QObject::tr("全部是")},
-		{QMessageBox::NoAll             ,QObject::tr("全部否")},
+		{QMessageBox::YesAll            ,QObject::tr("全是")},
+		{QMessageBox::NoAll             ,QObject::tr("全否")},
 		{QMessageBox::Default           ,QObject::tr("默认")},
 		{QMessageBox::Escape            ,QObject::tr("取消操作")},
 		{QMessageBox::FlagMask          ,""},
@@ -330,4 +330,28 @@ string GBK_UTF8(const char* strGBK)
 	QString strUnicode = GBKCodec->toUnicode(strGBK);
 	QByteArray ByteUTF8 = utf8Codec->fromUnicode(strUnicode);
 	return string(ByteUTF8.data(), ByteUTF8.size());
+}
+
+void  SetTableWidgetItemChecked(QTableWidget* pTableWidget, int nRow, int nCol, QButtonGroup* pButtonGrp, int nItemID, bool bChecked)
+{
+	QWidget* pCellWidget = new QWidget(pTableWidget);
+	QHBoxLayout* pHLayout = new QHBoxLayout();
+	pHLayout->setMargin(0);
+	pHLayout->setSpacing(0);
+
+	QCheckBox* pCheckBox = new QCheckBox();
+	pCheckBox->setChecked(false);
+	pCheckBox->setFont(pTableWidget->font());
+	pCheckBox->setFocusPolicy(Qt::NoFocus);
+	pCheckBox->setStyle(QStyleFactory::create("fusion"));
+	pCheckBox->setStyleSheet(QString(".QCheckBox {margin:3px;border:0px;}QCheckBox::indicator {width: %1px; height: %1px; }").arg(20));
+
+	pHLayout->addWidget(pCheckBox);
+	pHLayout->setAlignment(pCheckBox, Qt::AlignCenter);
+	pCellWidget->setLayout(pHLayout);
+	//pCheckBox->setEnabled(false);
+	pButtonGrp->addButton(pCheckBox, nItemID);
+	pTableWidget->setCellWidget(nRow, nCol, pCellWidget);
+	if (bChecked)
+		pCheckBox->setCheckState(Qt::Checked);
 }

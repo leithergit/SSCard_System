@@ -46,7 +46,7 @@ int  OpenReader(IN const char *szPortIn)
         return IDCard_Invalid_Parameter;
 }
 
-int IDCARD_API_EXPORT GetCurrentPort(OUT char *szPort,int nBufferSize)
+int  GetCurrentPort(OUT char *szPort,int nBufferSize)
 {
     if (!g_pIDCardSDK)
         return IDCard_Reader_NotOpen;
