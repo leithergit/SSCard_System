@@ -46,6 +46,10 @@ UpdatePassword::~UpdatePassword()
 	delete ui;
 }
 
+void  UpdatePassword::SetTimeOut(int nTimeout)
+{
+	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
+}
 
 void UpdatePassword::OnTimerEvent()
 {

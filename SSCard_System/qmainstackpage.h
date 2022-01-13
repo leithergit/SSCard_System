@@ -25,7 +25,8 @@ public:
 	virtual void timerEvent(QTimerEvent* event) override;
 	virtual void OnTimerEvent();
 	bool eventFilter(QObject* object, QEvent* event) override;
-	virtual void  ResetAllPages();
+	virtual void  ResetAllPages(int nStartPage = 1);
+	virtual void  SetTimeOut(int nTimeout) {};
 	// 	virtual void paintEvent(QPaintEvent* event) override
 	// 	{
 	// 		QPainter painter(this);
@@ -36,12 +37,17 @@ public:
 public slots:
 	void on_pushButton_MainPage_clicked();
 	virtual void on_SwitchNextPage(int nPageOperation);
+	//virtual void On_RetryCurrentPage(QStackPage* pCurrentPage);
 	virtual void on_SwitchPage(int nPage);
 	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
 	{
 		qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nPageOperation;
 		emit ShowMaskWidget(strTitle, strDesc, nStatus, nPageOperation);
 	}
+	//void On_RetryCurrentPage(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
+	//{
+	//	emit ShowMaskWidget(strTitle, strDesc, nStatus, nPageOperation);
+	//}
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation);
 	void SwitchNextPage(int nOperation);

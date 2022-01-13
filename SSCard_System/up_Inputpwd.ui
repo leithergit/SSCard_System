@@ -80,7 +80,10 @@ color: rgb(0, 0, 0);</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
+          <string notr="true">font:48pt &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
 color: rgb(0, 0, 0);</string>
          </property>
          <property name="text">
@@ -111,6 +114,9 @@ color: rgb(0, 0, 0);</string>
            <bold>false</bold>
           </font>
          </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::NoContextMenu</enum>
+         </property>
          <property name="styleSheet">
           <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
 color: rgb(0, 0, 0);</string>
@@ -126,6 +132,9 @@ color: rgb(0, 0, 0);</string>
          </property>
          <property name="cursorPosition">
           <number>6</number>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

@@ -1,8 +1,13 @@
 ﻿#ifndef DEVBASE_H
 #define DEVBASE_H
-#pragma execution_character_set("utf-8")
-#include "Gloabal.h"
+#include <string>
+#include <memory>
+#include <QString>
 
+#pragma execution_character_set("utf-8")
+//#include "Gloabal.h"
+
+using namespace std;
 using pCreateInstance = LPVOID(*)(LPVOID lpReserve);
 using pFreeInstance = void (*)(LPVOID lpDev);
 
@@ -63,6 +68,5 @@ public:
 	}
 };
 
-using KT_PrinterLibPtr = shared_ptr<KTModule<KT_Printer>>;
-using KT_ReaderLibPtr = shared_ptr<KTModule<KT_Reader>>;
+
 #endif // DEVBASE_H

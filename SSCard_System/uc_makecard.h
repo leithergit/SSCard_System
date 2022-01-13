@@ -28,17 +28,17 @@ public:
 	~uc_MakeCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-	int OpenDevice(QString& strMessage);
-	int OpenPrinter(QString& strMesssage);
-	int OpenReader(QString& strMesssage);
-	string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
-	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
-	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
-	//int GetCA(string& strPublicKey, SSCardInfoPtr& pSSCardInfo, CAInfo& caInfo, QString& strMessage);
-	int Depense(QString& strMessage);
+	//int OpenDevice(QString& strMessage);
+	//int OpenPrinter(QString& strMesssage);
+	//int OpenSSCardReader(QString& strMesssage);
+	//void CloseDevice();
+	//int TestPrinter(QString& strMessage);
+	//int Depense(QString& strMessage);
+	//string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
+	//int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+	//int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 	int PrecessCardInMaking(QString& strMessage);
 	int PrepareMakeCard(QString& strMessage);
-	void CloseDevice();
 	void ThreadWork();
 	virtual void ShutDown() override;
 	int     m_nSocketRetryInterval = 500;            // 支付结构查询时间间隔单 毫秒
@@ -47,10 +47,10 @@ public:
 
 private:
 	Ui::MakeCard* ui;
-	KT_PrinterLibPtr	m_pPrinterlib = nullptr;
-	KT_ReaderLibPtr		m_pReaderLib = nullptr;
-	KT_Printer* m_pPrinter = nullptr;
-	KT_Reader* m_pReader = nullptr;
+	//KT_PrinterLibPtr	m_pPrinterlib = nullptr;
+	//KT_ReaderLibPtr		m_pReaderLib = nullptr;
+	//KT_Printer* m_pPrinter = nullptr;
+	//KT_Reader* m_pReader = nullptr;
 
 	SSCardInfoPtr m_pSSCardInfo = nullptr;
 };

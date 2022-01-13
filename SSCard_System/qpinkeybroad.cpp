@@ -7,9 +7,16 @@ QPinKeybroad::QPinKeybroad(QString strDevPort, ushort nBaudrate, QObject* parent
 	m_nBaudreate(nBaudrate)
 {
 }
+QPinKeybroad::~QPinKeybroad()
+{
+	QString strError;
+	gInfo() << "Try to close device";
+	CloseDevice(strError);
 
+}
 int  QPinKeybroad::OpenDevice(QString& strError)
 {
+	gInfo() << "Try to Open device " << strError.toStdString().c_str();
 	int nOffset = m_strDevPort.indexOf("COM");
 	if (nOffset < 0)
 	{
@@ -20,12 +27,13 @@ int  QPinKeybroad::OpenDevice(QString& strError)
 	QString strNum = m_strDevPort.right(m_strDevPort.size() - 3);
 	int nPort = strNum.toInt();
 
+	gInfo() << "Try to Open Port " << nPort;
 	if (!SUNSON_OpenCom(nPort, m_nBaudreate))
 	{
 		strError = QString("打开密码键盘失败:%1,Baudrate:%2").arg(m_strDevPort).arg(m_nBaudreate);
 		return -1;
 	}
-
+	gInfo() << "Try to SUNSON_UseEppPlainTextMode";
 	unsigned char szRetInfo[255] = { 0 };
 	if (!SUNSON_UseEppPlainTextMode(0x06, 1, szRetInfo))
 	{
@@ -39,9 +47,11 @@ int  QPinKeybroad::OpenDevice(QString& strError)
 }
 int QPinKeybroad::CloseDevice(QString& strError)
 {
+
 	Q_UNUSED(strError);
 	if (m_bDevOpened)
 	{
+		gInfo() << "Try to SUNSON_CloseCom";
 		m_bDevOpened = false;
 		SUNSON_CloseCom();
 	}

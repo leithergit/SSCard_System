@@ -36,6 +36,7 @@ DLL_PUBLIC long DriverInit(HANDLE ReaderHandle, char *regionCode, char* OLDPIN, 
 /**
  * @brief 读基本信息
  * @param[in] iType 卡操作类型	1-接触 2-非接 3-自动寻卡(接触优先) 4-自动寻卡(非接优先)
+ * @param[in] cardAtr 卡上电返回的ATR
  * @param[out] pOutInfo 传出信息
  * @return 0-成功 1-失败
  */
@@ -61,7 +62,7 @@ DLL_PUBLIC int iWriteCardBas_HSM_Step1(char *pKey,char* pWriteInfo, char* pOutIn
  * @param[out] pOutInfo 传出信息
  * @return 0-成功 1-失败
  */
-DLL_PUBLIC long iReadCardBas_HSM_Step1(int iType,char* pOutInfo);
+DLL_PUBLIC long iReadCardBas_HSM_Step1(char* pOutInfo);
 /**
  * @brief 基于加密机的读基本信息 步骤2
  * @param[in] pKey 加密机返回的内部认证和外部认证数据

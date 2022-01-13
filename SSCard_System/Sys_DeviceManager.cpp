@@ -2,11 +2,14 @@
 #include "Sys_DeviceManager.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QMenu>
+#include <QAction>
 #include "Gloabal.h"
 #include "DevBase.h"
 #include "Payment.h"
 #include "Sys_dialogidcardinfo.h"
 #include "Sys_dialogcameratest.h"
+#include "Payment.h"
 
 DWORD GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, WORD& nBuildNum, WORD& nRevsion)
 {
@@ -77,6 +80,26 @@ DeviceManager::DeviceManager(QWidget* parent)
 
 	ui.lineEdit_SSCardReaderModule->setText(DevConfig.strReaderModule.c_str());
 
+	//QMenu* pBtnMenu = new QMenu(this);
+
+	//QAction* pInsertCard = pBtnMenu->addAction(tr("进卡"), this, SLOT(OnInsertCard()));
+	//QAction* pEjectCard = pBtnMenu->addAction(tr("出卡"), this, SLOT(OnEjectCard()));
+	//QAction* pRetracCard = pBtnMenu->addAction(tr("回收"), this, SLOT(OnRetractCard()));
+	//QAction* pPrintCard = pBtnMenu->addAction(tr("打印"), this, SLOT(OnPrintCard()));
+
+	//connect(pInsertCard, &QPushButton::clicked, this, &DeviceManager::OnInsertCard);
+	//connect(pEjectCard, &QPushButton::clicked, this, &DeviceManager::OnEjectCard);
+	//connect(pRetracCard, &QPushButton::clicked, this, &DeviceManager::OnRetractCard);
+	//connect(pPrinter, &QPushButton::clicked, this, &DeviceManager::OnPrintCard);
+
+	//ui.pushButton_PrinterTest->setMenu(pBtnMenu);
+	//ui.pushButton_PrinterTest->setStyleSheet("QPushButton::menu-indicator{"
+	//	"subcontrol-position:right center;"
+	//	"subcontrol-origin:padding;"
+	//	"image:url(./Image/arrow-down.png);}");
+
+	ui.pushButton_PrinterTest->hide();
+
 	// 制卡读卡器信息
 	nIndex = ui.comboBox_SSCardReaderPort->findText(DevConfig.strSSCardReaderPort.c_str());
 	ui.comboBox_SSCardReaderPort->setCurrentIndex(nIndex);
@@ -145,14 +168,21 @@ DeviceManager::DeviceManager(QWidget* parent)
 	}
 	pItem = ui.tableWidget->item(1, 2);
 	pItem->setFlags(pItem->flags() & (Qt::ItemIsEditable));
+	g_pDataCenter->CloseDevice();
 }
 
 DeviceManager::~DeviceManager()
 {
+	bThreadReadIDCardRunning = false;
+	bThreadReadPinRunning = false;
+	if (ThreadReadIDCard.joinable())
+		ThreadReadIDCard.join();
 
+	if (ThreadReadPin.joinable())
+		ThreadReadPin.join();
 }
 
-bool DeviceManager::CheckPrinter(QString& strPrinterLib, PrinterType& nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
+bool DeviceManager::CheckPrinterModule(QString& strPrinterLib, PrinterType& nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
 {
 	strPrinterLib = ui.lineEdit_PrinterModule->text();
 	if (strPrinterLib.isEmpty())
@@ -177,7 +207,7 @@ bool DeviceManager::CheckPrinter(QString& strPrinterLib, PrinterType& nPrinterTy
 	return true;
 }
 
-bool DeviceManager::CheckReader(QString& strReaderLib, ReaderBrand& nSSCardReaderType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage)
+bool DeviceManager::CheckReaderModule(QString& strReaderLib, ReaderBrand& nSSCardReaderType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage)
 {
 	if (nUsage == DeviceManager::Usage_MakeCard)
 	{
@@ -204,260 +234,217 @@ bool DeviceManager::CheckReader(QString& strReaderLib, ReaderBrand& nSSCardReade
 	return true;
 }
 
-int DeviceManager::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
-{
-	int nResult = -1;
-	char szRCode[32] = { 0 };
+//int DeviceManager::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
+//{
+//	
+//}
 
-	QString strPtinerType = ui.comboBox_PrinterType->currentText();
-	QString strPritnerModule = ui.lineEdit_PrinterModule->text();
-	try
-	{
-		m_pPrinterlib = nullptr;
-		do
-		{
-			if (!m_pPrinterlib)
-			{
-				QString strAppPath = QCoreApplication::applicationDirPath();
-				QString strFullPrinterModule = strAppPath + "/" + strPritnerModule;
+//int DeviceManager::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strPhoto, QString& strMessage)
+//{
+//	char szBuffer[1024] = { 0 };
+//	int nBufferSize = sizeof(szBuffer);
+//	int nResult = -1;
+//	char szRCode[32] = { 0 };
+//	CardFormPtr& pCardForm = g_pDataCenter->GetCardForm();
+//	do
+//	{
+//		nBufferSize = sizeof(szBuffer);
+//		ZeroMemory(szBuffer, nBufferSize);
+//
+//		if (QFailed(nResult = m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
+//		{
+//			strMessage = QString("Printer_InitPrint失败，错误代码:%1!").arg(szRCode);
+//			break;
+//		}
+//
+//		TextPosition* pFieldPos = &pCardForm->posName;
+//		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+//		pFieldPos = &pCardForm->posIDNumber;
+//		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+//		pFieldPos = &pCardForm->posSSCardID;
+//		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+//		pFieldPos = &pCardForm->posIssueDate;
+//
+//		int nYear, nMonth, nDay;
+//
+//		sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
+//		char szValidate[32] = { 0 };
+//		sprintf(szValidate, "%d年%d月", nYear, nMonth);
+//
+//		m_pPrinter->Printer_AddText((char*)UTF8_GBK(szValidate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+//		ImagePosition& ImgPos = pCardForm->posImage;
+//		m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
+//		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
+//		{
+//			strMessage = QString("Printer_StartPrint失败，错误代码:%1!").arg(szRCode);
+//			break;
+//		}
+//		if (QFailed(m_pPrinter->Printer_Eject(szRCode)))
+//		{
+//			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
+//			break;
+//		}
+//		nResult = 0;
+//
+//	} while (0);
+//	return nResult;
+//
+//}
 
-				m_pPrinterlib = make_shared<KTModule<KT_Printer>>(strFullPrinterModule.toStdString());
-				if (!m_pPrinterlib)
-				{
-					strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strFullPrinterModule);
-					break;
-				}
-				m_pPrinter = m_pPrinterlib->Instance();
-				if (!m_pPrinter)
-				{
-					strMessage = QString("创建‘%1’实例失败!").arg(strFullPrinterModule);
-					break;
-				}
+//int DeviceManager::Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage)
+//{
+//	int nResult = -1;
+//	BOXINFO BoxInfo;
+//	ZeroMemory(&BoxInfo, sizeof(BOXINFO));
+//	PRINTERSTATUS PrinterStatus;
+//	char szRCode[32] = { 0 };
+//	do
+//	{
+//		if (!m_pPrinter)
+//		{
+//			strMessage = "打印机未初始化";
+//			break;
+//		}
+//		if (QFailed(m_pPrinter->Printer_BoxStatus(BoxInfo, szRCode)))
+//		{
+//			strMessage = QString("Printer_BoxStatus失败:%1").arg(szRCode);
+//			break;
+//		}
+//
+//		if (BoxInfo.BoxList[nDepenseBox - 1].BoxStatus == 2)
+//		{
+//			strMessage = QString("卡箱无卡,请放入卡片!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
+//			break;
+//		}
+//
+//		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
+//		{
+//			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
+//			break;
+//		}
+//		if (PrinterStatus.fwDevice != 0)
+//		{
+//			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
+//			break;
+//		}
+//		// 0-无卡；2-卡在内部；3-卡在上电位，4-卡在闸门外 5-堵卡；6-卡片未知
+//		bool bSucceed = false;
+//		switch (PrinterStatus.fwMedia)
+//		{
+//		case 0:		// 机内无卡
+//		{
+//			bSucceed = true;
+//			break;
+//		}
+//		case 1:			// 1-卡在门口:
+//		{
+//			strMessage = QString("打印机出卡号尚有未取走卡片,取走点击确定以继续!");
+//			nResult = 1;		//
+//			break;
+//		}
+//		case 2:			// 2-卡在内部；
+//		case 3:			// 3-卡在上电位
+//		{
+//			if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
+//			{
+//				strMessage = QString("打印机尚有未取走卡片,尝试将其移动到回收箱失败，错误代码:%1!").arg(szRCode);
+//				break;
+//			}
+//			else
+//				bSucceed = true;
+//			break;
+//		}
+//		case 4:			// 4-卡在闸门外
+//		{
+//			strMessage = QString("请先取走出卡口的卡片!");
+//			break;
+//		}
+//		case 5:
+//		{
+//			strMessage = QString("打印机堵卡,请联系技术人员处理!");
+//			break;
+//		}
+//		case 6:
+//		default:
+//		{
+//			strMessage = QString("发生未知错误,请联系技术人员处理!");
+//			break;
+//		}
+//		}
+//		if (!bSucceed)
+//			break;
+//		// 0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
+//		bSucceed = false;
+//		switch (PrinterStatus.fwToner)
+//		{
+//		case 0:
+//		case 1:
+//		{
+//			bSucceed = true;
+//			break;
+//		}
+//		case 2:
+//		{
+//			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(PrinterStatus.fwToner);
+//			break;
+//		}
+//		case 3:
+//		{
+//			strMessage = QString("打印机中安装了不兼容的色带,请更换色带!").arg(PrinterStatus.fwToner);
+//			break;
+//		}
+//		case 4:
+//		default:
+//		{
+//			strMessage = QString("发生未知错误!").arg(PrinterStatus.fwToner);
+//			break;
+//		}
+//		}
+//		if (!bSucceed)
+//			break;
+//		int nDepensePos = 4;	// 1-读磁位；2-接触IC位;3-非接IC位;4-打印位， 默认为接触位
+//		if (nPowerOnType == CardPowerType::READER_UNCONTACT)
+//			nDepensePos = 3;
+//		else if (nPowerOnType == CardPowerType::READER_CONTACT)
+//			nDepensePos = 2;
+//
+//		if (QFailed(m_pPrinter->Printer_Dispense(nDepenseBox - 1, nDepensePos, szRCode)))
+//		{
+//			strMessage = QString("Printer_Dispense失败，错误代码:%1!").arg(szRCode);
+//			break;
+//		}
+//		nResult = 0;
+//	} while (0);
+//
+//	if (QFailed(nResult))
+//	{
+//		gInfo() << gQStr(strMessage);
+//	}
+//	return nResult;
+//}
 
-				if (QFailed(nResult = m_pPrinter->Printer_Init(nPrinterType, szRCode)))
-				{
-					strMessage = QString("Printer_Init‘%1’失败,错误代码:%2").arg(strPtinerType.toStdString().c_str()).arg(szRCode);
-					break;
-				}
 
-				if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
-				{
-					strMessage = QString("Printer_Open‘%1’失败,错误代码:%2").arg(strPtinerType.toStdString().c_str()).arg(szRCode);
-					break;
-				}
-			}
 
-		} while (0);
-		if (QFailed(nResult))
-			return -1;
-		else
-			return 0;
-	}
-	catch (std::exception& e)
-	{
-		strMessage = e.what();
-		gError() << gQStr(strMessage);
-		return -1;
-	}
-}
-
-int DeviceManager::PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strPhoto, QString& strMessage)
-{
-	char szBuffer[1024] = { 0 };
-	int nBufferSize = sizeof(szBuffer);
-	int nResult = -1;
-	char szRCode[32] = { 0 };
-	CardFormPtr& pCardForm = g_pDataCenter->GetCardForm();
-	do
-	{
-		nBufferSize = sizeof(szBuffer);
-		ZeroMemory(szBuffer, nBufferSize);
-
-		if (QFailed(nResult = m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
-		{
-			strMessage = QString("Printer_InitPrint失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
-
-		TextPosition* pFieldPos = &pCardForm->posName;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
-		pFieldPos = &pCardForm->posIDNumber;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
-		pFieldPos = &pCardForm->posSSCardID;
-		m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
-		pFieldPos = &pCardForm->posIssueDate;
-
-		int nYear, nMonth, nDay;
-
-		sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
-		char szValidate[32] = { 0 };
-		sprintf(szValidate, "%d年%d月", nYear, nMonth);
-
-		m_pPrinter->Printer_AddText((char*)UTF8_GBK(szValidate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
-		ImagePosition& ImgPos = pCardForm->posImage;
-		m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
-		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
-		{
-			strMessage = QString("Printer_StartPrint失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
-		if (QFailed(m_pPrinter->Printer_Eject(szRCode)))
-		{
-			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
-		nResult = 0;
-
-	} while (0);
-	return nResult;
-
-}
-
-int DeviceManager::Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage)
-{
-	int nResult = -1;
-	BOXINFO BoxInfo;
-	ZeroMemory(&BoxInfo, sizeof(BOXINFO));
-	PRINTERSTATUS PrinterStatus;
-	char szRCode[32] = { 0 };
-	do
-	{
-		if (!m_pPrinter)
-		{
-			strMessage = "打印机未初始化";
-			break;
-		}
-		if (QFailed(m_pPrinter->Printer_BoxStatus(BoxInfo, szRCode)))
-		{
-			strMessage = QString("Printer_BoxStatus失败:%1").arg(szRCode);
-			break;
-		}
-
-		if (BoxInfo.BoxList[nDepenseBox].BoxStatus == 2)
-		{
-			strMessage = QString("卡箱[%1]:BoxStatus = %2,无卡!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
-			break;
-		}
-
-		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
-		{
-			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
-		if (PrinterStatus.fwDevice != 0)
-		{
-			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
-			break;
-		}
-
-		if (PrinterStatus.fwMedia != 0)
-		{
-			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(PrinterStatus.fwToner);
-			if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
-			{
-				strMessage = QString("打印机尚有未取走卡片,尝试将其移动到回收箱失败，错误代码:%1!").arg(szRCode);
-				break;
-			}
-		}
-		if (PrinterStatus.fwToner == 2)
-		{
-			strMessage = QString("打印机色带耗尽或未安装色带,状态代码:%1!").arg(PrinterStatus.fwToner);
-			break;
-		}
-		int nDepensePos = 4;	// 1-读磁位；2-接触IC位;3-非接IC位;4-打印位， 默认为接触位
-		if (nPowerOnType == CardPowerType::READER_UNCONTACT)
-			nDepensePos = 3;
-		else if (nPowerOnType == CardPowerType::READER_CONTACT)
-			nDepensePos = 2;
-
-		if (QFailed(m_pPrinter->Printer_Dispense(nDepenseBox, nDepensePos, szRCode)))
-		{
-			strMessage = QString("Printer_Dispense失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
-		nResult = 0;
-	} while (0);
-
-	if (QFailed(nResult))
-	{
-		gInfo() << gQStr(strMessage);
-	}
-	return nResult;
-}
-
-int DeviceManager::OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
-{
-	int nResult = -1;
-	try
-	{
-		m_pReaderLib = nullptr;
-		do
-		{
-			if (!m_pReaderLib)
-			{
-				char szRCode[32] = { 0 };
-				QString strAppPath = QCoreApplication::applicationDirPath();
-				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
-
-				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
-				if (!m_pReaderLib)
-				{
-					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
-					break;
-				}
-				m_pReader = m_pReaderLib->Instance();
-				if (!m_pReader)
-				{
-					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
-					break;
-				}
-				if (QFailed(nResult = m_pReader->Reader_Create(nReaderType, szRCode)))
-				{
-					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
-					break;
-				}
-				if (QFailed(nResult = m_pReader->Reader_Init(szRCode)))
-				{
-					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
-					break;
-				}
-			}
-
-		} while (0);
-		if (QFailed(nResult))
-			return -1;
-		else
-			return 0;
-	}
-	catch (std::exception& e)
-	{
-		strMessage = e.what();
-		gError() << gQStr(strMessage);
-		return -1;
-	}
-	return 0;
-}
-
-void DeviceManager::CloseDevice()
-{
-	char szRCode[32] = { 0 };
-
-	if (m_pPrinter)
-	{
-		m_pPrinter->Printer_Close(szRCode);
-		m_pPrinter = nullptr;
-	}
-
-	m_pPrinterlib = nullptr;
-
-	if (m_pReader)
-	{
-		m_pReader->Reader_Exit(szRCode);
-		m_pReader = nullptr;
-	}
-	m_pReaderLib = nullptr;
-
-}
+//void DeviceManager::CloseDevice()
+//{
+//	char szRCode[32] = { 0 };
+//
+//	if (m_pPrinter)
+//	{
+//		m_pPrinter->Printer_Close(szRCode);
+//		m_pPrinter = nullptr;
+//	}
+//
+//	m_pPrinterlib = nullptr;
+//
+//	if (m_pReader)
+//	{
+//		m_pReader->Reader_Exit(szRCode);
+//		m_pReader = nullptr;
+//	}
+//	m_pReaderLib = nullptr;
+//
+//}
 
 bool DetectIDCardReaderPort(QString& strPort, QString& strMessage)
 {
@@ -542,7 +529,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	int nDepenseBox;
 	QString strDPI;
 #pragma warning(disable:4700)
-	if (!CheckPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
 		return;
@@ -553,7 +540,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	QString strSSCardReaderType;
 	QString strReaderLib;
 
-	if (!CheckReader(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
+	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
 	{
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
 		return;
@@ -569,44 +556,45 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	do
 	{
 		QWaitCursor Wait;
-		if (OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 			break;
 
-		if (OpenReader(strReaderLib, nSSCardReaderType, strMessage))
+		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
 			break;
 
-		if (Depense(nDepenseBox, nPowerType, strMessage))
+		if (g_pDataCenter->Depense(nDepenseBox, nPowerType, strMessage))
 			break;
 
-		char szCardATR[1024] = { 0 };
+		//		char szCardATR[1024] = { 0 };
 		char szRCode[1024] = { 0 };
-		int nCardATRLen = 0;
+		//		int nCardATRLen = 0;
+		string strCardATR;
 		QString strPowerType = ui.comboBox_PoweronType->currentText();
 
-		if (DriverInit((HANDLE)m_pReader, (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+		if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
 		{
 			strMessage = QString("DriverInit失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
 
-		if (QFailed(m_pReader->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
+		if (QFailed(g_pDataCenter->MoveCard(strMessage)))
 		{
 			strMessage = QString("读卡器上电失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
-		if (QFailed(iReadCardBas(nPowerType, szCardATR)))
+		if (QFailed(iReadCardBas(nPowerType, szRCode)))
 		{
 			strMessage = QString("iReadCardBas失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
 		bSucceed = true;
-		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
+		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(strCardATR.c_str());
 	} while (0);
 	if (!bSucceed)
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 	else
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-	m_pPrinter->Printer_Eject(szRCode);
+	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 }
 
 void DeviceManager::on_pushButton_BrowseDesktopReaderModule_clicked()
@@ -633,7 +621,7 @@ void DeviceManager::on_pushButton_DesktopReaderTest_clicked()
 	QString strSSCardReaderType;
 	QString strReaderLib;
 
-	if (!CheckReader(strReaderLib, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
+	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
 	{
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
 		return;
@@ -649,10 +637,10 @@ void DeviceManager::on_pushButton_DesktopReaderTest_clicked()
 		char szCardATR[128] = { 0 };
 		char szRCode[128] = { 0 };
 		int nCardATRLen = 0;
-		if (OpenReader(strReaderLib, nSSCardReaderType, strMessage))
+		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
 			break;
 		QString strPowerType = ui.comboBox_DesktopPoweronType->currentText();
-		if (QFailed(m_pReader->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
+		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("读卡器上电失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
@@ -693,33 +681,35 @@ void DeviceManager::on_pushButton_PrinterTest_clicked()
 	PrinterType nPrinterType;
 	int nDepenseBox;
 	QString strDPI;
-	if (!CheckPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
 		return;
 	}
 	QWaitCursor Wait;
 
-	if (OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
 		Wait.RestoreCursor();
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
-	if (Depense(nDepenseBox, (CardPowerType)0, strMessage))
+
+
+	if (g_pDataCenter->Depense(nDepenseBox, (CardPowerType)0, strMessage))
 	{
 		Wait.RestoreCursor();
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-	strcpy_s(pSSCardInfo->strName, UTF8_GBK("测试用户").c_str());
+	/*strcpy_s(pSSCardInfo->strName, UTF8_GBK("测试用户").c_str());
 	strcpy_s(pSSCardInfo->strCardID, "123456789012345678");
 	strcpy_s(pSSCardInfo->strCardNum, "PP123456N");
-	strcpy_s(pSSCardInfo->strValidDate, "20220101");
+	strcpy_s(pSSCardInfo->strValidDate, "20220101");*/
 	QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
 
-	if (PrintCard(pSSCardInfo, strPhoto, strMessage))
+	if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))
 	{
 		Wait.RestoreCursor();
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -969,7 +959,7 @@ bool DeviceManager::Save(QString& strMessage)
 	PrinterType nPrinterType;
 	int nDepenseBox;
 	QString strDPI;
-	if (!CheckPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 		return false;
 	devconfig.strPrinter = ui.comboBox_PrinterType->currentText().toStdString();
 	devconfig.nDepenseBox = nDepenseBox;
@@ -981,7 +971,7 @@ bool DeviceManager::Save(QString& strMessage)
 	QString strSSCardReaderType;
 	QString strReaderLib;
 
-	if (!CheckReader(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
+	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
 		return false;
 
 	devconfig.strReaderModule = strReaderLib.toStdString();
@@ -990,7 +980,7 @@ bool DeviceManager::Save(QString& strMessage)
 	devconfig.nSSCardReaderPowerOnType = nPowerType;
 	devconfig.strSSCardReaderPort = ui.comboBox_SSCardReaderPort->currentText().toStdString();
 
-	if (!CheckReader(strReaderLib, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
+	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
 		return false;
 
 	devconfig.strDesktopReaderModule = strReaderLib.toStdString();
@@ -1081,5 +1071,129 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 		ui.pushButton_PinBroadTest->setText("输入测试");
 		ThreadReadPin.join();
 		SUNSON_CloseCom();
+	}
+}
+
+void DeviceManager::on_comboBox_PrinterTest_currentIndexChanged(int index)
+{
+
+}
+
+void DeviceManager::on_comboBox_PrinterTest_activated(int index)
+{
+	qDebug() << __FUNCTION__ << "Current Item:" << index;
+	//if (index == nCurrentPrinterTest)
+	//	ui.comboBox_PrinterTest->emit currentIndexChanged(index);
+
+}
+
+void DeviceManager::on_pushButton_MakePhoto_clicked()
+{
+	QString strFile = QFileDialog::getOpenFileName();
+	if (strFile.isEmpty())
+	{
+		return;
+	}
+	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	if (LoadCardData(pSSCardInfo, strFile) == 0)
+	{
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+		g_pDataCenter->SetIDCardInfo(pIDCard);
+
+		strcpy((char*)g_pDataCenter->GetIDCardInfo()->szIdentify, pSSCardInfo->strCardID);
+		QString strMessage;
+		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+	}
+}
+
+void DeviceManager::on_pushButton_Excute_clicked()
+{
+	int index = ui.comboBox_PrinterTest->currentIndex();
+	QString strMessage;
+	QString strPrinterLib;
+	PrinterType nPrinterType;
+	int nDepenseBox;
+	QString strDPI;
+	char szRCode[128] = { 0 };
+	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	{
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
+		return;
+	}
+	QWaitCursor Wait;
+	if (!g_pDataCenter->GetPrinter())
+	{
+		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		{
+			Wait.RestoreCursor();
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+	}
+	else
+	{
+		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		{
+			Wait.RestoreCursor();
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+	}
+	switch (index)
+	{
+	case 0:
+	default:
+	{
+		if (g_pDataCenter->Depense(nDepenseBox, (CardPowerType)0, strMessage))
+		{
+			Wait.RestoreCursor();
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+		break;
+	}
+
+	case 1:
+	{
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject(szRCode)))
+		{
+			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+		break;
+	}
+
+	case 2:
+	{
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Retract(1, szRCode)))
+		{
+			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+		break;
+	}
+
+	case 3:
+	{
+		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+		strcpy_s(pSSCardInfo->strName, UTF8_GBK("测试用户").c_str());
+		strcpy_s(pSSCardInfo->strCardID, "123456789012345678");
+		strcpy_s(pSSCardInfo->strCardNum, "PP123456N");
+		strcpy_s(pSSCardInfo->strValidDate, "20220101");
+		QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
+
+		if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))
+		{
+			Wait.RestoreCursor();
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+		Wait.RestoreCursor();
+		strMessage = tr("卡片打印成功,请最走卡片!");
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+		break;
+	}
 	}
 }

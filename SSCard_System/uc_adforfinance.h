@@ -16,6 +16,10 @@ public:
 	explicit uc_AdforFinance(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_AdforFinance();
 	virtual void OnTimeout() override;
+	virtual void ShutDown() override
+	{
+		gInfo() << __FUNCTION__;
+	}
 private:
 	Ui::AdforFinance* ui;
 };

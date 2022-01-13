@@ -12,34 +12,6 @@ enum logTable_Column
 	logTable_Size
 };
 
-
-QStringList SearchFiles(const QString& dir_path, QDateTime* pStart = nullptr, QDateTime* pStop = nullptr)
-{
-	QStringList FileList;
-	QDir dir(dir_path);
-	if (!dir.exists())
-	{
-		qDebug() << "it is not true dir_path";
-	}
-
-	/*设置过滤参数，QDir::NoDotAndDotDot表示不会去遍历上层目录*/
-	QDirIterator dir_iterator(dir_path, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-
-	while (dir_iterator.hasNext())
-	{
-		dir_iterator.next();
-		QFileInfo file_info = dir_iterator.fileInfo();
-		QString files = file_info.absoluteFilePath();
-		if (pStart && file_info.birthTime() < *pStart)
-			continue;
-		if (pStop && file_info.birthTime() > *pStop)
-			continue;
-		FileList.append(files);
-	}
-
-	return FileList;
-}
-
 void logManager::Showlog(QStringList& strLogList)
 {
 	if (strLogList.size())
@@ -53,15 +25,15 @@ void logManager::Showlog(QStringList& strLogList)
 			QFileInfo fi(var);
 			if (!fi.isFile())
 				continue;
-            if (!fi.size())     // 0 size文件，可能文件正在被使用，忽略
-                continue;
+			if (!fi.size())     // 0 size文件，可能文件正在被使用，忽略
+				continue;
 			ui->tableWidget->insertRow(nRow);
 			ui->tableWidget->setItem(nRow, logTable_No, new QTableWidgetItem(QString("%1").arg(nRow + 1)));
 			ui->tableWidget->setItem(nRow, logTable_StartTime, new QTableWidgetItem(fi.birthTime().toString("yyyy-MM-dd hh:mm:ss")));
 			//ui->tableWidget->setItem(nRow, logTable_StopTime, new QTableWidgetItem(fi.lastModified().toString("yyyy-MM-dd hh:mm:ss")));
-            QTableWidgetItem *pItem = new QTableWidgetItem(fi.fileName());
-            pItem->setData(Qt::UserRole,fi.absoluteFilePath());
-            ui->tableWidget->setItem(nRow, logTable_FileName, pItem);
+			QTableWidgetItem* pItem = new QTableWidgetItem(fi.fileName());
+			pItem->setData(Qt::UserRole, fi.absoluteFilePath());
+			ui->tableWidget->setItem(nRow, logTable_FileName, pItem);
 			QString strFileSize;
 			if (fi.size() < 1024)
 				strFileSize = QString("%1 Bytes").arg(fi.size());
@@ -107,7 +79,7 @@ logManager::logManager(QWidget* parent) :
 		ui->tableWidget->horizontalHeader()->setSectionResizeMode(nIndex, QHeaderView::ResizeToContents);
 	}
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(logTable_FileName, QHeaderView::Stretch);
-    ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 logManager::~logManager()
@@ -131,65 +103,65 @@ void logManager::on_pushButton_Search_clicked()
 
 void logManager::on_pushButton_Export_clicked()
 {
-    QList<QTableWidgetItem*> ItemList = ui->tableWidget->selectedItems();
-    if (!ItemList.size())
-    {
-        QMessageBox_CN(QMessageBox::Information, "提示", "尚未选中需要导出的日志文件!", QMessageBox::Ok, this);
-        return ;
-    }
-    QString selectedFilter;
-    QString strFileName = QFileDialog::getSaveFileName(this,
-                                "导出日志",
-                                QCoreApplication::applicationDirPath(),
-                                tr("压缩文件(*.zip);;All Files (*)"),
-                                &selectedFilter);
-    qDebug()<<selectedFilter.toStdWString();
-    if(strFileName.isEmpty())
-    {
-        return ;
-    }
-    vector<wstring> vecFiles;
-    for (auto var:ItemList)
-    {
-        if (var->column() != logTable_FileName)
-            continue;
-        vecFiles.push_back(var->data(Qt::UserRole).toString().toStdWString());
-    }
-    QWaitCursor Wait;
-    QString str7ZLib = QCoreApplication::applicationDirPath() + "/7z.dll";
-    Bit7zLibrary lib7z{str7ZLib.toStdWString()};
-    BitCompressor compressor{ lib7z, BitFormat::Zip };
-    compressor.compress(vecFiles,strFileName.toStdWString());
+	QList<QTableWidgetItem*> ItemList = ui->tableWidget->selectedItems();
+	if (!ItemList.size())
+	{
+		QMessageBox_CN(QMessageBox::Information, "提示", "尚未选中需要导出的日志文件!", QMessageBox::Ok, this);
+		return;
+	}
+	QString selectedFilter;
+	QString strFileName = QFileDialog::getSaveFileName(this,
+		"导出日志",
+		QCoreApplication::applicationDirPath(),
+		tr("压缩文件(*.zip);;All Files (*)"),
+		&selectedFilter);
+	qDebug() << selectedFilter.toStdWString();
+	if (strFileName.isEmpty())
+	{
+		return;
+	}
+	vector<wstring> vecFiles;
+	for (auto var : ItemList)
+	{
+		if (var->column() != logTable_FileName)
+			continue;
+		vecFiles.push_back(var->data(Qt::UserRole).toString().toStdWString());
+	}
+	QWaitCursor Wait;
+	QString str7ZLib = QCoreApplication::applicationDirPath() + "/7z.dll";
+	Bit7zLibrary lib7z{ str7ZLib.toStdWString() };
+	BitCompressor compressor{ lib7z, BitFormat::Zip };
+	compressor.compress(vecFiles, strFileName.toStdWString());
 }
 
 void logManager::on_pushButton_Del_clicked()
 {
-    QList<QTableWidgetItem*> ItemList = ui->tableWidget->selectedItems();
-    if (!ItemList.size())
-    {
-        QMessageBox_CN(QMessageBox::Information, "提示", "尚未选中需要删除的日志文件!", QMessageBox::Ok, this);
-        return ;
-    }
+	QList<QTableWidgetItem*> ItemList = ui->tableWidget->selectedItems();
+	if (!ItemList.size())
+	{
+		QMessageBox_CN(QMessageBox::Information, "提示", "尚未选中需要删除的日志文件!", QMessageBox::Ok, this);
+		return;
+	}
 
-    if (QMessageBox_CN(QMessageBox::Information, "提示", "是否删除所选日志,删除后将无法恢复,是否继续?", QMessageBox::Yes|QMessageBox::No, this) == QMessageBox::No)
-        return ;
-    QWaitCursor Wait;
-    vector<int>vecRows;
-    for (auto var:ItemList)
-    {
-        if (var->column() != logTable_FileName)
-            continue;
-        QFile file2Del(var->data(Qt::UserRole).toString());
-        file2Del.remove();
-        vecRows.push_back(var->row());
-    }
-    for (auto it = vecRows.rbegin();it != vecRows.rend();it ++)
-        ui->tableWidget->removeRow(*it);
-    // 调整序号
-    int nRows = ui->tableWidget->rowCount();
-    for (int i = 0;i < nRows;i ++)
-    {
-        QTableWidgetItem *pItem = ui->tableWidget->item(i,logTable_No);
-        pItem->setText(QString("%1").arg(i + 1));
-    }
+	if (QMessageBox_CN(QMessageBox::Information, "提示", "是否删除所选日志,删除后将无法恢复,是否继续?", QMessageBox::Yes | QMessageBox::No, this) == QMessageBox::No)
+		return;
+	QWaitCursor Wait;
+	vector<int>vecRows;
+	for (auto var : ItemList)
+	{
+		if (var->column() != logTable_FileName)
+			continue;
+		QFile file2Del(var->data(Qt::UserRole).toString());
+		file2Del.remove();
+		vecRows.push_back(var->row());
+	}
+	for (auto it = vecRows.rbegin(); it != vecRows.rend(); it++)
+		ui->tableWidget->removeRow(*it);
+	// 调整序号
+	int nRows = ui->tableWidget->rowCount();
+	for (int i = 0; i < nRows; i++)
+	{
+		QTableWidgetItem* pItem = ui->tableWidget->item(i, logTable_No);
+		pItem->setText(QString("%1").arg(i + 1));
+	}
 }

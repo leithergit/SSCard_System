@@ -25,7 +25,8 @@ enum PageOperation
 	Return_MainPage,
 	Stay_CurrentPage,
 	Switch_NextPage,
-	Skip_NextPage
+	Skip_NextPage,
+	Retry_CurrentPage=1024
 };
 extern const char* g_szPageOperation[4];
 
@@ -58,7 +59,7 @@ public:
 			m_strStepImage = QString("border-image: url(%1);").arg(strFullImagePath);;
 		}
 	}
-	~QStackPage()
+	virtual ~QStackPage()
 	{
 		m_bWorkThreadRunning = false;
 		if (m_pWorkThread && m_pWorkThread->joinable())
@@ -81,15 +82,12 @@ public:
 		}
 	}
 
-	virtual void DisActiveTitle()
+	/*virtual void DisActiveTitle()
 	{
 		ShutDown();
-	}
+	}*/
 
-	virtual void    ShutDown()
-	{
-		return;
-	}
+	virtual void  ShutDown() = 0;
 	QString m_strStepImage;
 	QLabel* m_pTitle = nullptr;
 	int     m_nTimeout = 0;
@@ -120,6 +118,7 @@ public slots:
 signals:
 	void InputPin(unsigned char ch);
 	void SwitchNextPage(int nOperation);
+	//	void RetryCurrentPage(QStackPage* pCurrentPage);
 	void SwitchPage(int nPage);
 	void ErrorMessage(QString strMessage);
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);

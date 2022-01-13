@@ -62,6 +62,10 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 
 int GetIDImageStorePath(string& strFilePath);
 
-int LoadTestData(QString& strName, QString& strCardID, QString& strMobile);
+int LoadTestData(string& strName, string& strCardID, string& strMobile);
+
+int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile);
+
+int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64);
 
 #endif // PAYMENT_H

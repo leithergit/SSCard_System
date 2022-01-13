@@ -171,6 +171,15 @@
     <ClCompile Include="Sys_qwidgetreadidcard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WMIQuery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="license.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showlicense.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -293,6 +302,12 @@
     <QtMoc Include="updatepassword.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <ClInclude Include="WMIQuery.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="license.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -396,6 +411,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Sys_qwidgetreadidcard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="showlicense.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -548,6 +566,9 @@
   <ItemGroup>
     <QtMoc Include="Sys_qwidgetreadidcard.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="showlicense.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

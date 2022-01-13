@@ -35,6 +35,7 @@ public:
 	UpdatePassword* m_pUpdatePassword = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
 	MaskWidget* m_pMaskWindow = nullptr;
+	QMainStackPage* pLastStackPage = nullptr;
 	high_resolution_clock::time_point	m_tLastPress = high_resolution_clock::now();
 	int		m_nContinuePressCount = 0;
 
@@ -68,6 +69,7 @@ signals:
 private slots:
 	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);
 	void On_MaskWidgetTimeout(int nOperation);
+	void On_MaskWidgetEnsure(int nOperation, int nStatus);
 	void on_Shutdown();
 
 private:

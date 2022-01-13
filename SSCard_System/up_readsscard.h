@@ -20,13 +20,14 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	void    ThreadWork();
-	int OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
-	void CloseReader();
-	KT_ReaderLibPtr	m_pReaderLib = nullptr;
-	KT_Reader* m_pReader = nullptr;
+	//int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
+	//void CloseSSCardReader();
+	//KT_ReaderLibPtr	m_pReaderLib = nullptr;
+	//KT_Reader* m_pSSCardReader = nullptr;
+	virtual void ShutDown() override;
 
-	std::thread* pThreadReaderSSCard = nullptr;
-	bool bThreadReaderSSCard = false;
+	//std::thread* pThreadReaderSSCard = nullptr;
+	//bool bThreadReaderSSCard = false;
 private:
 	Ui::ReadSSCard* ui;
 

@@ -338,10 +338,42 @@ color: 0
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="pushButton_PrinterTest">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>0</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>打印测试</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_MakePhoto">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>生成照片</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="pushButton_BrowsePrinterModule">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>150</width>
                 <height>60</height>
                </size>
               </property>
@@ -351,15 +383,51 @@ color: 0
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_PrinterTest">
+             <widget class="QComboBox" name="comboBox_PrinterTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>120</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>65535</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>进卡</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>出卡</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>回收</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>打印</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_Excute">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
                 <height>60</height>
                </size>
               </property>
               <property name="text">
-               <string>打印测试</string>
+               <string>测试</string>
               </property>
              </widget>
             </item>

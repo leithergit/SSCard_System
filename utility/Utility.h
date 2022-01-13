@@ -112,8 +112,8 @@ int Hex2AscStringA(IN unsigned char* pHex, IN int nHexLen, OUT CHAR* szAscString
 // nBuffLen			输出缓冲区最大长度
 // 返回值			<0时 输入参数不合法
 //					>0 返回转换后pHex数据的长度
-int AscString2HexW(IN WCHAR* szAscString, IN int nAscStringLen, unsigned char* pHex, IN int nBuffLen, WCHAR chSeperator = L' ');
-int AscString2HexA(IN CHAR* szAscString, IN int nAscStringLen, unsigned char* pHex, IN int nBuffLen, CHAR chSeperator = ' ');
+int AscString2HexW(IN const WCHAR* szAscString, IN int nAscStringLen, unsigned char* pHex, IN int nBuffLen, WCHAR chSeperator = L' ');
+int AscString2HexA(IN const CHAR* szAscString, IN int nAscStringLen, unsigned char* pHex, IN int nBuffLen, CHAR chSeperator = ' ');
 
 
 // 取指定参数的一个字节

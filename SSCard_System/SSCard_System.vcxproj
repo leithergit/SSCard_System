@@ -78,7 +78,7 @@
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;release;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;./openssl-1.0.1g/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -146,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -166,7 +166,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;../openssl-1.0.1g/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -211,9 +211,11 @@ copy /y $(TargetPath) z:\</Command>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="Gloabal.cpp" />
+    <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
+    <ClCompile Include="showlicense.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
     <ClCompile Include="Sys_cardmanger.cpp" />
     <ClCompile Include="Sys_dialogcameratest.cpp" />
@@ -247,9 +249,12 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="up_readsscard.cpp" />
     <ClCompile Include="updatecard.cpp" />
     <ClCompile Include="updatepassword.cpp" />
+    <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h" />
+    <QtMoc Include="showlicense.h" />
+    <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
     </QtMoc>
@@ -257,6 +262,7 @@ copy /y $(TargetPath) z:\</Command>
     </QtMoc>
     <ClInclude Include="DevBase.h" />
     <ClInclude Include="Gloabal.h" />
+    <ClInclude Include="license.h" />
     <ClInclude Include="SDK\KT_Define.h" />
     <QtMoc Include="MaskWidget.h">
     </QtMoc>
@@ -351,6 +357,7 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
+    <QtUic Include="showlicense.ui" />
     <QtUic Include="Sys_DeviceManager.ui">
     </QtUic>
     <QtUic Include="Sys_cardmanger.ui">

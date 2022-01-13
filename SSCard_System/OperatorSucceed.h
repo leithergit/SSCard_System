@@ -15,6 +15,10 @@ public:
 	explicit OperatorSucceed(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~OperatorSucceed();
 	virtual void OnTimeout() override;
+	virtual void ShutDown() override
+	{
+		gInfo() << __FUNCTION__;
+	}
 private:
 	Ui::OperatorSucceed* ui;
 };

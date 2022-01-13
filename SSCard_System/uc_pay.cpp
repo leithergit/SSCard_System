@@ -23,7 +23,7 @@ uc_Pay::uc_Pay(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget*
 
 uc_Pay::~uc_Pay()
 {
-	ShutDownDevice();
+	ShutDown();
 	delete ui;
 }
 
@@ -92,14 +92,17 @@ int uc_Pay::ProcessBussiness()
 	}
 	}
 
-	m_bWorkThreadRunning = true;
-	m_pWorkThread = new std::thread(&uc_Pay::ThreadWork, this);
 	if (!m_pWorkThread)
 	{
-		QString strError = QString("内存不足,创建支付查询线程失败!");
-		gError() << strError.toLocal8Bit().data();
-		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-		return -1;
+		m_bWorkThreadRunning = true;
+		m_pWorkThread = new std::thread(&uc_Pay::ThreadWork, this);
+		if (!m_pWorkThread)
+		{
+			QString strError = QString("内存不足,创建支付查询线程失败!");
+			gError() << strError.toLocal8Bit().data();
+			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+			return -1;
+		}
 	}
 
 	return 0;
@@ -122,7 +125,7 @@ int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QString& strPayCode, QImage
 	}
 	else
 	{
-		strMessage = QString("查询支付结果失败:%1").arg(strMessage);
+		strMessage = QString("查询支付二维码失败:%1").arg(strMessage);
 		return -1;
 	}
 }
@@ -154,9 +157,9 @@ void uc_Pay::ThreadWork()
 	QString strMessage;
 	QString strPayUrl;
 	SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-	int nDelay = pSysConfig->nPageTimeout[Page_Payment];
-	if (g_pDataCenter->bDebug)
-		nDelay = 20000;
+	//int nDelay = pSysConfig->nPageTimeout[Page_Payment];
+	/*if (g_pDataCenter->bDebug)
+		nDelay = 20000;*/
 	auto tStart = high_resolution_clock::now();
 
 	PayResult nPayResult = PayResult::WaitforPay;
@@ -170,16 +173,17 @@ void uc_Pay::ThreadWork()
 				break;
 			continue;
 		}
-		if (g_pDataCenter->bDebug)
-		{
-#pragma Warning("未支付也将流程继续进行，即作演示用!")
-			auto tDelay = duration_cast<milliseconds>(high_resolution_clock::now() - tStart);
-			if (tDelay.count() >= nDelay)
-				nPayResult = PayResult::PaySucceed;
-		}
+		//		if (g_pDataCenter->bDebug)
+		//		{
+		//#pragma Warning("未支付也将流程继续进行，即作演示用!")
+		//			auto tDelay = duration_cast<milliseconds>(high_resolution_clock::now() - tStart);
+		//			if (tDelay.count() >= nDelay)
+		//				nPayResult = PayResult::PaySucceed;
+		//		}
 
 		if (nPayResult == PayResult::PaySucceed)
 			break;
+
 		if (!Delay(m_bWorkThreadRunning, pSysConfig->PaymentConfig.nQueryPayResultInterval))
 			break;
 	}
@@ -191,7 +195,7 @@ void uc_Pay::ThreadWork()
 	}
 	if (nPayResult == PayResult::PaySucceed)
 	{
-		strMessage = "费用已支付,现将进入制卡流程!";
+		strMessage = "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
 		emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
 	}
 	else
@@ -250,16 +254,5 @@ int  uc_Pay::GetQRCodeStorePath(QString& strFilePath)
 
 void uc_Pay::OnTimeout()
 {
-	ShutDownDevice();
-}
-
-void uc_Pay::ShutDownDevice()
-{
-	m_bWorkThreadRunning = false;
-	if (m_pWorkThread && m_pWorkThread->joinable())
-	{
-		m_pWorkThread->join();
-		delete m_pWorkThread;
-		m_pWorkThread = nullptr;
-	}
+	ShutDown();
 }

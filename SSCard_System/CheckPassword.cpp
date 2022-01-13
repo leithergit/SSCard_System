@@ -1,6 +1,7 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "CheckPassword.h"
 #include "Gloabal.h"
+#include <DevBase.h>
 
 CheckPassword::CheckPassword(QWidget* parent)
 	: QDialog(parent)

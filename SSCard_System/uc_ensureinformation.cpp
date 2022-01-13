@@ -16,6 +16,7 @@ uc_EnsureInformation::uc_EnsureInformation(QLabel* pTitle, QString strStepImage,
 
 uc_EnsureInformation::~uc_EnsureInformation()
 {
+	ShutDown();
 	delete ui;
 }
 
@@ -35,10 +36,12 @@ int uc_EnsureInformation::ProcessBussiness()
 	{
 		if (g_pDataCenter->bDebug)
 		{
-			QString strCardID, strName, strMobile;
-			LoadTestData(strName, strCardID, strMobile);
-			strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
-			strcpy((char*)pIDCard->szIdentify, strCardID.toStdString().c_str());
+			string strCardID, strName, strMobile;
+			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
+			{
+				strcpy((char*)pIDCard->szName, strName.c_str());
+				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
+			}
 		}
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
@@ -51,24 +54,9 @@ int uc_EnsureInformation::ProcessBussiness()
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
-		//#ifdef _DEBUG
-		//#pragma Warning("测试阶段使用测试人员身份信息")
-		//		QString strName, strID, strMobile;
-		//		if (QSucceed(LoadTestData(strName, strID, strMobile)))
-		//		{
-		//
-		//			gInfo() << "Succeed in load Test Card Data:" << gQStr(strName) << gQStr(strID) << gQStr(strMobile);
-		//			strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
-		//			strcpy((char*)pSSCardInfo->strName, strName.toLocal8Bit().data());
-		//			strcpy((char*)pIDCard->szIdentify, strID.toStdString().c_str());
-		//			strcpy((char*)pSSCardInfo->strCardID, strID.toStdString().c_str());
-		//			strcpy((char*)pSSCardInfo->strMobile, strMobile.toStdString().c_str());
-		//		}
-		//#endif
 		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
 		strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
-
 
 		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
 		{
@@ -124,6 +112,7 @@ int uc_EnsureInformation::ProcessBussiness()
 	{
 		gError() << gQStr(strMessage);
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return nResult;
 	}
 	QString strCardStatus = pSSCardInfo->strCardStatus;
 	switch (m_nPageIndex)
@@ -147,16 +136,21 @@ int uc_EnsureInformation::ProcessBussiness()
 			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
 			emit SwitchNextPage(nOperation);
 		}
+		break;
 	}
 	case Page_RegisterLost:
 	{
+		//ui->pushButton_OK->setEnabled(true);
 		if (strCardStatus == "正式挂失")
 		{
+			ui->label_Ensure->setText("是否确定解除挂失?");
 			ui->pushButton_OK->setText("解除挂失");
 			m_bRegisterLost = false;
 		}
 		else if (strCardStatus == "正常")
 		{
+			ui->label_Ensure->setText("是否确定挂失并补换卡?");
+			ui->pushButton_OK->setText("挂失");
 			m_bRegisterLost = true;
 		}
 		else

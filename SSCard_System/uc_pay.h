@@ -18,7 +18,6 @@ public:
 	~uc_Pay();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-	void    ShutDownDevice();
 	int     Pay(QString& strError);
 	void    ThreadWork();
 	int     uc_ReqestPaymentQR(QString& strMessage, QString& strPayCode, QImage& Image);
@@ -35,6 +34,17 @@ public:
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
 	int     m_nSocketFailedCount = 0;
 	int     m_nPayStatus = Pay_Not;
+	virtual void ShutDown() override
+	{
+		gInfo() << __FUNCTION__;
+		m_bWorkThreadRunning = false;
+		if (m_pWorkThread && m_pWorkThread->joinable())
+		{
+			m_pWorkThread->join();
+			delete m_pWorkThread;
+			m_pWorkThread = nullptr;
+		}
+	}
 private:
 	Ui::Pay* ui;
 };

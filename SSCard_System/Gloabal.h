@@ -42,6 +42,8 @@
 #include <QCheckBox>
 #include <QBrush>
 #include <QHBoxLayout>
+#include <QDirIterator>
+#include "DevBase.h"
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
@@ -78,6 +80,18 @@ using namespace bit7z;
 extern const char* szPrinterTypeList[PRINTER_MAX];
 extern const char* szReaderTypeList[READER_MAX + 1];
 extern QScreen* g_pCurScreen;
+
+using KT_PrinterLibPtr = shared_ptr<KTModule<KT_Printer>>;
+using KT_ReaderLibPtr = shared_ptr<KTModule<KT_Reader>>;
+
+string UTF8_GBK(const char* strUtf8);
+string GBK_UTF8(const char* strGBK);
+
+enum ReaderSide
+{
+	ReaderInPrinter = 0,
+	ReaderDesktop
+};
 
 enum FaceDetectStatus
 {
@@ -129,6 +143,9 @@ struct DeviceConfig
 		if (!pSettings)
 			return;
 		Load(pSettings);
+	}
+	~DeviceConfig()
+	{
 	}
 	bool Load(QSettings* pSettings)
 	{
@@ -353,6 +370,11 @@ struct DeviceConfig
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
 
 	string		strTerminalCode;					   // 终端唯一识别码
+public:
+
+private:
+
+
 };
 
 struct RegionInfo
@@ -391,6 +413,7 @@ struct RegionInfo
 		strSSCardDefaulutPin = pSettings->value("SSCardDefaulutPin", "").toString().toStdString();
 		strPrimaryKey = pSettings->value("PrimaryKey", "").toString().toStdString();
 		strBankCode = pSettings->value("BankCode", "").toString().toStdString();
+		nProvinceCode = (SSCardProvince)pSettings->value("ProvinceCode").toInt();
 		pSettings->endGroup();
 		return true;
 	}
@@ -445,6 +468,7 @@ struct RegionInfo
 	string		strPrimaryKey;							// 主控密钥
 	string		strBankCode;							// 银行代码
 	string		strCardVendor;							// 所属卡商
+	SSCardProvince	nProvinceCode;						// 省市代码
 };
 
 struct TextPosition
@@ -566,6 +590,7 @@ struct PaymentOpt
 	string  strAmount;
 	string  strPayResultUrl;
 };
+
 struct SysConfig
 {
 	SysConfig(QSettings* pSettings)
@@ -739,6 +764,7 @@ struct SysConfig
 	bool			bDebug = false;
 	std::map<string, string> strMapBank;
 };
+
 using SysConfigPtr = shared_ptr<SysConfig>;
 
 // struct SSCardInfo
@@ -757,6 +783,7 @@ using SysConfigPtr = shared_ptr<SysConfig>;
 // 	}
 // };
 using SSCardInfoPtr = shared_ptr<SSCardInfo>;
+
 using IDCardInfoPtr = shared_ptr<IDCardInfo>;
 
 class DataCenter
@@ -777,7 +804,7 @@ public:
 
 	SysConfigPtr& GetSysConfigure()
 	{
-		return pConfig;
+		return pSysConfig;
 	}
 	int LoadCardForm(QString& strError);
 	CardFormPtr& GetCardForm()
@@ -815,8 +842,8 @@ public:
 
 	int GetBankName(string strBankCode, string& strBankName)
 	{
-		auto itFind = pConfig->strMapBank.find(strBankCode);
-		if (itFind != pConfig->strMapBank.end())
+		auto itFind = pSysConfig->strMapBank.find(strBankCode);
+		if (itFind != pSysConfig->strMapBank.end())
 		{
 			strBankName = itFind->second;
 			return 0;
@@ -857,11 +884,50 @@ public:
 	string		   strCardMakeProgress;
 	string		   strPayCode;
 	bool		   bDebug;
+public:
+	int OpenDevice(QString& strMessage);
+
+	int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
+
+	void CloseDevice();
+
+	int OpenPrinter(QString& strMessage);
+
+	int OpenSSCardReader(QString& strMessage);
+
+	int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage);
+
+	int TestPrinter(QString& strMessage);
+
+	int Depense(QString& strMessage);
+
+	int Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage);
+
+	string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
+
+	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
+
+	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+
+	int MoveCard(QString& strMessage);
+
+	KT_Reader* GetSSCardReader()
+	{
+		return m_pSSCardReader;
+	}
+	KT_Printer* GetPrinter()
+	{
+		return m_pPrinter;
+	}
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
-	SysConfigPtr	pConfig = nullptr;
+	SysConfigPtr	pSysConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardInfoPtr   pSSCardInfo = nullptr;
+	KT_PrinterLibPtr	m_pPrinterlib = nullptr;
+	KT_ReaderLibPtr	m_pSSCardReaderLib = nullptr;
+	KT_Printer* m_pPrinter = nullptr;
+	KT_Reader* m_pSSCardReader = nullptr;
 	Manager_Level	nManagerLevel = Manager_Level::Manager;
 };
 
@@ -918,9 +984,10 @@ public:
 	~QWaitCursor();
 };
 
-string UTF8_GBK(const char* strUtf8);
-string GBK_UTF8(const char* strGBK);
+
 void SetTableWidgetItemChecked(QTableWidget* pTableWidget, int nRow, int nCol, QButtonGroup* pButtonGrp, int nItemID, bool bChecked = false);
+
+QStringList SearchFiles(const QString& dir_path, QDateTime* pStart = nullptr, QDateTime* pStop = nullptr);
 #define WaitCursor()  QWaitCursor qWait;
 
 #endif // GLOABAL_H

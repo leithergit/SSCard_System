@@ -15,6 +15,7 @@ uc_InputMobile::uc_InputMobile(QLabel* pTitle, QString strStepImage, Page_Index 
 
 uc_InputMobile::~uc_InputMobile()
 {
+	ShutDown();
 	delete ui;
 }
 
@@ -150,6 +151,8 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 	if (m_strMobile.size() == m_nMobilePhoneSize)
 	{
 		g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
+		SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+		strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
 		QString strMessage;
 		/*int nResult = 0;
 		if (QFailed(QueryPayResult(strMessage, nResult)))

@@ -31,10 +31,10 @@ public:
 	ushort  m_nBaudreate = 9600;
 	QPinKeybroadPtr m_pPinKeybroad = nullptr;
 	int     CheckPassword(QString& strError);
-	int		OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
-	void	CloseReader();
-	KT_ReaderLibPtr	m_pReaderLib = nullptr;
-	KT_Reader* m_pReader = nullptr;
+	//int		OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
+	//void	CloseSSCardReader();
+	//KT_ReaderLibPtr	m_pReaderLib = nullptr;
+	//KT_Reader* m_pSSCardReader = nullptr;
 
 private slots:
 	void OnInputPin(unsigned char ch);

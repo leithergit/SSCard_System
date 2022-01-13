@@ -180,6 +180,7 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 	// http://ip:port/paymentbusiness/pollForPayResult?payCode=code
 	PaymentOpt& PayOption = g_pDataCenter->GetSysConfigure()->PaymentConfig;
 	//std::string szUrl = "http://10.126.131.203:8080/paymentbusiness/getPayCode?payerName=胡杰&payerTel=13637281234&payerCard=410700199907110037&amount=16";
+	// http://10.125.40.244:8080/paymentbusiness/pollForPayResult?payCode=4100002110005553036m
 	std::string strUrl = "http://";
 	strUrl += PayOption.strHost;				strUrl += ":";
 	strUrl += PayOption.strPort;				strUrl += "/";
@@ -211,6 +212,7 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 		}
 		nStatus = (PayResult)rootObject.value("code").toInt();
 		strMessage = rootObject.value("msg").toString();
+		nStatus = (PayResult)strMessage.toInt();
 		gInfo() << "code=" << (int)nStatus << gQStr(strMessage);
 		return 0;
 	}
@@ -422,6 +424,7 @@ int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	CardIni.endGroup();
 	return 0;
 }
+
 int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 	QFileInfo fi(strINIFile);
@@ -512,6 +515,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 // nStatus 返回0为成功，其它都为失败
 int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
+	bool bLoaded = false;
 	QString strAppPath = QCoreApplication::applicationDirPath();
 	strAppPath += "/Debug";
 	QFileInfo fdir(strAppPath);
@@ -530,7 +534,54 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 	}
 
 	strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
-	QFileInfo ffile(strAppPath);
+	if (g_pDataCenter->bDebug)
+	{
+		QFileInfo ffile(strAppPath);
+		if (ffile.isFile())
+		{
+#pragma Warning("使用预存制卡数据")
+			SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
+			LoadCardData(pSSCardTemp, strAppPath);
+			strcpy(pSSCardInfo->strPCH, pSSCardTemp->strPCH);
+			strcpy(pSSCardInfo->strCardNum, pSSCardTemp->strCardNum);		// 新的卡号
+			strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
+			strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
+			strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
+			strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
+			strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
+			pSSCardInfo->strPhoto = pSSCardTemp->strPhoto;
+			bLoaded = true;
+		}
+	}
+	if (!bLoaded)
+	{
+		char szStatus[1014] = { 0 };
+		int nResult = getCardData(*pSSCardInfo, szStatus);
+		if (QFailed(nResult))
+		{
+			strMessage = "获取三代社保卡数据失败!";
+			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
+			gInfo() << gQStr(strInfo);
+			return -1;
+		}
+
+		if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+			(szStatus[1] >= '0' && szStatus[1] <= '9'))
+		{
+			nStatus = strtolong(szStatus, 10, 2);
+			if (nStatus == 0)
+			{
+				SaveCardData(pSSCardInfo, strAppPath);
+				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+			}
+			return 0;
+		}
+		else
+		{
+			strMessage = QString::fromLocal8Bit(szStatus);
+			return -1;
+		}
+	}
 	//#ifdef _DEBUG
 	//	if (ffile.isFile())
 	//	{
@@ -588,32 +639,6 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 	//		}
 	//	}
 	//#else
-	char szStatus[1014] = { 0 };
-	int nResult = getCardData(*pSSCardInfo, szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "获取三代社保卡数据失败!";
-		QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		if (nStatus == 0)
-		{
-			SaveCardData(pSSCardInfo, strAppPath);
-			SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
-		}
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
 	//#endif
 	return 0;
 }
@@ -677,7 +702,7 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 	char szStatus[1024] = { 0 };
 	if (QFailed(nResult = getCA(Region.strCM_CA_Account.c_str(),
 		Region.strCM_CA_Password.c_str(),
-		Region.strCountry.c_str(),
+		Region.strCityCode.c_str(),
 		pSSCardInfo->strCardID,
 		pSSCardInfo->strCardNum,
 		QMGY,
@@ -731,7 +756,7 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 	}
 }
 
-int LoadTestData(QString& strName, QString& strCardID, QString& strMobile)
+int LoadTestData(string& strName, string& strCardID, string& strMobile)
 {
 	if (g_pDataCenter->bDebug)
 	{
@@ -740,10 +765,34 @@ int LoadTestData(QString& strName, QString& strCardID, QString& strMobile)
 		QFileInfo fi(strAppPath);
 		if (!fi.isFile())
 			return -1;
+		QSettings PersonSetting(strAppPath, QSettings::IniFormat);
+		PersonSetting.beginGroup("Person");
+		strName = UTF8_GBK(PersonSetting.value("Name").toString().toStdString().c_str());
+		strCardID = UTF8_GBK(PersonSetting.value("CardID").toString().toStdString().c_str());
+		strMobile = UTF8_GBK(PersonSetting.value("Mobile").toString().toStdString().c_str());
+		PersonSetting.endGroup();
 
-		strName = "高香慧";
-		strCardID = "411421199107250045";
-		strMobile = "18017348763";
+		//strName = "周广恩";
+		//strCardID = "41232319830716003X";
+		//strMobile = "18088888888";
+
+		//strName = "任自力";
+		//strCardID = "412701196909143530";
+		//strMobile = "13838678266";
+		gInfo() << "Name = " << strName << "\tCardID = " << strCardID << "\tMobile = " << strMobile;
+		TraceMsgA("Name = %s\tCardID = %s\tMobile = %s.\n", strName.c_str(), strCardID.c_str(), strMobile.c_str());
+		//FILE* fp = fopen("info.txt", "wb");
+		//fwrite(strName.c_str(), strName.size(), 1, fp);
+		//fwrite("\r\n", 2, 1, fp);
+
+		//fwrite(strCardID.c_str(), strCardID.size(), 1, fp);
+		//fwrite("\r\n", 2, 1, fp);
+
+		//fwrite(strMobile.c_str(), strMobile.size(), 1, fp);
+		//fwrite("\r\n", 2, 1, fp);
+		//fclose(fp);
+
+
 	}
 
 	/*QSettings CardTest(strAppPath);
@@ -757,7 +806,7 @@ int LoadTestData(QString& strName, QString& strCardID, QString& strMobile)
 
 	strCardID = CardTest.value("CardID").toString();
 	strMobile = CardTest.value("Mobile").toString();
-	qDebug() << "Name = " << strName << "CardID = " << strCardID << "Mobile = " << strMobile;
+
 	CardTest.endGroup();*/
 	return 0;
 }

@@ -19,7 +19,7 @@ RegisterLost::RegisterLost(QWidget* parent) :
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard));
+		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard, ReadID_RegisterLost));
 		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "Registerlost2.png", Page_RegisterLost));
 		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < m_pStackWidget->count(); i++)
@@ -38,6 +38,11 @@ RegisterLost::RegisterLost(QWidget* parent) :
 RegisterLost::~RegisterLost()
 {
 	delete ui;
+}
+
+void  RegisterLost::SetTimeOut(int nTimeout)
+{
+	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
 }
 
 void RegisterLost::OnTimerEvent()

@@ -21,6 +21,10 @@ public:
 	virtual void OnTimeout() override;
 	QString  m_strMobile = "";
 	int      m_nMobilePhoneSize = 11;
+	virtual void ShutDown() override
+	{
+		gInfo() << __FUNCTION__;
+	}
 private slots:
 	void on_pushButton_0_clicked();
 	void on_pushButton_1_clicked();

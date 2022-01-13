@@ -27,6 +27,7 @@ public:
 	bool   m_bOuputProductInfo = false;
 	int    GetFaceCaptureStorePath(QString& strFilePath);
 	bool   m_bFaceDetectSucceed = false;
+	bool   m_bDetectionStart = false;
 
 signals:
 	void   FaceCaptureSucceed();

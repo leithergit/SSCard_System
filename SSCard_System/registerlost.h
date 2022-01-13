@@ -25,6 +25,7 @@ public:
 	~RegisterLost();
 
 	virtual void OnTimerEvent() override;
+	virtual void  SetTimeOut(int nTimeout) override;
 private slots:
 
 

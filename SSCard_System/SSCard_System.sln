@@ -27,6 +27,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtGlogSample", "..\QtGlogSa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glogLibSample", "..\glogLibSample\glogLibSample.vcxproj", "{AFE9BCDF-B2A4-4667-B4CA-2CB05BB53F9D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IDCard_API", "..\IDCard_API\IDCard_API.vcxproj", "{33AB2C65-02D7-3B31-9290-E148CCA8499F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KingaoLicense", "..\KingaoLicense\KingaoLicense.vcxproj", "{6DDAF258-CE44-33B2-BE1A-EF97309158D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -119,6 +123,18 @@ Global
 		{AFE9BCDF-B2A4-4667-B4CA-2CB05BB53F9D}.Release|x64.Build.0 = Release|x64
 		{AFE9BCDF-B2A4-4667-B4CA-2CB05BB53F9D}.Release|x86.ActiveCfg = Release|Win32
 		{AFE9BCDF-B2A4-4667-B4CA-2CB05BB53F9D}.Release|x86.Build.0 = Release|Win32
+		{33AB2C65-02D7-3B31-9290-E148CCA8499F}.Debug|x64.ActiveCfg = Debug|Win32
+		{33AB2C65-02D7-3B31-9290-E148CCA8499F}.Debug|x86.ActiveCfg = Debug|Win32
+		{33AB2C65-02D7-3B31-9290-E148CCA8499F}.Debug|x86.Build.0 = Debug|Win32
+		{33AB2C65-02D7-3B31-9290-E148CCA8499F}.Release|x64.ActiveCfg = Release|Win32
+		{33AB2C65-02D7-3B31-9290-E148CCA8499F}.Release|x86.ActiveCfg = Release|Win32
+		{33AB2C65-02D7-3B31-9290-E148CCA8499F}.Release|x86.Build.0 = Release|Win32
+		{6DDAF258-CE44-33B2-BE1A-EF97309158D0}.Debug|x64.ActiveCfg = Debug|Win32
+		{6DDAF258-CE44-33B2-BE1A-EF97309158D0}.Debug|x86.ActiveCfg = Debug|Win32
+		{6DDAF258-CE44-33B2-BE1A-EF97309158D0}.Debug|x86.Build.0 = Debug|Win32
+		{6DDAF258-CE44-33B2-BE1A-EF97309158D0}.Release|x64.ActiveCfg = Release|Win32
+		{6DDAF258-CE44-33B2-BE1A-EF97309158D0}.Release|x86.ActiveCfg = Release|Win32
+		{6DDAF258-CE44-33B2-BE1A-EF97309158D0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

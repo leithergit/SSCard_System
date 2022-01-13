@@ -36,14 +36,18 @@ SOURCES += \
     Sys_qwidgetreadidcard.cpp \
     Sys_regionconfigure.cpp \
     SystemManager.cpp \
+    WMIQuery.cpp \
     imageviewlabel.cpp \
+    license.cpp \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
+    openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
     registerlost.cpp \
+    showlicense.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -77,13 +81,91 @@ HEADERS += \
     Sys_qwidgetreadidcard.h \
     Sys_regionconfigure.h \
     SystemManager.h \
+    WMIQuery.h \
     imageviewlabel.h \
+    license.h \
     mainpage.h \
     mainwindow.h \
+    openssl-1.0.1g/include/openssl/aes.h \
+    openssl-1.0.1g/include/openssl/asn1.h \
+    openssl-1.0.1g/include/openssl/asn1_mac.h \
+    openssl-1.0.1g/include/openssl/asn1t.h \
+    openssl-1.0.1g/include/openssl/bio.h \
+    openssl-1.0.1g/include/openssl/blowfish.h \
+    openssl-1.0.1g/include/openssl/bn.h \
+    openssl-1.0.1g/include/openssl/buffer.h \
+    openssl-1.0.1g/include/openssl/camellia.h \
+    openssl-1.0.1g/include/openssl/cast.h \
+    openssl-1.0.1g/include/openssl/cmac.h \
+    openssl-1.0.1g/include/openssl/cms.h \
+    openssl-1.0.1g/include/openssl/comp.h \
+    openssl-1.0.1g/include/openssl/conf.h \
+    openssl-1.0.1g/include/openssl/conf_api.h \
+    openssl-1.0.1g/include/openssl/crypto.h \
+    openssl-1.0.1g/include/openssl/des.h \
+    openssl-1.0.1g/include/openssl/des_old.h \
+    openssl-1.0.1g/include/openssl/dh.h \
+    openssl-1.0.1g/include/openssl/dsa.h \
+    openssl-1.0.1g/include/openssl/dso.h \
+    openssl-1.0.1g/include/openssl/dtls1.h \
+    openssl-1.0.1g/include/openssl/e_os2.h \
+    openssl-1.0.1g/include/openssl/ebcdic.h \
+    openssl-1.0.1g/include/openssl/ec.h \
+    openssl-1.0.1g/include/openssl/ecdh.h \
+    openssl-1.0.1g/include/openssl/ecdsa.h \
+    openssl-1.0.1g/include/openssl/engine.h \
+    openssl-1.0.1g/include/openssl/err.h \
+    openssl-1.0.1g/include/openssl/evp.h \
+    openssl-1.0.1g/include/openssl/hmac.h \
+    openssl-1.0.1g/include/openssl/idea.h \
+    openssl-1.0.1g/include/openssl/krb5_asn.h \
+    openssl-1.0.1g/include/openssl/kssl.h \
+    openssl-1.0.1g/include/openssl/lhash.h \
+    openssl-1.0.1g/include/openssl/md4.h \
+    openssl-1.0.1g/include/openssl/md5.h \
+    openssl-1.0.1g/include/openssl/mdc2.h \
+    openssl-1.0.1g/include/openssl/modes.h \
+    openssl-1.0.1g/include/openssl/obj_mac.h \
+    openssl-1.0.1g/include/openssl/objects.h \
+    openssl-1.0.1g/include/openssl/ocsp.h \
+    openssl-1.0.1g/include/openssl/opensslconf.h \
+    openssl-1.0.1g/include/openssl/opensslv.h \
+    openssl-1.0.1g/include/openssl/ossl_typ.h \
+    openssl-1.0.1g/include/openssl/pem.h \
+    openssl-1.0.1g/include/openssl/pem2.h \
+    openssl-1.0.1g/include/openssl/pkcs12.h \
+    openssl-1.0.1g/include/openssl/pkcs7.h \
+    openssl-1.0.1g/include/openssl/pqueue.h \
+    openssl-1.0.1g/include/openssl/rand.h \
+    openssl-1.0.1g/include/openssl/rc2.h \
+    openssl-1.0.1g/include/openssl/rc4.h \
+    openssl-1.0.1g/include/openssl/ripemd.h \
+    openssl-1.0.1g/include/openssl/rsa.h \
+    openssl-1.0.1g/include/openssl/safestack.h \
+    openssl-1.0.1g/include/openssl/seed.h \
+    openssl-1.0.1g/include/openssl/sha.h \
+    openssl-1.0.1g/include/openssl/srp.h \
+    openssl-1.0.1g/include/openssl/srtp.h \
+    openssl-1.0.1g/include/openssl/ssl.h \
+    openssl-1.0.1g/include/openssl/ssl2.h \
+    openssl-1.0.1g/include/openssl/ssl23.h \
+    openssl-1.0.1g/include/openssl/ssl3.h \
+    openssl-1.0.1g/include/openssl/stack.h \
+    openssl-1.0.1g/include/openssl/symhacks.h \
+    openssl-1.0.1g/include/openssl/tls1.h \
+    openssl-1.0.1g/include/openssl/ts.h \
+    openssl-1.0.1g/include/openssl/txt_db.h \
+    openssl-1.0.1g/include/openssl/ui.h \
+    openssl-1.0.1g/include/openssl/ui_compat.h \
+    openssl-1.0.1g/include/openssl/whrlpool.h \
+    openssl-1.0.1g/include/openssl/x509.h \
+    openssl-1.0.1g/include/openssl/x509_vfy.h \
+    openssl-1.0.1g/include/openssl/x509v3.h \
     qmainstackpage.h \
     qpinkeybroad.h \
     qstackpage.h \
     registerlost.h \
+    showlicense.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -115,9 +197,11 @@ FORMS += \
     Sys_qwidgetreadidcard.ui \
     Sys_regionconfigure.ui \
     SystemManager.ui \
+    license.ui \
     mainpage.ui \
     mainwindow.ui \
     registerlost.ui \
+    showlicense.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \

@@ -41,6 +41,7 @@ UpdateCard::UpdateCard(QWidget* parent) :
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
 			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
 			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
+			//connect(pPage, &QStackPage::RetryCurrentPage, this, &QMainStackPage::On_RetryCurrentPage);
 		}
 		//connect(this, &QMainStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
 		//connect(this, &QMainStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
@@ -56,6 +57,11 @@ UpdateCard::~UpdateCard()
 	delete ui;
 }
 
+void  UpdateCard::SetTimeOut(int nTimeout)
+{
+	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
+}
+
 void UpdateCard::OnTimerEvent()
 {
 	ui->label_CountDown->setText(QString("%1").arg(--m_nTimeout));
@@ -64,7 +70,7 @@ void UpdateCard::OnTimerEvent()
 	{
 		killTimer(m_nTimerID);
 		qDebug() << "KillTimer:" << m_nTimerID;
-		m_nTimerID = 0;
+		;		m_nTimerID = 0;
 		((QStackPage*)ui->stackedWidget->currentWidget())->OnTimeout();
 		((MainWindow*)m_pMainWindow)->on_pushButton_MainPage_clicked();
 	}

@@ -7,6 +7,10 @@
 #include "DevBase.h"
 
 #include "Gloabal.h"
+#include "license.h"
+#include "showlicense.h"
+#include "./Bugtrap/BugTrap.h"
+#pragma comment(lib,"./Bugtrap/BugTrapU.lib")
 extern QScreen* g_pCurScreen;
 
 DataCenterPtr g_pDataCenter;
@@ -16,10 +20,24 @@ const char* g_szPageOperation[4] =
 	Str(Stay_CurrentPage),
 	Str(Switch_NextPage),
 	Str(Skip_NextPage)
+	Str(Retry_CurrentPage)
 };
+
+static void SetupExceptionHandler()
+{
+	BT_SetAppName(L"SSCard_System");
+	BT_SetActivityType(BTA_SAVEREPORT);
+	TCHAR szReportPath[1024] = { 0 };
+	GetAppPath(szReportPath, 1024);
+	BT_SetReportFilePath(szReportPath);
+	BT_SetFlags(BTF_DETAILEDMODE | BTF_RESTARTAPP);
+	BT_InstallSehFilter();
+
+}
 
 int main(int argc, char* argv[])
 {
+	SetupExceptionHandler();
 	//qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -76,6 +94,13 @@ int main(int argc, char* argv[])
 	google::SetLogFilenameExtension(".log");
 	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
 
+	if (!CheckLocalLicense(Code_License))
+	{
+		ShowLicense s;
+		s.show();
+		return a.exec();;
+	}
+
 	curl_global_init(CURL_GLOBAL_WIN32);
 
 	g_pDataCenter = make_shared<DataCenter>();
@@ -98,7 +123,7 @@ int main(int argc, char* argv[])
 	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
 	char szOutInfo[1024] = { 0 };
 
-	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strCityCode.c_str(), szOutInfo);
+	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strCityCode.c_str(), Reg.nProvinceCode, szOutInfo);
 	MainWindow w;
 
 	auto listScreens = QApplication::screens();

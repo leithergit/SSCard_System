@@ -52,25 +52,27 @@ int up_InputPWD::ProcessBussiness()
 		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 		return -1;
 	}
-	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	QString strMessage;
-	if (QFailed(OpenReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
-	{
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-		return -1;
-	}
+	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
+	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	char szRCode[1024] = { 0 };
 	char szATR[1024] = { 0 };
 	int nATRLen = 0;
 
-	if (QFailed(m_pReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szATR, nATRLen, szRCode)))
+
+	if (QFailed(g_pDataCenter->OpenSSCardReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+
+	if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nDesktopSSCardReaderPowerOnType, szATR, nATRLen, szRCode)))
 	{
 		emit ShowMaskWidget("操作失败", "卡片上电失败!", Fetal, Return_MainPage);
 		return -1;
 	}
 
-	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	if (DriverInit((HANDLE)m_pReader, (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+	if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
 	{
 		strMessage = QString("DriverInit失败:%1").arg(szRCode);
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
@@ -97,6 +99,7 @@ void up_InputPWD::OnTimeout()
 
 void  up_InputPWD::ShutDown()
 {
+	gInfo() << __FUNCTION__;
 	m_bWorkThreadRunning = false;
 	if (m_pWorkThread && m_pWorkThread->joinable())
 	{
@@ -104,7 +107,7 @@ void  up_InputPWD::ShutDown()
 		delete m_pWorkThread;
 		m_pWorkThread = nullptr;
 	}
-	m_pPinKeybroad = nullptr;
+
 	QString strMessage;
 	if (m_pPinKeybroad)
 	{
@@ -112,78 +115,73 @@ void  up_InputPWD::ShutDown()
 		m_pPinKeybroad = nullptr;
 	}
 
-	if (m_pReader)
-	{
-		CloseReader();
-		m_pReaderLib = nullptr;
-	}
-
+	g_pDataCenter->CloseDevice();
 }
-
-int up_InputPWD::OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
-{
-	int nResult = -1;
-	try
-	{
-		m_pReaderLib = nullptr;
-		do
-		{
-			if (!m_pReaderLib)
-			{
-				char szRCode[32] = { 0 };
-				QString strAppPath = QCoreApplication::applicationDirPath();
-				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
-
-				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
-				if (!m_pReaderLib)
-				{
-					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
-					break;
-				}
-				m_pReader = m_pReaderLib->Instance();
-				if (!m_pReader)
-				{
-					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
-					break;
-				}
-				if (QFailed(nResult = m_pReader->Reader_Create(nReaderType, szRCode)))
-				{
-					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
-					break;
-				}
-				if (QFailed(nResult = m_pReader->Reader_Init(szRCode)))
-				{
-					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
-					break;
-				}
-			}
-
-		} while (0);
-		if (QFailed(nResult))
-			return -1;
-		else
-			return 0;
-	}
-	catch (std::exception& e)
-	{
-		strMessage = e.what();
-		gError() << gQStr(strMessage);
-		return -1;
-	}
-	return 0;
-}
-
-void up_InputPWD::CloseReader()
-{
-	char szRCode[32] = { 0 };
-
-	if (m_pReader)
-	{
-		m_pReader->Reader_Exit(szRCode);
-		m_pReader = nullptr;
-	}
-	m_pReaderLib = nullptr;
-}
+//
+//int up_InputPWD::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
+//{
+//	int nResult = -1;
+//	try
+//	{
+//		m_pReaderLib = nullptr;
+//		do
+//		{
+//			if (!m_pReaderLib)
+//			{
+//				char szRCode[32] = { 0 };
+//				QString strAppPath = QCoreApplication::applicationDirPath();
+//				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
+//
+//				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
+//				if (!m_pReaderLib)
+//				{
+//					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
+//					break;
+//				}
+//				m_pSSCardReader = m_pReaderLib->Instance();
+//				if (!m_pSSCardReader)
+//				{
+//					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
+//					break;
+//				}
+//				if (QFailed(nResult = m_pSSCardReader->Reader_Create(nReaderType, szRCode)))
+//				{
+//					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
+//					break;
+//				}
+//				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
+//				{
+//					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
+//					break;
+//				}
+//			}
+//
+//		} while (0);
+//		if (QFailed(nResult))
+//			return -1;
+//		else
+//			return 0;
+//	}
+//	catch (std::exception& e)
+//	{
+//		strMessage = e.what();
+//		gError() << gQStr(strMessage);
+//		return -1;
+//	}
+//	return 0;
+//}
+//
+//void up_InputPWD::CloseSSCardReader()
+//{
+//	char szRCode[32] = { 0 };
+//
+//	if (m_pSSCardReader)
+//	{
+//		m_pSSCardReader->Reader_Exit(szRCode);
+//		m_pSSCardReader = nullptr;
+//	}
+//	m_pReaderLib = nullptr;
+//}
 
 
 void up_InputPWD::OnInputPin(unsigned char ch)
@@ -263,28 +261,32 @@ void up_InputPWD::ThreadWork()
 	}
 }
 
-int  up_InputPWD::CheckPassword(QString& strError)
+int  up_InputPWD::CheckPassword(QString& strMessage)
 {
-	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	char szRCode[1024] = { 0 };
+	string strCardATR;
+	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 
 	if (QFailed(iVerifyPin(DevConfig.nDesktopSSCardReaderPowerOnType, (char*)m_szPin, szRCode)))
 	{
-		strError = "密码校验失败";
+		strMessage = "密码校验失败";
+		ui->lineEdit_OldPassword->setText("");
+		ZeroMemory(m_szPin, sizeof(m_szPin));
+		m_nPinSize = 0;
 		return -1;
 	}
 	if (strcmp(szRCode, "0000") == 0)
 	{
-		strError = "密码校验成功!";
+		strMessage = "密码校验成功!";
 		return 0;
 	}
 	else
 	{
 		int iRemainChange = strtol(szRCode, nullptr, 10);
 		if (iRemainChange == 0)
-			strError = QString("输入密码错误,卡片已锁定!").arg(iRemainChange);
+			strMessage = QString("输入密码错误,卡片已锁定!").arg(iRemainChange);
 		else
-			strError = QString("输入密码错误,剩余机会:%1").arg(iRemainChange);
+			strMessage = QString("输入密码错误,剩余机会:%1").arg(iRemainChange);
 		return -1;
 	}
 }
@@ -312,11 +314,7 @@ void up_InputPWD::on_pushButton_OK_clicked()
 		else
 		{
 			g_pDataCenter->strSSCardOldPassword = (const char*)m_szPin;
-			if (m_pReader)
-			{
-				CloseReader();
-				m_pReaderLib = nullptr;
-			}
+
 			emit ShowMaskWidget("操作成功", "密码校验成功,随后请输入新密码!", Success, Switch_NextPage);
 		}
 	}

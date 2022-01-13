@@ -10,6 +10,8 @@ class QPinKeybroad:public QObject
     Q_OBJECT
 public:
     QPinKeybroad(QString strDevPort,ushort nBaudrate = 9600,QObject *parent = nullptr);
+    ~QPinKeybroad();
+
     int     OpenDevice(QString &strError);
     int     CloseDevice(QString &strError);
     int     ReadPin(uchar *pKeyValue);

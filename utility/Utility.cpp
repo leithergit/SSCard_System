@@ -823,7 +823,7 @@ int Hex2AscStringA(IN unsigned char *pHex,IN int nHexLen,OUT CHAR *szAscString,I
 // nBuffLen			输出缓冲区最大长度
 // 返回值			<0时 输入参数不合法
 //					>0 返回转换后pHex数据的长度
-int AscString2HexW(IN WCHAR *szAscString,IN int nAscStringLen,OUT unsigned char *pHex,IN int nBuffLen,WCHAR chSeperator)
+int AscString2HexW(IN const WCHAR *szAscString,IN int nAscStringLen,OUT unsigned char *pHex,IN int nBuffLen,WCHAR chSeperator)
 {//							
     //static const wchar_t *AscTable = L"0123456789ABCDEF";
 	if (!szAscString ||
@@ -859,7 +859,7 @@ int AscString2HexW(IN WCHAR *szAscString,IN int nAscStringLen,OUT unsigned char 
 // nBuffLen			输出缓冲区最大长度
 // 返回值			<0时 输入参数不合法
 //					>0 返回转换后pHex数据的长度
-int AscString2HexA(IN CHAR *szAscString,IN int nAscStringLen,OUT unsigned char *pHex,IN int nBuffLen,CHAR chSeperator)
+int AscString2HexA(IN const CHAR *szAscString,IN int nAscStringLen,OUT unsigned char *pHex,IN int nBuffLen,CHAR chSeperator)
 {//							
     //static const CHAR *AscTable = "0123456789ABCDEF";
 	if (!szAscString ||

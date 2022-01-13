@@ -21,6 +21,7 @@ public:
 	void Popup(QString strTitle, QString strDesc, int nStatus, int nPageOpteration, int nTimeout);
 signals:
 	void MaskTimeout(int nOperationPage);
+	void MaskEnsure(int nOPerationPage, int nOperation);
 private slots:
 	void on_pushButton_OK_clicked();
 

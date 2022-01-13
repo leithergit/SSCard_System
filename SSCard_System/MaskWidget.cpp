@@ -19,7 +19,6 @@ MaskWidget::~MaskWidget()
 	delete ui;
 }
 
-
 void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPageOpteration, int nTimeout)
 {
 	gInfo() << gQStr(strTitle) << gQStr(strDesc) << gVal(nStatus) << gVal(nPageOpteration) << gVal(nTimeout);
@@ -79,8 +78,15 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
 	show();
 	setFocus();
-	m_nTimeout = nTimeout;
-	m_nTimerID = startTimer(m_nTimerInterval);
+	//ui->pushButton_OK->show();
+
+	if (nPageOpteration != Retry_CurrentPage)
+	{
+		m_nTimeout = nTimeout;
+		m_nTimerID = startTimer(m_nTimerInterval);
+
+	}
+
 	ui->label_Title->setText(strTitle);
 	ui->label_Title->setStyleSheet(strQSS);
 	ui->label_Desc->setText(strDesc);
@@ -105,4 +111,7 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 void MaskWidget::on_pushButton_OK_clicked()
 {
 	hide();
+	killTimer(m_nTimerID);
+	m_nTimerID = 0;
+	emit MaskEnsure(m_nPageOpteration, 0);
 }

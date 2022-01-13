@@ -10,12 +10,18 @@ namespace Ui {
 	class ReadIDCard;
 }
 
+enum ReadID_Type
+{
+	ReadID_UpdateCard = 0,
+	ReadID_RegisterLost = 1
+};
+
 class uc_ReadIDCard : public QStackPage
 {
 	Q_OBJECT
 
 public:
-	explicit uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
+	explicit uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, ReadID_Type nFunction = ReadID_UpdateCard, QWidget* parent = nullptr);
 	~uc_ReadIDCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
@@ -26,9 +32,10 @@ public:
 	/*    int     GetIDImageStorePath(string &strFilePath);*/
 	int     ReaderIDCard();
 	void    ThreadWork();
-	void    ShutDown() override;
+	virtual void  ShutDown() override;
 	string  m_strDevPort;
 	ushort  m_nBaudreate = 9600;
+	ReadID_Type  nReadIDType = ReadID_UpdateCard;
 
 	IDCardInfoPtr m_pIDCard = nullptr;
 private slots:

@@ -27,10 +27,10 @@ public:
 	void    ClearPassword();
 	int     CheckPassword(QString& strError);
 	int     ChangePassword(QString& strError);
-	int		OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
-	void	CloseReader();
-	KT_ReaderLibPtr	m_pReaderLib = nullptr;
-	KT_Reader* m_pReader = nullptr;
+	//int		OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
+	//void	CloseSSCardReader();
+	//KT_ReaderLibPtr	m_pReaderLib = nullptr;
+	//KT_Reader* m_pSSCardReader = nullptr;
 	uchar   m_szPin[2][16] = { {0} };
 	int     m_nPinSize[2] = { 0 };
 	QLineEdit* m_pLineEdit[2] = { nullptr };

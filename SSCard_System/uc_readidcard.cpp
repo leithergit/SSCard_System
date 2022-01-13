@@ -17,9 +17,10 @@ using namespace chrono;
 #pragma comment(lib,"OleAut32.lib")
 //#pragma comment(lib,"SDK/IDCard/IDCard_API")
 
-uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex, ReadID_Type nType, QWidget* parent) :
 	QStackPage(pTitle, strStepImage, nIndex, parent),
-	ui(new Ui::ReadIDCard)
+	ui(new Ui::ReadIDCard),
+	nReadIDType(nType)
 {
 	ui->setupUi(this);
 	QMovie* movie = new QMovie("./Image/SwipeIDCard.gif");
@@ -45,15 +46,28 @@ int uc_ReadIDCard::ProcessBussiness()
 
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+
 	IDCardInfoPtr pIDCardInfo = make_shared<IDCardInfo>();
 	g_pDataCenter->SetIDCardInfo(pIDCardInfo);
 
 	m_pIDCard = g_pDataCenter->GetIDCardInfo();
+
 	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
 	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
 	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
-	m_bWorkThreadRunning = true;
-	m_pWorkThread = new std::thread(&uc_ReadIDCard::ThreadWork, this);
+	if (!m_pWorkThread)
+	{
+		m_bWorkThreadRunning = true;
+		m_pWorkThread = new std::thread(&uc_ReadIDCard::ThreadWork, this);
+		if (!m_pWorkThread)
+		{
+			QString strError = QString("内存不足,创建读卡线程失败!");
+			gError() << strError.toLocal8Bit().data();
+			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+			return -1;
+		}
+	}
+
 	return 0;
 }
 
@@ -64,6 +78,8 @@ void uc_ReadIDCard::OnTimeout()
 
 void  uc_ReadIDCard::ShutDown()
 {
+	gInfo() << __FUNCTION__;
+
 	m_bWorkThreadRunning = false;
 	if (m_pWorkThread && m_pWorkThread->joinable())
 	{
@@ -71,6 +87,7 @@ void  uc_ReadIDCard::ShutDown()
 		m_pWorkThread = nullptr;
 	}
 	m_pIDCard = nullptr;
+	CloseReader();
 }
 
 void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
@@ -91,7 +108,10 @@ void uc_ReadIDCard::ThreadWork()
 			int nResult = ReaderIDCard();
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
-				strError = "读取身份证成功,随后将进行人脸识别以确认是否本人操作!";
+				if (nReadIDType == ReadID_UpdateCard)
+					strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
+				else if (nReadIDType == ReadID_RegisterLost)
+					strError = "读取身份证成功,稍后请进行挂失/解挂操作!";
 				gInfo() << strError.toLocal8Bit().data();
 				emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
 				break;
@@ -141,28 +161,36 @@ void uc_ReadIDCard::ThreadWork()
 int uc_ReadIDCard::ReaderIDCard()
 {
 	int nResult = IDCard_Status::IDCard_Succeed;
+	bool bDevOpened = false;
 	do
 	{
+		if (m_bSucceed)
+			break;
+		//if (m_bSucceed && m_nDelayCount <= 3)
+		//{
+		//	m_nDelayCount++;
+		//	break;
+		//}
+		//else
+		//{
+		//	m_nDelayCount = 0;
+		//	m_bSucceed = false;
+		//}
+
 		if (m_strDevPort == "AUTO" || !m_strDevPort.size())
 		{
+			gInfo() << "Try to open IDCard Reader auto!" << m_strDevPort;
 			nResult = OpenReader(nullptr);
 		}
 		else
+		{
+			gInfo() << "Try to open IDCard Reader " << m_strDevPort;
 			nResult = OpenReader(m_strDevPort.c_str());
-		if (m_bSucceed && m_nDelayCount <= 3)
-		{
-			m_nDelayCount++;
-			break;
-		}
-		else
-		{
-			m_nDelayCount = 0;
-			m_bSucceed = false;
 		}
 
-		//nResult = OpenReader(nullptr);;
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
+			bDevOpened = true;
 			break;
 		}
 		nResult = FindIDCard();
@@ -183,10 +211,14 @@ int uc_ReadIDCard::ReaderIDCard()
 			QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);
 			ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
 		}
-
 		m_bSucceed = true;
-		CloseReader();
 	} while (0);
+	if (bDevOpened)
+	{
+		gInfo() << "Try to close IDCard Reader!";
+		CloseReader();
+	}
+
 	return nResult;
 }
 void uc_ReadIDCard::timerEvent(QTimerEvent* event)

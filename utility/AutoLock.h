@@ -42,10 +42,8 @@ private:
 	int		m_nLockLine;
 #endif
 
-	explicit CAutoLock() :m_pCS(NULL), m_bAutoDelete(false)
-	{
-	}
 public:
+	CAutoLock() = delete;
 	CAutoLock(CRITICAL_SECTION* pCS, bool bAutoDelete = false, const CHAR* szFile = nullptr, char* szFunction = nullptr, int nLine = 0)
 	{
 		ZeroMemory(this, sizeof(CAutoLock));

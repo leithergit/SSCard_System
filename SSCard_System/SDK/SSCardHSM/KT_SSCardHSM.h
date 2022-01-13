@@ -1,5 +1,5 @@
-#pragma once
-#include <windows.h>
+ï»¿#pragma once
+//#include "pch.h"
 #include <WinSock2.h>
 #include "KT_Define.h"
 
@@ -11,23 +11,23 @@ EXTERN_C_START
 
 
 /**
- * @brief ³õÊ¼»¯¿â,ÉèÖÃµ±Ç°»·¾³
- * @param[in] region µØÇøÃ¶¾Ù
+ * @brief åˆå§‹åŒ–åº“,è®¾ç½®å½“å‰ç¯å¢ƒ
+ * @param[in] region åœ°åŒºæšä¸¾
  */
-DLL_PUBLIC bool InitEnv(BaseInfo& info);
+	DLL_PUBLIC bool InitEnv(BaseInfo& info);
 
 /**
- * @brief ¼ÓÃÜ»úÍâ²¿ÈÏÖ¤
- * @param[in] Info Ïê¼ûHSMInfo½á¹¹Ìå
- * @param[out] pOutInfo ·µ»ØĞÅÏ¢,³É¹¦Ê±·µ»ØMAC,Ê§°Ü·µ»Ø´íÎóĞÅÏ¢
- * @return 0³É¹¦,·Ç0Ê§°Ü
+ * @brief åŠ å¯†æœºå¤–éƒ¨è®¤è¯
+ * @param[in] Info è¯¦è§HSMInfoç»“æ„ä½“
+ * @param[out] pOutInfo è¿”å›ä¿¡æ¯,æˆåŠŸæ—¶è¿”å›MAC,å¤±è´¥è¿”å›é”™è¯¯ä¿¡æ¯
+ * @return 0æˆåŠŸ,é0å¤±è´¥
  */
 DLL_PUBLIC int cardExternalAuth(HSMInfo& Info, char* pOutInfo);
 /**
- * @brief ÄÚ²¿ÈÏÖ¤£¨ÄÚÍâ²¿ÈÏÖ¤£©
- * @param[in] Info Ïê¼ûHSMInfo½á¹¹Ìå
- * @param[out] pOutInfo ·µ»ØĞÅÏ¢,³É¹¦Ê±·µ»ØMAC,Ê§°Ü·µ»Ø´íÎóĞÅÏ¢
- * @return 0³É¹¦,·Ç0Ê§°Ü
+ * @brief å†…éƒ¨è®¤è¯ï¼ˆå†…å¤–éƒ¨è®¤è¯ï¼‰
+ * @param[in] Info è¯¦è§HSMInfoç»“æ„ä½“
+ * @param[out] pOutInfo è¿”å›ä¿¡æ¯,æˆåŠŸæ—¶è¿”å›MAC,å¤±è´¥è¿”å›é”™è¯¯ä¿¡æ¯
+ * @return 0æˆåŠŸ,é0å¤±è´¥
  */
 DLL_PUBLIC int InnerAuth(HSMInfo& Info, char* pOutInfo);
 

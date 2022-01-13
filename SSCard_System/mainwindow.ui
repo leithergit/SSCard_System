@@ -184,7 +184,7 @@ color: #ffffff;
 }</string>
         </property>
         <property name="text">
-         <string>技术支持：金乔炜煜上海智能科技有限公司   服务电话：4008-917-928</string>
+         <string>技术支持：金乔炜煜(上海)智能科技有限公司   服务电话：4008-917-968</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

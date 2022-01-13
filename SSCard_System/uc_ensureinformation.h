@@ -26,6 +26,10 @@ public:
 	int	   UnRegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 	bool   m_bTestStatus = false;       // 测试专用变量
 	bool   m_bRegisterLost = false;
+	virtual void ShutDown() override
+	{
+		gInfo() << __FUNCTION__;
+	}
 
 private slots:
 	void on_pushButton_OK_clicked();

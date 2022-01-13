@@ -34,7 +34,8 @@ void  uc_FaceCapture::ShutDownDevice()
 }
 void uc_FaceCapture::ShutDown()
 {
-	//ShutDownDevice();
+	gInfo() << __FUNCTION__;
+	//ShutDownDevice();		// 不关闭摄像机，防止后开摄像机等待时间过长
 	if (m_pFaceDetectOcx)
 		m_pFaceDetectOcx->EndLiveDectection();
 }
@@ -102,14 +103,18 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 				break;
 			}
 		}
-
-		nResult = m_pFaceDetectOcx->StartLiveDetection(m_nTimeout);
-		if (nResult)
+		if (!m_bDetectionStart)
 		{
-			strError = QString("启动人脸检测失败,错误代码:%1,请检查设备连接!").arg(nResult);
-			nResult = -1;
-			break;
+			nResult = m_pFaceDetectOcx->StartLiveDetection(m_nTimeout);
+			if (nResult)
+			{
+				strError = QString("启动人脸检测失败,错误代码:%1,请检查设备连接!").arg(nResult);
+				nResult = -1;
+				break;
+			}
+			m_bDetectionStart = true;
 		}
+
 		//m_pImageFaceDetected = new QImage;
 	} while (0);
 	return nResult;
@@ -150,7 +155,7 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
 	QString strError;
 	m_pFaceDetectOcx->EndLiveDectection();
-
+	m_bDetectionStart = false;
 	gInfo() << "OnFaceCaptureSucceed!";
 	emit ShowMaskWidget("操作成功", "人脸识别成功,稍后请确认卡信息!", Success, Switch_NextPage);
 	//emit SwitchNextPage();
@@ -160,6 +165,7 @@ void uc_FaceCapture::OnFaceCaptureFailed()
 {
 	QString strError;
 	m_pFaceDetectOcx->EndLiveDectection();
+	m_bDetectionStart = false;
 	gInfo() << "OnFaceCaptureFailed!";
 	emit ShowMaskWidget("操作失败", "身份证照片与当前人脸对比相似度太低,匹配失败!", Failed, Return_MainPage);
 }

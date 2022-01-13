@@ -16,11 +16,6 @@ up_ReadSSCard::up_ReadSSCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 
 up_ReadSSCard::~up_ReadSSCard()
 {
-	if (m_pReader)
-	{
-		CloseReader();
-		m_pReaderLib = nullptr;
-	}
 	delete ui;
 }
 
@@ -30,87 +25,113 @@ int up_ReadSSCard::ProcessBussiness()
 	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	QString strMessage;
 	char szRCode[1024] = { 0 };
-	if (QFailed(OpenReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
+
+	if (QFailed(g_pDataCenter->OpenSSCardReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
 	{
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;
 	}
-	if (DriverInit((HANDLE)m_pReader, (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+
+	if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
 	{
 		strMessage = QString("DriverInit失败:%1").arg(szRCode);
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;
 	}
-	bThreadReaderSSCard = true;
-	pThreadReaderSSCard = new std::thread(&up_ReadSSCard::ThreadWork, this);
-	return 0;
-}
 
-
-int up_ReadSSCard::OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
-{
-	int nResult = -1;
-	try
+	if (!m_pWorkThread)
 	{
-		m_pReaderLib = nullptr;
-		do
+		m_bWorkThreadRunning = true;
+		m_pWorkThread = new std::thread(&up_ReadSSCard::ThreadWork, this);
+		if (!m_pWorkThread)
 		{
-			if (!m_pReaderLib)
-			{
-				char szRCode[32] = { 0 };
-				QString strAppPath = QCoreApplication::applicationDirPath();
-				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
-
-				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
-				if (!m_pReaderLib)
-				{
-					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
-					break;
-				}
-				m_pReader = m_pReaderLib->Instance();
-				if (!m_pReader)
-				{
-					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
-					break;
-				}
-				if (QFailed(nResult = m_pReader->Reader_Create(nReaderType, szRCode)))
-				{
-					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
-					break;
-				}
-				if (QFailed(nResult = m_pReader->Reader_Init(szRCode)))
-				{
-					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
-					break;
-				}
-			}
-
-		} while (0);
-		if (QFailed(nResult))
+			QString strError = QString("内存不足,创建读卡线程失败!");
+			gError() << strError.toLocal8Bit().data();
+			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 			return -1;
-		else
-			return 0;
+		}
 	}
-	catch (std::exception& e)
-	{
-		strMessage = e.what();
-		gError() << gQStr(strMessage);
-		return -1;
-	}
+
 	return 0;
 }
 
-void up_ReadSSCard::CloseReader()
+void up_ReadSSCard::ShutDown()
 {
-	char szRCode[32] = { 0 };
-
-	if (m_pReader)
+	m_bWorkThreadRunning = false;
+	if (m_pWorkThread && m_pWorkThread->joinable())
 	{
-		m_pReader->Reader_Exit(szRCode);
-		m_pReader = nullptr;
+		m_pWorkThread->join();
+		delete m_pWorkThread;
+		m_pWorkThread = nullptr;
 	}
-	m_pReaderLib = nullptr;
+
+	g_pDataCenter->CloseDevice();
 }
+
+//int up_ReadSSCard::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
+//{
+//	int nResult = -1;
+//	try
+//	{
+//		m_pReaderLib = nullptr;
+//		do
+//		{
+//			if (!m_pReaderLib)
+//			{
+//				char szRCode[32] = { 0 };
+//				QString strAppPath = QCoreApplication::applicationDirPath();
+//				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
+//
+//				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
+//				if (!m_pReaderLib)
+//				{
+//					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
+//					break;
+//				}
+//				m_pSSCardReader = m_pReaderLib->Instance();
+//				if (!m_pSSCardReader)
+//				{
+//					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
+//					break;
+//				}
+//				if (QFailed(nResult = m_pSSCardReader->Reader_Create(nReaderType, szRCode)))
+//				{
+//					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
+//					break;
+//				}
+//				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
+//				{
+//					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
+//					break;
+//				}
+//			}
+//
+//		} while (0);
+//		if (QFailed(nResult))
+//			return -1;
+//		else
+//			return 0;
+//	}
+//	catch (std::exception& e)
+//	{
+//		strMessage = e.what();
+//		gError() << gQStr(strMessage);
+//		return -1;
+//	}
+//	return 0;
+//}
+//
+//void up_ReadSSCard::CloseSSCardReader()
+//{
+//	char szRCode[32] = { 0 };
+//
+//	if (m_pSSCardReader)
+//	{
+//		m_pSSCardReader->Reader_Exit(szRCode);
+//		m_pSSCardReader = nullptr;
+//	}
+//	m_pReaderLib = nullptr;
+//}
 
 void up_ReadSSCard::ThreadWork()
 {
@@ -119,19 +140,17 @@ void up_ReadSSCard::ThreadWork()
 	int nCardATRLen = 0;
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 
-	while (bThreadReaderSSCard)
+	while (m_bWorkThreadRunning)
 	{
-		if (QFailed(m_pReader->Reader_PowerOn(DevConfig.nDesktopSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nDesktopSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
 		{
 			this_thread::sleep_for(chrono::milliseconds(100));
 		}
 		else
 		{
-			if (m_pReader)
-			{
-				CloseReader();
-				m_pReaderLib = nullptr;
-			}
+			g_pDataCenter->GetSSCardReader()->Reader_PowerOff(DevConfig.nDesktopSSCardReaderPowerOnType, szRCode);
+			g_pDataCenter->CloseDevice();
+
 			emit ShowMaskWidget("操作成功", "卡片已插入,稍后请输入旧密码!", Success, Switch_NextPage);
 			break;
 		}
@@ -140,13 +159,5 @@ void up_ReadSSCard::ThreadWork()
 
 void up_ReadSSCard::OnTimeout()
 {
-	bThreadReaderSSCard = false;
-	if (pThreadReaderSSCard && pThreadReaderSSCard->joinable())
-	{
-		pThreadReaderSSCard->join();
-		delete pThreadReaderSSCard;
-		pThreadReaderSSCard = nullptr;
-	}
-
-	CloseReader();
+	ShutDown();
 }

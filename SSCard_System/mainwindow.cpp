@@ -78,7 +78,7 @@ void MainWindow::On_LoadSystemManager()
 	if (checkpwd.exec() == QDialog::Accepted)
 	{
 		SystemManager d(this);
-        d.setGeometry(g_pCurScreen->geometry());
+		d.setGeometry(g_pCurScreen->geometry());
 		d.exec();
 	}
 }
@@ -144,20 +144,44 @@ int MainWindow::LoadConfigure(QString& strError)
 }
 void MainWindow::on_pushButton_Updatecard_clicked()
 {
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		pLastStackPage = nullptr;
+	}
 	QString strError;
-	if (LoadConfigure(strError))
+	if (LoadConfigure(strError))		// 加载配置时会自动关闭已经打开的打印和读卡器
 	{
 		gError() << strError.toLatin1().data();
 		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		return;
+	}
+
+	QString strMessage;
+	int nResult = -1;
+	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
+	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
 	m_pUpdateCard->show();
+	pLastStackPage = m_pUpdateCard;
 }
 
 void MainWindow::on_pushButton_ChangePWD_clicked()
 {
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		pLastStackPage = nullptr;
+	}
 	QString strError;
 	if (LoadConfigure(strError))
 	{
@@ -165,13 +189,20 @@ void MainWindow::on_pushButton_ChangePWD_clicked()
 		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
 		return;
 	}
+
 	ui->stackedWidget->setCurrentWidget(m_pUpdatePassword);
 	m_pUpdatePassword->ResetAllPages();
 	m_pUpdatePassword->show();
+	pLastStackPage = m_pUpdatePassword;
 }
 
 void MainWindow::on_pushButton_RegisterLost_clicked()
 {
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		pLastStackPage = nullptr;
+	}
 	QString strError;
 	if (LoadConfigure(strError))
 	{
@@ -179,15 +210,27 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
 		return;
 	}
+
 	ui->stackedWidget->setCurrentWidget(m_pRegiserLost);
 	m_pRegiserLost->ResetAllPages();
 	m_pRegiserLost->show();
+	pLastStackPage = m_pRegiserLost;
 }
 
 void MainWindow::on_pushButton_MainPage_clicked()
 {
 	gInfo() << "Return mainPage!";
 	// 回到主页时需清空所有身份数据
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		if (pLastStackPage->m_nTimerID)
+		{
+			killTimer(pLastStackPage->m_nTimerID);
+			pLastStackPage->m_nTimerID = 0;
+		}
+		pLastStackPage = nullptr;
+	}
 	g_pDataCenter->ResetIDData();
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
 	m_pMainpage->show();
@@ -211,6 +254,7 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	}
 
 	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
+	connect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetTimeout);
 
 	int nTimeout = 2;
 	switch (nStatus)
@@ -236,11 +280,33 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 
 void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 {
-	gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
+	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
 	if (m_pMaskWindow)
 	{
 		//m_pMaskWindow->hide();
 		disconnect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
+		delete m_pMaskWindow;
+	}
+	if (pLastStackPage)
+	{
+		if (pLastStackPage->m_nTimerID)
+		{
+			killTimer(pLastStackPage->m_nTimerID);
+			pLastStackPage->m_nTimerID = 0;
+		}
+	}
+
+	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
+	pCurPage->emit SwitchNextPage(nPageOperation);
+}
+
+void MainWindow::On_MaskWidgetEnsure(int nPageOperation, int nStatus)
+{
+	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
+	if (m_pMaskWindow)
+	{
+		//m_pMaskWindow->hide();
+		disconnect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetEnsure);
 		delete m_pMaskWindow;
 	}
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
