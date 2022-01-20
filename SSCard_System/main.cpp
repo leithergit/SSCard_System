@@ -9,8 +9,8 @@
 #include "Gloabal.h"
 #include "license.h"
 #include "showlicense.h"
-#include "./Bugtrap/BugTrap.h"
-#pragma comment(lib,"./Bugtrap/BugTrapU.lib")
+#include "BugTrap.h"
+#pragma comment(lib,"BugTrapU.lib")
 extern QScreen* g_pCurScreen;
 
 DataCenterPtr g_pDataCenter;
