@@ -1,7 +1,6 @@
 ﻿#pragma once
 #ifndef KT_READER_H
 #define KT_READER_H
-//#include "pch.h"
 
 enum ReaderBrand
 {

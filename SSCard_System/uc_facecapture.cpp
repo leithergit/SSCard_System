@@ -170,7 +170,29 @@ void uc_FaceCapture::OnFaceCaptureFailed()
 	emit ShowMaskWidget("操作失败", "身份证照片与当前人脸对比相似度太低,匹配失败!", Failed, Return_MainPage);
 }
 
-int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath)
+int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, int nFull)
+{
+	if (QFailed(GetFaceCaptureStorePath(strFaceImageFile, nFull)))
+	{
+		gError() << QString("无法访问人脸数据目录!").toLocal8Bit().data();
+		return -1;
+	}
+	strMessage = QString("准备生成临时文件:%1").arg(strFaceImageFile);
+	gInfo() << gQStr(strMessage);
+	//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
+	QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(nFull);
+	if (!strPhotoBase64.size())
+	{
+		gError() << QString("获取人脸数据失败!").toLocal8Bit().data();
+		return -1;
+	}
+
+	QImage ImageFace = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));
+	ImageFace.save(strFaceImageFile);
+	return 0;
+}
+
+int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, int nFull)
 {
 	QString strStorePath = QCoreApplication::applicationDirPath();
 	strStorePath += "/FaceCapture/";
@@ -188,7 +210,10 @@ int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath)
 			return -1;
 		}
 	}
-	strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+	if (nFull == 0)
+		strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+	else
+		strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
 	return 0;
 }
 
@@ -210,27 +235,19 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 			//	gInfo() << gQStr(strInfo);
 			//	return;
 			//}
-
+			QString strFullImageFile;
+			if (QFailed(SaveImage(strFullImageFile, strEvent, 0)))
+			{
+				gError() << gQStr(strEvent);
+				return;
+			}
 			QString strFaceImageFile;
-			if (QFailed(GetFaceCaptureStorePath(strFaceImageFile)))
+			if (QFailed(SaveImage(strFaceImageFile, strEvent, 1)))
 			{
-				gError() << QString("无法访问人脸数据目录!").toLocal8Bit().data();
+				gError() << gQStr(strEvent);
 				return;
 			}
-			strEvent = QString("准备生成临时文件:%1").arg(strFaceImageFile);
-			gInfo() << gQStr(strEvent);
-			//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
-			QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(1);
-			if (!strPhotoBase64.size())
-			{
-				gError() << QString("获取人脸数据失败!").toLocal8Bit().data();
-				return;
-			}
-			strEvent = QString("准备生成人脸比对文件:%1").arg(strFaceImageFile);
-			gInfo() << gQStr(strEvent);
 
-			QImage ImageFace = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));
-			ImageFace.save(strFaceImageFile);
 			QFileInfo fi(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
 			if (!fi.isFile())
 			{

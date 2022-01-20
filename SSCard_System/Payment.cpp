@@ -471,7 +471,7 @@ int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	return 0;
 }
 
-int  GetIDImageStorePath(string& strFilePath)
+int  GetImageStorePath(string& strFilePath, int nType)
 {
 	QString strStorePath = QCoreApplication::applicationDirPath();
 	strStorePath += "/IDImage/";
@@ -489,7 +489,12 @@ int  GetIDImageStorePath(string& strFilePath)
 			return -1;
 		}
 	}
-	QString strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+	QString strTempPath;
+	if (nType == 0)
+		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+	else
+		strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum);
+
 	strFilePath = strTempPath.toStdString();
 	return 0;
 }
@@ -506,7 +511,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 	Base64Decode(szPhotoBase64, strlen(szPhotoBase64), (BYTE*)g_szPhotoBuffer, &nPhotoSize);
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
 	string strPhotoPath;
-	GetIDImageStorePath(strPhotoPath);
+	GetImageStorePath(strPhotoPath, 1);
 	photo.save(strPhotoPath.c_str(), "JPG", 90);
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
 	return 0;
@@ -550,6 +555,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
 			strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
 			pSSCardInfo->strPhoto = pSSCardTemp->strPhoto;
+			SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 			bLoaded = true;
 		}
 	}

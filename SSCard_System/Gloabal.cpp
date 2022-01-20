@@ -488,7 +488,7 @@ int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int
 			{
 				QString strAppPath = QCoreApplication::applicationDirPath();
 				QString strFullPrinterModule = strAppPath + "/" + strPrinterLib;
-
+				gInfo() << "Try to load " << strFullPrinterModule.toStdString();
 				m_pPrinterlib = make_shared<KTModule<KT_Printer>>(strFullPrinterModule.toStdString());
 				if (!m_pPrinterlib)
 				{
@@ -681,7 +681,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 
 		if (BoxInfo.BoxList[nDepenseBox - 1].BoxStatus == 2)
 		{
-			strMessage = QString("卡箱无卡,请放入卡片!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
+			strMessage = QString("进卡箱无卡,请放入卡片后重试!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
 			break;
 		}
 
@@ -729,13 +729,13 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		case 5:
 		{
-			strMessage = QString("打印机堵卡,请联系技术人员处理!");
+			strMessage = QString("打印机堵卡,请联系相关技术人员处理!");
 			break;
 		}
 		case 6:
 		default:
 		{
-			strMessage = QString("发生未知错误,请联系技术人员处理!");
+			strMessage = QString("发生未知错误,请联系相关技术人员处理!");
 			break;
 		}
 		}

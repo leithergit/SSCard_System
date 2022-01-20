@@ -565,9 +565,9 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 		if (g_pDataCenter->Depense(nDepenseBox, nPowerType, strMessage))
 			break;
 
-		//		char szCardATR[1024] = { 0 };
+		char szCardATR[1024] = { 0 };
 		char szRCode[1024] = { 0 };
-		//		int nCardATRLen = 0;
+		int nCardATRLen = 0;
 		string strCardATR;
 		QString strPowerType = ui.comboBox_PoweronType->currentText();
 
@@ -579,16 +579,15 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 
 		if (QFailed(g_pDataCenter->MoveCard(strMessage)))
 		{
-			strMessage = QString("读卡器上电失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
-		if (QFailed(iReadCardBas(nPowerType, szRCode)))
+		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("iReadCardBas失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
 		bSucceed = true;
-		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(strCardATR.c_str());
+		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
 	} while (0);
 	if (!bSucceed)
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);

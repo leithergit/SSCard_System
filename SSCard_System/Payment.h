@@ -60,7 +60,8 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 
 int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
-int GetIDImageStorePath(string& strFilePath);
+// nType，0为保存身份证照片，1为保存社保卡照片
+int GetImageStorePath(string& strFilePath, int nType = 0);
 
 int LoadTestData(string& strName, string& strCardID, string& strMobile);
 

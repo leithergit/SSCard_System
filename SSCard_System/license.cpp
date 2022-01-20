@@ -14,6 +14,7 @@
 #include <list>
 #include <string>
 #include "Gloabal.h"
+#include "Utility.h"
 #pragma comment(lib,"libssl.lib")
 #pragma comment(lib,"libcrypto.lib")
 
@@ -39,10 +40,11 @@ struct DeviceInfo
 {
 	int		nFields;
 	const	int nMaxFields;
+	Declare_ClassName();
 	DeviceInfo(int nMax) :nMaxFields(nMax)
 	{
 	}
-	void Reset()
+	virtual void Reset()
 	{
 		nFields = 0;
 	}
@@ -68,6 +70,7 @@ struct CPUInfo :public DeviceInfo
 {
 	string strVender;
 	string strCPUID;
+	Declare_ClassName();
 	CPUInfo() :DeviceInfo(2) {};
 };
 
@@ -75,7 +78,12 @@ struct BaseBoard :public DeviceInfo
 {
 	string strManufacturer;
 	string strSerialNumber;
+	Declare_ClassName();
 	BaseBoard() :DeviceInfo(2) {};
+	virtual void Reset()
+	{
+		gInfo() << __className() << "\tManufacturer = " << strManufacturer << "\tSerialNumber = " << strSerialNumber;
+	}
 };
 struct HardDriveInfo :public DeviceInfo
 {
@@ -84,7 +92,12 @@ struct HardDriveInfo :public DeviceInfo
 	string  strModel;
 	string	strDiskID;
 	string	strInterfaceType;
+	Declare_ClassName();
 	HardDriveInfo() :DeviceInfo(4) {};
+	virtual void Reset()
+	{
+		gInfo() << __className() << "\tModel = " << strModel << "\tInterfaceType = " << strInterfaceType << "\tDiskID = " << strDiskID;
+	}
 };
 
 struct NetAdapter :public DeviceInfo
@@ -93,6 +106,11 @@ struct NetAdapter :public DeviceInfo
 	string strMacID;
 	string strPNPDeviceID;
 	NetAdapter() :DeviceInfo(3) {};
+	Declare_ClassName();
+	virtual void Reset()
+	{
+		gInfo() << __className() << "\tVender = " << strVender << "\tPNPDeviceID = " << strPNPDeviceID << "\tMacAddress = " << strMacID;
+	}
 	bool isPCI()
 	{
 		return strPNPDeviceID.find("PCI\\") != string::npos;
@@ -224,6 +242,10 @@ void __stdcall AccessValue(wstring strName, VARIANT Value, DWORD_PTR pUserPtr)
 
 	case Win32_BaseBoard:
 	{
+		if (strName == L"EnumerationFinished")
+		{
+			g_HardwareID.MotherBoard.Reset();
+		}
 		if (strName == L"SerialNumber")
 			g_HardwareID.MotherBoard.strSerialNumber = _AnsiString(Value.bstrVal, CP_ACP);
 
@@ -238,8 +260,11 @@ void __stdcall AccessValue(wstring strName, VARIANT Value, DWORD_PTR pUserPtr)
 		if (strName == L"EnumerationFinished")
 		{
 			if (hdd.nPartitioins >= 1)
+			{
 				g_HardwareID.listHDD.push_back(hdd);
-			hdd.Reset();
+				hdd.Reset();
+			}
+
 			hdd.nPartitioins = 0;
 		}
 
@@ -280,8 +305,11 @@ void __stdcall AccessValue(wstring strName, VARIANT Value, DWORD_PTR pUserPtr)
 		if (strName == L"EnumerationFinished")
 		{
 			if (NetInterface.isPCI())
+			{
 				g_HardwareID.listNetAdapter.push_back(NetInterface);
-			NetInterface.Reset();
+				NetInterface.Reset();
+			}
+
 		}
 		if (strName == L"Name")
 		{

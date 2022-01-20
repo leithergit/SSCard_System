@@ -7,6 +7,7 @@
 #include <WinSock2.h>
 #include <winioctl.h>
 #include <comutil.h>
+#include <regex>
 
 #ifdef Release_D
 #undef assert
@@ -27,6 +28,16 @@ using namespace std;
 #if !defined (HIWORD)
 #define HIWORD(l)				((WORD)(((DWORD)(l) >> 16) & 0xFFFF))
 #endif
+
+#define Declare_ClassName()		\
+  virtual std::string __className() { \
+    std::string nameBuffer( __FUNCTION__ ); \
+    std::smatch result; \
+    std::regex pattern( "(\\w+)::" ); \
+    std::regex_search( nameBuffer, result, pattern ); \
+    return result[1]; \
+  }
+
 
 //内部IO控制函数
 typedef BOOL(*KernelIoControlProc)(DWORD, LPVOID, DWORD, LPVOID, DWORD, LPDWORD);
@@ -492,6 +503,6 @@ DWORD GetOsMajorVersion();
 BOOL ModifyWndStyle(HWND hWnd, int nStyleOffset, DWORD dwRemove, DWORD dwAdd, UINT nFlags);
 BOOL IsCancelDialogMessage(MSG* pMsg);
 
-bool EnumSerialPortW(WCHAR *szBuffer,WORD nBufferSize, WORD & nPortCount);
-bool EnumSerialPortW(HWND hComboBox ,WORD &nPortCount);
-bool EnumSerialPortA(HWND hComboBox ,WORD &nPortCount);
+bool EnumSerialPortW(WCHAR* szBuffer, WORD nBufferSize, WORD& nPortCount);
+bool EnumSerialPortW(HWND hComboBox, WORD& nPortCount);
+bool EnumSerialPortA(HWND hComboBox, WORD& nPortCount);

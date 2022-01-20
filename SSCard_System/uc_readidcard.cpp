@@ -206,7 +206,7 @@ int uc_ReadIDCard::ReaderIDCard()
 		}
 		g_pDataCenter->SetIDCardInfo(m_pIDCard);
 
-		if (QSucceed(GetIDImageStorePath(g_pDataCenter->strIDImageFile)))
+		if (QSucceed(GetImageStorePath(g_pDataCenter->strIDImageFile)))
 		{
 			QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);
 			ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));

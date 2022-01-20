@@ -78,7 +78,7 @@
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;./openssl-1.0.1g/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -100,10 +100,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;../openssl-1.0.1g/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <LinkIncremental>false</LinkIncremental>
       <OptimizeReferences>true</OptimizeReferences>
@@ -146,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;..\utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -205,7 +205,7 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath) z:\</Command>
+::copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

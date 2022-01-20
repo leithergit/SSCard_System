@@ -41,7 +41,7 @@ struct BOXINFO
 struct PRINTERSTATUS
 {
 	WORD fwDevice;			//打印机状态, 0-Ready；1-Busy；2-Offline；3-ErrMachine；4-Printing
-	WORD fwMedia;			//介质状态，0-无卡；1-卡在门口；2-卡在内部；3-卡在上电位，4-卡在闸门外；5-堵卡；6-卡片未知（根据硬件特性返回,必须支持有无卡检测）
+	WORD fwMedia;			//介质状态，0-无卡；1-卡在门口；2-卡在内部；3-卡在接触位；4-卡在非接位；5-卡在闸门外；6-堵卡；7-卡片未知（根据硬件特性返回,必须支持有无卡检测）
 	WORD fwToner;			//平印色带状态,0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
 };
 

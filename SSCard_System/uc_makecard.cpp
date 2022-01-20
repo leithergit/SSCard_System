@@ -528,16 +528,16 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 	int nPayStatus = Pay_Not;
 	do
 	{
-#ifndef _DEBUG
-		if (QFailed(nResult = queryPayResult(strMessage, nPayStatus)))
-			break;
-		if (nPayStatus == Pay_Not)
-		{
-			strMessage = "补卡费用尚未支付!";
-			nResult = -1;
-			break;
-}
-#endif
+		//#ifndef _DEBUG
+		//		if (QFailed(nResult = queryPayResult(strMessage, nPayStatus)))
+		//			break;
+		//		if (nPayStatus == Pay_Not)
+		//		{
+		//			strMessage = "补卡费用尚未支付!";
+		//			nResult = -1;
+		//			break;
+		//}
+		//#endif
 
 		nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
 		if (QFailed(nResult))
