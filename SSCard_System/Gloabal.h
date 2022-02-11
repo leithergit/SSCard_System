@@ -59,6 +59,7 @@
 #include "./SDK/7Z/include/bitarchiveinfo.hpp"
 #include "./SDK/7Z/include/bitcompressor.hpp"
 #include "./SDK/7Z/include/bitexception.hpp"
+#include "../SSCardService/SSCardService.h"
 
 //宏定义
 #define __STR2__(x) #x
