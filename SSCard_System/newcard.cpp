@@ -1,6 +1,6 @@
 ﻿#pragma execution_character_set("utf-8")
-#include "updatecard.h"
-#include "ui_updatecard.h"
+#include "newcard.h"
+#include "ui_Newcard.h"
 #include "mainwindow.h"
 #include "uc_readidcard.h"
 #include "uc_facecapture.h"
@@ -17,16 +17,14 @@ using namespace  std;
 
 #define _Stack_Count  (_AdforFinance + 1)
 
-UpdateCard::UpdateCard(QWidget* parent) :
+NewCard::NewCard(QWidget* parent) :
 	QMainStackPage(parent),
-	ui(new Ui::UpdateCard)
+	ui(new Ui::NewCard)
 {
 	ui->setupUi(this);
-
 	try
 	{
 		m_pStackWidget = ui->stackedWidget;
-		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
 		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "updatecard1.png", Page_ReaderIDCard));				// step 0
 		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_step, "updatecard2.png", Page_FaceCapture));				// step 1
 		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "updatecard3.png", Page_EnsureInformation));	// step 2
@@ -43,6 +41,8 @@ UpdateCard::UpdateCard(QWidget* parent) :
 			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 			//connect(pPage, &QStackPage::RetryCurrentPage, this, &QMainStackPage::On_RetryCurrentPage);
 		}
+		//connect(this, &QMainStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+		//connect(this, &QMainStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 	}
 	catch (exception& e)
 	{
@@ -50,17 +50,17 @@ UpdateCard::UpdateCard(QWidget* parent) :
 	}
 }
 
-UpdateCard::~UpdateCard()
+NewCard::~NewCard()
 {
 	delete ui;
 }
 
-void  UpdateCard::SetTimeOut(int nTimeout)
+void  NewCard::SetTimeOut(int nTimeout)
 {
 	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
 }
 
-void UpdateCard::OnTimerEvent()
+void NewCard::OnTimerEvent()
 {
 	ui->label_CountDown->setText(QString("%1").arg(--m_nTimeout));
 	qDebug() << __FUNCTION__ << "m_nTimeout:" << m_nTimeout;

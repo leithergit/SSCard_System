@@ -43,6 +43,13 @@ const char* g_szPrivateKey = "-----BEGIN RSA PRIVATE KEY-----\n"
 "JjHm1rAH5+vLXzbaJ4jOiB9RxKyenIMBH3HGR32goLs=\n"
 "-----END RSA PRIVATE KEY-----\n";
 
+const char* g_szPublicKey = "-----BEGIN PUBLIC KEY-----\n"
+"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQClc+3UN7YBHTUN0M2xK1inyXg5\n"
+"Yaxg3fJLL5DD5c8CibkuDmecPwb+WYQOQec3Pc502RoI4nFISxeWF04Yn0ELrPIf\n"
+"sW6bW/Aw6DedAD2uFoyWvvH4PWVM6OoQUq1L7LIWFrXMewdZQJrlPAGnJoVVJEtS\n"
+"Ogk7PIMvaSSU9swwbwIDAQAB\n"
+"-----END PUBLIC KEY-----\n";
+
 std::string EncryptRSAKey(const char* szKey, const std::string& strData)
 {
 	if (strData.empty())
@@ -83,6 +90,52 @@ std::string EncryptRSAKey(const char* szKey, const std::string& strData)
 	return strRet;
 }
 
+std::string DecryptRSAKey(const char* szKey, const std::string& strData)
+{
+	if (strData.empty())
+	{
+		assert(false);
+		return "";
+	}
+	std::string strRet;
+	BIO* bio = NULL;
+	RSA* pRSAPubKey = NULL;
+	char* chPublicKey = const_cast<char*>(szKey);
+	if ((bio = BIO_new_mem_buf(chPublicKey, -1)) == NULL)       //从字符串读取RSA公钥
+	{
+		return "";
+	}
+	pRSAPubKey = PEM_read_bio_RSA_PUBKEY(bio, NULL, NULL, NULL);		//从bio结构中得到rsa结构
+	if (!pRSAPubKey)
+	{
+		ERR_load_crypto_strings();
+		char errBuf[512];
+		ERR_error_string_n(ERR_get_error(), errBuf, sizeof(errBuf));
+		BIO_free_all(bio);
+		return "";
+	}
+
+	int nLen = RSA_size(pRSAPubKey);
+	char* pDecode = new char[nLen + 1];
+
+	int ret = RSA_public_decrypt(strData.length(), (const unsigned char*)strData.c_str(), (unsigned char*)pDecode, pRSAPubKey, RSA_PKCS1_PADDING);
+	if (ret >= 0)
+	{
+		strRet = std::string((char*)pDecode, ret);
+	}
+	else
+	{
+		ERR_load_crypto_strings();
+		char errBuf[512];
+		ERR_error_string_n(ERR_get_error(), errBuf, sizeof(errBuf));
+		BIO_free_all(bio);
+	}
+	delete[] pDecode;
+	RSA_free(pRSAPubKey);
+	CRYPTO_cleanup_all_ex_data();
+	return strRet;
+}
+
 Register::Register(QWidget* parent)
 	: QDialog(parent)
 	, ui(new Ui::Register)
@@ -117,13 +170,13 @@ void Register::on_ButtonRegister_clicked()
 void Register::on_ButtonExport_clicked()
 {
 	QString selectedFilter;
-	QString strFileName = QFileDialog::getSaveFileName(this,
+	strLicenseFile = QFileDialog::getSaveFileName(this,
 		"导出授权文件",
-		QCoreApplication::applicationDirPath(),
+		strLicenseFile,
 		tr("授权文件(*.lic);;All Files (*)"),
 		&selectedFilter);
 
-	if (strFileName.isEmpty())
+	if (strLicenseFile.isEmpty())
 	{
 		return;
 	}
@@ -141,7 +194,7 @@ void Register::on_ButtonExport_clicked()
 		return;
 	}
 
-	QSettings License(strFileName, QSettings::IniFormat);
+	QSettings License(strLicenseFile, QSettings::IniFormat);
 	License.beginGroup("License");
 	License.setValue("MachineCode", strMachineCode);
 	License.setValue("RegisterCode", strRegister);
@@ -151,18 +204,18 @@ void Register::on_ButtonExport_clicked()
 void Register::on_ButtonImportMachineCode_clicked()
 {
 	QString selectedFilter;
-	QString strFileName = QFileDialog::getOpenFileName(this,
+	strLicenseFile = QFileDialog::getOpenFileName(this,
 		"导入机器码",
 		QCoreApplication::applicationDirPath(),
 		tr("授权文件(*.lic);;All Files (*)"),
 		&selectedFilter);
 
-	if (strFileName.isEmpty())
+	if (strLicenseFile.isEmpty())
 	{
 		return;
 	}
 
-	QSettings License(strFileName, QSettings::IniFormat);
+	QSettings License(strLicenseFile, QSettings::IniFormat);
 	License.beginGroup("License");
 	QString strMachineCode = License.value("MachineCode", "").toString();
 	if (strMachineCode.size() != 64)
@@ -172,4 +225,32 @@ void Register::on_ButtonImportMachineCode_clicked()
 	}
 	ui->lineEdit_HardwareCode->setText(strMachineCode);
 	License.endGroup();
+}
+
+void Register::on_ButtonCheckLicense_clicked()
+{
+	char szHardwareCodeText[128] = { 0 };
+	QString strHardwareCode = ui->lineEdit_HardwareCode->text();
+	strcpy_s(szHardwareCodeText, 128, strHardwareCode.toStdString().c_str());
+
+	unsigned char szHardCodeBinary[128] = { 0 };
+	AscString2HexA(strHardwareCode.toStdString().c_str(), strHardwareCode.size(), szHardCodeBinary, 128, '\0');
+
+	QString strLicenseCode = ui->textEdit_Registercode->toPlainText();
+
+	char szLicenseCodeA[512];
+	strcpy(szLicenseCodeA, strLicenseCode.toStdString().c_str());
+
+	char szLicenseBinary[256] = { 0 };
+	int nSize = AscString2HexA(szLicenseCodeA, strlen(szLicenseCodeA), (unsigned char*)szLicenseBinary, 256, '\0');//注册码转换
+	std::string strLicenseCodeBinary = std::string(szLicenseBinary, nSize);
+
+	// 使用公钥解密码，得到硬件码,进行比较
+	std::string strHardwareCode2 = DecryptRSAKey(g_szPublicKey, strLicenseCodeBinary);
+	char szAscHardwareCode2[256] = { 0 };
+	Hex2AscStringA((unsigned char*)strHardwareCode2.c_str(), strHardwareCode2.size(), szAscHardwareCode2, 256, '\0');
+	if ((strHardwareCode.compare(szAscHardwareCode2) == 0))
+		QMessageBox::information(nullptr, "提示", "授权校验通过", QMessageBox::Ok);
+	else
+		QMessageBox::critical(nullptr, "提示", "授权校验失败", QMessageBox::Ok);
 }

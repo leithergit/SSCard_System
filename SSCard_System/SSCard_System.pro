@@ -42,6 +42,7 @@ SOURCES += \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
+    newcard.cpp \
     openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
@@ -86,6 +87,7 @@ HEADERS += \
     license.h \
     mainpage.h \
     mainwindow.h \
+    newcard.h \
     openssl-1.0.1g/include/openssl/aes.h \
     openssl-1.0.1g/include/openssl/asn1.h \
     openssl-1.0.1g/include/openssl/asn1_mac.h \
@@ -186,6 +188,7 @@ HEADERS += \
 FORMS += \
     CheckPassword.ui \
     MaskWidget.ui \
+    Newcard.ui \
     OperatorSucceed.ui \
     Sys_DeviceManager.ui \
     Sys_cardmanger.ui \
@@ -214,7 +217,6 @@ FORMS += \
     up_readsscard.bak.ui \
     up_readsscard.ui \
     updatecard.ui \
-    updatecard_copy.ui \
     updatepassword.ui
 
 # Default rules for deployment.

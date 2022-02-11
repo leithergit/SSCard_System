@@ -441,19 +441,23 @@ int DataCenter::OpenPrinter(QString& strMessage)
 
 				if (QFailed(nResult = m_pPrinter->Printer_Init(DevConfig.nPrinterType, szRCode)))
 				{
-					strMessage = QString("Printer_Init‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+					strMessage = QString("打印机初始化‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
 					break;
 				}
 
 				if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
 				{
-					strMessage = QString("Printer_Open‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+					if (strcmp(szRCode, "0010") == 0)
+						strMessage = QString("打开打印机‘%1’失败,未安装色带!").arg(DevConfig.strPrinterType.c_str());
+					else if (strcmp(szRCode, "0011") == 0)
+						strMessage = QString("打开打印机‘%1’失败,色带与打印不兼容!").arg(DevConfig.strPrinterType.c_str());
+					else
+						strMessage = QString("打开打印机‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
 					break;
 				}
 			}
 			else
 				return 0;
-
 		} while (0);
 		if (QFailed(nResult))
 			return -1;

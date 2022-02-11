@@ -9,6 +9,7 @@
 #include "updatepassword.h"
 #include "registerlost.h"
 #include "MaskWidget.h"
+#include "newcard.h"
 #include <chrono>
 //#include "operatorfailed.h"
 
@@ -22,7 +23,6 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 
-
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -31,6 +31,7 @@ public:
 	MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 	MainPage* m_pMainpage = nullptr;
+	NewCard* m_pNewCard = nullptr;
 	UpdateCard* m_pUpdateCard = nullptr;
 	UpdatePassword* m_pUpdatePassword = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
@@ -40,6 +41,8 @@ public:
 	int		m_nContinuePressCount = 0;
 
 	void mousePressEvent(QMouseEvent* e);
+
+	void on_pushButton_NewCard_clicked();
 
 	void on_pushButton_Updatecard_clicked();
 

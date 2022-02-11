@@ -55,6 +55,15 @@
       <Extensions>ts;xlf</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
+    <Filter Include="SSCardService">
+      <UniqueIdentifier>{f059f0b0-1b47-42ae-ad3d-63359f81c3e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{f146918b-b784-4282-ad84-2904008ef1b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{fb4a6581-74aa-4db0-8779-fd671b47cede}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp">
@@ -129,45 +138,6 @@
     <ClCompile Include="qstackpage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="registerlost.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_adforfinance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_ensureinformation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_facecapture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_inputmobile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_makecard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_pay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_readidcard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="up_Inputpwd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="up_changepwd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="up_readsscard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="updatecard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="updatepassword.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sys_qwidgetreadidcard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -178,7 +148,55 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="showlicense.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="newcard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_ensureinformation.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_adforfinance.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_facecapture.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_inputmobile.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_makecard.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_pay.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_readidcard.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="up_changepwd.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="up_Inputpwd.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="up_readsscard.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="updatecard.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="updatepassword.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="registerlost.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utility\json\cJSON.c">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utility\json\CJsonObject.cpp">
+      <Filter>json</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,50 +281,17 @@
     <QtMoc Include="qstackpage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="registerlost.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_adforfinance.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_ensureinformation.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_facecapture.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_inputmobile.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_makecard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_pay.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_readidcard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="up_Inputpwd.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="up_changepwd.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="up_readsscard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="updatecard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="updatepassword.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <ClInclude Include="WMIQuery.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="license.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utility\json\cJSON.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utility\json\CJsonObject.hpp">
+      <Filter>json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -404,9 +389,6 @@
     <QtUic Include="updatecard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="updatecard_copy.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="updatepassword.ui">
       <Filter>Form Files</Filter>
     </QtUic>
@@ -414,6 +396,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="showlicense.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Newcard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -567,8 +552,50 @@
     <QtMoc Include="Sys_qwidgetreadidcard.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="newcard.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <QtMoc Include="showlicense.h">
-      <Filter>Generated Files</Filter>
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_adforfinance.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_ensureinformation.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_facecapture.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_inputmobile.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_makecard.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_pay.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_readidcard.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="up_changepwd.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="up_Inputpwd.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="up_readsscard.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="updatecard.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="updatepassword.h">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="registerlost.h">
+      <Filter>UI</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

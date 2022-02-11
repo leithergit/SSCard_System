@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
-    <height>248</height>
+    <width>653</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -165,6 +165,9 @@
          <height>120</height>
         </size>
        </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -219,6 +222,25 @@
        </property>
        <property name="text">
         <string>生成授权</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ButtonCheckLicense">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>校验授权</string>
        </property>
       </widget>
      </item>

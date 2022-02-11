@@ -76,13 +76,13 @@ struct HSMInfo
 	char strRandom2[17];		//随机数2(内部认证用)
 	char strRandom3[17];		//随机数3(外部认证用)
 	char strRandom4[17];		//随机数4(外部认证用)
-
 };
 
 //获取卡信息
 struct SSCardInfo
 {
-	char strOrganID[21] = {0};			//经办机构
+	char strOrganID[21] = { 0 };		//经办机构
+
 	char strCardNum[10] = { 0 };		//社保卡号
 	char strCardID[19] = { 0 };			//身份证号
 	char strBirthday[9] = { 0 };		//出生日期
@@ -111,10 +111,9 @@ struct SSCardInfo
 	char strBankNum[27] = { 0 };		//银行卡号
 	char strPCH[20] = { 0 };			//批次号
 	char* strPhoto = NULL;				//相片
-
 };
 
-struct CAInfo 
+struct CAInfo
 {
 	char QMZS[1024];		//签名证书
 	char JMZS[1024];		//加密证书

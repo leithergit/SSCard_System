@@ -15,6 +15,7 @@ class Register : public QDialog
 public:
 	Register(QWidget* parent = nullptr);
 	~Register();
+	QString strLicenseFile;
 
 private slots:
 	void on_ButtonRegister_clicked();
@@ -22,6 +23,8 @@ private slots:
 	void on_ButtonExport_clicked();
 
 	void on_ButtonImportMachineCode_clicked();
+
+	void on_ButtonCheckLicense_clicked();
 
 private:
 	Ui::Register* ui;

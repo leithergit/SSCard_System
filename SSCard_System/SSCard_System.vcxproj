@@ -209,10 +209,13 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\utility\json\cJSON.c" />
+    <ClCompile Include="..\utility\json\CJsonObject.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
+    <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
     <ClCompile Include="showlicense.cpp" />
@@ -254,6 +257,9 @@
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h" />
     <QtMoc Include="showlicense.h" />
+    <QtMoc Include="newcard.h" />
+    <ClInclude Include="..\utility\json\cJSON.h" />
+    <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -355,6 +361,7 @@
     </QtUic>
     <QtUic Include="MaskWidget.ui">
     </QtUic>
+    <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
     <QtUic Include="showlicense.ui" />
@@ -406,8 +413,6 @@
     <QtUic Include="up_readsscard.ui">
     </QtUic>
     <QtUic Include="updatecard.ui">
-    </QtUic>
-    <QtUic Include="updatecard_copy.ui">
     </QtUic>
     <QtUic Include="updatepassword.ui">
     </QtUic>
