@@ -4,16 +4,21 @@
 #include <QString>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <fstream>
+
 #include "DevBase.h"
 
 #include "Gloabal.h"
 #include "license.h"
 #include "showlicense.h"
 #include "BugTrap.h"
+#include "../utility/json/CJsonObject.hpp"
 #pragma comment(lib,"BugTrapU.lib")
 extern QScreen* g_pCurScreen;
 
 DataCenterPtr g_pDataCenter;
+using namespace neb;
+using namespace std;
 const char* g_szPageOperation[4] =
 {
 	Str(Return_MainPage),
@@ -94,11 +99,46 @@ int main(int argc, char* argv[])
 	google::SetLogFilenameExtension(".log");
 	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
 
+	ifstream ifs("./AppRuning.json");
+	int nRunCount = 0;
+	QDateTime Now = QDateTime::currentDateTime();
+	if (ifs)
+	{
+		stringstream ss;
+		ss << ifs.rdbuf();
+		CJsonObject RunJson(ss.str());
+		if (RunJson.KeyExist("StartTime") &&
+			RunJson.KeyExist("Count"))
+		{
+			string strStartTime;
+			RunJson.Get("StartTime", strStartTime);
+			RunJson.Get("Count", nRunCount);
+			QDateTime lastStartTime = QDateTime::fromString(strStartTime.c_str(), "yyyy-MM-dd hh:mm:ss");
+
+			int nDiffSecond = lastStartTime.secsTo(Now);
+			if (nDiffSecond <= 1)
+			{
+				if (nRunCount >= 3)
+					return 0;
+				else
+					nRunCount++;
+			}
+		}
+	}
+
+	ofstream ofs("./AppRuning.json");
+	CJsonObject RunJson;
+	QString strRunTime = Now.toString("yyyy-MM-dd hh:mm:ss");
+	RunJson.Add("StartTime", strRunTime.toStdString());
+	RunJson.Add("Count", nRunCount);
+	ofs << RunJson.ToString();
+	ofs.close();
+
 	if (!CheckLocalLicense(Code_License))
 	{
 		ShowLicense s;
 		s.show();
-		return a.exec();;
+		return a.exec();
 	}
 
 	curl_global_init(CURL_GLOBAL_WIN32);
@@ -122,13 +162,27 @@ int main(int argc, char* argv[])
 	}
 	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
 	char szOutInfo[1024] = { 0 };
+	CJsonObject jsonReg;
+	jsonReg.Add("province", Reg.nProvinceCode);
+	jsonReg.Add("user", Reg.strCMAccount);
+	jsonReg.Add("pwd", Reg.strCMPassword);
+	jsonReg.Add("city", Reg.strCityCode);
+	string strJson = jsonReg.ToString();
+	CJsonObject jsonT(strJson);
+	qDebug() << strJson.c_str();
+	int nProvince;
+	string struser, strpwd, strcity;
+	jsonT.Get("province", nProvince);
+	jsonT.Get("user", struser);
+	jsonT.Get("pwd", strpwd);
+	jsonT.Get("city", strcity);
 
-	initCardInfo(Reg.strCMAccount.c_str(), Reg.strCMPassword.c_str(), Reg.strCityCode.c_str(), Reg.nProvinceCode, szOutInfo);
+	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;
 
 	auto listScreens = QApplication::screens();
 	g_pCurScreen = listScreens.at(0);
-	if (listScreens.size() > 1)
+	if (listScreens.size() > 1)		// 若多块屏幕，只在1080p的屏幕上显示
 	{
 		for (auto Screen : listScreens)
 		{
