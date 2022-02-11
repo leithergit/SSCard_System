@@ -407,8 +407,6 @@
     </QtUic>
     <QtUic Include="updatecard.ui">
     </QtUic>
-    <QtUic Include="updatecard_copy.ui">
-    </QtUic>
     <QtUic Include="updatepassword.ui">
     </QtUic>
   </ItemGroup>

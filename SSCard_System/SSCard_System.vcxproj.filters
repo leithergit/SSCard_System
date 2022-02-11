@@ -404,9 +404,6 @@
     <QtUic Include="updatecard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="updatecard_copy.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="updatepassword.ui">
       <Filter>Form Files</Filter>
     </QtUic>
