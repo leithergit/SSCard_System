@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	m_nDateTimer = startTimer(1000);
 	m_pMainpage = new MainPage(this);
+	m_pNewCard = new NewCard(this);
 	m_pUpdateCard = new UpdateCard(this);
 	m_pUpdatePassword = new UpdatePassword(this);
 	m_pRegiserLost = new RegisterLost(this);
@@ -42,6 +43,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	//m_pOperatorFailed = new OperatorFailed();
 	ui->stackedWidget->addWidget(m_pMainpage);
+	ui->stackedWidget->addWidget(m_pNewCard);
 	ui->stackedWidget->addWidget(m_pUpdateCard);
 	ui->stackedWidget->addWidget(m_pUpdatePassword);
 	ui->stackedWidget->addWidget(m_pRegiserLost);
@@ -142,6 +144,43 @@ int MainWindow::LoadConfigure(QString& strError)
 		return -1;
 	}
 }
+
+void MainWindow::on_pushButton_NewCard_clicked()
+{
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		pLastStackPage = nullptr;
+	}
+	QString strError;
+	if (LoadConfigure(strError))		// 加载配置时会自动关闭已经打开的打印和读卡器
+	{
+		gError() << strError.toLatin1().data();
+		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		return;
+	}
+
+	QString strMessage;
+	int nResult = -1;
+	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
+
+	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
+
+	ui->stackedWidget->setCurrentWidget(m_pNewCard);
+	m_pNewCard->ResetAllPages();
+	m_pNewCard->show();
+	pLastStackPage = m_pNewCard;
+
+}
+
 void MainWindow::on_pushButton_Updatecard_clicked()
 {
 	if (pLastStackPage)
@@ -164,11 +203,13 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+
 	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
 	{
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
 	m_pUpdateCard->show();

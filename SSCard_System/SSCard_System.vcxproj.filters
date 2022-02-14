@@ -180,9 +180,6 @@
     <ClCompile Include="license.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="showlicense.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -191,6 +188,12 @@
     </ClCompile>
     <ClCompile Include="..\utility\json\CJsonObject.cpp">
       <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="newcard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showlicense.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -437,6 +440,9 @@
     <QtUic Include="showlicense.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="Newcard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png">
@@ -588,8 +594,11 @@
     <QtMoc Include="Sys_qwidgetreadidcard.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="newcard.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <QtMoc Include="showlicense.h">
-      <Filter>Generated Files</Filter>
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

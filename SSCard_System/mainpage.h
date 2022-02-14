@@ -33,6 +33,8 @@ private slots:
 
 	void on_pushButton_RegisterLost_clicked();
 
+    void on_pushButton_NewCard_clicked();
+
 private:
 	Ui::MainPage* ui;
 };

@@ -222,6 +222,7 @@
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
+    <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
     <ClCompile Include="showlicense.cpp" />
@@ -266,6 +267,7 @@
     <QtMoc Include="showlicense.h" />
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
+    <QtMoc Include="newcard.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -367,6 +369,7 @@
     </QtUic>
     <QtUic Include="MaskWidget.ui">
     </QtUic>
+    <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
     <QtUic Include="showlicense.ui" />
