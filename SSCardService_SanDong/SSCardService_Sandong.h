@@ -4,7 +4,7 @@
 #include <ctime>
 #include <sstream>
 #include "../SSCardService/SSCardService.h"
-#include "../SDK/SSCardInfo/SD_SSCardInfo.h"
+#include "../SDK/SSCardInfo_Sandong/SD_SSCardInfo.h"
 #include "Utility.h"
 #include "CJsonObject.hpp"
 
@@ -36,8 +36,7 @@ public:
 	virtual int Initialize(string& strInitJson, string& szOutInfo)
 	{
 		//Warning("需要确定initCardInfo输入数据的Json定义!");
-		initCardInfo(strInitJson, szOutInfo);
-		return initCardInfo(strInitJson, szOutInfo);
+		return initCardInfo(strInitJson.c_str(), szOutInfo);
 	}
 	~SSCardService_Sandong()
 	{
@@ -263,8 +262,7 @@ public:
 			CardInfo.strCardID = ds["shbzhm"].ToString();
 			CardInfo.strCardNum = ds["kh"].ToString();
 			CardInfo.strName = ds["xm"].ToString();
-			CardInfo.strCardNum = ds["kh"].ToString();
-			CardInfo.strCardStatus = ds["kzt"].ToString();
+			//CardInfo.strst = ds["kzt"].ToString();
 			CardInfo.strChipNum = ds["kxpzh"].ToString();
 			CardInfo.strMagNum = ds["kctzh"].ToString();
 			CardInfo.strBankCode = ds["yhbh"].ToString();		// 银行编号
@@ -556,7 +554,7 @@ public:
 				TempCardInfo.strBirthday.empty() ||
 				TempCardInfo.strSex.empty() ||
 				TempCardInfo.strNation.empty() ||
-				TempCardInfo.strAdress.empty() ||
+				TempCardInfo.strAdress.empty()
 				/*TempCardInfo.strPhoto.empty()*/)
 			{
 				strMessage = "Any items of cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo can't be empty!";
