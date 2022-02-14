@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MarkupSample", "..\MarkupSa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSCardService_SanDong", "..\SSCardService_SanDong\SSCardService_SanDong.vcxproj", "{02F650B8-B868-4752-B4F7-850675B688A4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SD_SSCardInfo", "..\..\SDK.git\sd_sscardinfo\SD_SSCardInfo\SD_SSCardInfo\SD_SSCardInfo.vcxproj", "{55D1C509-7E02-43A1-977D-248F6E60252F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -155,6 +157,14 @@ Global
 		{02F650B8-B868-4752-B4F7-850675B688A4}.Release|x64.Build.0 = Release|x64
 		{02F650B8-B868-4752-B4F7-850675B688A4}.Release|x86.ActiveCfg = Release|Win32
 		{02F650B8-B868-4752-B4F7-850675B688A4}.Release|x86.Build.0 = Release|Win32
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Debug|x64.ActiveCfg = Debug|x64
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Debug|x64.Build.0 = Debug|x64
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Debug|x86.ActiveCfg = Debug|Win32
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Debug|x86.Build.0 = Debug|Win32
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Release|x64.ActiveCfg = Release|x64
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Release|x64.Build.0 = Release|x64
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Release|x86.ActiveCfg = Release|Win32
+		{55D1C509-7E02-43A1-977D-248F6E60252F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

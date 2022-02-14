@@ -13,7 +13,7 @@
 #include "showlicense.h"
 #include "BugTrap.h"
 #include "../utility/json/CJsonObject.hpp"
-#pragma comment(lib,"BugTrapU.lib")
+
 extern QScreen* g_pCurScreen;
 
 DataCenterPtr g_pDataCenter;

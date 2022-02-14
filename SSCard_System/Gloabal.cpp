@@ -13,6 +13,7 @@
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 #pragma comment(lib,"Version.lib")
+#pragma comment(lib,"BugTrapU.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printerd")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")

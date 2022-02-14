@@ -56,9 +56,9 @@
 #include "../SDK/IDCard/idcard_api.h"
 #include "../SDK/PinKeybroad/XZ_F31_API.h"
 #include "../SDK/libcurl/curl.h"
-#include "./SDK/7Z/include/bitarchiveinfo.hpp"
-#include "./SDK/7Z/include/bitcompressor.hpp"
-#include "./SDK/7Z/include/bitexception.hpp"
+#include "../SDK/7Z/include/bitarchiveinfo.hpp"
+#include "../SDK/7Z/include/bitcompressor.hpp"
+#include "../SDK/7Z/include/bitexception.hpp"
 #include "../SSCardService/SSCardService.h"
 
 //宏定义

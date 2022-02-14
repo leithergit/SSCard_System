@@ -100,7 +100,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;../openssl-1.0.1g/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;..\SDK\PinKeybroad;..\SDK\QREncode;..\SDK\Printer;..\SDK\Reader;../openssl-1.0.1g/lib;..\SDK\Bugtrap;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -143,10 +143,13 @@
       <Command>@echo copy $(TargetPath) to remote device
 ::copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>@call updatesdk.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;../utility;./SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -166,7 +169,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;../openssl-1.0.1g/lib;./SDK/Bugtrap/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;..\SDK\PinKeybroad;..\SDK\QREncode;..\SDK\Printer;..\SDK\Reader;../openssl-1.0.1g/lib;..\SDK\Bugtrap;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -207,8 +210,14 @@
       <Command>@echo copy $(TargetPath) to remote device
 ::copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>@call updatesdk.bat $(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
+    <ClCompile Include="..\utility\json\cJSON.c" />
+    <ClCompile Include="..\utility\json\CJsonObject.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
@@ -228,7 +237,6 @@
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="..\utility\TimeUtility.cpp" />
     <ClCompile Include="..\utility\Utility.cpp" />
-    <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
     <ClCompile Include="imageviewlabel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainpage.cpp" />
@@ -252,8 +260,12 @@
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\SDK\dvtldcamocx\dvtldcamocxlib.h" />
+    <ClInclude Include="..\SSCardService\SSCardService.h" />
     <ClInclude Include="..\utility\AutoLock.h" />
     <QtMoc Include="showlicense.h" />
+    <ClInclude Include="..\utility\json\cJSON.h" />
+    <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">

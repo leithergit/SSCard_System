@@ -55,6 +55,12 @@
       <Extensions>ts;xlf</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
+    <Filter Include="SSCardService">
+      <UniqueIdentifier>{ec9808fc-007a-439d-9d91-5d09cd665fef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{40638b80-43ae-48f0-9f80-d0e72a05c38f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp">
@@ -103,9 +109,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\utility\Utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imageviewlabel.cpp">
@@ -179,6 +182,15 @@
     </ClCompile>
     <ClCompile Include="showlicense.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utility\json\cJSON.c">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utility\json\CJsonObject.cpp">
+      <Filter>json</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -307,6 +319,18 @@
     </ClInclude>
     <ClInclude Include="license.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SSCardService\SSCardService.h">
+      <Filter>SSCardService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\dvtldcamocx\dvtldcamocxlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utility\json\cJSON.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utility\json\CJsonObject.hpp">
+      <Filter>json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,7 @@
 #define PhotoBufferSize		256*1024
 char* g_szPhotoBuffer = new char[PhotoBufferSize];
 
-#include "./SDK/QREncode/qrencode.h"
+#include "../SDK/QREncode/qrencode.h"
 #include "Gloabal.h"
 
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage)

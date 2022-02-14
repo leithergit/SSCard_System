@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <memory>
 #include "qstackpage.h"
-#include "./SDK/IDCard/idcard_api.h"
+#include "../SDK/IDCard/idcard_api.h"
 
 namespace Ui {
 	class ReadIDCard;
