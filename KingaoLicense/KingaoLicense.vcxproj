@@ -1,0 +1,340 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6DDAF258-CE44-33B2-BE1A-EF97309158D0}</ProjectGuid>
+    <RootNamespace>KingaoLicense</RootNamespace>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+    <OutputDirectory>release\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>KingaoLicense</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+    <OutputDirectory>debug\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>KingaoLicense</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\SSCard_System\debug\</OutDir>
+    <IntDir>..\SSCard_System\debug\</IntDir>
+    <TargetName>KingaoLicense</TargetName>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>release\</OutDir>
+    <IntDir>release\</IntDir>
+    <TargetName>KingaoLicense</TargetName>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <QtInstall>5.15.2_msvc2019</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <QtInstall>5.15.2_msvc2019</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\openssl-1.0.1g\include;release;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>release\</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:\Work\SSCard_System\MainProject\openssl-1.0.1g\lib\libcrypto.lib;D:\Work\SSCard_System\MainProject\openssl-1.0.1g\lib\libssl.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Work\SSCard_System\MainProject\openssl-1.0.1g\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>$(OutDir)\KingaoLicense.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <DynamicSource>output</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <QtUicDir>$(ProjectDir)</QtUicDir>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\openssl-1.0.1g\include;debug;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>debug\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>D:\Work\SSCard_System\MainProject\openssl-1.0.1g\lib\libcrypto.lib;D:\Work\SSCard_System\MainProject\openssl-1.0.1g\lib\libssl.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Work\SSCard_System\MainProject\openssl-1.0.1g\lib;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)\KingaoLicense.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <DynamicSource>output</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <QtUicDir>$(ProjectDir)</QtUicDir>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utility\TimeUtility.cpp" />
+    <ClCompile Include="..\utility\Utility.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="register.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\utility\TimeUtility.h" />
+    <ClInclude Include="..\utility\Utility.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\__DECC_INCLUDE_PROLOGUE.H" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\aes.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\asn1.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\asn1_mac.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\asn1err.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\asn1t.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\async.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\asyncerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\bio.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\bioerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\blowfish.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\bn.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\bnerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\buffer.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\buffererr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\camellia.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\cast.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\cmac.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\cms.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\cmserr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\comp.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\comperr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\conf.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\conf_api.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\conferr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\crypto.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\cryptoerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ct.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\cterr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\des.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\dh.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\dherr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\dsa.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\dsaerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\dtls1.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\e_os2.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ebcdic.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ec.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ecdh.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ecdsa.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ecerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\engine.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\engineerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\err.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\evp.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\evperr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\hmac.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\idea.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\kdf.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\kdferr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\lhash.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\md2.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\md4.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\md5.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\mdc2.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\modes.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\obj_mac.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\objects.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\objectserr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ocsp.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ocsperr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\opensslconf.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\opensslv.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ossl_typ.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pem.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pem2.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pemerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pkcs12.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pkcs12err.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pkcs7.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\pkcs7err.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\rand.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\randerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\rc2.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\rc4.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\rc5.h" />
+    <ClInclude Include="resource.h" />
+    <QtMoc Include="register.h">
+    </QtMoc>
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ripemd.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\rsa.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\rsaerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\safestack.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\seed.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\sha.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\srp.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\srtp.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ssl.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ssl2.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ssl3.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\sslerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\stack.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\store.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\storeerr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\symhacks.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\tls1.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ts.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\tserr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\txt_db.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\ui.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\uierr.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\whrlpool.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\x509.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\x509_vfy.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\x509err.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\x509v3.h" />
+    <ClInclude Include="..\openssl-1.0.1g\include\openssl\x509v3err.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">debug\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">release\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="register.ui">
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="KingaoLicense.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="key.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
