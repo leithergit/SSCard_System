@@ -1,0 +1,5 @@
+﻿LIBRARY "SSCardService_Sandong"
+
+EXPORTS
+	CreateInstance	@1;
+	FreeInstance	@2;

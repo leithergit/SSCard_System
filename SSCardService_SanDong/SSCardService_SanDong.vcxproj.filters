@@ -30,6 +30,12 @@
     <ClInclude Include="..\utility\json\CJsonObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SSCardService_Sandong_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -44,5 +50,15 @@
     <ClCompile Include="..\utility\json\CJsonObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SSCardService_Sandong.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SSCardService_SanDong.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

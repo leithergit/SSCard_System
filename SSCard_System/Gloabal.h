@@ -52,7 +52,7 @@
 #include "../SDK/KT_Reader/KT_Reader.h"
 #include "../SDK/SSCardDriver/SSCardDriver.h"
 #include "../SDK/SSCardHSM/KT_SSCardHSM.h"
-#include "../SDK/SSCardInfo/KT_SSCardInfo.h"
+#include "../SDK/SSCardInfo_henan/KT_SSCardInfo.h"
 #include "../SDK/IDCard/idcard_api.h"
 #include "../SDK/PinKeybroad/XZ_F31_API.h"
 #include "../SDK/libcurl/curl.h"

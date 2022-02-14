@@ -2,6 +2,7 @@
 
 #include "SSCardService_Sandong.h"
 #include "pch.h"
+#pragma comment(lib,"../sdk/sscardinfo_sandong/SD_SSCardInfod.lib")
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,

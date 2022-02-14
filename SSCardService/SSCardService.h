@@ -57,5 +57,9 @@ public:
 	// 正式挂失/解挂
 	virtual int RegisterLost(string& strJsonIn, string& strJsonOut, int nOperation = 0) = 0;
 
+	virtual int LoadCardData(string& strINIFile) = 0;
 
+	virtual int SaveCardData(string& strINIFile) = 0;
+
+	virtual int ExecExtraInterface(const string& strCommand, string& strInput, string& strOutput) = 0;
 };
