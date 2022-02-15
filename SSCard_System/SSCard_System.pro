@@ -42,6 +42,8 @@ SOURCES += \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
+    nc_commitpersoninfo.cpp \
+    newcard.cpp \
     openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
@@ -86,6 +88,8 @@ HEADERS += \
     license.h \
     mainpage.h \
     mainwindow.h \
+    nc_commitpersoninfo.h \
+    newcard.h \
     openssl-1.0.1g/include/openssl/aes.h \
     openssl-1.0.1g/include/openssl/asn1.h \
     openssl-1.0.1g/include/openssl/asn1_mac.h \
@@ -186,6 +190,7 @@ HEADERS += \
 FORMS += \
     CheckPassword.ui \
     MaskWidget.ui \
+    Newcard.ui \
     OperatorSucceed.ui \
     Sys_DeviceManager.ui \
     Sys_cardmanger.ui \
@@ -200,6 +205,7 @@ FORMS += \
     license.ui \
     mainpage.ui \
     mainwindow.ui \
+    nc_commitpersoninfo.ui \
     registerlost.ui \
     showlicense.ui \
     uc_adforfinance.ui \
