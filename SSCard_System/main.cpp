@@ -134,32 +134,41 @@ int main(int argc, char* argv[])
 	ofs << RunJson.ToString();
 	ofs.close();
 
-	if (!CheckLocalLicense(Code_License))
-	{
-		ShowLicense s;
-		s.show();
-		return a.exec();
-	}
-
 	curl_global_init(CURL_GLOBAL_WIN32);
 
 	g_pDataCenter = make_shared<DataCenter>();
-	if (!g_pDataCenter)
+	QString strMessage;
+	int nResult = -1;
+	do
 	{
-		gError() << QString("内存不足,初始数据中心失败!").toLocal8Bit().data();
-		return -1;
-	}
-	QString strError;
-	if (g_pDataCenter->LoadSysConfigure(strError))
+		if (!g_pDataCenter)
+		{
+			strMessage = "内存不足,初始数据中心失败!";
+			break;
+		}
+		QString strError;
+		if (g_pDataCenter->LoadSysConfigure(strError))
+		{
+			strMessage = QString("加载系统配置失败:%1").arg(strError);
+			gError() << QString("加载系统配置失败:%1").arg(strError).toLocal8Bit().data();
+			break;
+		}
+		if (g_pDataCenter->LoadCardForm(strError))
+		{
+			strMessage = QString("加载卡片打印模板失败:%1").arg(strError);
+
+			break;
+		}
+		nResult = 0;
+	} while (0);
+
+	if (nResult)
 	{
-		gError() << QString("加载系统配置失败:%1").arg(strError).toLocal8Bit().data();
-		return -1;
+		gError() << gQStr(strMessage);
+		QMessageBox::critical(nullptr, "提示", strMessage, QMessageBox::Ok);
+		return nResult;
 	}
-	if (g_pDataCenter->LoadCardForm(strError))
-	{
-		gError() << QString("加载卡片打印模板失败:%1").arg(strError).toLocal8Bit().data();
-		return -1;
-	}
+
 	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
 	char szOutInfo[1024] = { 0 };
 	CJsonObject jsonReg;
@@ -176,6 +185,13 @@ int main(int argc, char* argv[])
 	jsonT.Get("user", struser);
 	jsonT.Get("pwd", strpwd);
 	jsonT.Get("city", strcity);
+
+	if (!CheckLocalLicense(Code_License))
+	{
+		ShowLicense s;
+		s.show();
+		return a.exec();
+	}
 
 	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;

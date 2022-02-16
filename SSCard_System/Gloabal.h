@@ -179,6 +179,7 @@ struct DeviceConfig
 			gError() << gQStr(strInfo);
 			nDepenseBox = 1;
 		}
+		bCheckBezel = pSettings->value("CheckBezel", true).toBool();					   // 是否检查出卡口有卡
 
 		// 制卡读卡器配置
 		strReaderModule = pSettings->value("ReaderModule").toString().toStdString();				// 读卡器驱动模块名称,如KT_Reader.dll
@@ -350,6 +351,7 @@ struct DeviceConfig
 	PrinterType nPrinterType;                          // 打印机型号代码
 	string      strPrinterType;                        // 打印机型号名
 	int			nDepenseBox;						   // 发卡箱号
+	bool		bCheckBezel = true;						   // 是否检查出卡口有卡
 	string		strDPI;								   // 打印机DPI，300*300,300*600
 
 	string		strReaderModule;					   // 制卡读卡器驱动模块名称,如KT_Reader.dll
@@ -898,6 +900,8 @@ public:
 	int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage);
 
 	int TestPrinter(QString& strMessage);
+
+	int TestCard(QString& strMessage);
 
 	int Depense(QString& strMessage);
 

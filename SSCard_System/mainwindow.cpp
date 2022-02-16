@@ -210,6 +210,12 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		return;
 	}
 
+	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
+
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
 	m_pUpdateCard->show();

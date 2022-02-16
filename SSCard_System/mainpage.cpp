@@ -30,15 +30,16 @@ MainPage::MainPage(QWidget* parent) :
 		"QPushButton:hover{border-image: url(./Image/%1_Hover.png);}"
 		"QPushButton:pressed{border-image: url(./Image/%1_Pressed.png);}";
 	QString strNewCard = QString(strButtonStyle).arg("NewCard");
-	QString strUpdateCard = QString(strButtonStyle).arg("UpdateCard");
+	QString strUpdateCard = QString(strButtonStyle).arg("UpdateCard_big");
 	QString strRegisterLost = QString(strButtonStyle).arg("RegisterLost");
 	QString strChangePassword = QString(strButtonStyle).arg("ChangePassword");
 
-	ui->pushButton_NewCard->setStyleSheet(strNewCard);
+	//ui->pushButton_NewCard->setStyleSheet(strNewCard);
+	//ui->pushButton_NewCard->hide();
 	ui->pushButton_Updatecard->setStyleSheet(strUpdateCard);
 	ui->pushButton_RegisterLost->setStyleSheet(strRegisterLost);
 	ui->pushButton_ChangePWD->setStyleSheet(strChangePassword);
-	ui->pushButton_NewCard->show();
+
 	if (LoadServiceDescription())
 	{
 		QString strStyle = QString("border-image: url(./Image/%1);").arg(m_ServiceDescription[0].strQR_Photo);

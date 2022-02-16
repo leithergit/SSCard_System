@@ -172,6 +172,13 @@ public:
 	 * @return 0：成功；1：失败
 	 */
 	virtual int Printer_CloseSleepMode(char* resCode) { return 0;}
+	/**
+	 * @brief  向打印机发送命令
+	 * @param[in] cmd 传入命令
+	 * @param[out] resCode(最低长度256) 成功返回对应值,失败返回0001
+	 * @return 0:成功 非0查看对应打印机错误返回值
+	 */
+	virtual int Printer_ExtraCommand(const char* cmd, char* resCode) = 0;
 };
 
 #endif
