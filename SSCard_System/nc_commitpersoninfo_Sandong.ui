@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>nc_commitPersonInfo</class>
- <widget class="QWidget" name="nc_commitPersonInfo">
+ <class>nc_commitPersonInfo_Sandong</class>
+ <widget class="QWidget" name="nc_commitPersonInfo_Sandong">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -440,6 +440,12 @@ font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
          </item>
          <item>
           <widget class="QComboBox" name="comboBox_Occupation">
+           <property name="minimumSize">
+            <size>
+             <width>500</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">QComboBox
 {

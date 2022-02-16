@@ -111,18 +111,20 @@ enum MaskStatus
 
 enum Page_Index
 {
-	Page_ReaderIDCard,				//读取身份证
-	Page_FaceCapture,				//读取社保卡	
-	Page_EnsureInformation,			//信息确认
-	Page_InputMobile,				//输入手机号码
-	Page_Payment,					//支付页面
-	Page_MakeCard,					//制卡页面	
-	Page_ReadSSCard,				//读取社保卡	
-	Page_InputSSCardPWD,			//输入社保卡密码	
-	Page_ChangeSSCardPWD,			//修改社保卡密码	
-	Page_RegisterLost,				//挂失 / 解挂
-	Page_AdforFinance,				//开通金融页面
-	Page_Succeed					//操作成功
+	Page_ReaderIDCard,				// 读取身份证
+	Page_FaceCapture,				// 读取社保卡	
+	Page_EnsureInformation,			// 信息确认
+	Page_InputMobile,				// 输入手机号码
+	Page_Payment,					// 支付页面
+	Page_MakeCard,					// 制卡页面	
+	Page_ReadSSCard,				// 读取社保卡	
+	Page_InputSSCardPWD,			// 输入社保卡密码	
+	Page_ChangeSSCardPWD,			// 修改社保卡密码	
+	Page_RegisterLost,				// 挂失 / 解挂
+	Page_AdforFinance,				// 开通金融页面
+	Page_Succeed,					// 操作成功
+	Page_CommitPersonInfo,			// 提交个人信息
+	Page_MakePhoto					// 照片采集
 };
 
 enum class Manager_Level

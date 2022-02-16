@@ -222,6 +222,7 @@
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
+    <ClCompile Include="nc_commitpersoninfo_Sandong.cpp" />
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <QtMoc Include="newcard.h" />
+    <QtMoc Include="nc_commitpersoninfo_Sandong.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -369,6 +371,7 @@
     </QtUic>
     <QtUic Include="MaskWidget.ui">
     </QtUic>
+    <QtUic Include="nc_commitpersoninfo_Sandong.ui" />
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>

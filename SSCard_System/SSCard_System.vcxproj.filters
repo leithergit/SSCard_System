@@ -195,6 +195,9 @@
     <ClCompile Include="showlicense.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nc_commitpersoninfo_Sandong.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -443,6 +446,9 @@
     <QtUic Include="Newcard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="nc_commitpersoninfo_Sandong.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png">
@@ -598,6 +604,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="showlicense.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="nc_commitpersoninfo_Sandong.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

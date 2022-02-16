@@ -43,6 +43,8 @@ SOURCES += \
     mainpage.cpp \
     mainwindow.cpp \
     nc_commitpersoninfo.cpp \
+    nc_commitpersoninfo_Sandong.cpp \
+    nc_makephoto.cpp \
     newcard.cpp \
     openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
@@ -89,6 +91,8 @@ HEADERS += \
     mainpage.h \
     mainwindow.h \
     nc_commitpersoninfo.h \
+    nc_commitpersoninfo_Sandong.h \
+    nc_makephoto.h \
     newcard.h \
     openssl-1.0.1g/include/openssl/aes.h \
     openssl-1.0.1g/include/openssl/asn1.h \
@@ -206,6 +210,8 @@ FORMS += \
     mainpage.ui \
     mainwindow.ui \
     nc_commitpersoninfo.ui \
+    nc_commitpersoninfo_Sandong.ui \
+    nc_makephoto.ui \
     registerlost.ui \
     showlicense.ui \
     uc_adforfinance.ui \
