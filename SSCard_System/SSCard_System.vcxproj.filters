@@ -293,6 +293,9 @@
     <ClInclude Include="..\utility\json\CJsonObject.hpp">
       <Filter>json</Filter>
     </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -599,8 +602,9 @@
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="SSCard_System.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <Image Include="SSCard_System.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SSCard_System.rc" />
   </ItemGroup>
 </Project>

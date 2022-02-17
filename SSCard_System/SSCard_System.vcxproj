@@ -260,6 +260,7 @@ copy /y $(TargetPath) z:\</Command>
     <QtMoc Include="newcard.h" />
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -472,6 +473,9 @@ copy /y $(TargetPath) z:\</Command>
     </QtRcc>
     <None Include="Image\todo.png" />
     <None Include="Image\zhifubao.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="SSCard_System.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SSCard_System.rc" />
