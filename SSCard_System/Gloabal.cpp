@@ -1379,6 +1379,9 @@ bool DataCenter::OpenCamera()
 		if (nRet != LD_RET_OK)
 			break;
 
+		char szProductInfo[8192] = { 0 };
+		nRet = DVTGKLDCam_GetProduct(szProductInfo, 8192);
+		qDebug() << szProductInfo;
 		nRet = DVTGKLDCam_SetFrameCallback(m_hCamera, 0, LDCam_VIS_FrameCallback, this);
 		if (nRet != LD_RET_OK)
 			break;
@@ -1398,10 +1401,10 @@ bool DataCenter::StartVideo(HWND hWnd)
 	int nRet = -1;
 	do
 	{
-		if (m_hCamera)
+		if (!m_hCamera)
 			break;
 
-		if (!m_bVideoStarted)
+		if (m_bVideoStarted)
 			return m_bVideoStarted;
 
 		if (!IsWindow(hWnd))
@@ -1412,13 +1415,14 @@ bool DataCenter::StartVideo(HWND hWnd)
 		RECT rtWnd;
 		GetWindowRect(hWnd, &rtWnd);
 		int nWndWidth = rtWnd.right - rtWnd.left;
-		int nWndHeight = rtWnd.top - rtWnd.bottom;
+		int nWndHeight = rtWnd.bottom - rtWnd.top;
 		nRet = DVTGKLDCam_StartVideo(m_hCamera, (HWND)hWnd, 0, 0, nWndWidth, nWndHeight);
 		if (nRet != LD_RET_OK)
 			break;
-		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_ONGOING, 30, (char*)"人脸检测正在进行");
-		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_FAIL_TIMEOUT, 30, (char*)"人脸检测失败，超时");
-		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_SUCCESS, 30, (char*)"人脸检测成功");
+		QString strText[] = { "人脸检测正在进行" ,"人脸检测失败，超时" ,"人脸检测成功" };
+		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_ONGOING, 30, (char*)strText[0].toLocal8Bit().toStdString().c_str());
+		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_FAIL_TIMEOUT, 30, (char*)strText[1].toLocal8Bit().toStdString().c_str());
+		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_SUCCESS, 30, (char*)strText[2].toLocal8Bit().toStdString().c_str());
 		m_bVideoStarted = true;
 	} while (0);
 	return m_bVideoStarted;
@@ -1499,7 +1503,7 @@ bool DataCenter::FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, 
 		return false;
 
 	QFileInfo fi2(strFacePhoto2.c_str());
-	if (fi2.isFile())
+	if (!fi2.isFile())
 		return false;
 
 	QImage FaceImage1(strFacePhoto1.c_str());
@@ -1509,8 +1513,8 @@ bool DataCenter::FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, 
 	QImage FaceImage2(strFacePhoto2.c_str());
 	if (FaceImage1.isNull())
 		return false;
-
-	if (LD_RET_OK != DVTGKLDCam_FaceCompFeature(m_hCamera, strFacePhoto1.c_str(), strFacePhoto2.c_str(), FaceImage1.width(), FaceImage1.height(), FaceImage2.width(), FaceImage2.height(), &dfSimilarity))
+	int nRet = DVTGKLDCam_FaceCompFeature(m_hCamera, strFacePhoto1.c_str(), strFacePhoto2.c_str(), FaceImage1.height(), FaceImage1.width(), FaceImage2.height(), FaceImage2.width(), &dfSimilarity);
+	if (LD_RET_OK != nRet)
 		return false;
 
 	return true;
@@ -1536,7 +1540,7 @@ bool DataCenter::SwitchVideoWnd(HWND hWnd)
 	RECT rtWnd;
 	GetWindowRect(hWnd, &rtWnd);
 	int nWndWidth = rtWnd.right - rtWnd.left;
-	int nWndHeight = rtWnd.top - rtWnd.bottom;
+	int nWndHeight = rtWnd.bottom - rtWnd.top;
 	return LD_RET_OK == DVTGKLDCam_UpdateWindow(m_hCamera, hWnd, 0, 0, nWndWidth, nWndHeight);
 }
 

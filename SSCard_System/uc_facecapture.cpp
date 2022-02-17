@@ -135,6 +135,7 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 		//	}
 		//	m_bDetectionStart = true;
 		//}
+		g_pDataCenter->StopDetect();
 		if (g_pDataCenter->IsVideoStart())
 		{
 			if (!g_pDataCenter->SwitchVideoWnd((HWND)ui->label_FaceDetect->winId()))
@@ -146,16 +147,17 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 		}
 		else
 		{
-			if (!g_pDataCenter->StartVideo((HWND)ui->label_FaceDetect->winId()));
+			if (!g_pDataCenter->StartVideo((HWND)ui->label_FaceDetect->winId()))
 			{
 				strError = "获取视频数据失败!";
 				return -1;
 			}
-			if (!g_pDataCenter->StartDetect(this, 2000, 30000))
-			{
-				strError = "启动人脸检测失败!";
-				return -1;
-			}
+
+		}
+		if (!g_pDataCenter->StartDetect(this, 2000, m_nTimeout * 1000))
+		{
+			strError = "启动人脸检测失败!";
+			return -1;
 		}
 		connect(this, SIGNAL(LiveDetectStatusEvent(int, int)), this, SLOT(OnLiveDetectStatusEvent(int, int)));
 		m_bDetectionStart = true;
@@ -219,16 +221,16 @@ void uc_FaceCapture::OnFaceCaptureFailed()
 	emit ShowMaskWidget("操作失败", "身份证照片与当前人脸对比相似度太低,匹配失败!", Failed, Return_MainPage);
 }
 
-int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, int nFull)
+int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, bool bFull)
 {
-	if (QFailed(GetFaceCaptureStorePath(strFaceImageFile, nFull)))
+	if (QFailed(GetFaceCaptureStorePath(strFaceImageFile, bFull)))
 	{
 		gError() << QString("无法访问人脸数据目录!").toLocal8Bit().data();
 		return -1;
 	}
 	strMessage = QString("准备生成临时文件:%1").arg(strFaceImageFile);
 	gInfo() << gQStr(strMessage);
-	g_pDataCenter->SaveFaceImage(strFaceImageFile.toStdString(), nFull);
+	g_pDataCenter->SaveFaceImage(strFaceImageFile.toStdString(), bFull);
 
 	//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
 	//QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(nFull);
@@ -249,7 +251,7 @@ int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, i
 	return 0;
 }
 
-int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, int nFull)
+int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, bool bFull)
 {
 	QString strStorePath = QCoreApplication::applicationDirPath();
 	strStorePath += "/FaceCapture/";
@@ -267,7 +269,7 @@ int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, int nFull)
 			return -1;
 		}
 	}
-	if (nFull == 0)
+	if (bFull)
 		strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
 	else
 		strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
@@ -293,13 +295,13 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 			//	return;
 			//}
 			QString strFullImageFile;
-			if (QFailed(SaveImage(strFullImageFile, strEvent, 0)))
+			if (QFailed(SaveImage(strFullImageFile, strEvent, true)))
 			{
 				gError() << gQStr(strEvent);
 				return;
 			}
 			QString strFaceImageFile;
-			if (QFailed(SaveImage(strFaceImageFile, strEvent, 1)))
+			if (QFailed(SaveImage(strFaceImageFile, strEvent, false)))
 			{
 				gError() << gQStr(strEvent);
 				return;

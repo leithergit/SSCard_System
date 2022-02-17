@@ -26,11 +26,11 @@ public:
 	int    CloseCamera(QString& strError);
 	bool   m_bOuputProductInfo = false;
 	// nFull	0为全屏图像，1即人脸
-	int    GetFaceCaptureStorePath(QString& strFilePath, int bFull = 1);
+	int    GetFaceCaptureStorePath(QString& strFilePath, bool bFull = 1);
 	bool   m_bFaceDetectSucceed = false;
 	bool   m_bDetectionStart = false;
-	// nFull	0为全屏图像，1即人脸
-	int   SaveImage(QString& strImagePath, QString& strMessage, int nFull = 1);
+	// nFull	true为全屏图像，false即人脸
+	int   SaveImage(QString& strImagePath, QString& strMessage, bool nFull = false);
 
 private slots:
 	void   OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
