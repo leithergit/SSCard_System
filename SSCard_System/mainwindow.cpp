@@ -27,6 +27,11 @@ MainWindow::MainWindow(QWidget* parent)
 		gInfo() << "Failed in InitEnv";
 	}
 
+	if (g_pDataCenter->OpenCamera())
+	{
+		gInfo() << "Failed in OpenCamera";
+	}
+
 	//setStyleSheet(QString::fromUtf8("background-image:url(./Image/backgroud.jpg);"));
 	//setStyleSheet(QString::fromUtf8("background-image:url(D:/Work/Henan_shangqiu/HNBXZM/Image/backgroud.jpg);"));
 	//this->setStyleSheet(QString::fromUtf8(".QMainWindow{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
@@ -114,6 +119,7 @@ void MainWindow::mousePressEvent(QMouseEvent* e)
 
 MainWindow::~MainWindow()
 {
+	g_pDataCenter->CloseCamera();
 	delete ui;
 }
 

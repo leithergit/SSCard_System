@@ -8,17 +8,20 @@
 #include <QTextCodec>
 #include "Gloabal.h"
 #include "Payment.h"
+#include "qstackpage.h"
 
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 #pragma comment(lib,"Version.lib")
+#pragma comment(lib,"../sdk/FaceCapture/DVTGKLDCamSDK.lib")
+#pragma comment(lib,"../sdk/BugTrap/BugTrapU.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printerd")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
-#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
+#pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfod")
 #pragma comment(lib, "../SDK/libcurl/libcurld")
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
@@ -80,10 +83,12 @@ extern DataCenterPtr g_pDataCenter;
 QScreen* g_pCurScreen = nullptr;
 DataCenter::DataCenter()
 {
+	DVTGKLDCam_Init();
 }
 
 DataCenter::~DataCenter()
 {
+	DVTGKLDCam_UnInit();
 }
 // 
 int DataCenter::LoadSysConfigure(QString& strError)
@@ -264,7 +269,6 @@ bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage)
 	return bSucceed;
 }
 
-
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent)
 {
 	QMessageBox Msgbox(nIcon, strTitle, strText, stdButtons, parent);
@@ -384,7 +388,6 @@ QStringList SearchFiles(const QString& dir_path, QDateTime* pStart, QDateTime* p
 
 	return FileList;
 }
-
 
 int DataCenter::OpenDevice(QString& strMessage)
 {
@@ -945,7 +948,6 @@ int DataCenter::Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& st
 	return nResult;
 }
 
-
 string DataCenter::MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo)
 {
 	string strCardInfo = "";
@@ -1228,4 +1230,333 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 	} while (0);
 	return nResult;
+}
+
+int g_index = 0;
+
+int WINAPI LDCam_VIS_FrameCallback(PVOID context, PUCHAR pFrameData, int nFrameLen)
+{
+	g_index++;
+	return 0;
+}
+
+int WINAPI LDCam_NIR_FrameCallback(PVOID context, PUCHAR pFrameData, int nFrameLen)
+{
+	if (g_index == 10)
+	{
+		//WriteBMPFile("d:\\nir.bmp", pFrameData, 640, 480);
+	}
+
+	return 0;
+}
+
+
+int WINAPI LDCam_EventCallback(int nEventID, PVOID context, int nFrameStatus)
+{
+	QStackPage* pWidget = (QStackPage*)context;
+	pWidget->emit LiveDetectStatusEvent(nEventID, nFrameStatus);
+	return 0;
+}
+
+BOOL WriteBMPFile(const char* strFileName, PUCHAR pData, int nWidth, int nHeight)
+{
+	BITMAPFILEHEADER   bmfHdr;
+	BITMAPINFOHEADER   bi;
+	int nLen;
+
+	FILE* f = NULL;
+
+	BOOL bRet;
+
+	nLen = nWidth * nHeight * 3;
+	bi.biSize = sizeof(BITMAPINFOHEADER);
+	bi.biWidth = nWidth;
+	bi.biHeight = nHeight;
+	bi.biPlanes = 1;
+	bi.biBitCount = 24;
+	bi.biCompression = BI_RGB;
+	bi.biSizeImage = nLen;
+	bi.biXPelsPerMeter = 0;
+	bi.biYPelsPerMeter = 0;
+	bi.biClrUsed = 0;
+	bi.biClrImportant = 0;
+	bmfHdr.bfType = 0x4D42;  // "BM"
+	bmfHdr.bfSize = sizeof(BITMAPFILEHEADER) + bi.biSize + nLen;
+	bmfHdr.bfReserved1 = 0;
+	bmfHdr.bfReserved2 = 0;
+	bmfHdr.bfOffBits = sizeof(BITMAPFILEHEADER) + bi.biSize;
+
+	f = fopen(strFileName, "wb");
+	if (NULL == f)
+	{
+		bRet = FALSE;
+		goto done;
+	}
+
+	if (1 != fwrite(&bmfHdr, sizeof(BITMAPFILEHEADER), 1, f))
+	{
+		bRet = FALSE;
+		goto done;
+	}
+
+	if (1 != fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, f))
+	{
+		bRet = FALSE;
+		goto done;
+	}
+
+
+	if (1 != fwrite(pData, nLen, 1, f))
+	{
+		bRet = FALSE;
+		goto done;
+	}
+
+	bRet = TRUE;
+
+done:
+
+	if (f)
+		fclose(f);
+
+	return bRet;
+}
+
+
+//int DataCenter::FaceCamera_EventCallback(int nEventID, int nFrameStatus)
+//{
+//	if (nEventID == EVENT_OK)
+//	{
+//		ZeroMemory(pImageBuffer, nBufferSize);
+//		int nFaceW, nFaceH;
+//		int nDataLen = 0;
+//		int nRet = 0;
+//		do
+//		{
+//			nRet = DVTGKLDCam_GetImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nDataLen);
+//			if (nRet != LD_RET_OK)
+//				break;
+//
+//			WriteBMPFile(strFullCapture.c_str(), pImageBuffer, m_nWidth, m_nHeight);
+//			ZeroMemory(pImageBuffer, nBufferSize);
+//			nRet = DVTGKLDCam_GetFaceImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nFaceW, &nFaceH, &nDataLen);
+//			if (nRet != LD_RET_OK)
+//				break;
+//			WriteBMPFile(strFaceCapture.c_str(), pImageBuffer, nFaceW, nFaceH);
+//
+//
+//		} while (0);
+//
+//	}
+//	else if (nEventID == EVENT_ONGOING)
+//	{
+//		qDebug("Detecting, event = %d iFrameStatus = %d \n", nEventID, nFrameStatus);
+//	}
+//	else
+//	{
+//		qDebug("Detect error, event = %d iFrameStatus = %d", nEventID, nFrameStatus);
+//	}
+//}
+
+bool DataCenter::IsVideoStart()
+{
+	return m_bVideoStarted;
+}
+bool DataCenter::OpenCamera()
+{
+	int nRet = -1;
+	do
+	{
+		if (m_hCamera)
+			break;
+
+		nBufferSize = m_nWidth * m_nHeight * 4;
+		pImageBuffer = new byte[nBufferSize];
+		if (!pImageBuffer)
+			break;
+
+		nRet = DVTGKLDCam_Open(&m_hCamera);
+		if (nRet != LD_RET_OK)
+			break;
+
+		nRet = DVTGKLDCam_SetFrameCallback(m_hCamera, 0, LDCam_VIS_FrameCallback, this);
+		if (nRet != LD_RET_OK)
+			break;
+
+		nRet = DVTGKLDCam_SetFrameCallback(m_hCamera, 1, LDCam_NIR_FrameCallback, this);
+		if (nRet != LD_RET_OK)
+			break;
+	} while (0);
+	if (nRet != LD_RET_OK)
+		return false;
+	else
+		return true;
+}
+
+bool DataCenter::StartVideo(HWND hWnd)
+{
+	int nRet = -1;
+	do
+	{
+		if (m_hCamera)
+			break;
+
+		if (!m_bVideoStarted)
+			return m_bVideoStarted;
+
+		if (!IsWindow(hWnd))
+			break;
+		nRet = DVTGKLDCam_SetCamFormat(m_hCamera, 1, LD_FMT_MJPG, m_nWidth, m_nHeight);
+		if (nRet != LD_RET_OK)
+			break;
+		RECT rtWnd;
+		GetWindowRect(hWnd, &rtWnd);
+		int nWndWidth = rtWnd.right - rtWnd.left;
+		int nWndHeight = rtWnd.top - rtWnd.bottom;
+		nRet = DVTGKLDCam_StartVideo(m_hCamera, (HWND)hWnd, 0, 0, nWndWidth, nWndHeight);
+		if (nRet != LD_RET_OK)
+			break;
+		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_ONGOING, 30, (char*)"人脸检测正在进行");
+		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_FAIL_TIMEOUT, 30, (char*)"人脸检测失败，超时");
+		DVTGKLDCam_SetDetectText(m_hCamera, TEXT_SUCCESS, 30, (char*)"人脸检测成功");
+		m_bVideoStarted = true;
+	} while (0);
+	return m_bVideoStarted;
+}
+
+void DataCenter::StopVideo()
+{
+	if (!m_hCamera)
+		return;
+
+	if (!m_bVideoStarted)
+		return;
+
+	DVTGKLDCam_StopVideo(m_hCamera);
+	m_bVideoStarted = false;
+}
+
+void DataCenter::CloseCamera()
+{
+	if (m_hCamera)
+	{
+		StopDetect();
+		DVTGKLDCam_Close(m_hCamera);
+		delete[]pImageBuffer;
+		pImageBuffer = nullptr;
+		m_hCamera = nullptr;
+	}
+}
+
+bool DataCenter::StartDetect(void* pContext, int nDetectMilliSeconds, int nTimeoutMilliSeconds)
+{
+	if (!m_hCamera)
+		return false;
+
+	if (LD_RET_OK != DVTGKLDCam_SetEventCallback(m_hCamera, LDCam_EventCallback, pContext))
+		return false;
+
+	if (LD_RET_OK != DVTGKLDCam_StartDetection(m_hCamera, nDetectMilliSeconds, nTimeoutMilliSeconds))
+		return false;
+	m_bDetectStarted = true;
+	return true;
+}
+
+bool DataCenter::SaveFaceImage(string strPhotoFile, bool bFull)
+{
+	if (!m_hCamera)
+		return false;
+	int nDataLen = 0;
+	bool bSucceed = false;
+	ZeroMemory(pImageBuffer, nBufferSize);
+	if (bFull)
+	{
+		if (LD_RET_OK == DVTGKLDCam_GetImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nDataLen))
+		{
+			WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, m_nWidth, m_nHeight);
+			bSucceed = true;
+		}
+	}
+	else
+	{
+		int nFaceWidth = 0, nFaceHeight = 0;
+		if (LD_RET_OK == DVTGKLDCam_GetFaceImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nFaceWidth, &nFaceHeight, &nDataLen))
+		{
+			WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, nFaceWidth, nFaceHeight);
+			bSucceed = true;
+		}
+	}
+	return bSucceed;
+}
+
+bool DataCenter::FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, float& dfSimilarity)
+{
+	if (!m_hCamera)
+		return false;
+	QFileInfo fi1(strFacePhoto1.c_str());
+
+	if (!fi1.isFile())
+		return false;
+
+	QFileInfo fi2(strFacePhoto2.c_str());
+	if (fi2.isFile())
+		return false;
+
+	QImage FaceImage1(strFacePhoto1.c_str());
+	if (FaceImage1.isNull())
+		return false;
+
+	QImage FaceImage2(strFacePhoto2.c_str());
+	if (FaceImage1.isNull())
+		return false;
+
+	if (LD_RET_OK != DVTGKLDCam_FaceCompFeature(m_hCamera, strFacePhoto1.c_str(), strFacePhoto2.c_str(), FaceImage1.width(), FaceImage1.height(), FaceImage2.width(), FaceImage2.height(), &dfSimilarity))
+		return false;
+
+	return true;
+}
+
+void DataCenter::StopDetect()
+{
+	if (m_bDetectStarted)
+	{
+		DVTGKLDCam_StopDetection(m_hCamera);
+		m_bDetectStarted = false;
+	}
+}
+
+bool DataCenter::SwitchVideoWnd(HWND hWnd)
+{
+	if (!IsWindow(hWnd))
+		return false;
+
+	if (!m_hCamera)
+		return false;
+
+	RECT rtWnd;
+	GetWindowRect(hWnd, &rtWnd);
+	int nWndWidth = rtWnd.right - rtWnd.left;
+	int nWndHeight = rtWnd.top - rtWnd.bottom;
+	return LD_RET_OK == DVTGKLDCam_UpdateWindow(m_hCamera, hWnd, 0, 0, nWndWidth, nWndHeight);
+}
+
+bool DataCenter::Snapshot(string strFilePath)
+{
+	if (m_hCamera)
+	{
+		int nDataLen = 0;
+		ZeroMemory(pImageBuffer, nBufferSize);
+		int nRet = DVTGKLDCam_Snapshot(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nDataLen);
+		if (nRet == LD_RET_OK)
+		{
+			WriteBMPFile(strFilePath.c_str(), pImageBuffer, m_nWidth, m_nHeight);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+		return false;
 }

@@ -208,7 +208,7 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-::copy /y $(TargetPath) z:\</Command>
+copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>@call updatesdk.bat $(Configuration)</Command>

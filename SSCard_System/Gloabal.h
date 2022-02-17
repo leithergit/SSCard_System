@@ -52,13 +52,14 @@
 #include "../SDK/KT_Reader/KT_Reader.h"
 #include "../SDK/SSCardDriver/SSCardDriver.h"
 #include "../SDK/SSCardHSM/KT_SSCardHSM.h"
-#include "../SDK/SSCardInfo/KT_SSCardInfo.h"
+#include "../SDK/SSCardInfo_Henan/KT_SSCardInfo.h"
 #include "../SDK/IDCard/idcard_api.h"
 #include "../SDK/PinKeybroad/XZ_F31_API.h"
 #include "../SDK/libcurl/curl.h"
-#include "./SDK/7Z/include/bitarchiveinfo.hpp"
-#include "./SDK/7Z/include/bitcompressor.hpp"
-#include "./SDK/7Z/include/bitexception.hpp"
+#include "../SDK/7Z/include/bitarchiveinfo.hpp"
+#include "../SDK/7Z/include/bitcompressor.hpp"
+#include "../SDK/7Z/include/bitexception.hpp"
+#include "../SDK/FaceCapture/DVTGKLDCamSDK.h"
 
 //宏定义
 #define __STR2__(x) #x
@@ -136,6 +137,12 @@ enum class Manager_Level
 #define Str(x)       #x
 #define gVal(p)      #p<<" = "<<p <<"\t"
 #define gQStr(p)	 #p<<" = "<<p.toLocal8Bit().data()<<"\t"
+
+int WINAPI LDCam_EventCallback(int event_id, PVOID context, int iFrameStatus);
+int WINAPI LDCam_NIR_FrameCallback(PVOID context, PUCHAR pFrameData, int nFrameLen);
+int WINAPI LDCam_VIS_FrameCallback(PVOID context, PUCHAR pFrameData, int nFrameLen);
+BOOL WriteBMPFile(const char* strFileName, PUCHAR pData, int nWidth, int nHeight);
+
 struct DeviceConfig
 {
 	DeviceConfig(QSettings* pSettings)
@@ -886,6 +893,41 @@ public:
 	string		   strCardMakeProgress;
 	string		   strPayCode;
 	bool		   bDebug;
+public:
+	bool m_bDetectStarted = false;
+	bool m_bVideoStarted = false;
+	HANDLE  m_hCamera = nullptr;
+	int m_nWidth = 640;
+	int m_nHeight = 480;
+	int nWndIndex = 0;
+	byte* pImageBuffer = nullptr;
+	int		nBufferSize = 0;
+	string strFullCapture;
+	string strFaceCapture;
+	//int FaceCamera_EventCallback(int nEventID, int nFrameStatus);
+
+	bool IsVideoStart();
+
+	bool OpenCamera();
+
+	bool StartVideo(HWND hWnd);
+
+	void StopVideo();
+
+	void CloseCamera();
+
+	bool StartDetect(void* pContext, int nDetectMilliSeconds = 2000, int nTimeoutMilliSeconds = 15000);
+
+	bool SaveFaceImage(string strPhotoFile, bool bFull = true);
+
+	bool FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, float& dfSimilarity);
+
+	void StopDetect();
+
+	bool SwitchVideoWnd(HWND hWnd);
+
+	bool Snapshot(string strFilePath);
+
 public:
 	int OpenDevice(QString& strMessage);
 
