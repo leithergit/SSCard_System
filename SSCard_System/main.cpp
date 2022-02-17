@@ -37,7 +37,6 @@ static void SetupExceptionHandler()
 	BT_SetReportFilePath(szReportPath);
 	BT_SetFlags(BTF_DETAILEDMODE | BTF_RESTARTAPP);
 	BT_InstallSehFilter();
-
 }
 
 int main(int argc, char* argv[])

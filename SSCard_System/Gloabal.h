@@ -52,14 +52,13 @@
 #include "../SDK/KT_Reader/KT_Reader.h"
 #include "../SDK/SSCardDriver/SSCardDriver.h"
 #include "../SDK/SSCardHSM/KT_SSCardHSM.h"
-#include "../SDK/SSCardInfo_henan/KT_SSCardInfo.h"
+#include "../SDK/SSCardInfo/KT_SSCardInfo.h"
 #include "../SDK/IDCard/idcard_api.h"
 #include "../SDK/PinKeybroad/XZ_F31_API.h"
 #include "../SDK/libcurl/curl.h"
-#include "../SDK/7Z/include/bitarchiveinfo.hpp"
-#include "../SDK/7Z/include/bitcompressor.hpp"
-#include "../SDK/7Z/include/bitexception.hpp"
-#include "../SSCardService/SSCardService.h"
+#include "./SDK/7Z/include/bitarchiveinfo.hpp"
+#include "./SDK/7Z/include/bitcompressor.hpp"
+#include "./SDK/7Z/include/bitexception.hpp"
 
 //宏定义
 #define __STR2__(x) #x
@@ -111,20 +110,18 @@ enum MaskStatus
 
 enum Page_Index
 {
-	Page_ReaderIDCard,				// 读取身份证
-	Page_FaceCapture,				// 读取社保卡	
-	Page_EnsureInformation,			// 信息确认
-	Page_InputMobile,				// 输入手机号码
-	Page_Payment,					// 支付页面
-	Page_MakeCard,					// 制卡页面	
-	Page_ReadSSCard,				// 读取社保卡	
-	Page_InputSSCardPWD,			// 输入社保卡密码	
-	Page_ChangeSSCardPWD,			// 修改社保卡密码	
-	Page_RegisterLost,				// 挂失 / 解挂
-	Page_AdforFinance,				// 开通金融页面
-	Page_Succeed,					// 操作成功
-	Page_CommitPersonInfo,			// 提交个人信息
-	Page_MakePhoto					// 照片采集
+	Page_ReaderIDCard,				//读取身份证
+	Page_FaceCapture,				//读取社保卡	
+	Page_EnsureInformation,			//信息确认
+	Page_InputMobile,				//输入手机号码
+	Page_Payment,					//支付页面
+	Page_MakeCard,					//制卡页面	
+	Page_ReadSSCard,				//读取社保卡	
+	Page_InputSSCardPWD,			//输入社保卡密码	
+	Page_ChangeSSCardPWD,			//修改社保卡密码	
+	Page_RegisterLost,				//挂失 / 解挂
+	Page_AdforFinance,				//开通金融页面
+	Page_Succeed					//操作成功
 };
 
 enum class Manager_Level
@@ -182,6 +179,7 @@ struct DeviceConfig
 			gError() << gQStr(strInfo);
 			nDepenseBox = 1;
 		}
+		bCheckBezel = pSettings->value("CheckBezel", true).toBool();					   // 是否检查出卡口有卡
 
 		// 制卡读卡器配置
 		strReaderModule = pSettings->value("ReaderModule").toString().toStdString();				// 读卡器驱动模块名称,如KT_Reader.dll
@@ -353,6 +351,7 @@ struct DeviceConfig
 	PrinterType nPrinterType;                          // 打印机型号代码
 	string      strPrinterType;                        // 打印机型号名
 	int			nDepenseBox;						   // 发卡箱号
+	bool		bCheckBezel = true;						   // 是否检查出卡口有卡
 	string		strDPI;								   // 打印机DPI，300*300,300*600
 
 	string		strReaderModule;					   // 制卡读卡器驱动模块名称,如KT_Reader.dll
@@ -901,6 +900,8 @@ public:
 	int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage);
 
 	int TestPrinter(QString& strMessage);
+
+	int TestCard(QString& strMessage);
 
 	int Depense(QString& strMessage);
 

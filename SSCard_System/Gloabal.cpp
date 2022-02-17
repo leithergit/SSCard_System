@@ -13,13 +13,12 @@
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 #pragma comment(lib,"Version.lib")
-#pragma comment(lib,"BugTrapU.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printerd")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
-#pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfod")
+#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
 #pragma comment(lib, "../SDK/libcurl/libcurld")
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
@@ -31,7 +30,7 @@
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriver")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSM")
-#pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfo")
+#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfo")
 #pragma comment(lib, "../SDK/libcurl/libcurl")
 #pragma comment(lib, "../SDK/QREncode/qrencode")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
@@ -442,19 +441,23 @@ int DataCenter::OpenPrinter(QString& strMessage)
 
 				if (QFailed(nResult = m_pPrinter->Printer_Init(DevConfig.nPrinterType, szRCode)))
 				{
-					strMessage = QString("Printer_Init‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+					strMessage = QString("打印机初始化‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
 					break;
 				}
 
 				if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
 				{
-					strMessage = QString("Printer_Open‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+					if (strcmp(szRCode, "0010") == 0)
+						strMessage = QString("打开打印机‘%1’失败,未安装色带!").arg(DevConfig.strPrinterType.c_str());
+					else if (strcmp(szRCode, "0011") == 0)
+						strMessage = QString("打开打印机‘%1’失败,色带与打印不兼容!").arg(DevConfig.strPrinterType.c_str());
+					else
+						strMessage = QString("打开打印机‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
 					break;
 				}
 			}
 			else
 				return 0;
-
 		} while (0);
 		if (QFailed(nResult))
 			return -1;
@@ -662,6 +665,95 @@ int DataCenter::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QStrin
 	return 0;
 }
 
+int DataCenter::TestCard(QString& strMessage)
+{
+	PRINTERSTATUS PrinterStatus;
+	DeviceConfig& DevConfig = pSysConfig->DevConfig;
+
+	int nResult = -1;
+	BOXINFO BoxInfo;
+	ZeroMemory(&BoxInfo, sizeof(BOXINFO));
+	char szRCode[32] = { 0 };
+	do
+	{
+		if (QFailed(g_pDataCenter->Depense(strMessage)))
+		{
+			break;
+		}
+
+		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
+		{
+			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
+			break;
+		}
+		if (PrinterStatus.fwDevice != 0)
+		{
+			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
+			break;
+		}
+		// 0-无卡；2-卡在内部；3-卡在上电位，4-卡在闸门外 5-堵卡；6-卡片未知
+		bool bSucceed = false;
+		switch (PrinterStatus.fwMedia)
+		{
+		case 0:		// 机内无卡
+		{
+			break;
+		}
+		case 1:			// 1-卡在门口:
+		{
+			strMessage = QString("打印机出卡号尚有未取走卡片,取走点击确定以继续!");
+			nResult = 1;
+			break;
+		}
+		case 2:			// 2-卡在内部；
+		case 3:			// 3-卡在接触位
+		case 4:			// 4-卡在非接位
+		{
+			if (!m_pSSCardReader)
+				break;
+			char szCardATR[128] = { 0 };
+			char szRCode[128] = { 0 };
+			int nCardATRLen = 0;
+			if (QFailed(m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+			{
+				strMessage = "卡片上电失败,请更换卡片或重新进卡!";
+				break;
+			}
+			const char* szCommand = "0084000008";
+			char szOut[1024] = { 0 };
+			int nOutLen = 0;
+			if (QFailed(m_pSSCardReader->Reader_APDU((BYTE*)szCommand, strlen(szCommand), szOut, nOutLen, szRCode)))
+			{
+				strMessage = "卡片数据交互失败,请更换卡片或重新进卡!";
+				break;
+			}
+			bSucceed = true;
+			break;
+		}
+		case 5:
+		{
+			strMessage = QString("打印机堵卡,请联系相关技术人员处理!");
+			break;
+		}
+		case 6:
+		default:
+		{
+			strMessage = QString("发生未知错误,请联系相关技术人员处理!");
+			break;
+		}
+		}
+		if (!bSucceed)
+			break;
+
+		nResult = 0;
+	} while (0);
+	if (QFailed(nResult))
+	{
+		m_pPrinter->Printer_Retract(1, szRCode);
+	}
+	return nResult;
+}
+
 int DataCenter::TestPrinter(QString& strMessage)
 {
 	PRINTERSTATUS PrinterStatus;
@@ -707,12 +799,13 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		case 1:			// 1-卡在门口:
 		{
-			strMessage = QString("打印机出卡号尚有未取走卡片,取走点击确定以继续!");
-			nResult = 1;		//
+			strMessage = QString("打印机出卡口尚有未取走卡片,请先取走卡片后重新操作!");
+			nResult = 1;
 			break;
 		}
 		case 2:			// 2-卡在内部；
 		case 3:			// 3-卡在上电位
+		case 4:			// 4-卡在闸门外
 		{
 			if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
 			{
@@ -723,11 +816,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 				bSucceed = true;
 			break;
 		}
-		case 4:			// 4-卡在闸门外
-		{
-			strMessage = QString("请先取走出卡口的卡片!");
-			break;
-		}
+
 		case 5:
 		{
 			strMessage = QString("打印机堵卡,请联系相关技术人员处理!");
@@ -792,10 +881,11 @@ int DataCenter::Depense(QString& strMessage)
 			break;
 		}
 
+		/* 此功能前置,不再在制卡时才检查是否有卡，而是在进行整个流程开始前就检查，以防止制止中途无卡时发生无卡的情况
 		if (QFailed(nResult = TestPrinter(strMessage)))
 		{
 			break;
-		}
+		}*/
 
 		int nDepensePos = 2;	// 1-读磁位；2-接触IC位;3-非接IC位;4-打印位， 默认为接触位
 		if (DevConfig.nSSCardReaderPowerOnType == 2)
@@ -1049,7 +1139,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
-			strMessage = QString("写卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;
 		}
 		// szCardBaseWrite输出结果为两个随机数

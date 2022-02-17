@@ -35,6 +35,8 @@ const char* g_szPublicKey = "-----BEGIN PUBLIC KEY-----\n"
 "Ogk7PIMvaSSU9swwbwIDAQAB\n"
 "-----END PUBLIC KEY-----\n";
 
+const char* g_szKey = "Kingaotech(Shanghai)";
+
 using namespace std;
 struct DeviceInfo
 {
@@ -345,7 +347,7 @@ bool SetHardwareCode(std::string& strMachineCode)
 	return true;
 }
 
-bool GetHardwareCode(std::string& strMachineCode)
+bool GetHardwareCode1(std::string& strMachineCode)
 {
 	shared_ptr<CWMIQuery> pQuery = shared_ptr<CWMIQuery>(new CWMIQuery(L"root\\CIMV2"));
 	if (FAILED(pQuery->Initialize()))
@@ -371,9 +373,7 @@ bool GetHardwareCode(std::string& strMachineCode)
 		return false;
 
 	AES_KEY key;
-	char szKey[32] = { 0 };
-	strcpy(szKey, "Kingaotech(Shanghai)");		// 密钥
-	AES_set_encrypt_key((const unsigned char*)szKey, 128, &key);
+	AES_set_encrypt_key((const unsigned char*)g_szKey, 128, &key);
 
 	// 生成机器码
 	// 由网卡ID，第一块硬盘序列号，主板序列号，组成，理论上重复的机率较小
@@ -399,8 +399,6 @@ bool GetHardwareCode(std::string& strMachineCode)
 	// 主板序列号
 	//memcpy(&szHardWareID[nSize], g_HardwareID.MotherBoard.strSerialNumber.c_str(), g_HardwareID.MotherBoard.strSerialNumber.size());
 	//nSize += g_HardwareID.MotherBoard.strSerialNumber.size();
-
-	AES_set_encrypt_key((const unsigned char*)szKey, 128, &key);
 	char szEncryptHD_ID[36] = { 0 };
 	// 加密
 	AES_encrypt((const unsigned char*)szHardWareID, (unsigned char*)szEncryptHD_ID, &key);
@@ -412,6 +410,38 @@ bool GetHardwareCode(std::string& strMachineCode)
 	return true;
 }
 
+
+bool GetHardwareCode2(std::string& strMachineCode)
+{
+	if (!g_pDataCenter)
+		return false;
+	QString strMessage;
+	if (g_pDataCenter->OpenPrinter(strMessage))
+	{
+		gInfo() << gQStr(strMessage);
+		return false;
+	}
+	char szResult[1024] = { 0 };
+	if (g_pDataCenter->GetPrinter()->Printer_ExtraCommand("Rsn", szResult))
+	{
+		gInfo() << QString("发送命令Rsn失败:%1").arg(szResult).toLocal8Bit().data();
+		return false;
+	}
+	char szHardWareID[128] = { 0 };
+	int nSize = 0;
+	strcpy(szHardWareID, szResult);
+	AES_KEY key;
+	AES_set_encrypt_key((const unsigned char*)g_szKey, 128, &key);
+	char szEncryptHD_ID[36] = { 0 };
+	// 加密
+	AES_encrypt((const unsigned char*)szHardWareID, (unsigned char*)szEncryptHD_ID, &key);
+	AES_encrypt((const unsigned char*)&szHardWareID[16], (unsigned char*)&szEncryptHD_ID[16], &key);
+
+	char szMachineCode[128] = { 0 };
+	Hex2AscStringA((unsigned char*)szEncryptHD_ID, 32, szMachineCode, 128, '\0');
+	strMachineCode = std::string(szMachineCode, 64);
+	return true;
+}
 
 std::string DecryptRSAKey(const char* szKey, const std::string& strData)
 {
@@ -459,11 +489,56 @@ std::string DecryptRSAKey(const char* szKey, const std::string& strData)
 	return strRet;
 }
 
+
+bool CheckLocalLicense(DWORD dwSoftCode)
+{
+	if (CheckLocalLicense1(dwSoftCode))
+		return true;
+	else if (CheckLocalLicense2(dwSoftCode))
+		return true;
+	else
+		return false;
+}
+
 //对外接口，每次开启软件的时候都调用一下
-bool CheckLocalLicense(DWORD dwSoftwareCode)
+bool CheckLocalLicense1(DWORD dwSoftwareCode)
 {
 	string strHardwareCode;
-	GetHardwareCode(strHardwareCode);
+	GetHardwareCode1(strHardwareCode);
+	SetHardwareCode(strHardwareCode);
+
+	string strLicenseCode;
+	if (!GetLocalLicense(strLicenseCode))
+		return false;
+
+	if (strLicenseCode.empty())
+		return false;
+
+	/*std::string strMachineCodeA = strHardwareCode;
+	char szHardwareCodeBin[128] = { 0 };
+	AscString2HexA((const char*)strMachineCodeA.c_str(), strMachineCodeA.size(), (unsigned char*)szHardwareCodeBin, 128, '\0');*/
+
+	char szLicenseCodeA[512];
+	strcpy(szLicenseCodeA, strLicenseCode.c_str());
+
+	char szLicenseBinary[256] = { 0 };
+	int nSize = AscString2HexA(szLicenseCodeA, strlen(szLicenseCodeA), (unsigned char*)szLicenseBinary, 256, '\0');//注册码转换
+	std::string strLicenseCodeBinary = std::string(szLicenseBinary, nSize);
+
+	// 使用公钥解密码，得到硬件码,进行比较
+	std::string strHardwareCode2 = DecryptRSAKey(g_szPublicKey, strLicenseCodeBinary);
+	char szAscHardwareCode2[256] = { 0 };
+	Hex2AscStringA((unsigned char*)strHardwareCode2.c_str(), strHardwareCode2.size(), szAscHardwareCode2, 256, '\0');
+	return (strHardwareCode.compare(szAscHardwareCode2) == 0);
+}
+
+//对外接口，每次开启软件的时候都调用一下
+bool CheckLocalLicense2(DWORD dwSoftwareCode)
+{
+	if (!g_pDataCenter)
+		return false;
+	string strHardwareCode;
+	GetHardwareCode2(strHardwareCode);
 	SetHardwareCode(strHardwareCode);
 
 	string strLicenseCode;
