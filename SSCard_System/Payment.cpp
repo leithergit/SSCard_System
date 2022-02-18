@@ -425,7 +425,7 @@ int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	return 0;
 }
 
-int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
+int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 	QFileInfo fi(strINIFile);
 	if (!fi.isFile())
@@ -554,7 +554,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 		{
 #pragma Warning("使用预存制卡数据")
 			SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-			LoadCardData(pSSCardTemp, strAppPath);
+			LoadSSCardData(pSSCardTemp, strAppPath);
 			strcpy(pSSCardInfo->strPCH, pSSCardTemp->strPCH);
 			strcpy(pSSCardInfo->strCardNum, pSSCardTemp->strCardNum);		// 新的卡号
 			strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);

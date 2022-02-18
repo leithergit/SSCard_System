@@ -47,8 +47,10 @@ SOURCES += \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
+    qwidgetreadidcard.cpp \
     registerlost.cpp \
     showlicense.cpp \
+    sys_manualmakecard.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -166,8 +168,10 @@ HEADERS += \
     qmainstackpage.h \
     qpinkeybroad.h \
     qstackpage.h \
+    qwidgetreadidcard.h \
     registerlost.h \
     showlicense.h \
+    sys_manualmakecard.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -205,6 +209,7 @@ FORMS += \
     mainwindow.ui \
     registerlost.ui \
     showlicense.ui \
+    sys_manualmakecard.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \

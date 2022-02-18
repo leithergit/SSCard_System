@@ -209,11 +209,13 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-
-	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	if (!g_pDataCenter->bDebug)
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-		return;
+		if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+		{
+			m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			return;
+		}
 	}
 
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);

@@ -385,7 +385,6 @@ QStringList SearchFiles(const QString& dir_path, QDateTime* pStart, QDateTime* p
 	return FileList;
 }
 
-
 int DataCenter::OpenDevice(QString& strMessage)
 {
 	int nResult = -1;
@@ -669,6 +668,7 @@ int DataCenter::TestCard(QString& strMessage)
 {
 	PRINTERSTATUS PrinterStatus;
 	DeviceConfig& DevConfig = pSysConfig->DevConfig;
+	int& nDepenseBox = DevConfig.nDepenseBox;
 
 	int nResult = -1;
 	BOXINFO BoxInfo;
@@ -676,6 +676,17 @@ int DataCenter::TestCard(QString& strMessage)
 	char szRCode[32] = { 0 };
 	do
 	{
+		if (QFailed(m_pPrinter->Printer_BoxStatus(BoxInfo, szRCode)))
+		{
+			strMessage = QString("Printer_BoxStatus失败:%1").arg(szRCode);
+			break;
+		}
+
+		if (BoxInfo.BoxList[nDepenseBox - 1].BoxStatus == 2)
+		{
+			strMessage = QString("进卡箱无卡,请放入卡片后重试!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
+			break;
+		}
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 		{
 			break;
@@ -1010,11 +1021,7 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 			strMessage = QString("Printer_StartPrint失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
-		if (QFailed(m_pPrinter->Printer_Eject(szRCode)))
-		{
-			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
+
 		nResult = 0;
 
 	} while (0);
@@ -1091,6 +1098,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			nResult = -4;
 			break;
 		}
 		gInfo() << "CardATR:" << szCardATR;

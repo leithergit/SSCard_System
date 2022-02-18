@@ -81,7 +81,7 @@ int uc_Pay::ProcessBussiness()
 	case Pay_Succeed:
 	{
 		gInfo() << strMessage.toLocal8Bit().data();
-		emit ShowMaskWidget("操作成功", "制卡费用已经成功支付,准备制卡", Success, Stay_CurrentPage);
+		emit ShowMaskWidget("操作成功", "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片", Success, Switch_NextPage);
 		return 0;
 	}
 	default:

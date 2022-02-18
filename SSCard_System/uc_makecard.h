@@ -19,6 +19,16 @@ namespace Ui {
 	class MakeCard;
 }
 
+enum MakeCard_Progress
+{
+	MP_PreMakeCard = 0,
+	//Depense,
+	MP_WriteCard,
+	MP_PrintCard,
+	MP_EnableCard,
+	MP_RejectCard
+};
+
 class uc_MakeCard : public QStackPage
 {
 	Q_OBJECT
@@ -45,8 +55,13 @@ public:
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
 	int     m_nSocketFailedCount = 0;
 
+public slots:
+	void	OnUpdateProgress(int nStep);
+signals:
+	void	UpdateProgress(int nStep);
 private:
 	Ui::MakeCard* ui;
+	QVector<QLabel*> m_LableStep;
 	//KT_PrinterLibPtr	m_pPrinterlib = nullptr;
 	//KT_ReaderLibPtr		m_pReaderLib = nullptr;
 	//KT_Printer* m_pPrinter = nullptr;

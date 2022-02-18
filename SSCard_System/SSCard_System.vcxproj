@@ -207,6 +207,9 @@
       <Command>@echo copy $(TargetPath) to remote device
 copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>::@call updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\utility\json\cJSON.c" />
@@ -224,6 +227,7 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="Sys_dialogcameratest.cpp" />
     <ClCompile Include="Sys_dialogidcardinfo.cpp" />
     <ClCompile Include="Sys_logmanager.cpp" />
+    <ClCompile Include="sys_manualmakecard.cpp" />
     <ClCompile Include="Sys_otheroptions.cpp" />
     <ClCompile Include="Sys_pageconfigure.cpp" />
     <ClCompile Include="Sys_qwidgetreadidcard.cpp" />
@@ -261,6 +265,7 @@ copy /y $(TargetPath) z:\</Command>
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <ClInclude Include="resource1.h" />
+    <QtMoc Include="sys_manualmakecard.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -376,6 +381,7 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="Sys_logmanager.ui">
     </QtUic>
+    <QtUic Include="sys_manualmakecard.ui" />
     <QtUic Include="Sys_otheroptions.ui">
     </QtUic>
     <QtUic Include="Sys_pageconfigure.ui">

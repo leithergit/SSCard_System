@@ -136,7 +136,8 @@ int uc_EnsureInformation::ProcessBussiness()
 			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
 			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
 			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
-			emit SwitchNextPage(nOperation);
+			//emit SwitchNextPage(nOperation);
+			emit ShowMaskWidget("操作成功", "制卡信息已确认,现将转入制卡页面!", Success, nOperation);
 		}
 		break;
 	}

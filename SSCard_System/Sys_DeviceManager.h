@@ -13,11 +13,6 @@ class DeviceManager : public QWidget
 public:
 	DeviceManager(QWidget* parent = Q_NULLPTR);
 	~DeviceManager();
-	//int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strPhoto, QString& strMessage);
-	//int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMesssage);
-	//int OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
-	//int Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage);
-	//void CloseDevice();
 	int ReaderIDCard(const char* szPort, IDCardInfo& CardInfo);
 	void fnThreadReadIDCard(QString strPort);
 	void fnThreadReadPin();

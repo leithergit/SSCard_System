@@ -103,17 +103,16 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 				break;
 			}
 		}
-		if (!m_bDetectionStart)
+		m_pFaceDetectOcx->EndLiveDectection();
+
+		nResult = m_pFaceDetectOcx->StartLiveDetection(m_nTimeout);
+		if (nResult)
 		{
-			nResult = m_pFaceDetectOcx->StartLiveDetection(m_nTimeout);
-			if (nResult)
-			{
-				strError = QString("启动人脸检测失败,错误代码:%1,请检查设备连接!").arg(nResult);
-				nResult = -1;
-				break;
-			}
-			m_bDetectionStart = true;
+			strError = QString("启动人脸检测失败,错误代码:%1,请检查设备连接!").arg(nResult);
+			nResult = -1;
+			break;
 		}
+		m_bDetectionStart = true;
 
 		//m_pImageFaceDetected = new QImage;
 	} while (0);

@@ -7,6 +7,7 @@
 #include "Sys_otheroptions.h"
 #include "Sys_cardmanger.h"
 #include "Sys_logmanager.h"
+#include "sys_manualmakecard.h"
 #include <QMessageBox>
 #include "Gloabal.h"
 #include <thread>
@@ -19,8 +20,8 @@ SystemManager::SystemManager(QWidget* parent)
 	setStyleSheet(QString::fromUtf8("#SystemManager{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(26, 37, 223, 255), stop:1 rgba(3, 152, 252, 255));}"));
 	ui.tabWidget->addTab(new DeviceManager, "设备管理");
 	ui.tabWidget->addTab(new RegionConfigure, "区域设置");
-    //ui.tabWidget->addTab(new PageConfigure, "页面设置");
-	ui.tabWidget->addTab(new CardManger, "卡片管理");
+	//ui.tabWidget->addTab(new PageConfigure, "页面设置");
+	ui.tabWidget->addTab(new Sys_ManualMakeCard, "手动制卡");
 	ui.tabWidget->addTab(new logManager, "日志管理");
 	ui.tabWidget->addTab(new OtherOptions, "其它选项");
 	showFullScreen();

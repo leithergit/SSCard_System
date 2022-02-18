@@ -198,6 +198,9 @@
     <ClCompile Include="..\utility\json\CJsonObject.cpp">
       <Filter>json</Filter>
     </ClCompile>
+    <ClCompile Include="sys_manualmakecard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -404,6 +407,9 @@
     <QtUic Include="Newcard.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="sys_manualmakecard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png">
@@ -599,6 +605,9 @@
     </QtMoc>
     <QtMoc Include="registerlost.h">
       <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_manualmakecard.h">
+      <Filter>Source Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
