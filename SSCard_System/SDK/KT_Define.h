@@ -2,6 +2,7 @@
 #define KT_DEFINE_H
 
 #include <windows.h>
+#include <string>
 
 enum SSCardProvince
 {
@@ -76,13 +77,13 @@ struct HSMInfo
 	char strRandom2[17];		//随机数2(内部认证用)
 	char strRandom3[17];		//随机数3(外部认证用)
 	char strRandom4[17];		//随机数4(外部认证用)
+
 };
 
-//获取卡信息
+//河南卡信息
 struct SSCardInfo
 {
-	char strOrganID[21] = { 0 };		//经办机构
-
+	char strOrganID[21] = {0};			//经办机构
 	char strCardNum[10] = { 0 };		//社保卡号
 	char strCardID[19] = { 0 };			//身份证号
 	char strBirthday[9] = { 0 };		//出生日期
@@ -110,10 +111,58 @@ struct SSCardInfo
 	char strCardATR[27] = { 0 };		//卡复位信息
 	char strBankNum[27] = { 0 };		//银行卡号
 	char strPCH[20] = { 0 };			//批次号
+	char strPersonType[5] = { 0 };		//人员类别
+	char strLocalNum[20] = { 0 };		//所在社区或单位,编号
+	char strClassName[50] = { 0 };		//班级名称
+	char strUniversity[2] = { 0 };		//是否大学
+	char strDepartmentName[50] = { 0 };	//所在院系名称
+	char strFailType[10] = { 0 };		//失败类型(银行,制卡)
+	char strFailReason[101] = { 0 };	//失败原因
 	char* strPhoto = NULL;				//相片
 };
 
-struct CAInfo
+//山东卡信息
+struct SD_SSCardInfo
+{
+	std::string strCardNum;			//社保卡号
+	std::string strCardID;			//身份证号
+	std::string strBirthday;		//出生日期
+	std::string strName;			//姓名
+	std::string strSex;				//性别
+	std::string strNation;			//民族
+	std::string strMobile;			//手机号
+	std::string strAdress;			//通讯地址
+	std::string strPostalCode;		//邮政编码
+	std::string strEmail;			//电子邮箱
+	std::string strGuardianName;	//监护人姓名
+	std::string strCity;			//所属城市
+	std::string strSSQX;			//所属区县
+	std::string strBankCode;		//银行代码
+	std::string strReleaseDate;		//发卡日期
+	std::string strValidDate;		//有效日期
+	std::string strIdentifyNum;		//卡识别码
+	std::string strCardATR;			//卡复位信息
+	std::string strBankNum;			//银行卡号
+	std::string strCardType;		//证件类型
+	std::string strOperator;		//经办人
+	std::string strOccupType;		//职业类别
+	std::string strDealType;		//办卡类型
+	std::string strChipNum;			//卡芯片账号
+	std::string strMagNum;			//卡磁条账号
+	std::string strCardVersion;		//卡规范版本
+	std::string strChipType;		//芯片类型
+	std::string strCardUnit;		//发证机关
+	std::string strBirthPlace;		//出生地
+	std::string strPerAddr;			//户籍所在地
+	std::string strRegAttr;			//户口性质
+	std::string strEducation;		//文化程度
+	std::string strMarital;			//婚姻状况
+	std::string strContactsName;	//联系人姓名
+	std::string strContactsMobile;	//联系人电话
+	std::string strReason;			//补换原因
+	std::string strPhoto;			//相片
+};
+struct CAInfo 
 {
 	char QMZS[1024];		//签名证书
 	char JMZS[1024];		//加密证书

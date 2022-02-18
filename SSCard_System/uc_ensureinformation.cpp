@@ -39,8 +39,10 @@ int uc_EnsureInformation::ProcessBussiness()
 			string strCardID, strName, strMobile;
 			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
 			{
+				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentify;
 				strcpy((char*)pIDCard->szName, strName.c_str());
 				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
+				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentify;
 			}
 		}
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);

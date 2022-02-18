@@ -799,6 +799,7 @@ public:
 	}
 	void SetIDCardInfo(IDCardInfoPtr& pCardInfo)
 	{
+		gInfo() << "Name:" << pCardInfo->szName << "\tID:" << pCardInfo->szIdentify;
 		pIDCard = pCardInfo;
 	}
 

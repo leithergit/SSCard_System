@@ -698,7 +698,7 @@ void uc_MakeCard::ThreadWork()
 	do
 	{
 		// 数据回盘
-		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo)))
+		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
 		{
 			gError() << strMessage.toLocal8Bit().data();
 			break;

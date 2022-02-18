@@ -510,15 +510,23 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 	int nPhotoSize = PhotoBufferSize;
 	Base64Decode(szPhotoBase64, strlen(szPhotoBase64), (BYTE*)g_szPhotoBuffer, &nPhotoSize);
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
+	if (photo.isNull())
+		return -1;
+
 	string strPhotoPath;
 	GetImageStorePath(strPhotoPath, 1);
+	gInfo() << "Try Save SSCard Photo:" << strPhotoPath;
 	photo.save(strPhotoPath.c_str(), "JPG", 90);
+	QFileInfo fi(strPhotoPath.c_str());
+	if (!fi.isFile())
+		return -1;
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
+
 	return 0;
 }
 
 // nStatus 返回0为成功，其它都为失败
-int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bSkipPreStep)
 {
 	bool bLoaded = false;
 	QString strAppPath = QCoreApplication::applicationDirPath();
@@ -562,7 +570,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 	if (!bLoaded)
 	{
 		char szStatus[1014] = { 0 };
-		int nResult = getCardData(*pSSCardInfo, szStatus);
+		int nResult = getCardData(*pSSCardInfo, szStatus, bSkipPreStep);
 		if (QFailed(nResult))
 		{
 			strMessage = "获取三代社保卡数据失败!";
@@ -649,10 +657,16 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 	return 0;
 }
 
-int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bFailed)
 {
 	char szStatus[1024] = { 0 };
-	int nResult = returnCardData(*pSSCardInfo, szStatus);
+	if (bFailed)
+	{
+		strcpy(pSSCardInfo->strFailReason, "Withdraw");
+		strcpy(pSSCardInfo->strFailType, QString("制卡").toLocal8Bit().toStdString().c_str());
+	}
+
+	int nResult = returnCardData(*pSSCardInfo, szStatus, bFailed);
 	if (QFailed(nResult))
 	{
 		strMessage = "制卡回盘失败";
