@@ -328,14 +328,14 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage)
 
 void Sys_ManualMakeCard::on_pushButton_LoadCardData_clicked()
 {
-    QString strMessage;
+	QString strMessage;
 
 	if (QFailed(LoadPersonSSCardData(strMessage)))
 	{
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
-    SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
 	ui->label_Pohoto->setStyleSheet(strStyle);
 	ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
@@ -450,16 +450,21 @@ void Sys_ManualMakeCard::ProceBatchLock()
 		if (nStatus != 0 && nStatus != 1)
 			break;
 #pragma Warning("启用卡片失败如何处理？")
-		char* szResCode[128] = { 0 };
-		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode)))
-		{
-			strMessage = "出卡失败,稍后请转入设备管理页面手动出卡!";
-			break;
-		}
+		//char* szResCode[128] = { 0 };
+		//if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode)))
+		//{
+		//	strMessage = "出卡失败,稍后请转入设备管理页面手动出卡!";
+		//	break;
+		//}
 		nResult = 0;
 	} while (0);
+	char* szResCode[128] = { 0 };
+	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
 
-	QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	if (QFailed(nResult))
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	else
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "制卡成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
 
 void Sys_ManualMakeCard::ProcessPowerOnFailed()
@@ -547,16 +552,22 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 		if (nStatus != 0 && nStatus != 1)
 			break;
 #pragma Warning("启用卡片失败如何处理？")
-		char* szResCode[128] = { 0 };
-		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char *)szResCode)))
+		/*char* szResCode[128] = { 0 };
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode)))
 		{
 			strMessage = "出卡失败,稍后请转入设备管理页面手动出卡!";
 			break;
-		}
+		}*/
 		nResult = 0;
 	} while (0);
-	
-	QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+
+	char* szResCode[128] = { 0 };
+	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
+
+	if (QFailed(nResult))
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	else
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "制卡成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
 
 void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()

@@ -108,6 +108,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			return -1;
 		}
 		bDebug = GetSysConfigure()->bDebug;
+		bTestCard = GetSysConfigure()->bTestCard;
 		return 0;
 	}
 
@@ -687,10 +688,7 @@ int DataCenter::TestCard(QString& strMessage)
 			strMessage = QString("进卡箱无卡,请放入卡片后重试!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
 			break;
 		}
-		if (QFailed(g_pDataCenter->Depense(strMessage)))
-		{
-			break;
-		}
+
 
 		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
 		{
@@ -842,6 +840,11 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		if (!bSucceed)
 			break;
+		if (QFailed(g_pDataCenter->Depense(strMessage)))
+		{
+			bSucceed = false;
+			break;
+		}
 		// 0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
 		bSucceed = false;
 		switch (PrinterStatus.fwToner)
@@ -869,6 +872,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 			break;
 		}
 		}
+
 		if (!bSucceed)
 			break;
 		nResult = 0;

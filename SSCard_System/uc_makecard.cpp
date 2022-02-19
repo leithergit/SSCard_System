@@ -344,22 +344,22 @@ void uc_MakeCard::ThreadWork()
 			strInfo = QString("尝试第%1次写卡!").arg(nWriteCardCount + 1);
 			gInfo() << gQStr(strInfo);
 			nResult = g_pDataCenter->WriteCard(pSSCardInfo, strMessage);
+			if (nResult == 0)
+				break;
 			if (nResult == -4)
 			{
 				nWriteCardCount++;
-				strMessage = "写卡失败!";
+				strMessage = "写卡上电失败!";
+				gInfo() << gQStr(strMessage);
 				g_pDataCenter->MoveCard(strMessage);
 				continue;
 			}
-			else
-				if (QFailed(nResult))
-				{
-					strMessage = "写卡失败!";
-					break;
-				}
-
-			nResult = 0;
-		} while (0);
+			else if (QFailed(nResult))
+			{
+				strMessage = "写卡失败!";
+				break;
+			}
+		}
 		if (QFailed(nResult))
 		{
 			strInfo = "写卡失败";
@@ -433,16 +433,14 @@ void uc_MakeCard::ThreadWork()
 #pragma Warning("启用卡片失败如何处理？")
 		emit UpdateProgress(MP_EnableCard);
 		this_thread::sleep_for(chrono::milliseconds(2000));
-		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject(szRCode)))
-		{
-			strMessage = QString("出卡失败，错误代码:%1!").arg(szRCode);
-			break;
-		}
-		emit UpdateProgress(MP_RejectCard);
-		this_thread::sleep_for(chrono::milliseconds(2000));
+
 		nResult = 0;
 	} while (0);
 
+	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+
+	emit UpdateProgress(MP_RejectCard);
+	this_thread::sleep_for(chrono::milliseconds(2000));
 	if (QFailed(nResult))
 	{
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);

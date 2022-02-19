@@ -209,7 +209,8 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-	//if (!g_pDataCenter->bDebug)
+	QString strInfo = "尝试对卡片进行上电测试！";
+	if (g_pDataCenter->bTestCard)
 	{
 		if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 		{
@@ -217,6 +218,11 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 			return;
 		}
 	}
+	else
+	{
+		strInfo = "跳过卡片上电测试！";
+	}
+	gInfo() << gQStr(strInfo);
 
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();

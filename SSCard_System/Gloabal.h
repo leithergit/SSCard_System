@@ -687,6 +687,7 @@ struct SysConfig
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
+		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
 
 		bUpoadlog = pSettings->value("logUpload", false).toBool();;
 		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
@@ -764,6 +765,7 @@ struct SysConfig
 	int             nLogServerPort = 80;                // 日志服务器端口
 	int             nLogSavePeroid = 30;                // 日志保存天数
 	bool			bDebug = false;
+	bool			bTestCard = false;
 	std::map<string, string> strMapBank;
 };
 
@@ -887,6 +889,7 @@ public:
 	string		   strCardMakeProgress;
 	string		   strPayCode;
 	bool		   bDebug;
+	bool		   bTestCard = false;
 
 public:
 	int OpenDevice(QString& strMessage);
