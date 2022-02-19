@@ -209,7 +209,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-	if (!g_pDataCenter->bDebug)
+	//if (!g_pDataCenter->bDebug)
 	{
 		if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 		{

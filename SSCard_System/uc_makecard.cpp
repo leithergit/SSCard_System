@@ -132,9 +132,10 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 			{
 				if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 				{
-					if (strMessage == "批次确认加锁失败(保存失败)")
+					if (strMessage.contains("批次"))
+					{
 						strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
-
+					}
 					break;
 					/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
 						break;*/
@@ -251,6 +252,12 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 
 		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 		{
+			if (strMessage.contains("批次"))
+			{
+				strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
+				break;
+			}
+
 			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
 			{
 				strMessage = "因获取制卡数据失败,尝试取消即制卡标注时再次失败!";
@@ -340,13 +347,17 @@ void uc_MakeCard::ThreadWork()
 			if (nResult == -4)
 			{
 				nWriteCardCount++;
-				strMessage = "待制卡上电失败!";
+				strMessage = "写卡失败!";
 				g_pDataCenter->MoveCard(strMessage);
 				continue;
 			}
 			else
 				if (QFailed(nResult))
+				{
+					strMessage = "写卡失败!";
 					break;
+				}
+
 			nResult = 0;
 		} while (0);
 		if (QFailed(nResult))
@@ -366,7 +377,7 @@ void uc_MakeCard::ThreadWork()
 		nResult = 0;
 	} while (0);
 
-	if (nResult == -4)
+	if QFailed(nResult)
 	{
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;

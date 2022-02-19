@@ -450,6 +450,12 @@ void Sys_ManualMakeCard::ProceBatchLock()
 		if (nStatus != 0 && nStatus != 1)
 			break;
 #pragma Warning("启用卡片失败如何处理？")
+		char* szResCode[128] = { 0 };
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode)))
+		{
+			strMessage = "出卡失败,稍后请转入设备管理页面手动出卡!";
+			break;
+		}
 		nResult = 0;
 	} while (0);
 
@@ -541,9 +547,15 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 		if (nStatus != 0 && nStatus != 1)
 			break;
 #pragma Warning("启用卡片失败如何处理？")
+		char* szResCode[128] = { 0 };
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char *)szResCode)))
+		{
+			strMessage = "出卡失败,稍后请转入设备管理页面手动出卡!";
+			break;
+		}
 		nResult = 0;
 	} while (0);
-
+	
 	QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 }
 
