@@ -110,6 +110,11 @@ color: 0
        </item>
        <item>
         <property name="text">
+         <string>打印卡面</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>失败回盘</string>
         </property>
        </item>

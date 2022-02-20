@@ -991,7 +991,7 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 		nBufferSize = sizeof(szBuffer);
 		ZeroMemory(szBuffer, nBufferSize);
 
-		if (QFailed(nResult = m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
+		if (QFailed(m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
 		{
 			strMessage = QString("Printer_InitPrint失败，错误代码:%1!").arg(szRCode);
 			break;
@@ -1000,25 +1000,32 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 		TextPosition* pFieldPos = &pCardForm->posName;
 		if (bPrintText)
 		{
-			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			if (QFailed(m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode)))
+				break;
 			pFieldPos = &pCardForm->posIDNumber;
-			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			if (QFailed(m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode)))
+				break;
 			pFieldPos = &pCardForm->posSSCardID;
-			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			if (QFailed(m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode)))
+				break;
 			pFieldPos = &pCardForm->posIssueDate;
 			int nYear, nMonth, nDay;
 
 			sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
 			char szReleaseDate[32] = { 0 };
 			sprintf_s(szReleaseDate, 32, "%d年%d月", nYear, nMonth);
-			m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			if (QFailed(m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode)))
+				break;
 		}
 
 		ImagePosition& ImgPos = pCardForm->posImage;
 		if (!strPhoto.size())
-			m_pPrinter->Printer_AddImage((char*)strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
-		else
-			m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
+		{
+			if (QFailed(m_pPrinter->Printer_AddImage((char*)strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
+				break;
+			else if (QFailed(m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
+				break;
+		}
 
 		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
 		{

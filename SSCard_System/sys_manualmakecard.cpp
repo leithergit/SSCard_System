@@ -467,6 +467,56 @@ void Sys_ManualMakeCard::ProceBatchLock()
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), "制卡成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
 
+void Sys_ManualMakeCard::PrintCardData()
+{
+	int nResult = -1;
+	QString strMessage;
+
+	int nStatus = 0;
+	QString strInfo;
+	SSCardInfoPtr pSSCardInfo;
+	do
+	{
+		if (QFailed(LoadPersonSSCardData(strMessage)))
+		{
+			break;
+		}
+		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+
+		if (!g_pDataCenter->GetPrinter())
+		{
+			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+				break;
+		}
+		if (!g_pDataCenter->GetSSCardReader())
+		{
+			if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
+				break;
+		}
+
+		if (QFailed(g_pDataCenter->Depense(strMessage)))
+			break;
+		strInfo = "进卡成功";
+		gInfo() << gQStr(strInfo);
+
+		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+			break;
+		strInfo = "卡片打印成功";
+		gInfo() << gQStr(strInfo);
+		nResult = 0;
+	} while (0);
+
+	gInfo() << gQStr(QString("写卡，打印成功"));
+
+	char* szResCode[128] = { 0 };
+	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
+
+	if (QFailed(nResult))
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	else
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "打印成功,请及时取走您的卡片", QMessageBox::Ok, this);
+}
+
 void Sys_ManualMakeCard::ProcessPowerOnFailed()
 {
 	int nResult = -1;
@@ -594,6 +644,9 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 		ProceBatchLock();
 		break;
 	case 2:
+		PrintCardData();
+		break;
+	case 3:
 	{
 		int nResult = 0;
 		int nStatus = 0;

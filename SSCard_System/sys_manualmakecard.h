@@ -25,10 +25,11 @@ public:
 
 	int ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 	int	QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
-    void ProceBatchLock();
-    void ProcessPowerOnFailed();
+	void ProceBatchLock();
+	void ProcessPowerOnFailed();
+	void PrintCardData();
 
-    int LoadPersonSSCardData(QString &strMesssage);
+	int LoadPersonSSCardData(QString& strMesssage);
 
 signals:
 	void ShowIDCardInfo(bool bSuccceed, QString strMessage);
