@@ -402,8 +402,16 @@ void Sys_ManualMakeCard::ProceBatchLock()
 		strInfo = "写卡成功";
 		gInfo() << gQStr(strInfo);
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+		{
+			strMessage = "卡片打印失败,请稍后重试!";
+			strInfo = strMessage;
 			break;
-		strInfo = "卡片打印成功";
+		}
+		else
+		{
+			strInfo = "卡片打印成功";
+		}
+
 		gInfo() << gQStr(strInfo);
 		nResult = 0;
 	} while (0);
@@ -475,6 +483,7 @@ void Sys_ManualMakeCard::PrintCardData()
 	int nStatus = 0;
 	QString strInfo;
 	SSCardInfoPtr pSSCardInfo;
+	char szRCode[128] = { 0 };
 	do
 	{
 		if (QFailed(LoadPersonSSCardData(strMessage)))
@@ -500,13 +509,43 @@ void Sys_ManualMakeCard::PrintCardData()
 		gInfo() << gQStr(strInfo);
 
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+		{
+			strMessage = "片卡打印失败,请稍后重试!";
+			strInfo = strMessage;
+			gInfo() << gQStr(strInfo);
 			break;
+		}
+
+		// 数据回盘
+		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+		{
+			gError() << strMessage.toLocal8Bit().data();
+			break;
+		}
+
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = "数据回盘失败,请稍后重试!";
+			break;
+		}
+
+		// 启用
+		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+		{
+			gError() << strMessage.toLocal8Bit().data();
+			break;
+		}
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = "卡片启用失败,请稍后重试!";
+			break;
+		}
+
+		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
 		nResult = 0;
 	} while (0);
-
-	gInfo() << gQStr(QString("写卡，打印成功"));
 
 	char* szResCode[128] = { 0 };
 	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
@@ -554,7 +593,12 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 		strInfo = "写卡成功";
 		gInfo() << gQStr(strInfo);
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+		{
+			strMessage = "片卡打印失败,请稍后重试!";
+			strInfo = strMessage;
+			gInfo() << gQStr(strInfo);
 			break;
+		}
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
 		nResult = 0;
@@ -601,13 +645,7 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 		}
 		if (nStatus != 0 && nStatus != 1)
 			break;
-#pragma Warning("启用卡片失败如何处理？")
-		/*char* szResCode[128] = { 0 };
-		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode)))
-		{
-			strMessage = "出卡失败,稍后请转入设备管理页面手动出卡!";
-			break;
-		}*/
+
 		nResult = 0;
 	} while (0);
 

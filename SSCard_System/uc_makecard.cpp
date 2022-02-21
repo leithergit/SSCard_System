@@ -330,7 +330,7 @@ void uc_MakeCard::ThreadWork()
 			}
 		}
 		emit UpdateProgress(MP_PreMakeCard);
-		this_thread::sleep_for(chrono::milliseconds(2000));
+		//this_thread::sleep_for(chrono::milliseconds(2000));
 		//if (QFailed(g_pDataCenter->Depense(strMessage)))
 		//	break;
 		//emit UpdateProgress(Depense);
@@ -360,6 +360,7 @@ void uc_MakeCard::ThreadWork()
 				break;
 			}
 		}
+
 		if (QFailed(nResult))
 		{
 			strInfo = "写卡失败";
@@ -367,11 +368,15 @@ void uc_MakeCard::ThreadWork()
 			break;
 		}
 		emit UpdateProgress(MP_WriteCard);
-		this_thread::sleep_for(chrono::milliseconds(2000));
+		///this_thread::sleep_for(chrono::milliseconds(2000));
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
-			break;
+		{
+			nResult = -1;
+			strMessage = "卡面打印失败,稍后请管理人员到【手动制卡】界面,选择【打印卡面】以继续完成卡片制作!";
+			return;
+		}
+
 		emit UpdateProgress(MP_PrintCard);
-		this_thread::sleep_for(chrono::milliseconds(2000));
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
 		nResult = 0;
