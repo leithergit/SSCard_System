@@ -159,24 +159,7 @@ int main(int argc, char* argv[])
 		gError() << QString("加载卡片打印模板失败:%1").arg(strError).toLocal8Bit().data();
 		return -1;
 	}
-	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
-	char szOutInfo[1024] = { 0 };
-	CJsonObject jsonReg;
-	jsonReg.Add("province", Reg.nProvinceCode);
-	jsonReg.Add("user", Reg.strCMAccount);
-	jsonReg.Add("pwd", Reg.strCMPassword);
-	jsonReg.Add("city", Reg.strCityCode);
-	string strJson = jsonReg.ToString();
-	CJsonObject jsonT(strJson);
-	qDebug() << strJson.c_str();
-	int nProvince;
-	string struser, strpwd, strcity;
-	jsonT.Get("province", nProvince);
-	jsonT.Get("user", struser);
-	jsonT.Get("pwd", strpwd);
-	jsonT.Get("city", strcity);
 
-	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;
 
 	auto listScreens = QApplication::screens();

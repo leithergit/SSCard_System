@@ -9,15 +9,6 @@
 #define Pay_Not                 2         // 尚未支付
 #define Failed_QREnocode        3         // 生成支付二维码失败
 
-enum class PayResult
-{
-	WaitforPay = 0,
-	WairforConfirm,
-	PaySucceed,
-	PayFailed,
-	InvalidOrder,
-	OrderCanceled
-};
 
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage);
 

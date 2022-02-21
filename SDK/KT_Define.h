@@ -116,6 +116,8 @@ struct SSCardInfo
 	char strClassName[50] = { 0 };		//班级名称
 	char strUniversity[2] = { 0 };		//是否大学
 	char strDepartmentName[50] = { 0 };	//所在院系名称
+	char strFailType[10] = { 0 };		//失败类型(银行,制卡)
+	char strFailReason[101] = { 0 };	//失败原因
 	char* strPhoto = NULL;				//相片
 };
 

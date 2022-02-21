@@ -4,11 +4,11 @@
 #include "mainwindow.h"
 #include "uc_readidcard.h"
 #include "uc_facecapture.h"
-#include "uc_ensureinformation.h"
 #include "uc_inputmobile.h"
 #include "uc_pay.h"
 #include "uc_makecard.h"
 #include "uc_adforfinance.h"
+#include "nc_commitPersonInfo.h"
 #include "OperatorSucceed.h"
 #include <exception>
 #include "Gloabal.h"
@@ -25,12 +25,12 @@ NewCard::NewCard(QWidget* parent) :
 	try
 	{
 		m_pStackWidget = ui->stackedWidget;
-		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "updatecard1.png", Page_ReaderIDCard));				// step 0
-		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_step, "updatecard2.png", Page_FaceCapture));				// step 1
-		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "updatecard3.png", Page_EnsureInformation));	// step 2
-		ui->stackedWidget->addWidget(new uc_InputMobile(ui->label_step, "updatecard4.png", Page_InputMobile));				// step 3
-		ui->stackedWidget->addWidget(new uc_Pay(ui->label_step, "updatecard5.png", Page_Payment));							// step 4
-		ui->stackedWidget->addWidget(new uc_MakeCard(ui->label_step, "updatecard6.png", Page_MakeCard));					// step 5
+		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Sandong/updatecard1.png", Page_ReaderIDCard));				// step 0
+		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_step, "Sandong/updatecard2.png", Page_FaceCapture));				// step 1
+		ui->stackedWidget->addWidget(new nc_commitPersonInfo(ui->label_step, "Sandong/updatecard3.png", Page_CommitNewInfo));	// step 2
+		ui->stackedWidget->addWidget(new uc_InputMobile(ui->label_step, "Sandong/updatecard4.png", Page_InputMobile));				// step 3
+		//ui->stackedWidget->addWidget(new uc_Pay(ui->label_step, "updatecard5.png", Page_Payment));							// step 4
+		ui->stackedWidget->addWidget(new uc_MakeCard(ui->label_step, "Sandong/updatecard5.png", Page_MakeCard));					// step 5
 		ui->stackedWidget->addWidget(new uc_AdforFinance(nullptr, "", Page_AdforFinance));									// step 6
 		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < m_pStackWidget->count(); i++)

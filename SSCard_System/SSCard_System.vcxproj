@@ -211,7 +211,8 @@
 copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>@call updatesdk.bat $(Configuration)</Command>
+      <Command>@call updatesdk.bat $(Configuration)
+@call  $(SolutionDir)updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -222,7 +223,7 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
-    <ClCompile Include="nc_commitpersoninfo_Sandong.cpp" />
+    <ClCompile Include="nc_commitPersonInfo.cpp" />
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
@@ -262,14 +263,13 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\SDK\dvtldcamocx\dvtldcamocxlib.h" />
     <ClInclude Include="..\SSCardService\SSCardService.h" />
     <ClInclude Include="..\utility\AutoLock.h" />
     <QtMoc Include="showlicense.h" />
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <QtMoc Include="newcard.h" />
-    <QtMoc Include="nc_commitpersoninfo_Sandong.h" />
+    <QtMoc Include="nc_commitPersonInfo.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -305,7 +305,6 @@ copy /y $(TargetPath) z:\</Command>
     </QtMoc>
     <ClInclude Include="..\utility\TimeUtility.h" />
     <ClInclude Include="..\utility\Utility.h" />
-    <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h" />
     <QtMoc Include="imageviewlabel.h">
     </QtMoc>
     <QtMoc Include="mainpage.h">
@@ -371,7 +370,7 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="MaskWidget.ui">
     </QtUic>
-    <QtUic Include="nc_commitpersoninfo_Sandong.ui" />
+    <QtUic Include="nc_commitpersoninfo.ui" />
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>

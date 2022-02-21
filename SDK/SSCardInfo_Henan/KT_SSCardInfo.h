@@ -119,14 +119,14 @@ DLL_PUBLIC int cancelMarkCard(SSCardInfo& info, char* pOutInfo);
 * @param[out] pOutInfo	返回结果,00成功
 * @return 0成功,非0失败
 */
-DLL_PUBLIC int getCardData(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int getCardData(SSCardInfo& info, char* pOutInfo, bool bSkipPreStep = false);
 /**
 * @brief 制卡回盘
-* @param[in] info	传入的人员信息
+* @param[in] info	传入的人员信息,制卡成功:CardNum,CardID,Name,ReleaseDate,ValidDate,IdentifyNum,CardATR, BankNum,PCH   制卡失败:CardNum,CardID,Name,PCH
 * @param[out] pOutInfo	返回结果,00成功
-* @return 0成功,非0失败
+* @return 0成功,非0失败 2-即制卡人数失败 3-即制卡人员失败 4-获取批次号失败 5-即制卡批次失败
 */
-DLL_PUBLIC int returnCardData(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int returnCardData(SSCardInfo& info, char* pOutInfo, bool bFailed = false);
 /**
 * @brief 领卡启用
 * @param[in] info	传入的人员信息

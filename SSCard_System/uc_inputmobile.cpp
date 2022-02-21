@@ -22,7 +22,7 @@ uc_InputMobile::~uc_InputMobile()
 int uc_InputMobile::ProcessBussiness()
 {
 	ui->lineEdit_Mobile->setText("");
-	ui->lineEdit_Mobile->selectAll();
+	//ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
@@ -154,20 +154,42 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 		strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
 		QString strMessage;
-		/*int nResult = 0;
-		if (QFailed(QueryPayResult(strMessage, nResult)))
+		PayResult nPayResult = PayResult::Pay_Unsupport;
+		string strPayMessage;
+		SSCardService* pService = g_pDataCenter->GetSSCardService();
+		CJsonObject jsonIn;
+		jsonIn.Add("CardID", (const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
+
+		if (QFailed(pService->QueryPayResult(strJsonIn, strJsonOut)))
 		{
-			gInfo() << strMessage.toLocal8Bit().data();
+			CJsonObject jsonOut(strJsonOut);
+			jsonOut.Get("Result", (int&)nPayResult);
+
+			jsonOut.Get("Message", strPayMessage);
+			gError() << strPayMessage;
+			strMessage = QString::fromLocal8Bit(strPayMessage.c_str());
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 			return;
 		}
-		if (QSucceed(nResult))
+		CJsonObject jsonOut(strJsonOut);
+		jsonOut.Get("Result", (int&)nPayResult);
+		jsonOut.Get("Message", strPayMessage);
+
+		if (nPayResult == PayResult::Pay_Unsupport)
+		{
+			QString strInfo = "手机号码已确认,稍后开始制卡!";
+			gInfo() << gQStr(strInfo);
+			emit ShowMaskWidget("操作成功", strInfo, Success, Skip_NextPage);
+		}
+		else if (nPayResult == PayResult::PaySucceed)
 		{
 			QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
 			gInfo() << strInfo.toLocal8Bit().data();
 			emit ShowMaskWidget("操作成功", strInfo, Success, Skip_NextPage);
 		}
-		else*/
+		else
 		{
 			QString strInfo = "手机号码已确认,稍后将进入费用支付流程!";
 			gInfo() << strInfo.toLocal8Bit().data();

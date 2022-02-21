@@ -2,11 +2,35 @@
 #include <string>
 using namespace std;
 
-enum ServiceType
+enum class ServiceType
 {
 	Service_NewCard,
 	Service_ReplaceCard,
 	Service_RegisterLost
+};
+
+enum class PayResult
+{
+	Pay_Unsupport = -1,		// 所有不需要支付的场景都返回-1
+	WaitforPay = 0,
+	WairforConfirm,
+	PaySucceed,
+	PayFailed,
+	InvalidOrder,
+	OrderCanceled
+};
+
+enum class CardStatus
+{
+	Card_Release = 0,			// 已经放号
+	Card_Normal,				// 正常
+	Card_RegisterLost,			// 挂失
+	Card_RegisgerTempLost,		// 临时挂失
+	Card_CanceledOnRegisterLost,// 挂失后注销
+	Card_Canceled,				// 注销
+	Card_DeActived,				// 未启用
+	Card_Making,				// 制卡中	河南等地使用
+	Card_Unknow = 255
 };
 
 class SSCardService
@@ -14,12 +38,15 @@ class SSCardService
 protected:
 	ServiceType nServiceType;
 public:
-	SSCardService() = delete;
+	SSCardService()
+	{}
 
-	SSCardService(ServiceType nSvrType) :
-		nServiceType(nSvrType)
-	{
-	}
+	//SSCardService(/*ServiceType nSvrType*/)/* :		nServiceType(nSvrType)*/
+	//{
+	//}
+
+	virtual int SetSerivdeType(ServiceType nSvrType) = 0;
+
 	virtual int Initialize(string& szJson, string& szOut) = 0;
 
 	virtual ~SSCardService()
@@ -29,9 +56,11 @@ public:
 	// 查询卡状态
 	virtual int QueryCardStatus(string& strJsonIn, string& strJsonOut) = 0;
 
+	// 查询卡信息
+	virtual int QueryCardInfo(string& strJsonIn, string& strJsonOut) = 0;
+
 	// 提交制卡人信息
 	virtual int CommitPersonInfo(string& strJsonIn, string& strJsonOut) = 0;
-
 
 	// 预制卡
 	virtual int PreMakeCard(string& strJsonIn, string& strJsonOut) = 0;
@@ -61,5 +90,7 @@ public:
 
 	virtual int SaveCardData(string& strINIFile) = 0;
 
-	virtual int ExecExtraInterface(const string& strCommand, string& strInput, string& strOutput) = 0;
+	virtual int QueryPayResult(string& strJsonIn, string& strJsonOut) = 0;
+
+	virtual int SetExtraInterface(const string& strCommand, string& strInput, string& strOutput) = 0;
 };

@@ -18,10 +18,11 @@ public:
 	~uc_FaceCapture();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
+	virtual void ShutDown() override;
 	// DVTLDCamOCXLib::DVTLDCamOCX* m_pFaceDetectOcx = nullptr;
 	//QImage* m_pImageFaceDetected = nullptr;
 	void    ShutDownDevice();
-	virtual void ShutDown() override;
+
 	int    OpenCamara(QString& strError);
 	int    CloseCamera(QString& strError);
 	bool   m_bOuputProductInfo = false;

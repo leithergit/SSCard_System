@@ -24,13 +24,17 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 extern "C" {
 #endif
 
-	LPVOID WINAPI CreateInstance(int nServiceType)
+	LPVOID WINAPI CreateInstance(void* pServiceType)
 	{
-		if (nServiceType < Service_NewCard ||
-			nServiceType > Service_RegisterLost)
-			return nullptr;
+		//if (!pServiceType)
+		//	return nullptr;
+		//ServiceType nServiceType = (ServiceType) * (int*)pServiceType;
+		//if (nServiceType < ServiceType::Service_NewCard ||
+		//	nServiceType > ServiceType::Service_RegisterLost)
+		//	return nullptr;
 
-		SSCardService_Sandong* pService = new SSCardService_Sandong((ServiceType)nServiceType);
+		SSCardService_Sandong* pService = new SSCardService_Sandong();
+		//pService->SetSerivdeType((ServiceType)nServiceType);
 		return (LPVOID)pService;
 	}
 

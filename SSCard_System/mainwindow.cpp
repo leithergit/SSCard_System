@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
+	connect(m_pNewCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);

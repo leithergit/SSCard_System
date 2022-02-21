@@ -26,6 +26,7 @@ copy /y ..\sdk.git\sscardhsm\SSCardHSM\SSCardHSM\KT_SSCardHSM.h .\SDK\SSCardHSM
 copy /y ..\sdk.git\sscardhsm\SSCardHSM\%1\*.* .\SDK\SSCardHSM
 
 @echo update SSCardInfo Driver...
+copy /y ..\sdk.git\SSCardInfo\SSCardInfo\SSCardInfo\KT_Define.h .\SDK
 copy /y ..\sdk.git\SSCardInfo\SSCardInfo\SSCardInfo\KT_SSCardInfo.h .\SDK\SSCardInfo_Henan
 copy /y ..\sdk.git\SSCardInfo\SSCardInfo\%1\*.* .\SDK\SSCardInfo_Henan
 

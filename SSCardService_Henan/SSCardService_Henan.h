@@ -188,13 +188,15 @@ public:
 			}
 
 			CJsonObject outJson(strOutInfo);
-			int nErrFlag = 1;
+			string strErrFlag;
 
-			if (!outJson.Get("errflag", nErrFlag))
+
+			if (!outJson.Get("errflag", strErrFlag))
 			{
 				strMessage = "can't locate field errflag from output of chkCanCardBh!";
 				break;
 			}
+			int nErrFlag = 1;
 			if (nErrFlag)
 			{
 				if (!outJson.KeyExist("errtext"))

@@ -10,6 +10,7 @@
 #include "Payment.h"
 #include "qstackpage.h"
 
+
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
@@ -403,6 +404,95 @@ int DataCenter::OpenDevice(QString& strMessage)
 		gError() << gQStr(strMessage);
 		return nResult;
 	}
+	return 0;
+}
+
+int DataCenter::OpenSSCardService(ServiceType nServiceType, SSCardService** ppService, QString& strMessage)
+{
+	int nResult = -1;
+	char szRCode[32] = { 0 };
+	RegionInfo& Regcfg = pSysConfig->Region;
+	string strAppPath = QCoreApplication::applicationDirPath().toStdString();
+	string strServiceMudule = strAppPath + "/" + Regcfg.strSSCardSeriveModule;
+	string strErrText;
+	try
+	{
+		do
+		{
+			if (!pSServiceLib)
+			{
+				pSServiceLib = make_shared<KTModule<SSCardService>>(strServiceMudule);
+				if (!pSServiceLib)
+				{
+					strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strServiceMudule.c_str());
+					break;
+				}
+			}
+			if (!pSScardSerivce)
+			{
+				pSScardSerivce = pSServiceLib->Instance();
+				if (!pSScardSerivce)
+				{
+					strMessage = QString("创建‘%1’实例失败!").arg(strServiceMudule.c_str());
+					break;
+				}
+			}
+			RegionInfo& Reg = GetSysConfigure()->Region;
+
+			string strDescPath = strAppPath + "/" + Reg.strSSCardServiceDescription;
+			QFileInfo fi(strDescPath.c_str());
+			if (!fi.isFile())
+			{
+				strMessage = QString("无法加载卡管服务描述文件:%1").arg(strDescPath.c_str());
+				break;
+			}
+			ifstream fsDesc(strDescPath);
+			stringstream ss;
+			ss << fsDesc.rdbuf();
+			string strJsonIn = ss.str();
+			string strJsonOut;
+			if (QFailed(pSScardSerivce->Initialize(strJsonIn, strJsonOut)))
+			{
+				CJsonObject jsonOut;
+				if (!jsonOut.Parse(strJsonOut))
+				{
+					gInfo() << "Json Parse failed:" << strJsonOut;
+					break;
+				}
+				if (!jsonOut.KeyExist("errflag") ||
+					!jsonOut.KeyExist("errtext"))
+				{
+					gInfo() << "Can't find field errflag or errtext:" << strJsonOut;
+					break;
+				}
+				jsonOut.Get("errtext", strErrText);
+				strMessage = QString::fromLocal8Bit(strErrText.c_str());
+				break;
+			}
+			if (QFailed(pSScardSerivce->SetSerivdeType(nServiceType)))
+			{
+				strMessage = "设置业务类型失败,只能是新办卡,补办和挂失/解挂";
+				break;
+			}
+			*ppService = pSScardSerivce;
+			nResult = 0;
+		} while (0);
+		if (QFailed(nResult))
+			return -1;
+		else
+			return 0;
+	}
+	catch (std::exception& e)
+	{
+		strMessage = e.what();
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+}
+
+int DataCenter::CloseSSCardService(QString& strMessage)
+{
+	m_pPrinterlib = nullptr;
 	return 0;
 }
 

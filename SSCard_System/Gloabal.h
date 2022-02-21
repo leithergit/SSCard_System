@@ -11,6 +11,7 @@
 #include <chrono>
 #include <iostream>
 #include <errno.h>
+#include <fstream>
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <string>
 #include <QObject>
@@ -60,6 +61,8 @@
 #include "../SDK/7Z/include/bitcompressor.hpp"
 #include "../SDK/7Z/include/bitexception.hpp"
 #include "../SDK/FaceCapture/DVTGKLDCamSDK.h"
+#include "../SSCardService/SSCardService.h"
+#include "../utility/json/CJsonObject.hpp"
 
 //宏定义
 #define __STR2__(x) #x
@@ -76,6 +79,7 @@
 using namespace std;
 using namespace chrono;
 using namespace bit7z;
+using namespace neb;
 //using namespace Kingaotech;
 
 extern const char* szPrinterTypeList[PRINTER_MAX];
@@ -84,6 +88,7 @@ extern QScreen* g_pCurScreen;
 
 using KT_PrinterLibPtr = shared_ptr<KTModule<KT_Printer>>;
 using KT_ReaderLibPtr = shared_ptr<KTModule<KT_Reader>>;
+using SSCardServiceLibPtr = shared_ptr<KTModule<SSCardService>>;
 
 string UTF8_GBK(const char* strUtf8);
 string GBK_UTF8(const char* strGBK);
@@ -121,6 +126,7 @@ enum Page_Index
 	Page_InputSSCardPWD,			//输入社保卡密码	
 	Page_ChangeSSCardPWD,			//修改社保卡密码	
 	Page_RegisterLost,				//挂失 / 解挂
+	Page_CommitNewInfo,				//提交新办卡信息
 	Page_AdforFinance,				//开通金融页面
 	Page_Succeed					//操作成功
 };
@@ -422,7 +428,10 @@ struct RegionInfo
 		strSSCardDefaulutPin = pSettings->value("SSCardDefaulutPin", "").toString().toStdString();
 		strPrimaryKey = pSettings->value("PrimaryKey", "").toString().toStdString();
 		strBankCode = pSettings->value("BankCode", "").toString().toStdString();
+		strSSCardSeriveModule = pSettings->value("SSCardServiceModule", "").toString().toStdString();
+		strSSCardServiceDescription = pSettings->value("SSCardServiceDescription", "").toString().toStdString();
 		nProvinceCode = (SSCardProvince)pSettings->value("ProvinceCode").toInt();
+		strOperator = pSettings->value("Operator").toString().toStdString();
 		pSettings->endGroup();
 		return true;
 	}
@@ -477,6 +486,9 @@ struct RegionInfo
 	string		strPrimaryKey;							// 主控密钥
 	string		strBankCode;							// 银行代码
 	string		strCardVendor;							// 所属卡商
+	string		strSSCardSeriveModule;					// 社保卡服务模块
+	string		strSSCardServiceDescription;			// 社保卡服务描述文件，用于服务初始化
+	string		strOperator;							// 操作人员
 	SSCardProvince	nProvinceCode;						// 省市代码
 };
 
@@ -891,6 +903,7 @@ public:
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
 	string		   strCardMakeProgress;
+	CardStatus	   nCardStratus;
 	string		   strPayCode;
 	bool		   bDebug;
 public:
@@ -931,6 +944,10 @@ public:
 public:
 	int OpenDevice(QString& strMessage);
 
+	int OpenSSCardService(ServiceType nServiceType, SSCardService** ppService, QString& strMessage);
+
+	int CloseSSCardService(QString& strMessage);
+
 	int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
 	void CloseDevice();
@@ -965,6 +982,10 @@ public:
 	{
 		return m_pPrinter;
 	}
+	SSCardService* GetSSCardService()
+	{
+		return pSScardSerivce;
+	}
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pSysConfig = nullptr;
@@ -972,9 +993,13 @@ private:
 	SSCardInfoPtr   pSSCardInfo = nullptr;
 	KT_PrinterLibPtr	m_pPrinterlib = nullptr;
 	KT_ReaderLibPtr	m_pSSCardReaderLib = nullptr;
+	SSCardServiceLibPtr pSServiceLib = nullptr;
+
 	KT_Printer* m_pPrinter = nullptr;
 	KT_Reader* m_pSSCardReader = nullptr;
+	SSCardService* pSScardSerivce = nullptr;
 	Manager_Level	nManagerLevel = Manager_Level::Manager;
+
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;
@@ -1029,7 +1054,6 @@ public:
 
 	~QWaitCursor();
 };
-
 
 void SetTableWidgetItemChecked(QTableWidget* pTableWidget, int nRow, int nCol, QButtonGroup* pButtonGrp, int nItemID, bool bChecked = false);
 

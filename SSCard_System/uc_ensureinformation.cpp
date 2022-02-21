@@ -32,6 +32,7 @@ int uc_EnsureInformation::ProcessBussiness()
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+	g_pDataCenter->nCardStratus = CardStatus::Card_Unknow;
 	do
 	{
 		if (g_pDataCenter->bDebug)
@@ -43,91 +44,167 @@ int uc_EnsureInformation::ProcessBussiness()
 				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
 			}
 		}
-		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
-		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-		strcpy((char*)pSSCardInfo->strTransType, "5");
-		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		if (g_pDataCenter->bDebug)
+		{
+			string strCardID, strName, strMobile;
+			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
+			{
+				strcpy((char*)pIDCard->szName, strName.c_str());
+				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
+			}
+		}
 
-		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
-		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
-		strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+		SSCardService* pService = nullptr;
 
-		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
+		if (QFailed(g_pDataCenter->OpenSSCardService(ServiceType::Service_ReplaceCard, &pService, strMessage)))
 		{
 			break;
 		}
 
-		g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pTempSSCardInfo->strCardStatus).toStdString();
-		if (g_pDataCenter->strCardMakeProgress == "制卡中")
+		if (!pService)
 		{
-			// 可以获取新的社保卡一些数据
-			if (QFailed(nResult = (ReadSSCardInfo(strMessage, nStatus, pSSCardInfo))))
-				break;
-			if (nStatus != 0 && nStatus != 1)
-				break;
-			nResult = 0;
+			strMessage = "社保卡卡管服务不可用!";
 			break;
 		}
+		/*
+		"CardID":"33333333333333",
+		 "Name":"",
+		 "City":"",			// 行政区域
+		 "BankCode":""
+		*/
+		CJsonObject jsonIn;
+		jsonIn.Add("CardID", (char*)pIDCard->szIdentify);
+#pragma  Warning("姓名是用什么编码?UTF-8 or GBK?")
+		jsonIn.Add("Name", (const char*)pIDCard->szName);
+		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+		jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
 
-		// 可取旧社保卡号
-		if (QFailed(ReadSSCardInfo(strMessage, nStatus, pSSCardInfo)))
-			break;
-
-		if (nStatus != 0 && nStatus != 1)
-			break;
-
-		if (QFailed(QuerySSCardStatus(strMessage, pSSCardInfo)))
-			break;
-
-		if (nStatus != 0)
+		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
 		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText;
+			jsonOut.Get("Result", nResult);
+			jsonOut.Get("Message", strText);
+
+			strMessage = QString("查询制卡信息失败:%1").arg(strText.c_str());
 			break;
 		}
+		CJsonObject jsonOut(strJsonOut);
 
-		strcpy((char*)pSSCardInfo->strBankCode, pTempSSCardInfo->strBankCode);
-
-		ui->label_Hello->setText(QString("您好，%1").arg(QString::fromLocal8Bit(pSSCardInfo->strName)));
-		ui->label_SSCard->setText(QString("社保卡号:%1").arg(pSSCardInfo->strCardNum));
-
-		string strBankName;
-		if (QFailed(g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName)))
+		string strName, strCardID, strSSCardNum, strCardStatus, strBankCode, strMobile;
+		if (!jsonOut.Get("Name", strName) ||
+			!jsonOut.Get("CardID", strCardID) ||
+			!jsonOut.Get("SSCardNum", strSSCardNum) ||
+			!jsonOut.Get("CardStatus", strCardStatus) ||
+			!jsonOut.Get("BankCode", strBankCode) ||
+			!jsonOut.Get("Mobile", strMobile))
 		{
-			strMessage = QString("未知的银行代码:%1").arg(pSSCardInfo->strBankCode);
+			strMessage = "姓名,身份证,社保卡号,社保卡状态,银行代码中有一些字段无效!";
+			gInfo() << strJsonOut;
 			break;
 		}
+		strcpy(pSSCardInfo->strCardNum, strSSCardNum.c_str());
+		strcpy(pSSCardInfo->strBankCode, strBankCode.c_str());
+		g_pDataCenter->nCardStratus = (CardStatus)strtol(strCardStatus.c_str(), nullptr, 10);
 
-		ui->label_Bank->setText(QString("服务银行:%1").arg(QString(strBankName.c_str())));
-		string strCardStatus;
-		ui->label_CardStatus->setText(QString("卡片状态:%1").arg(pSSCardInfo->strCardStatus));
 		nResult = 0;
 	} while (0);
 
+	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	if (QFailed(nResult))
 	{
 		gError() << gQStr(strMessage);
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return nResult;
 	}
+
+	QString strCardStatus2 = "未知";
+	switch (g_pDataCenter->nCardStratus)
+	{
+	case CardStatus::Card_Release:
+		strCardStatus2 = "放号";
+		break;
+	case CardStatus::Card_Normal:
+		strCardStatus2 = "正常";
+		break;
+	case CardStatus::Card_RegisterLost:
+		strCardStatus2 = "挂失";
+		break;
+	case CardStatus::Card_RegisgerTempLost:
+		strCardStatus2 = "临时挂失";
+		break;
+	case CardStatus::Card_CanceledOnRegisterLost:
+		strCardStatus2 = "挂失后注销";
+		break;
+	case CardStatus::Card_Canceled:
+		strCardStatus2 = "注销";
+		break;
+	case CardStatus::Card_DeActived:
+		strCardStatus2 = "未启用";
+		break;
+	case CardStatus::Card_Making:
+		strCardStatus2 = "制卡中";
+		break;
+	default:
+	case CardStatus::Card_Unknow:
+		strCardStatus2 = "未知";
+		break;
+	}
+	ui->label_Hello->setText(QString("您好,%1").arg(QString::fromLocal8Bit((const char*)pIDCard->szName)));
+	ui->label_SSCard->setText(QString("社保卡号:%1").arg((char*)pSSCardInfo->strCardNum));
+	string strBankName;
+	if (QFailed(g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName)))
+	{
+		strBankName = pSSCardInfo->strBankCode;
+	}
+	ui->label_Bank->setText(QString("服务银行:%1").arg(strBankName.c_str()));
+	ui->label_CardStatus->setText(QString("卡片状态:%1").arg(strCardStatus2));
+	ui->pushButton_OK->setEnabled(false);
 	QString strCardStatus = pSSCardInfo->strCardStatus;
 	switch (m_nPageIndex)
 	{
 	case Page_EnsureInformation:
 	{
-		if (strCardStatus == "正式挂失")
+		switch (g_pDataCenter->nCardStratus)
 		{
+		case CardStatus::Card_Release:
+		case CardStatus::Card_Normal:
+			ui->pushButton_OK->setEnabled(true);
+			break;
+		case CardStatus::Card_CanceledOnRegisterLost:
+		case CardStatus::Card_Canceled:
+		{
+			QString strInfo = QString("卡号已注销,请按新办卡流程处理!");
+			gError() << gQStr(strMessage);
+			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			return 0;
+		}
+		break;
+		case CardStatus::Card_RegisgerTempLost:
+		case CardStatus::Card_RegisterLost:
+		{
+			ui->pushButton_OK->setEnabled(false);
+			strCardStatus2 = "挂失";
 			QString strInfo = QString("卡片状态:正式挂失,稍后请输入手机号码!");
 			gInfo() << gQStr(strInfo);
-
 			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
 		}
-		if (g_pDataCenter->strCardMakeProgress == "制卡中")
+		break;
+		case CardStatus::Card_DeActived:
 		{
+			ui->pushButton_OK->setEnabled(false);
+			strCardStatus2 = "未启用";
+			QString strInfo = QString("卡片状态:未记用,请先启用再输补卡业务!");
+			gInfo() << gQStr(strInfo);
+			emit ShowMaskWidget("操作成功", strInfo, Fetal, Return_MainPage);
+			return 0;
+		}
+		break;
+		case CardStatus::Card_Making:
+		{
+			ui->pushButton_OK->setEnabled(false);
 			QString strInfo = QString("制卡进度:制卡中,直接跳至制卡页面!");
 			gInfo() << gQStr(strInfo);
 			// 直接跳转到制止页面
@@ -135,28 +212,90 @@ int uc_EnsureInformation::ProcessBussiness()
 			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
 			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
 			emit SwitchNextPage(nOperation);
+			strCardStatus2 = "制卡中";
 		}
+
+		break;
+		default:
+		case CardStatus::Card_Unknow:
+			strCardStatus2 = "未知";
+			ui->pushButton_OK->setEnabled(false);
+			break;
+		}
+
 		break;
 	}
 	case Page_RegisterLost:
 	{
-		//ui->pushButton_OK->setEnabled(true);
-		if (strCardStatus == "正式挂失")
+		switch (g_pDataCenter->nCardStratus)
 		{
-			ui->label_Ensure->setText("是否确定解除挂失?");
-			ui->pushButton_OK->setText("解除挂失");
-			m_bRegisterLost = false;
-		}
-		else if (strCardStatus == "正常")
+		case CardStatus::Card_Release:
+		case CardStatus::Card_Normal:
 		{
 			ui->label_Ensure->setText("是否确定挂失并补换卡?");
 			ui->pushButton_OK->setText("挂失");
-			m_bRegisterLost = true;
+			ui->pushButton_OK->setEnabled(true);
 		}
-		else
+		break;
+		case CardStatus::Card_CanceledOnRegisterLost:
+		case CardStatus::Card_Canceled:
+		{
 			ui->pushButton_OK->setEnabled(false);
+			QString strInfo = QString("卡号已注销,请按新办卡流程处理!");
+			gError() << gQStr(strMessage);
+			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			return 0;
+		}
+		break;
+		case CardStatus::Card_RegisgerTempLost:
+		case CardStatus::Card_RegisterLost:
+		{
+			ui->pushButton_OK->setEnabled(true);
+			strCardStatus2 = "挂失";
+			ui->label_Ensure->setText("是否确定解除挂失?");
+			ui->pushButton_OK->setText("解除挂失");
+			QString strInfo = QString("卡片状态:正式挂失,稍后请输入手机号码!");
+			gInfo() << gQStr(strInfo);
+			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
+		}
+		break;
+
+		case CardStatus::Card_DeActived:
+		{
+			ui->pushButton_OK->setEnabled(false);
+			strCardStatus2 = "未启用";
+			QString strInfo = QString("卡片状态:未记用,请先启用再输补卡业务!");
+			gInfo() << gQStr(strInfo);
+			emit ShowMaskWidget("操作成功", strInfo, Fetal, Return_MainPage);
+			return 0;
+		}
+		break;
+		case CardStatus::Card_Making:
+		{
+			ui->pushButton_OK->setEnabled(true);
+			QString strInfo = QString("制卡进度:制卡中,直接跳至制卡页面!");
+			gInfo() << gQStr(strInfo);
+			// 直接跳转到制止页面
+			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
+			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
+			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
+			emit SwitchNextPage(nOperation);
+			strCardStatus2 = "制卡中";
+		}
+		break;
+		default:
+		case CardStatus::Card_Unknow:
+		{
+			strCardStatus2 = "未知";
+			QString strInfo = QString("卡状态未知,无法进行下一步业务,请联系工作人处理!");
+			gError() << gQStr(strMessage);
+			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		}
+		break;
+		}
 	}
 	default:
+		ui->pushButton_OK->setEnabled(false);
 		break;
 	}
 
@@ -168,185 +307,135 @@ void uc_EnsureInformation::OnTimeout()
 
 }
 
-// int uc_EnsureInformation::QueryRegisterLost(QString& strMessage)
-// {
-// 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-// 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-// 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-// 	QueryRegisterLost()
-// 	return 0;
-// }
-
-int	 uc_EnsureInformation::QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo)
-{
-	int nResult = 0;
-	char* szStatus[1024] = { 0 };
-	// 这里需要旧卡号
-	if (QFailed(nResult = queryCardStatus(*pSSCardInfo, reinterpret_cast<char*>(szStatus))))
-	{
-		QString strInfo = QString("queryCardStatus失败:%1,CardID = %2\tName = %3\t").arg(nResult).arg(reinterpret_cast<char*>(pSSCardInfo->strCardID)).arg(reinterpret_cast<char*>(pSSCardInfo->strName));
-		gError() << gQStr(strInfo);
-		strMessage = QString("查询卡状态失败!");
-		return -1;
-	}
-
-	if (strcmp(_strupr((char*)szStatus), "OK") == 0)
-	{
-		strcpy(pSSCardInfo->strCardStatus, "正常");
-	}
-	else
-	{
-		QString strStatus = QString::fromLocal8Bit((char*)szStatus);
-		strcpy(pSSCardInfo->strCardStatus, (char*)strStatus.toStdString().c_str());
-	}
-
-	return 0;
-}
-
-int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	int nResult = 0;
-	char szStatus[1024] = { 0 };
-	if (QFailed(nResult = queryPersonInfo(*pSSCardInfo, szStatus)))
-	{
-		QString strInfo = QString("queryPersonInfo失败:%1,CardID = %2\tName = %3\t").arg(nResult).arg((char*)pSSCardInfo->strCardID).arg((char*)pSSCardInfo->strName);
-		gError() << gQStr(strInfo);
-		strMessage = QString("查询社保卡信息失败!");
-		return -1;
-	}
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-	}
-	else
-	{
-		strMessage = szStatus;
-		return -1;
-	}
-	//g_pDataCenter->SetSSCardInfo(pSSCardInfo);
-	return 0;
-}
-
-int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = 0;
-	if (QFailed(nResult = reportLostCard(*pSSCardInfo, szStatus)))
-	{
-		QString strInfo = QString("reportLostCard失败:%1,Name = %2\tCardID = %3").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
-		gError() << gQStr(strInfo);
-		strMessage = QString("挂失失败!");
-		return -1;
-	}
-
-	gInfo() << "reportLostCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		if (nStatus == 2)
-		{
-			strMessage = (char*)&szStatus[2];
-		}
-	}
-	else
-	{
-		strMessage = szStatus;
-		return -1;
-	}
-
-	return 0;
-}
-
-int uc_EnsureInformation::UnRegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = 0;
-	if (QFailed(nResult = cancelLostCard(*pSSCardInfo, szStatus)))
-	{
-		QString strInfo = QString("cancelLostCard失败:%1,Name = %2\tCardID = %3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
-		gError() << gQStr(strInfo);
-		strMessage = QString("解除挂失败!");
-		return -1;
-	}
-
-	gInfo() << "cancelLostCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		if (nStatus == 2)
-		{
-			strMessage = (char*)&szStatus[2];
-		}
-	}
-	else
-	{
-		strMessage = szStatus;
-		return -1;
-	}
-	return 0;
-}
 
 void uc_EnsureInformation::on_pushButton_OK_clicked()
 {
 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+	QString strMessage;
 	if (m_nPageIndex == Page_EnsureInformation)
 	{
-		QString strError("社保卡信息已经确认,正在发送挂失信息!");
-		gInfo() << strError.toLocal8Bit().data();
-		//emit ShowMaskWidget("操作成功", strError, Information, Stay_CurrentPage);
-		int nStatus = 0;
-		if (QFailed(RegisterLost(strError, nStatus, pSSCardInfo)))
+		if (g_pDataCenter->nCardStratus == CardStatus::Card_Release ||
+			g_pDataCenter->nCardStratus == CardStatus::Card_Normal)
 		{
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
-			return;
-		}
-		else
-		{
-			strError = "社保卡挂失成功,稍后请输入常用手机号码!";
+			QString strError("社保卡信息已经确认,正在发送挂失信息!");
+			gInfo() << strError.toLocal8Bit().data();
+			//emit ShowMaskWidget("操作成功", strError, Information, Stay_CurrentPage);
+			int nStatus = 0;
+			SSCardService* pService = g_pDataCenter->GetSSCardService();
+			CJsonObject jsonIn;
+
+			jsonIn.Add("CardID", (const char*)pIDCard->szIdentify);
+			jsonIn.Add("Name", (const char*)pIDCard->szName);
+			jsonIn.Add("City", Reginfo.strCityCode);
+			jsonIn.Add("BankCode", Reginfo.strBankCode);
+			jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+			jsonIn.Add("Operator", Reginfo.strOperator);
+			string strJsonIn = jsonIn.ToString();
+			string strJsonout;
+			int nResult = 0;
+
+			if (QFailed(pService->RegisterLost(strJsonIn, strJsonout)))
+			{
+				CJsonObject jsonOut(strJsonout);
+				string strText;
+				jsonOut.Get("Result", nResult);
+				jsonOut.Get("Message", strText);
+				strError = QString("挂失失败:%1").arg(strText.c_str());
+				gError() << gQStr(strError);
+				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+				return;
+			}
+			if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonout)))
+			{
+				CJsonObject jsonOut(strJsonout);
+				string strText;
+				jsonOut.Get("Result", nResult);
+				jsonOut.Get("Message", strText);
+				strError = "查询卡状态失败!";
+				gError() << gQStr(strError);
+				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+			}
 			gInfo() << strError.toLocal8Bit().data();
 			emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
+			return;
 		}
 	}
 	else
 	{
 		if (m_bRegisterLost)
 		{
-			QString strError("社保卡信息已经确认,正在发送挂失信息!");
-			gInfo() << strError.toLocal8Bit().data();
-			//emit ShowMaskWidget("操作成功", strError, Information, Stay_CurrentPage);
-			int nStatus = 0;
-			if (QFailed(RegisterLost(strError, nStatus, pSSCardInfo)))
+			if (g_pDataCenter->nCardStratus == CardStatus::Card_Release ||
+				g_pDataCenter->nCardStratus == CardStatus::Card_Normal)
 			{
-				gError() << strError.toLocal8Bit().data();
-				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
-				return;
-			}
-			else
-			{
-				strError = "社保卡挂失成功!";
-				emit ShowMaskWidget("操作成功", strError, Success, Return_MainPage);
+				QString strError("社保卡信息已经确认,正在发送挂失信息!");
+				gInfo() << strError.toLocal8Bit().data();
+				int nStatus = 0;
+				SSCardService* pService = g_pDataCenter->GetSSCardService();
+				CJsonObject jsonIn;
+				jsonIn.Add("CardID", (const char*)pIDCard->szIdentify);
+				jsonIn.Add("Name", (const char*)pIDCard->szName);
+				jsonIn.Add("City", Reginfo.strCityCode);
+				jsonIn.Add("BankCode", Reginfo.strBankCode);
+				jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+				jsonIn.Add("Operator", Reginfo.strOperator);
+				string strJsonIn = jsonIn.ToString();
+				string strJsonout;
+				int nResult = 0;
+
+				if (QFailed(pService->RegisterLost(strJsonIn, strJsonout)))
+				{
+					CJsonObject jsonOut(strJsonout);
+					string strText;
+					jsonOut.Get("Result", nResult);
+					jsonOut.Get("Message", strText);
+					strError = QString("挂失失败:%1").arg(strText.c_str());
+					gError() << gQStr(strError);
+					emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+				}
+				else
+				{
+					gInfo() << strError.toLocal8Bit().data();
+					emit ShowMaskWidget("操作成功", strError, Success, Return_MainPage);
+				}
 			}
 		}
 		else
 		{
-			QString strError("社保卡信息已经确认,正在发送解挂信息!");
-			gInfo() << strError.toLocal8Bit().data();
-			//emit ShowMaskWidget("操作成功", strError, Information, Stay_CurrentPage);
-			int nStatus = 0;
-			if (QFailed(UnRegisterLost(strError, nStatus, pSSCardInfo)))
+			if (g_pDataCenter->nCardStratus == CardStatus::Card_Release ||
+				g_pDataCenter->nCardStratus == CardStatus::Card_Normal)
 			{
-				gError() << strError.toLocal8Bit().data();
-				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
-				return;
-			}
-			else
-			{
-				strError = "社保卡解除挂失成功!";
-				emit ShowMaskWidget("操作成功", strError, Success, Return_MainPage);
+				QString strError("社保卡信息已经确认,正在发送挂失信息!");
+				gError() << gQStr(strError);
+				SSCardService* pService = g_pDataCenter->GetSSCardService();
+				CJsonObject jsonIn;
+				jsonIn.Add("CardID", (const char*)pIDCard->szIdentify);
+				jsonIn.Add("Name", (const char*)pIDCard->szName);
+				jsonIn.Add("City", Reginfo.strCityCode);
+				jsonIn.Add("BankCode", Reginfo.strBankCode);
+				jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+				jsonIn.Add("Operator", Reginfo.strOperator);
+				string strJsonIn = jsonIn.ToString();
+				string strJsonout;
+
+				if (QFailed(pService->RegisterLost(strJsonIn, strJsonout, 1)))
+				{
+					int nResult = 0;
+					CJsonObject jsonOut(strJsonout);
+					string strText;
+					jsonOut.Get("Result", nResult);
+					jsonOut.Get("Message", strText);
+					strError = QString("挂失失败:%1").arg(strText.c_str());
+					gError() << gQStr(strError);
+					emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+
+				}
+				else
+				{
+					strError = "社保卡解除挂失成功!";
+					emit ShowMaskWidget("操作成功", strError, Success, Return_MainPage);
+				}
 			}
 		}
 	}
