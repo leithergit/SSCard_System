@@ -28,6 +28,8 @@ public:
 	void ProceBatchLock();
 	void ProcessPowerOnFailed();
 	void PrintCardData();
+	void PrintPhoto();
+	void EnableCard();
 
 	int LoadPersonSSCardData(QString& strMesssage);
 

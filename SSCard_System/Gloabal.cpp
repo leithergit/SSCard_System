@@ -1019,11 +1019,37 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 		}
 
 		ImagePosition& ImgPos = pCardForm->posImage;
-		if (strPhoto.size())
+		if (!strPhoto.size())
 		{
-			if (QFailed(m_pPrinter->Printer_AddImage((char*)strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
-				break;
-			else if (QFailed(m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
+			gInfo() << "There is no sepiciialed immage ,now try to print:" << strSSCardPhotoFile;
+			QFileInfo fi(strSSCardPhotoFile.c_str());
+			if (fi.isFile())
+			{
+				gInfo() << "Try to print image:" << strSSCardPhotoFile;
+				if (QFailed(m_pPrinter->Printer_AddImage((char*)strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
+					break;
+			}
+			else
+			{
+				gInfo() << "Image " << strSSCardPhotoFile << " is not exist!Try to print " << g_pDataCenter->strIDImageFile;
+				QFileInfo fi(g_pDataCenter->strIDImageFile.c_str());
+				if (fi.isFile())
+				{
+					gInfo() << "Try to print image:" << g_pDataCenter->strIDImageFile;
+					if (QFailed(m_pPrinter->Printer_AddImage((char*)g_pDataCenter->strIDImageFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
+						break;
+				}
+				else
+				{
+					gInfo() << "Error,There is no image to print for " << pSSCardInfo->strName;
+					break;
+				}
+			}
+		}
+		else
+		{
+			gInfo() << "Try to print image:" << strPhoto.toStdString();
+			if (QFailed(m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
 				break;
 		}
 
