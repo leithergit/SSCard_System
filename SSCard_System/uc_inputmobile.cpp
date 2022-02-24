@@ -158,7 +158,7 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		string strPayMessage;
 		SSCardService* pService = g_pDataCenter->GetSSCardService();
 		CJsonObject jsonIn;
-		jsonIn.Add("CardID", (const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+		jsonIn.Add("CardID", (const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
 
@@ -181,7 +181,7 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		{
 			QString strInfo = "手机号码已确认,稍后开始制卡!";
 			gInfo() << gQStr(strInfo);
-			emit ShowMaskWidget("操作成功", strInfo, Success, Skip_NextPage);
+			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
 		}
 		else if (nPayResult == PayResult::PaySucceed)
 		{

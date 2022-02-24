@@ -29,6 +29,13 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	void ThreadWork();
+	int  PremakeCard(QString& strMessage);
+	int  CommitPersionInfo(QString& strMessage);
+	int	 WriteCard(QString& strMessage);
+	int  EnsureData(QString& strMessage);
+	int  ActiveCard(QString& strMessage);
+	//int  PrintCard(QString& strMessage);
+
 	virtual void ShutDown() override;
 	int     m_nSocketRetryInterval = 500;            // 支付结构查询时间间隔单 毫秒
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数

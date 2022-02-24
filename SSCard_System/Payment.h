@@ -54,7 +54,7 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 // nType，0为保存身份证照片，1为保存社保卡照片
 int GetImageStorePath(string& strFilePath, int nType = 0);
 
-int LoadTestData(string& strName, string& strCardID, string& strMobile);
+int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo, string& strMobile);
 
 int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile);
 

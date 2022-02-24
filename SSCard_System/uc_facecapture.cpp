@@ -270,9 +270,9 @@ int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, bool bFull)
 		}
 	}
 	if (bFull)
-		strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+		strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 	else
-		strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+		strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 	return 0;
 }
 

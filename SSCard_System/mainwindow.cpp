@@ -17,11 +17,20 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 	installEventFilter(this);
+
 	BaseInfo Bi;
 	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
 	strcpy(Bi.strEMUrl, region.strEMURL.c_str());
 	strcpy(Bi.strAccount, region.strEMAccount.c_str());
 	strcpy(Bi.strPassword, region.strEMPassword.c_str());
+	/*
+	* char strArea[16];				// 区域代码
+	char strLicense[64];			// 授权代码
+	char strEMUrl[64];				// 加密机IP
+	char strAccount[64];			// 加密机账号
+	char strPassword[64];			// 加密机密码
+	*/
+
 	if (!InitEnv(Bi))
 	{
 		gInfo() << "Failed in InitEnv";
@@ -340,6 +349,7 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 		//m_pMaskWindow->hide();
 		disconnect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 		delete m_pMaskWindow;
+		m_pMaskWindow = nullptr;
 	}
 	if (pLastStackPage)
 	{
@@ -362,6 +372,7 @@ void MainWindow::On_MaskWidgetEnsure(int nPageOperation, int nStatus)
 		//m_pMaskWindow->hide();
 		disconnect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetEnsure);
 		delete m_pMaskWindow;
+		m_pMaskWindow = nullptr;
 	}
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
 	pCurPage->emit SwitchNextPage(nPageOperation);

@@ -1099,7 +1099,7 @@ void DeviceManager::on_pushButton_MakePhoto_clicked()
 		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 		g_pDataCenter->SetIDCardInfo(pIDCard);
 
-		strcpy((char*)g_pDataCenter->GetIDCardInfo()->szIdentify, pSSCardInfo->strCardID);
+		strcpy((char*)g_pDataCenter->GetIDCardInfo()->szIdentity, pSSCardInfo->strCardID);
 		QString strMessage;
 		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 	}

@@ -154,7 +154,18 @@ DLL_PUBLIC int saveCardBhList(SD_SSCardInfo& info,std::string& pOutInfo);
  */
 DLL_PUBLIC int saveCardBhk(SD_SSCardInfo& info,std::string& pOutInfo);
 
-
+/**
+* @brief 获取CA
+* @param[in]  name  姓名
+* @param[in]  cardID  身份证号
+* @param[in]  cardNum  卡号
+* @param[in]  signatureKey  签名公钥
+* @param[in]  SF  算法
+* @param[in]  city  行政区划代码
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int getCA(std::string name, std::string cardID, std::string cardNum, std::string signatureKey, std::string SF, std::string city,std::string& pOutInfo);
 
 #ifdef __cplusplus
 EXTERN_C_END

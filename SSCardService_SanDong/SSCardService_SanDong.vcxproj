@@ -32,7 +32,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <OutputDirectory>debug\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <IntermediateDirectory>debug\</IntermediateDirectory>
     <PrimaryOutput>SSCardService_Sandong</PrimaryOutput>
@@ -133,7 +133,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_DEBUG;SSCARDSERVICESANDONG_EXPORTS;_USRDLL;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;_HAS_STD_BYTE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_DEBUG;SSCARDSERVICESANDONG_EXPORTS;_USRDLL;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;_HAS_STD_BYTE=0;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>

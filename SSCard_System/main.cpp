@@ -5,6 +5,7 @@
 #include <QDesktopWidget>
 #include <QScreen>
 #include <fstream>
+#include <sstream>
 
 #include "DevBase.h"
 
@@ -13,6 +14,7 @@
 #include "showlicense.h"
 #include "BugTrap.h"
 #include "../utility/json/CJsonObject.hpp"
+#include "../Utility/Markup.h"
 
 extern QScreen* g_pCurScreen;
 
@@ -97,6 +99,7 @@ int main(int argc, char* argv[])
 	google::SetStderrLogging(google::GLOG_INFO);	// 大于该级别的日志输出到stderr
 	google::SetLogFilenameExtension(".log");
 	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
+
 
 	ifstream ifs("./AppRuning.json");
 	int nRunCount = 0;

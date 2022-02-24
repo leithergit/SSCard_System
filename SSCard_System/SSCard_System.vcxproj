@@ -156,10 +156,10 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;_DEBUG;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -212,13 +212,14 @@ copy /y $(TargetPath) z:\</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>@call updatesdk.bat $(Configuration)
-@call  $(SolutionDir)updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
+::@call  $(SolutionDir)updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
     <ClCompile Include="..\utility\json\cJSON.c" />
     <ClCompile Include="..\utility\json\CJsonObject.cpp" />
+    <ClCompile Include="..\utility\Markup.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
@@ -228,6 +229,7 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
     <ClCompile Include="showlicense.cpp" />
+    <ClCompile Include="sscardservicet.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
     <ClCompile Include="Sys_cardmanger.cpp" />
     <ClCompile Include="Sys_dialogcameratest.cpp" />
@@ -270,6 +272,8 @@ copy /y $(TargetPath) z:\</Command>
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <QtMoc Include="newcard.h" />
     <QtMoc Include="nc_commitPersonInfo.h" />
+    <QtMoc Include="sscardservicet.h" />
+    <ClInclude Include="..\utility\Markup.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -375,6 +379,7 @@ copy /y $(TargetPath) z:\</Command>
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
     <QtUic Include="showlicense.ui" />
+    <QtUic Include="sscardservicet.ui" />
     <QtUic Include="Sys_DeviceManager.ui">
     </QtUic>
     <QtUic Include="Sys_cardmanger.ui">

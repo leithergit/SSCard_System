@@ -3,14 +3,17 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <fstream>
 #include "../SSCardService/SSCardService.h"
 #include "../SDK/SSCardInfo_Sandong/SD_SSCardInfo.h"
 #include "Utility.h"
 #include "CJsonObject.hpp"
+#include "Markup.h"
 #include <QtCore/qglobal.h>
 #include <QSettings>
 #include <QFileInfo>
 #include <QDebug>
+#include <map>
 
 //宏定义
 #define __STR2__(x) #x
@@ -18,7 +21,7 @@
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)")"
 #define Warning(strMessage) message( __LOC__ " Warning: " strMessage)
 
-
+extern map<string, string>g_mapNationnaltyCode;
 #define  QFailed(x)		(x!= 0)
 
 using namespace std;
@@ -31,7 +34,8 @@ private:
 public:
 
 	SSCardService_Sandong()
-	{}
+	{
+	}
 
 	//SSCardService_Sandong(/*ServiceType nSvrType*/)	/*	:SSCardService(nSvrType)*/
 	//{
@@ -198,7 +202,7 @@ public:
 	// cardID,name,city,bankcode,PaperType
 	int QueryNewCardStatus(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -218,25 +222,24 @@ public:
 				break;
 			}
 
-			jsonIn.Get("CardID", TempCardInfo.strCardID);
-			jsonIn.Get("Name", TempCardInfo.strName);
-			jsonIn.Get("City", TempCardInfo.strCity);
-			jsonIn.Get("BankCode", TempCardInfo.strBankCode);
-			TempCardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			jsonIn.Get("CardID", CardInfo.strCardID);
+			jsonIn.Get("Name", CardInfo.strName);
+			jsonIn.Get("City", CardInfo.strCity);
+			jsonIn.Get("BankCode", CardInfo.strBankCode);
+			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
-			if (TempCardInfo.strCardID.empty()
-				|| TempCardInfo.strName.empty()
-				|| TempCardInfo.strCity.empty()
-				|| TempCardInfo.strBankCode.empty()
-				//||TempCardInfo.strCardType.empty()
+			if (CardInfo.strCardID.empty()
+				|| CardInfo.strName.empty()
+				|| CardInfo.strCity.empty()
+				|| CardInfo.strBankCode.empty()
+				//||CardInfo.strCardType.empty()
 				)
 			{
-				strMessage = "Any items of CardID,Name,City,Bankcode can't be empty!";
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
 				break;
 			}
 
-			CardInfo = TempCardInfo;
-			if (QFailed(nSSResult = chkCanCardSq(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = chkCanCardSq(CardInfo, strOutInfo)))
 			{
 				strMessage = "Faled in chkCanCardSq:";
 				strMessage += std::to_string(nSSResult);
@@ -290,14 +293,13 @@ public:
 	/*
 		Name
 		CardID
-		SSCardNum
+		CardNum
 		CardStatus
 		BankName
 		Mobile
 	*/
 	int QueryOldCardStatus(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -311,24 +313,24 @@ public:
 				strMessage = "strJsonIn Input is invalid!";
 				break;
 			}
-			jsonIn.Get("CardID", TempCardInfo.strCardID);
-			jsonIn.Get("Name", TempCardInfo.strName);
-			jsonIn.Get("City", TempCardInfo.strCity);
-			jsonIn.Get("BankCode", TempCardInfo.strBankCode);
-			TempCardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			jsonIn.Get("CardID", CardInfo.strCardID);
+			jsonIn.Get("Name", CardInfo.strName);
+			jsonIn.Get("City", CardInfo.strCity);
+			jsonIn.Get("BankCode", CardInfo.strBankCode);
+			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
-			if (TempCardInfo.strCardID.empty()
-				|| TempCardInfo.strName.empty()
-				|| TempCardInfo.strCity.empty()
-				|| TempCardInfo.strBankCode.empty()
-				|| TempCardInfo.strCardType.empty()
+			if (CardInfo.strCardID.empty()
+				|| CardInfo.strName.empty()
+				|| CardInfo.strCity.empty()
+				|| CardInfo.strBankCode.empty()
+				|| CardInfo.strCardType.empty()
 				)
 			{
-				strMessage = "Any items of CardID,Name,City,Bankcode can't be empty!";
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
 				break;
 			}
 
-			if (QFailed(nSSResult = chkCanCardBh(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = chkCanCardBh(CardInfo, strOutInfo)))
 			{
 				strMessage = "Faled in chkCanCardSq:";
 				strMessage += std::to_string(nSSResult);
@@ -380,14 +382,13 @@ public:
 	/*
 		Name
 		CardID
-		SSCardNum
+		CardNum
 		CardStatus
 		BankName
 		Mobile
 	*/
 	int QueryCardInfo(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -401,13 +402,13 @@ public:
 				strMessage = "strJsonIn Input is invalid!";
 				break;
 			}
-			jsonIn.Get("CardID", TempCardInfo.strCardID);
-			jsonIn.Get("Name", TempCardInfo.strName);
-			jsonIn.Get("City", TempCardInfo.strCity);
-			jsonIn.Get("BankCode", TempCardInfo.strBankCode);
-			TempCardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			jsonIn.Get("CardID", CardInfo.strCardID);
+			jsonIn.Get("Name", CardInfo.strName);
+			jsonIn.Get("City", CardInfo.strCity);
+			jsonIn.Get("BankCode", CardInfo.strBankCode);
+			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
-			if (QFailed(nSSResult = queryCardInfoBySfzhm(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = queryCardInfoBySfzhm(CardInfo, strOutInfo)))
 			{
 				strMessage = "Failed in queryCardInfoBySfzhm:";
 				strMessage += std::to_string(nSSResult);
@@ -486,7 +487,7 @@ public:
 			outJson.Clear();
 			outJson.Add("Name", CardInfo.strName);
 			outJson.Add("CardID", CardInfo.strCardID);
-			outJson.Add("SSCardNum", CardInfo.strCardNum);
+			outJson.Add("CardNum", CardInfo.strCardNum);
 			outJson.Add("BankName", strBankName);
 			outJson.Add("BankCode", CardInfo.strBankCode);
 			outJson.Add("CardStatus", (int)nCardStatus);
@@ -504,40 +505,20 @@ public:
 		return nResult;
 	}
 
-	// 	virtual int QueryCardInfo(string& strJsonIn, string& strJsonOut)
-	// 	{
-	// 		switch (nServiceType)
-	// 		{
-	// 		case ServiceType::Service_NewCard:
-	// 			return QueryNewCardStatus(strJsonIn, strJsonOut);
-	// 			break;
-	// 		case ServiceType::Service_ReplaceCard:
-	// 			return QueryOldCardStatus(strJsonIn, strJsonOut);
-	// 			break;
-	// 		case ServiceType::Service_RegisterLost:
-	// 		default:
-	// 		{
-	// 			CJsonObject jsonOut;
-	// 			jsonOut.Add("Message", "Invalid Service Type!");
-	// 			return -1;
-	// 			break;
-	// 		}
-	// 		}
-	// 	}
-		/*
-		input string
-		 {
-		 "CardID":"33333333333333",
-		 "Name":"",
-		 "City":"",			// 行政区域
-		 "BankCode":""
-		}
-
-		output string
+	/*
+	input string
 		{
-			"message":""
-		}
-		*/
+		"CardID":"33333333333333",
+		"Name":"",
+		"City":"",			// 行政区域
+		"BankCode":""
+	}
+
+	output string
+	{
+		"message":""
+	}
+	*/
 
 	virtual int QueryCardStatus(string& strJsonIn, string& strJsonOut) override
 	{
@@ -578,14 +559,13 @@ public:
 	{
 	"Name":"",
 	"CardID":"",
-	"SSCardNum":"",
+	"CardNum":"",
 	"Mobile":"",
 	"BankCode":""
 	}
 	*/
 	int CommitNewCardInfo(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -605,44 +585,39 @@ public:
 				break;
 			}
 
-			TempCardInfo = CardInfo;
-			/*TempCardInfo.strName = jsonIn["Name"].ToString();
-			TempCardInfo.strCity = jsonIn["City"].ToString();
-			TempCardInfo.strBankCode = jsonIn["BankCode"].ToString();*/
-			TempCardInfo.strDealType = "0";	// new card
-			//TempCardInfo.strCardType = jsonIn["PaperType"].ToString();
-			jsonIn.Get("IssueDate", TempCardInfo.strReleaseDate);
-			jsonIn.Get("ExpireDate", TempCardInfo.strValidDate);
-			jsonIn.Get("Mobile", TempCardInfo.strMobile);
-			jsonIn.Get("Operator", TempCardInfo.strOperator);
-			jsonIn.Get("OccupType", TempCardInfo.strOccupType);
-			jsonIn.Get("Birthday", TempCardInfo.strBirthday);
-			jsonIn.Get("Gender", TempCardInfo.strSex);
-			jsonIn.Get("Nation", TempCardInfo.strNation);
-			jsonIn.Get("Address", TempCardInfo.strAdress);
-			jsonIn.Get("Photo", TempCardInfo.strPhoto);
+			CardInfo.strDealType = "0";	// new card
+			CardInfo.strOperator = "Administrator";
+			CardInfo.strCardType = "A";
+			jsonIn.Get("IssueDate", CardInfo.strReleaseDate);
+			jsonIn.Get("ExpireDate", CardInfo.strValidDate);
+			jsonIn.Get("Mobile", CardInfo.strMobile);
+			jsonIn.Get("Operator", CardInfo.strOperator);
+			//jsonIn.Get("OccupType", CardInfo.strOccupType);
+			jsonIn.Get("Birthday", CardInfo.strBirthday);
+			jsonIn.Get("Gender", CardInfo.strSex);
+			jsonIn.Get("Nation", CardInfo.strNation);
+			jsonIn.Get("Address", CardInfo.strAdress);
+			jsonIn.Get("Photo", CardInfo.strPhoto);
 
-			if (TempCardInfo.strCardID.empty()
-				|| TempCardInfo.strName.empty()
-				|| TempCardInfo.strCity.empty()
-				|| TempCardInfo.strBankCode.empty()
-				|| TempCardInfo.strCardType.empty()
-				|| TempCardInfo.strMobile.empty()
-				|| TempCardInfo.strOperator.empty()
-				|| TempCardInfo.strOccupType.empty()
-				|| TempCardInfo.strReleaseDate.empty()
-				|| TempCardInfo.strValidDate.empty()
-				|| TempCardInfo.strBirthday.empty()
-				|| TempCardInfo.strSex.empty()
-				|| TempCardInfo.strNation.empty()
-				|| TempCardInfo.strAdress.empty()
-				|| TempCardInfo.strPhoto.empty())
+
+			if (CardInfo.strCardID.empty()
+				|| CardInfo.strName.empty()
+				|| CardInfo.strCity.empty()
+				|| CardInfo.strBankCode.empty()
+				|| CardInfo.strMobile.empty()
+				|| CardInfo.strReleaseDate.empty()
+				|| CardInfo.strValidDate.empty()
+				|| CardInfo.strBirthday.empty()
+				|| CardInfo.strSex.empty()
+				|| CardInfo.strNation.empty()
+				|| CardInfo.strAdress.empty()
+				|| CardInfo.strPhoto.empty())
 			{
-				strMessage = "Any items of cardID,cardType,name,city,bankcode,mobile,operator,OccupType,releaseDate,validDate,Birthday,sex,nation,address photo can't be empty!";
+				strMessage = "身份证,姓名,城市代码,银行代码,手机,证件有效,生日,性别,民族,住址或照片不能为空!";
 				break;
 			}
-			CardInfo = TempCardInfo;
-			if (QFailed(nSSResult = saveCardSqList(TempCardInfo, strOutInfo)))
+
+			if (QFailed(nSSResult = saveCardSqList(CardInfo, strOutInfo)))
 			{
 				strMessage = "Failed in saveCardSqList:";
 				strMessage += strOutInfo;
@@ -683,11 +658,11 @@ public:
 			// 20210126
 			date2 << std::put_time(std::localtime(&tNext), "%Y%m%d");
 
-			TempCardInfo.strReleaseDate = date1.str();
-			TempCardInfo.strValidDate = date2.str();
+			CardInfo.strReleaseDate = date1.str();
+			CardInfo.strValidDate = date2.str();
 
 			// city,bankcode,validDate,dealType,releaseDate
-			if (QFailed(nSSResult = queryCardZksqList(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
 			{
 				strMessage = "Faled in queryCardInfoBySfzhm:";
 				strMessage += strOutInfo;
@@ -735,7 +710,7 @@ public:
 			CJsonObject outJson;
 			outJson.Add("Name", CardInfo.strName);
 			outJson.Add("CardID", CardInfo.strCardID);
-			outJson.Add("SSCardNum", CardInfo.strCardNum);
+			outJson.Add("CardNum", CardInfo.strCardNum);
 			outJson.Add("Mobile", CardInfo.strMobile);
 			outJson.Add("BankCode", tmpJson["yhbh"].ToString());
 			strJsonOut = outJson.ToString();
@@ -756,7 +731,7 @@ public:
 	// cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo
 	int CommitReplaceCardInfo(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject json(strJsonIn);
 		int nSSResult = -1;
 		int nResult = -1;
@@ -770,46 +745,65 @@ public:
 				strMessage = "Json Input is empty!";
 				break;
 			}
-			TempCardInfo.strDealType = "1";	// replace card
-			//TempCardInfo.strCardID = json["CardID"].ToString();			
-			//TempCardInfo.strName = json["Name"].ToString();
-			//TempCardInfo.strBankCode = json["BankCode"].ToString();
-			TempCardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
-			json.Get("City", TempCardInfo.strCity);
-			json.Get("Mobile", TempCardInfo.strMobile);
-			json.Get("Reason", TempCardInfo.strReason);
-			json.Get("Operator", TempCardInfo.strOperator);
-			json.Get("OccupType", TempCardInfo.strOccupType);
-			json.Get("IssueDate", TempCardInfo.strReleaseDate);
-			json.Get("ExpireDate", TempCardInfo.strValidDate);
-			json.Get("Birthday", TempCardInfo.strBirthday);
-			json.Get("Gender", TempCardInfo.strSex);
-			json.Get("Nation", TempCardInfo.strNation);
-			json.Get("Address", TempCardInfo.strAdress);
-			//TempCardInfo.strPhoto = json["Photo"].ToString();	// 补办卡不需要身份证
+			string strGender, strNationality, strPhoto;
+			CardInfo.strDealType = "1";	// replace card
+			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			json.Get("CardID", CardInfo.strCardID);
+			json.Get("Name", CardInfo.strName);
+			json.Get("BankCode", CardInfo.strBankCode);
+			json.Get("City", CardInfo.strCity);
+			json.Get("Mobile", CardInfo.strMobile);
+			CardInfo.strReason = "Replace Card!";
+			CardInfo.strOperator = "Administrator";
+			//json.Get("Reason", CardInfo.strReason);
+			//json.Get("Operator", CardInfo.strOperator);
+			//json.Get("OccupType", CardInfo.strOccupType);
+			json.Get("IssueDate", CardInfo.strReleaseDate);
+			json.Get("ExpireDate", CardInfo.strValidDate);
+			json.Get("Birthday", CardInfo.strBirthday);
+			json.Get("Gender", strGender);
+			json.Get("Nation", strNationality);
+			json.Get("Address", CardInfo.strAdress);
+			json.Get("CardNum", CardInfo.strCardNum);
 
-			if (TempCardInfo.strCardID.empty() ||
-				TempCardInfo.strName.empty() ||
-				TempCardInfo.strBankCode.empty() ||
-				TempCardInfo.strCity.empty() ||
-				TempCardInfo.strMobile.empty() ||
-				TempCardInfo.strReason.empty() ||
-				TempCardInfo.strOperator.empty() ||
-				TempCardInfo.strOccupType.empty() ||
-				TempCardInfo.strCardType.empty() ||
-				TempCardInfo.strReleaseDate.empty() ||
-				TempCardInfo.strValidDate.empty() ||
-				TempCardInfo.strBirthday.empty() ||
-				TempCardInfo.strSex.empty() ||
-				TempCardInfo.strNation.empty() ||
-				TempCardInfo.strAdress.empty()
-				/*TempCardInfo.strPhoto.empty()*/)
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strBankCode.empty() ||
+				CardInfo.strCity.empty() ||
+				CardInfo.strMobile.empty() ||
+				CardInfo.strReason.empty() ||
+				CardInfo.strOperator.empty() ||
+				strGender.empty() ||
+				//CardInfo.strOccupType.empty() ||
+				CardInfo.strCardType.empty() ||
+				CardInfo.strReleaseDate.empty() ||
+				CardInfo.strValidDate.empty() ||
+				CardInfo.strBirthday.empty() ||
+				strNationality.empty() ||
+				CardInfo.strAdress.empty())
 			{
-				strMessage = "Any items of cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo can't be empty!";
+				strMessage = "身份号码,姓名,银行代码,城市,手机号码,出生日期,性别,民族或住址不能为空!";
 				break;
 			}
-			CardInfo = TempCardInfo;
-			if (QFailed(nSSResult = saveCardBhList(TempCardInfo, strOutInfo)))
+			if (strGender == "男")
+				CardInfo.strSex = "1";
+			else if (strGender == "女")
+				CardInfo.strSex = "2";
+			else
+				CardInfo.strSex = "9";
+
+			auto itFind = g_mapNationnaltyCode.find(strNationality);
+			if (itFind != g_mapNationnaltyCode.end())
+			{
+				CardInfo.strNation = itFind->second;
+			}
+			else
+			{
+				strMessage = "民族无效!";
+				break;
+			}
+
+			if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
 			{
 				strMessage = "Failed in saveCardSqList:";
 				strMessage += strOutInfo;
@@ -850,15 +844,26 @@ public:
 			// 20210126
 			date2 << std::put_time(std::localtime(&tNext), "%Y%m%d");
 
-			TempCardInfo.strReleaseDate = date1.str();
-			TempCardInfo.strValidDate = date2.str();
+			CardInfo.strReleaseDate = date1.str();
+			CardInfo.strValidDate = date2.str();
 
 			// city,bankcode,validDate,dealType,releaseDate
-			if (QFailed(nSSResult = queryCardZksqList(TempCardInfo, strOutInfo)))
+
+			if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
 			{
 				strMessage = "Faled in queryCardInfoBySfzhm:";
 				strMessage += strOutInfo;
 				break;
+			}
+			try
+			{
+				string strOutputFile = "./Debug/Carddata_" + CardInfo.strCardID + ".json";
+				fstream fs(strOutputFile, ios::out);
+				fs << strOutInfo;
+				fs.close();
+			}
+			catch (std::exception& e)
+			{
 			}
 
 			if (!tmpJson.Parse(strOutInfo))
@@ -902,7 +907,7 @@ public:
 			ds.Get("sjhm", CardInfo.strMobile);
 
 			// cardID,cardType,name,bankCode,city,cardNum,operator
-			if (QFailed(nSSResult = saveCardBhk(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = saveCardBhk(CardInfo, strOutInfo)))
 			{
 				strMessage = "Faled in saveCardBhk:";
 				strMessage += strOutInfo;
@@ -932,13 +937,6 @@ public:
 				break;
 			}
 
-			CJsonObject outJson;
-			outJson.Add("Name", CardInfo.strName);
-			outJson.Add("CardID", CardInfo.strCardID);
-			outJson.Add("SSCardNum", CardInfo.strCardNum);
-			outJson.Add("Mobile", CardInfo.strMobile);
-			outJson.Add("BankCode", tmpJson["yhbh"].ToString());
-			strJsonOut = outJson.ToString();
 			nResult = 0;
 
 		} while (0);
@@ -1003,15 +1001,38 @@ public:
 	*/
 	virtual int PreMakeCard(string& strJsonIn, string& strJsonOut) override
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
 		int nErrFlag = 0;
 		string strMessage;
 		string strOutInfo;
+		CJsonObject json(strJsonIn);
 		do
 		{
+			if (json.IsEmpty())
+			{
+				strMessage = "Json Input is empty!";
+				break;
+			}
+			string strGender, strNationality, strPhoto;
+			CardInfo.strDealType = "1";	// replace card
+			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			CardInfo.strOperator = "Administrator";
+			json.Get("CardID", CardInfo.strCardID);
+			json.Get("Name", CardInfo.strName);
+			json.Get("BankCode", CardInfo.strBankCode);
+			json.Get("City", CardInfo.strCity);
+
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strBankCode.empty() ||
+				CardInfo.strCity.empty())
+			{
+				strMessage = "身份号码,姓名,银行代码或城市代码中存在空字段!";
+				break;
+			}
 
 			// cardID,cardType,name,bankCode,operator,city
 			if (QFailed(nSSResult = saveCardOpen(CardInfo, strOutInfo)))
@@ -1021,26 +1042,6 @@ public:
 				break;
 			}
 
-			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::days(1));
-			stringstream date1, date2;
-
-			// date1 = "2022-01-26 09:51:00"
-			// date1 << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
-			date1 << std::put_time(std::localtime(&tNow), "%Y%m%d");
-			// 20210126
-			date2 << std::put_time(std::localtime(&tNext), "%Y%m%d");
-
-			CardInfo.strReleaseDate = date1.str();
-			CardInfo.strValidDate = date2.str();
-
-			// city,bankcode,validDate,dealType,releaseDate
-			if (QFailed(nSSResult = saveCardOpen(CardInfo, strOutInfo)))
-			{
-				strMessage = "Faled in saveCardOpen:";
-				strMessage += strOutInfo;
-				break;
-			}
 			CJsonObject tmpJson;
 			if (!tmpJson.Parse(strOutInfo))
 			{
@@ -1066,6 +1067,17 @@ public:
 				}
 				break;
 			}
+			try
+			{
+				string strOutputFile = "./Debug/Carddata_" + CardInfo.strCardID + ".json";
+				fstream fs(strOutputFile, ios::out);
+				fs << strOutInfo;
+				fs.close();
+			}
+			catch (std::exception& e)
+			{
+				string strException = e.what();
+			}
 
 			CJsonObject ds = tmpJson["ds"];
 			if (ds.IsEmpty())
@@ -1075,9 +1087,15 @@ public:
 			}
 			ds.Get("sbkh", CardInfo.strCardNum);
 			ds.Get("zp", CardInfo.strPhoto);
+
+			CJsonObject outJson;
+			outJson.Add("CardNum", CardInfo.strCardNum);
+			outJson.Add("Photo", CardInfo.strPhoto);
+			strJsonOut = outJson.ToString();
 			nResult = 0;
+
 		} while (0);
-		if (nResult)
+		if (nErrFlag)
 		{
 			CJsonObject jsonOut;
 			jsonOut.Add("Result", nErrFlag);
@@ -1132,12 +1150,27 @@ public:
 				break;
 			}
 
+			CardInfo.strDealType = "1";	// replace card
+			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			CardInfo.strOperator = "Administrator";
+
+			json.Get("CardID", CardInfo.strCardID);
+			json.Get("Name", CardInfo.strName);
+			json.Get("BankCode", CardInfo.strBankCode);
+			json.Get("City", CardInfo.strCity);
+			json.Get("CardNum", CardInfo.strCardNum);
+			json.Get("ChipNum", CardInfo.strChipNum);
+			json.Get("MagNum", CardInfo.strMagNum);
+			json.Get("CardATR", CardInfo.strCardATR);
+			json.Get("CardIdentity", CardInfo.strIdentifyNum);
+			json.Get("CardVersion", CardInfo.strCardVersion);
+			json.Get("ChipType", CardInfo.strChipType);
+
+
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||
 				CardInfo.strCity.empty() ||
 				CardInfo.strBankCode.empty() ||
-				CardInfo.strCardType.empty() ||
-				CardInfo.strOperator.empty() ||
 				CardInfo.strCardNum.empty() ||
 				CardInfo.strChipNum.empty() ||
 				CardInfo.strMagNum.empty() ||
@@ -1146,7 +1179,7 @@ public:
 				CardInfo.strCardVersion.empty() ||
 				CardInfo.strChipType.empty())
 			{
-				strMessage = "Any items of cardID,cardType,name,bankCode,operator,city,cardNum,chipNum,MagNum,ATR,identifyNum,cardVersion,chipType can't be empty!";
+				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号,卡芯片号,磁条号,ATR,卡识别码,卡版本或芯片类型不能为空!";
 				break;
 			}
 			if (QFailed(nSSResult = saveCardCompleted(CardInfo, strOutInfo)))
@@ -1193,10 +1226,10 @@ public:
 	}
 
 	// 激活及后续收尾工作
-	// cardID,cardType,name,cardNum,bankCode,operator,city,magNum
+	// cardID,name,cardNum,bankCode,city
 	virtual int ActiveCard(string& strJsonIn, string& strJsonOut) override
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject json(strJsonIn);
 		int nSSResult = -1;
 		int nResult = -1;
@@ -1211,27 +1244,28 @@ public:
 				break;
 			}
 
-			json.Get("CardID", TempCardInfo.strCardID);
-			json.Get("PaperType", TempCardInfo.strCardType);
-			json.Get("Name", TempCardInfo.strName);
-			json.Get("BankCode", TempCardInfo.strBankCode);
-			json.Get("Operator", TempCardInfo.strOperator);
-			json.Get("City", TempCardInfo.strCity);
-			json.Get("cardNum", TempCardInfo.strCardNum);
+			CardInfo.strDealType = "1";	// replace card
+			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			CardInfo.strOperator = "Administrator";
 
-			if (TempCardInfo.strCardID.empty() ||
-				TempCardInfo.strName.empty() ||
-				TempCardInfo.strCity.empty() ||
-				TempCardInfo.strBankCode.empty() ||
-				TempCardInfo.strCardType.empty() ||
-				TempCardInfo.strOperator.empty() ||
-				TempCardInfo.strCardNum.empty())
+			json.Get("CardID", CardInfo.strCardID);
+			json.Get("Name", CardInfo.strName);
+			json.Get("BankCode", CardInfo.strBankCode);
+			json.Get("City", CardInfo.strCity);
+			json.Get("cardNum", CardInfo.strCardNum);
+			json.Get("MagNum", CardInfo.strMagNum);
+
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strCity.empty() ||
+				CardInfo.strBankCode.empty() ||
+				CardInfo.strCardNum.empty())
 			{
-				strMessage = "Any items of cardID,cardType,name,bankCode,operator,city,cardNum,chipNum,MagNum,ATR,identifyNum,cardVersion,chipType can't be empty!";
+				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号,卡芯片号,磁条号,ATR,卡识别码,卡版本或芯片类型不能为空!";
 				break;
 			}
 
-			if (QFailed(nSSResult = saveCardActive(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = saveCardActive(CardInfo, strOutInfo)))
 			{
 				strMessage = "Failed in saveCardCompleted:";
 				strMessage += strOutInfo;
@@ -1265,7 +1299,7 @@ public:
 			}
 
 			// cardID,cardType,name,magNum,bankCode,operator,city
-			if (QFailed(nSSResult = saveCardJrzhActive(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = saveCardJrzhActive(CardInfo, strOutInfo)))
 			{
 				strMessage = "Failed in saveCardJrzhActive:";
 				strMessage += strOutInfo;
@@ -1295,7 +1329,6 @@ public:
 				break;
 			}
 
-			CardInfo = TempCardInfo;
 			nResult = 0;
 		} while (0);
 		if (nResult)
@@ -1323,7 +1356,7 @@ public:
 	// 默认挂失，nOperation为1时为解挂
 	virtual int RegisterLostTemporary(string& strJsonIn, string& strJsonOut, int nOperation = 0) override
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject json;
 		string strOutInfo;
 		string strMessage;
@@ -1340,19 +1373,19 @@ public:
 			CJsonObject tmpJson;
 			string strFunction = "saveCardLsgs";
 			json.Get("Operator", CardInfo.strOperator);
+			CardInfo.strCardType = "A";
+			CardInfo.strOperator = "Administrator";
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strCity.empty() ||
+				CardInfo.strBankCode.empty() ||
+				CardInfo.strCardNum.empty())
+			{
+				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号不能为空!";
+				break;
+			}
 			if (nOperation == 0)
 			{
-				if (CardInfo.strCardID.empty() ||
-					CardInfo.strName.empty() ||
-					CardInfo.strCity.empty() ||
-					CardInfo.strBankCode.empty() ||
-					CardInfo.strCardType.empty() ||
-					CardInfo.strCardNum.empty() ||
-					CardInfo.strOperator.empty())
-				{
-					strMessage = "CardID,Name,City,Bankcode,PaperType,CardNum,Operator can't be empty!";
-					break;
-				}
 				if (QFailed(nSSResult = saveCardLsgs(CardInfo, strOutInfo)))
 				{
 					strMessage = "Failed saveCardLsgs:";
@@ -1363,16 +1396,6 @@ public:
 			else if (nOperation == 1)
 			{
 				string strFunction = "saveCardLsgsjg";
-				if (CardInfo.strCardID.empty() ||
-					CardInfo.strName.empty() ||
-					CardInfo.strCity.empty() ||
-					CardInfo.strBankCode.empty() ||
-					CardInfo.strCardType.empty() ||
-					CardInfo.strCardNum.empty())
-				{
-					strMessage = "CardID,Name,City,Bankcode,PaperType,CardNum can't be empty!";
-					break;
-				}
 				if (QFailed(nSSResult = saveCardLsgsjg(CardInfo, strOutInfo)))
 				{
 					strMessage = "Failed saveCardLsgsjg:";
@@ -1442,7 +1465,7 @@ public:
 	*/
 	virtual int RegisterLost(string& strJsonIn, string& strJsonOut, int nOperation = 0) override
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject json(strJsonIn);
 		string strOutInfo;
 		string strMessage;
@@ -1457,26 +1480,25 @@ public:
 				break;
 			}
 			// cardID,cardType,name,cardNum,city,cardNum,operator,bankcode
-			json.Get("CardID", TempCardInfo.strCardID);
-			json.Get("Name", TempCardInfo.strName);
-			json.Get("City", TempCardInfo.strCity);
-			json.Get("BankCode", TempCardInfo.strBankCode);
-			json.Get("CardNum", TempCardInfo.strCardNum);
-			json.Get("Operator", TempCardInfo.strOperator);
-			TempCardInfo.strCardType = "A";
+			json.Get("CardID", CardInfo.strCardID);
+			json.Get("Name", CardInfo.strName);
+			json.Get("City", CardInfo.strCity);
+			json.Get("BankCode", CardInfo.strBankCode);
+			json.Get("CardNum", CardInfo.strCardNum);
+			json.Get("Operator", CardInfo.strOperator);
+			CardInfo.strCardType = "A";
+			CardInfo.strOperator = "Administrator";
 
-			if (TempCardInfo.strCardID.empty() ||
-				TempCardInfo.strName.empty() ||
-				TempCardInfo.strCity.empty() ||
-				TempCardInfo.strBankCode.empty() ||
-				TempCardInfo.strCardType.empty() ||
-				TempCardInfo.strCardNum.empty() ||
-				TempCardInfo.strOperator.empty())
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strCity.empty() ||
+				CardInfo.strBankCode.empty() ||
+				CardInfo.strCardNum.empty())
 			{
-				strMessage = "CardID,Name,City,Bankcode,PaperType,CardNum,Operation can't be empty!";
+				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号不能为空!";
 				break;
 			}
-			if (QFailed(nSSResult = saveCardGs(TempCardInfo, strOutInfo)))
+			if (QFailed(nSSResult = saveCardGs(CardInfo, strOutInfo)))
 			{
 				strMessage = "Failed saveCardGs:";
 				strMessage += strOutInfo;
@@ -1523,7 +1545,7 @@ public:
 	{
 		CJsonObject jsonOut;
 		jsonOut.Add("Result", (int)PayResult::Pay_Unsupport);
-		jsonOut.Add("Message", "不支付或没有支付流程!");
+		jsonOut.Add("Message", "无须支付或没有支付流程!");
 		strJsonOut = jsonOut.ToString();
 		return 0;
 	}
@@ -1557,7 +1579,7 @@ public:
 	*/
 	int QueryPersionOnfo(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -1571,20 +1593,19 @@ public:
 				strMessage = "strJsonIn Input is invalid!";
 				break;
 			}
-			jsonIn.Get("CardID", TempCardInfo.strCardID);
-			jsonIn.Get("Name", TempCardInfo.strName);
-			jsonIn.Get("City", TempCardInfo.strCity);
-			TempCardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			jsonIn.Get("CardID", CardInfo.strCardID);
+			jsonIn.Get("Name", CardInfo.strName);
+			jsonIn.Get("City", CardInfo.strCity);
+			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
-			if (TempCardInfo.strCardID.empty()
-				|| TempCardInfo.strName.empty()
-				|| TempCardInfo.strCity.empty()
-				|| TempCardInfo.strCardType.empty())
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strCity.empty())
 			{
-				strMessage = "Any items of CardID,Name,City,Bankcode can't be empty!";
+				strMessage = "身份证,姓名,城市代码!";
 				break;
 			}
-			if (QFailed(queryPersonInfo(TempCardInfo, strJsonOut)))
+			if (QFailed(queryPersonInfo(CardInfo, strJsonOut)))
 			{
 				strMessage = "Failed in queryPersonInfo!";
 				break;
@@ -1615,41 +1636,26 @@ public:
 			}
 			CJsonObject jsonOut;
 
-			tmpJson.Get("yxzjhm", TempCardInfo.strCardID);		//有效证件号码			
-			tmpJson.Get("shbzhm", TempCardInfo.strCardNum);		//社会保障号码			
-			tmpJson.Get("xm", TempCardInfo.strName);		//姓名
-			tmpJson.Get("xb", TempCardInfo.strSex);			//性别
-			tmpJson.Get("csrq", TempCardInfo.strBirthday);	//出生日期
-			tmpJson.Get("mz", TempCardInfo.strNation);		//民族
-			tmpJson.Get("txdz", TempCardInfo.strAdress);		//通讯地址
-			tmpJson.Get("sjhm", TempCardInfo.strMobile);		//手机号码
-			tmpJson.Get("zylb", TempCardInfo.strOccupType);	//职业类别
-			// tmpJson.Get("yxzjlx"	,);		//有效证件类型
-			// tmpJson.Get("lxdh"	, TempCardInfo.strMobile);		//固定电话或其他联系电话
-			// tmpJson.Get("gj"	, TempCardInfo.strco);			//国籍
-			// tmpJson.Get("yzbm"	, TempCardInfo.s);		//邮政编码
-			// tmpJson.Get("zjqsrq"	, TempCardInfo.strReleaseDate);		//证件有效起始日期
-			// tmpJson.Get("zjdqrq"	, TempCardInfo.strValidDate);		//证件有效终止日期
-			// tmpJson.Get("fzjg"	,);		//发证机关
-			// tmpJson.Get("csd"	,);		//	出生地
-			// tmpJson.Get("hjszd"	,);		//户籍所在地
-			// tmpJson.Get("hkxz"	,);		//户口性质
-			// tmpJson.Get("whcd"	,);		//文化程度
-			// tmpJson.Get("hyzk"	,);		//婚姻状况
-			// tmpJson.Get("lxrxm"	,);		//联系人姓名
-			// tmpJson.Get("lxrdh"	,);		//联系人电话
-			// tmpJson.Get("jgbh"	,);		//机构编号
-			// tmpJson.Get("jgmc"	,);		//机构名称
+			tmpJson.Get("yxzjhm", CardInfo.strCardID);		//有效证件号码			
+			tmpJson.Get("shbzhm", CardInfo.strCardNum);		//社会保障号码			
+			tmpJson.Get("xm", CardInfo.strName);			//姓名
+			tmpJson.Get("xb", CardInfo.strSex);				//性别
+			tmpJson.Get("csrq", CardInfo.strBirthday);		//出生日期
+			tmpJson.Get("mz", CardInfo.strNation);			//民族
+			tmpJson.Get("txdz", CardInfo.strAdress);		//通讯地址
+			tmpJson.Get("sjhm", CardInfo.strMobile);		//手机号码
+			tmpJson.Get("zylb", CardInfo.strOccupType);		//职业类别
 
-			jsonOut.Add("CardID", TempCardInfo.strCardID);
-			jsonOut.Add("CardNum", TempCardInfo.strCardNum);
-			jsonOut.Add("Name", TempCardInfo.strName);
-			jsonOut.Add("Gender", TempCardInfo.strSex);
-			jsonOut.Add("Birthday", TempCardInfo.strBirthday);
-			jsonOut.Add("Nation", TempCardInfo.strNation);
-			jsonOut.Add("Address", TempCardInfo.strAdress);
-			jsonOut.Add("Mobile", TempCardInfo.strMobile);
-			jsonOut.Add("OccupType", TempCardInfo.strOccupType);
+
+			jsonOut.Add("CardID", CardInfo.strCardID);
+			jsonOut.Add("CardNum", CardInfo.strCardNum);
+			jsonOut.Add("Name", CardInfo.strName);
+			jsonOut.Add("Gender", CardInfo.strSex);
+			jsonOut.Add("Birthday", CardInfo.strBirthday);
+			jsonOut.Add("Nation", CardInfo.strNation);
+			jsonOut.Add("Address", CardInfo.strAdress);
+			jsonOut.Add("Mobile", CardInfo.strMobile);
+			jsonOut.Add("OccupType", CardInfo.strOccupType);
 
 			nResult = 0;
 		} while (0);
@@ -1668,7 +1674,7 @@ public:
 	*/
 	int QueryPersonPhoto(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo TempCardInfo;
+		SD_SSCardInfo CardInfo;
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -1682,20 +1688,19 @@ public:
 				strMessage = "strJsonIn Input is invalid!";
 				break;
 			}
-			jsonIn.Get("CardID", TempCardInfo.strCardID);
-			jsonIn.Get("Name", TempCardInfo.strName);
-			jsonIn.Get("City", TempCardInfo.strCity);
-			TempCardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			jsonIn.Get("CardID", CardInfo.strCardID);
+			jsonIn.Get("Name", CardInfo.strName);
+			jsonIn.Get("City", CardInfo.strCity);
+			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
-			if (TempCardInfo.strCardID.empty()
-				|| TempCardInfo.strName.empty()
-				|| TempCardInfo.strCity.empty()
-				|| TempCardInfo.strCardType.empty())
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strCity.empty())
 			{
-				strMessage = "Any items of CardID,Name,City,Bankcode can't be empty!";
+				strMessage = "身份证,姓名,城市代码!";
 				break;
 			}
-			if (QFailed(queryPerPhoto(TempCardInfo, strJsonOut)))
+			if (QFailed(queryPerPhoto(CardInfo, strJsonOut)))
 			{
 				strMessage = "Failed in queryPerPhoto!";
 				break;
@@ -1724,10 +1729,17 @@ public:
 				}
 				break;
 			}
-			CJsonObject jsonOut;
 
-			tmpJson.Get("photostr", TempCardInfo.strPhoto);		//有效证件号码
-			jsonOut.Add("Photo", TempCardInfo.strPhoto);
+			CJsonObject ds = tmpJson["ds"];
+			if (ds.IsEmpty())
+			{
+				strMessage = "ds from output of queryCardInfoBySfzhm is invalid !";
+				break;
+			}
+
+			ds.Get("photostr", CardInfo.strPhoto);
+			CJsonObject jsonOut;
+			jsonOut.Add("Photo", CardInfo.strPhoto);
 
 			nResult = 0;
 		} while (0);
@@ -1744,5 +1756,102 @@ public:
 	int ModifyPersonInfo(string& strJsonIn, string& strJsonOut)
 	{
 		return -1;
+	}
+
+	// CardID,Name,City,CardNum,SignatureKey
+	virtual int GetCA(string& strJsonIn, string& strJsonOut)
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = 0;
+		string strMessage;
+		string strOutInfo;
+		string strSignatureKey;
+		string strAlgorithm = "SM2";
+		string strName, strCardID, strCardNum, strCity;
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			jsonIn.Get("CardID", strCardID);
+			jsonIn.Get("Name", strName);
+			jsonIn.Get("City", strCity);
+			jsonIn.Get("CardNum", strCardNum);
+			jsonIn.Get("SignatureKey", strSignatureKey);
+
+			if (strCardID.empty() ||
+				strName.empty() ||
+				strCity.empty() ||
+				strCardNum.empty())
+			{
+				strMessage = "身份证,姓名,城市代码或社保卡号不能为空!";
+				break;
+			}
+
+			if (QFailed(getCA(strName, strCardID, strCardNum, strSignatureKey, strAlgorithm, strCity, strOutInfo)))
+			{
+				strMessage = "Failed in getCA!";
+				break;
+			}
+			CJsonObject tmpJson;
+			if (!tmpJson.Parse(strOutInfo))
+			{
+				strMessage = "Output of getCA is invalid!";
+				break;
+			}
+
+			string strErrFlag;
+			if (!tmpJson.Get("errflag", strErrFlag))
+			{
+				strMessage = "can't locate field 'errflag' in output of queryPerPhoto!";
+				break;
+			}
+			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+			if (nErrFlag)
+			{
+				if (!tmpJson.KeyExist("errtext"))
+					strMessage = "can't locate field 'errtext' in output of queryPerPhoto!";
+				else
+				{
+					tmpJson.Get("errtext", strMessage);
+				}
+				break;
+			}
+
+			CJsonObject ds = tmpJson["ds"];
+			if (ds.IsEmpty())
+			{
+				strMessage = "ds from output of queryCardInfoBySfzhm is invalid !";
+				break;
+			}
+
+			string strCaOut = ds.ToString();
+
+			if (!strCaOut.size())
+			{
+				strMessage = "CA out is empty!";
+				break;
+			}
+
+			strJsonOut = strCaOut;
+			CardInfo.strCardNum = strCardNum;
+			CardInfo.strCardID = strCardID;
+			CardInfo.strName = strName;
+			CardInfo.strCity = strCity;
+
+			nResult = 0;
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
 	}
 };

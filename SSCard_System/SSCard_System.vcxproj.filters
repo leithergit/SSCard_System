@@ -204,6 +204,12 @@
     <ClCompile Include="SystemManager.cpp">
       <Filter>SystemManager</Filter>
     </ClCompile>
+    <ClCompile Include="sscardservicet.cpp">
+      <Filter>SystemManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utility\Markup.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -295,6 +301,9 @@
     </ClInclude>
     <ClInclude Include="..\utility\json\CJsonObject.hpp">
       <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utility\Markup.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -405,6 +414,9 @@
       <Filter>SystemManager</Filter>
     </QtUic>
     <QtUic Include="SystemManager.ui">
+      <Filter>SystemManager</Filter>
+    </QtUic>
+    <QtUic Include="sscardservicet.ui">
       <Filter>SystemManager</Filter>
     </QtUic>
   </ItemGroup>
@@ -607,6 +619,9 @@
       <Filter>SystemManager</Filter>
     </QtMoc>
     <QtMoc Include="SystemManager.h">
+      <Filter>SystemManager</Filter>
+    </QtMoc>
+    <QtMoc Include="sscardservicet.h">
       <Filter>SystemManager</Filter>
     </QtMoc>
   </ItemGroup>

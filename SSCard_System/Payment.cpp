@@ -48,7 +48,7 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+	strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 	strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 	char szStatus[1024] = { 0 };
 	int nResult = queryPayment(*pSSCardInfo, (char*)szStatus);
@@ -123,7 +123,7 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& 
 	strUrl += PayOption.strFieldMobile;			strUrl += "=";
 	strUrl += g_pDataCenter->strMobilePhone;	strUrl += "&";
 	strUrl += PayOption.strFieldCardID;			strUrl += "=";
-	strUrl += (char*)pIDCard->szIdentify;		strUrl += "&";
+	strUrl += (char*)pIDCard->szIdentity;		strUrl += "&";
 	strUrl += PayOption.strFiledamount;			strUrl += "=";
 	strUrl += PayOption.strAmount;
 	gInfo() << "Payment request url = " << strUrl.c_str();
@@ -491,9 +491,9 @@ int  GetImageStorePath(string& strFilePath, int nType)
 	}
 	QString strTempPath;
 	if (nType == 0)
-		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 	else
-		strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum);
+		strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum);
 
 	strFilePath = strTempPath.toStdString();
 	return 0;
@@ -706,6 +706,7 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
 	int nResult = -1;
 	char szStatus[1024] = { 0 };
+	// std::string name, std::string cardID, std::string cardNum, std::string signatureKey, std::string SF, std::string city, std::string& pOutInfo
 	if (QFailed(nResult = getCA(Region.strCM_CA_Account.c_str(),
 		Region.strCM_CA_Password.c_str(),
 		Region.strCityCode.c_str(),
@@ -762,7 +763,7 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 	}
 }
 
-int LoadTestData(string& strName, string& strCardID, string& strMobile)
+int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo, string& strMobile)
 {
 	if (g_pDataCenter->bDebug)
 	{
@@ -771,48 +772,28 @@ int LoadTestData(string& strName, string& strCardID, string& strMobile)
 		QFileInfo fi(strAppPath);
 		if (!fi.isFile())
 			return -1;
+		if (!pIDCard)
+			return -1;
+
 		QSettings PersonSetting(strAppPath, QSettings::IniFormat);
 		PersonSetting.beginGroup("Person");
-		strName = UTF8_GBK(PersonSetting.value("Name").toString().toStdString().c_str());
-		strCardID = UTF8_GBK(PersonSetting.value("CardID").toString().toStdString().c_str());
+		strcpy((char*)pIDCard->szName, UTF8_GBK(PersonSetting.value("Name").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szIdentity, UTF8_GBK(PersonSetting.value("CardID").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szNation, UTF8_GBK(PersonSetting.value("Nationalty").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szGender, UTF8_GBK(PersonSetting.value("Gender").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szBirthday, UTF8_GBK(PersonSetting.value("Birthday").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szExpirationDate1, UTF8_GBK(PersonSetting.value("Issuedate").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szExpirationDate2, UTF8_GBK(PersonSetting.value("ExpireDate").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szAddress, UTF8_GBK(PersonSetting.value("Address").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pSSCardInfo->strCardATR, PersonSetting.value("CardATR").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strIdentifyNum, PersonSetting.value("CardIdentityNum").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strBankNum, PersonSetting.value("BankNum").toString().toStdString().c_str());
+		g_pDataCenter->strCardVersion = "3.00";
+
 		strMobile = UTF8_GBK(PersonSetting.value("Mobile").toString().toStdString().c_str());
+
 		PersonSetting.endGroup();
 
-		//strName = "周广恩";
-		//strCardID = "41232319830716003X";
-		//strMobile = "18088888888";
-
-		//strName = "任自力";
-		//strCardID = "412701196909143530";
-		//strMobile = "13838678266";
-		gInfo() << "Name = " << strName << "\tCardID = " << strCardID << "\tMobile = " << strMobile;
-		TraceMsgA("Name = %s\tCardID = %s\tMobile = %s.\n", strName.c_str(), strCardID.c_str(), strMobile.c_str());
-		//FILE* fp = fopen("info.txt", "wb");
-		//fwrite(strName.c_str(), strName.size(), 1, fp);
-		//fwrite("\r\n", 2, 1, fp);
-
-		//fwrite(strCardID.c_str(), strCardID.size(), 1, fp);
-		//fwrite("\r\n", 2, 1, fp);
-
-		//fwrite(strMobile.c_str(), strMobile.size(), 1, fp);
-		//fwrite("\r\n", 2, 1, fp);
-		//fclose(fp);
-
-
 	}
-
-	/*QSettings CardTest(strAppPath);
-	QStringList strFieldList = CardTest.allKeys();
-	for (auto var : strFieldList)
-	{
-		qDebug() << CardTest.value(var).toString();;
-	}
-	CardTest.beginGroup("CardData");
-	strName = CardTest.value("Name").toString();
-
-	strCardID = CardTest.value("CardID").toString();
-	strMobile = CardTest.value("Mobile").toString();
-
-	CardTest.endGroup();*/
 	return 0;
 }

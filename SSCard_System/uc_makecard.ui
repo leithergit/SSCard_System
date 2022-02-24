@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>934</width>
-    <height>540</height>
+    <width>1387</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,7 +19,15 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,2">
+  <property name="styleSheet">
+   <string notr="true">font: 32pt &quot;思源黑体 CN Regular&quot;;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -34,7 +42,7 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <layout class="QHBoxLayout" name="horizontalLayout_15">
      <item>
       <spacer name="horizontalSpacer_15">
        <property name="orientation">
@@ -50,104 +58,35 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout">
+       <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QLabel" name="label_Depanse">
+          <widget class="QLabel" name="label_FaceCapture_4">
            <property name="minimumSize">
             <size>
-             <width>60</width>
+             <width>120</width>
              <height>60</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>60</width>
+             <width>120</width>
              <height>60</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">image: url(:/Image/Status_Finish.png);</string>
+            <string notr="true">font: 28pt &quot;思源黑体 CN Regular&quot;;
+color: rgb(0, 0, 0);</string>
            </property>
            <property name="text">
-            <string/>
+            <string>预制卡</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="0" column="1">
-        <widget class="QProgressBar" name="progressBar">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>2</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>2</height>
-          </size>
-         </property>
-         <property name="value">
-          <number>100</number>
-         </property>
-         <property name="textVisible">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="label_Write">
-           <property name="minimumSize">
-            <size>
-             <width>60</width>
-             <height>60</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>60</width>
-             <height>60</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">image: url(:/Image/Status_Finish.png);</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="3">
-        <widget class="QProgressBar" name="progressBar_2">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>2</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>2</height>
-          </size>
-         </property>
-         <property name="value">
-          <number>100</number>
-         </property>
-         <property name="textVisible">
-          <bool>false</bool>
-         </property>
-         <property name="invertedAppearance">
-          <bool>false</bool>
-         </property>
-        </widget>
        </item>
        <item row="0" column="4">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -175,36 +114,6 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_FaceCapture">
-           <property name="minimumSize">
-            <size>
-             <width>120</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>120</width>
-             <height>80</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">font: 32pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
-           </property>
-           <property name="text">
-            <string>进卡</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="1" column="2">
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
@@ -212,17 +121,17 @@ color: rgb(0, 0, 0);</string>
            <property name="minimumSize">
             <size>
              <width>120</width>
-             <height>0</height>
+             <height>60</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>120</width>
-             <height>80</height>
+             <height>60</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">font: 32pt &quot;Microsoft YaHei UI&quot;;
+            <string notr="true">font: 28pt &quot;思源黑体 CN Regular&quot;;
 color: rgb(0, 0, 0);</string>
            </property>
            <property name="text">
@@ -235,6 +144,63 @@ color: rgb(0, 0, 0);</string>
          </item>
         </layout>
        </item>
+       <item row="0" column="7">
+        <widget class="Line" name="line_4">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(85, 170, 0);</string>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <widget class="Line" name="line_5">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(85, 170, 0);</string>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="7">
+        <spacer name="horizontalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>60</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="1" column="4">
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
@@ -242,17 +208,17 @@ color: rgb(0, 0, 0);</string>
            <property name="minimumSize">
             <size>
              <width>120</width>
-             <height>0</height>
+             <height>60</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>120</width>
-             <height>80</height>
+             <height>60</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">font: 32pt &quot;Microsoft YaHei UI&quot;;
+            <string notr="true">font: 28pt &quot;思源黑体 CN Regular&quot;;
 color: rgb(0, 0, 0);</string>
            </property>
            <property name="text">
@@ -265,10 +231,356 @@ color: rgb(0, 0, 0);</string>
          </item>
         </layout>
        </item>
+       <item row="1" column="6">
+        <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <item>
+          <widget class="QLabel" name="label_FaceCapture_6">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>120</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 28pt &quot;思源黑体 CN Regular&quot;;
+color: rgb(0, 0, 0);</string>
+           </property>
+           <property name="text">
+            <string>启用</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="3">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>60</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="5">
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>60</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="1">
+        <widget class="Line" name="line_2">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(85, 170, 0);</string>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_MakeCard">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/Image/todo.png);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_Write">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/Image/todo.png);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>60</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="8">
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="label_FaceCapture_5">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>120</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 28pt &quot;思源黑体 CN Regular&quot;;
+color: rgb(0, 0, 0);</string>
+           </property>
+           <property name="text">
+            <string>出卡</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="8">
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QLabel" name="label_Reject">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/Image/todo.png);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="3">
+        <widget class="Line" name="line_3">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(85, 170, 0);</string>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QLabel" name="label_ReturnData">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/Image/todo.png);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
      <item>
       <spacer name="horizontalSpacer_16">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_13">
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">font: 32pt &quot;思源黑体 CN Regular&quot;;
+color: rgb(0, 0, 0);</string>
+           </property>
+           <property name="text">
+            <string>制卡进行中……</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="styleSheet">
+          <string notr="true">font: 32pt &quot;思源黑体 CN Regular&quot;;
+color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="text">
+          <string>期间请勿执行其它操作！</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>

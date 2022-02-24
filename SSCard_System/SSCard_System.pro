@@ -52,6 +52,7 @@ SOURCES += \
     qstackpage.cpp \
     registerlost.cpp \
     showlicense.cpp \
+    sscardservicet.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -174,6 +175,7 @@ HEADERS += \
     qstackpage.h \
     registerlost.h \
     showlicense.h \
+    sscardservicet.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -214,6 +216,7 @@ FORMS += \
     nc_makephoto.ui \
     registerlost.ui \
     showlicense.ui \
+    sscardservicet.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \

@@ -93,4 +93,6 @@ public:
 	virtual int QueryPayResult(string& strJsonIn, string& strJsonOut) = 0;
 
 	virtual int SetExtraInterface(const string& strCommand, string& strInput, string& strOutput) = 0;
+
+	virtual int GetCA(string& strJsonIn, string& strJsonou) = 0;
 };

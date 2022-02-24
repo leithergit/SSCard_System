@@ -37,20 +37,10 @@ int uc_EnsureInformation::ProcessBussiness()
 	{
 		if (g_pDataCenter->bDebug)
 		{
-			string strCardID, strName, strMobile;
-			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
+			string strMobile;
+			if (QSucceed(LoadTestIDData(pIDCard, pSSCardInfo, strMobile)))
 			{
-				strcpy((char*)pIDCard->szName, strName.c_str());
-				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
-			}
-		}
-		if (g_pDataCenter->bDebug)
-		{
-			string strCardID, strName, strMobile;
-			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
-			{
-				strcpy((char*)pIDCard->szName, strName.c_str());
-				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
+				strcpy(pSSCardInfo->strMobile, strMobile.c_str());
 			}
 		}
 
@@ -73,15 +63,17 @@ int uc_EnsureInformation::ProcessBussiness()
 		 "BankCode":""
 		*/
 		CJsonObject jsonIn;
-		jsonIn.Add("CardID", (char*)pIDCard->szIdentify);
+		jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
 #pragma  Warning("姓名是用什么编码?UTF-8 or GBK?")
 		jsonIn.Add("Name", (const char*)pIDCard->szName);
 		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
 		jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
+		//pService->SetExtraInterface("QueryPersonInfo", strJsonIn, strJsonOut);		// 查不到职业类型
+		//pService->SetExtraInterface("QueryPersonPhoto", strJsonIn, strJsonOut);
 
-		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
+		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))					// 查不到职业类型
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText;
@@ -93,21 +85,35 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 		CJsonObject jsonOut(strJsonOut);
 
-		string strName, strCardID, strSSCardNum, strCardStatus, strBankCode, strMobile;
+		string strName, strCardID, strSSCardNum, strBankCode, strMobile;
+		int nCardStatus;
 		if (!jsonOut.Get("Name", strName) ||
 			!jsonOut.Get("CardID", strCardID) ||
-			!jsonOut.Get("SSCardNum", strSSCardNum) ||
-			!jsonOut.Get("CardStatus", strCardStatus) ||
+			!jsonOut.Get("CardNum", strSSCardNum) ||
+			!jsonOut.Get("CardStatus", nCardStatus) ||
 			!jsonOut.Get("BankCode", strBankCode) ||
 			!jsonOut.Get("Mobile", strMobile))
 		{
-			strMessage = "姓名,身份证,社保卡号,社保卡状态,银行代码中有一些字段无效!";
+			strMessage = "姓名,身份证,社保卡号,社保卡状态,银行代码存在无效字段!";
 			gInfo() << strJsonOut;
 			break;
 		}
+		strcpy(pSSCardInfo->strName, (char*)pIDCard->szName);
+		strcpy(pSSCardInfo->strCardID, (char*)pIDCard->szIdentity);
+		strcpy(pSSCardInfo->strNation, (char*)pIDCard->szNation);
+		strcpy(pSSCardInfo->strAdress, (char*)pIDCard->szAddress);
 		strcpy(pSSCardInfo->strCardNum, strSSCardNum.c_str());
 		strcpy(pSSCardInfo->strBankCode, strBankCode.c_str());
-		g_pDataCenter->nCardStratus = (CardStatus)strtol(strCardStatus.c_str(), nullptr, 10);
+
+
+		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		strcpy((char*)pSSCardInfo->strTransType, "5");
+		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		g_pDataCenter->nCardStratus = (CardStatus)nCardStatus;
 
 		nResult = 0;
 	} while (0);
@@ -326,7 +332,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			SSCardService* pService = g_pDataCenter->GetSSCardService();
 			CJsonObject jsonIn;
 
-			jsonIn.Add("CardID", (const char*)pIDCard->szIdentify);
+			jsonIn.Add("CardID", (const char*)pIDCard->szIdentity);
 			jsonIn.Add("Name", (const char*)pIDCard->szName);
 			jsonIn.Add("City", Reginfo.strCityCode);
 			jsonIn.Add("BankCode", Reginfo.strBankCode);
@@ -374,7 +380,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 				int nStatus = 0;
 				SSCardService* pService = g_pDataCenter->GetSSCardService();
 				CJsonObject jsonIn;
-				jsonIn.Add("CardID", (const char*)pIDCard->szIdentify);
+				jsonIn.Add("CardID", (const char*)pIDCard->szIdentity);
 				jsonIn.Add("Name", (const char*)pIDCard->szName);
 				jsonIn.Add("City", Reginfo.strCityCode);
 				jsonIn.Add("BankCode", Reginfo.strBankCode);
@@ -410,7 +416,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 				gError() << gQStr(strError);
 				SSCardService* pService = g_pDataCenter->GetSSCardService();
 				CJsonObject jsonIn;
-				jsonIn.Add("CardID", (const char*)pIDCard->szIdentify);
+				jsonIn.Add("CardID", (const char*)pIDCard->szIdentity);
 				jsonIn.Add("Name", (const char*)pIDCard->szName);
 				jsonIn.Add("City", Reginfo.strCityCode);
 				jsonIn.Add("BankCode", Reginfo.strBankCode);

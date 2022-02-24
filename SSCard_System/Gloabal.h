@@ -905,6 +905,7 @@ public:
 	string		   strCardMakeProgress;
 	CardStatus	   nCardStratus;
 	string		   strPayCode;
+	string		   strCardVersion;
 	bool		   bDebug;
 public:
 	bool m_bDetectStarted = false;
@@ -966,7 +967,7 @@ public:
 
 	int Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage);
 
-	string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
+	string MakeCardInfo(SSCardInfoPtr& pSSCardInfo);
 
 	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
 
@@ -986,6 +987,7 @@ public:
 	{
 		return pSScardSerivce;
 	}
+
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pSysConfig = nullptr;

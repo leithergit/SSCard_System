@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SSCardServiceT</class>
+ <widget class="QWidget" name="SSCardServiceT">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>904</width>
+    <height>639</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_CreateService">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>CreateService</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_LoadCardID">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Load IDCard</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_QueryCardStatus">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Query CardStatus</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_RestisterLost">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>RegisterLost</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_LoadPreMakeCard">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Load PreMakeCard</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="pushButton_CommitInfo">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>CommitInfo</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PremakeCard">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Premake Card</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_WriteCard">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>WriteCard</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_ReturnCard">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Return Data</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_ActiveCard">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>ActieCard</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
