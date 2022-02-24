@@ -9,6 +9,17 @@ char* g_szPhotoBuffer = new char[PhotoBufferSize];
 #include "./SDK/QREncode/qrencode.h"
 #include "Gloabal.h"
 
+bool IsDigitString(const char* szStr)
+{
+	int nLen = strlen(szStr);
+	for (int i = 0; i < nLen; i++)
+	{
+		if (!isdigit(szStr[i]))
+			return false;
+	}
+	return true;
+}
+
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage)
 {
 	QRcode* qr = QRcode_encodeString(s.toUtf8(), 1, QR_ECLEVEL_Q, QR_MODE_KANJI, 1);
@@ -235,8 +246,7 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 		return -1;
 	}
 	gInfo() << "applyCardReplacement:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -294,8 +304,7 @@ int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCa
 		return -1;
 	}
 	gInfo() << "registerPayment:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -347,8 +356,7 @@ int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 		return -1;
 	}
 	gInfo() << "markCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -372,8 +380,7 @@ int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		return -1;
 	}
 	gInfo() << "cancelMarkCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -579,8 +586,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			return -1;
 		}
 
-		if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-			(szStatus[1] >= '0' && szStatus[1] <= '9'))
+		if (IsDigitString(szStatus))
 		{
 			nStatus = strtolong(szStatus, 10, 2);
 			if (nStatus == 0)
@@ -675,8 +681,7 @@ int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		return -1;
 	}
 	gInfo() << "returnCardData:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -700,8 +705,7 @@ int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo
 		gInfo() << gQStr(strInfo);
 		return -1;
 	}
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -737,8 +741,7 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 		return nResult;
 	}
 	gInfo() << "getCA:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;
@@ -763,8 +766,7 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 		return nResult;
 	}
 	gInfo() << "queryCardProgress:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		return 0;

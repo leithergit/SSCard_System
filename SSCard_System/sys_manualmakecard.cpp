@@ -426,6 +426,7 @@ void Sys_ManualMakeCard::ProceBatchLock()
 			{
 				strMessage = QString("取消标注失败:%1").arg(strMessage);
 				gInfo() << gQStr(strMessage);
+				nResult = -1;
 				break;
 			}
 
@@ -614,6 +615,7 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 			{
 				strMessage = QString("取消标注失败:%1").arg(strMessage);
 				gInfo() << gQStr(strMessage);
+				nResult = -1;
 				break;
 			}
 

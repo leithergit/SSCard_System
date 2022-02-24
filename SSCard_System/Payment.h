@@ -11,6 +11,7 @@
 
 enum class PayResult
 {
+	Pay_Unsupport = -1,
 	WaitforPay = 0,
 	WairforConfirm,
 	PaySucceed,
@@ -18,6 +19,8 @@ enum class PayResult
 	InvalidOrder,
 	OrderCanceled
 };
+
+bool IsDigitString(const char* szStr);
 
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage);
 

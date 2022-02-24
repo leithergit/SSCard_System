@@ -1019,7 +1019,7 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 		}
 
 		ImagePosition& ImgPos = pCardForm->posImage;
-		if (!strPhoto.size())
+		if (strPhoto.size())
 		{
 			if (QFailed(m_pPrinter->Printer_AddImage((char*)strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
 				break;

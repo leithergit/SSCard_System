@@ -217,8 +217,7 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCa
 		strMessage = QString("查询社保卡信息失败!");
 		return -1;
 	}
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 	}
@@ -230,6 +229,7 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCa
 	//g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	return 0;
 }
+
 
 int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
@@ -244,8 +244,8 @@ int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCar
 	}
 
 	gInfo() << "reportLostCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		if (nStatus == 2)
@@ -275,8 +275,7 @@ int uc_EnsureInformation::UnRegisterLost(QString& strMessage, int& nStatus, SSCa
 	}
 
 	gInfo() << "cancelLostCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+	if (IsDigitString(szStatus))
 	{
 		nStatus = strtolong(szStatus, 10, 2);
 		if (nStatus == 2)
