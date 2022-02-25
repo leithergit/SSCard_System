@@ -49,6 +49,7 @@ public:
 	//int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 	int PrecessCardInMaking(QString& strMessage);
 	int PrepareMakeCard(QString& strMessage);
+	void ShowSSCardInfo();
 	void ThreadWork();
 	virtual void ShutDown() override;
 	int     m_nSocketRetryInterval = 500;            // 支付结构查询时间间隔单 毫秒
@@ -59,15 +60,12 @@ public slots:
 	void	OnUpdateProgress(int nStep);
 signals:
 	void	UpdateProgress(int nStep);
+private slots:
+    void on_pushButton_OK_clicked();
+
 private:
 	Ui::MakeCard* ui;
 	QVector<QLabel*> m_LableStep;
-	//KT_PrinterLibPtr	m_pPrinterlib = nullptr;
-	//KT_ReaderLibPtr		m_pReaderLib = nullptr;
-	//KT_Printer* m_pPrinter = nullptr;
-	//KT_Reader* m_pReader = nullptr;
-
-	SSCardInfoPtr m_pSSCardInfo = nullptr;
 };
 
 #endif // UC_MAKECARD_H

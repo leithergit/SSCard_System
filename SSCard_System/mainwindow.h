@@ -69,11 +69,12 @@ signals:
 	void LoadSystemManager();
 	void Shutdown();
 
-private slots:
+public slots:
 	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);
 	void On_MaskWidgetTimeout(int nOperation);
 	void On_MaskWidgetEnsure(int nOperation, int nStatus);
 	void on_Shutdown();
+	void OnNewInstance(const QString&);
 
 private:
 	Ui::MainWindow* ui;

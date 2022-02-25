@@ -146,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;../utility;./SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;../utility;./SDK/Bugtrap;./QtSingleton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -221,6 +221,8 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
+    <ClCompile Include="QtSingleton\qtlocalpeer.cpp" />
+    <ClCompile Include="QtSingleton\qtsingleapplication.cpp" />
     <ClCompile Include="showlicense.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
     <ClCompile Include="Sys_cardmanger.cpp" />
@@ -264,6 +266,8 @@ copy /y $(TargetPath) z:\</Command>
     <QtMoc Include="newcard.h" />
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
+    <QtMoc Include="QtSingleton\qtlocalpeer.h" />
+    <QtMoc Include="QtSingleton\qtsingleapplication.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="sys_manualmakecard.h" />
     <ClInclude Include="WMIQuery.h" />

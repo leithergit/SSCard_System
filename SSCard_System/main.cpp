@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <fstream>
 #include <QSharedMemory>
+#include "qtsingleapplication.h"
 
 #include "DevBase.h"
 
@@ -54,7 +55,10 @@ int main(int argc, char* argv[])
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	//QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-	QApplication a(argc, argv);
+	QtSingleApplication a(argc, argv);
+	if (a.sendMessage("Wake up!"))
+		return 0;
+	//QApplication a(argc, argv);
 	//google::InitGoogleLogging(argv[0]);
 	//font.setStyleStrategy(QFont::PreferAntialias);
 //    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
@@ -202,6 +206,9 @@ int main(int argc, char* argv[])
 
 	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;
+	a.setActivationWindow(&w);
+
+	QObject::connect(&a, &QtSingleApplication::messageReceived, &w, &MainWindow::OnNewInstance);
 
 	auto listScreens = QApplication::screens();
 	g_pCurScreen = listScreens.at(0);

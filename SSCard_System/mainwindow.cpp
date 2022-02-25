@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 	w.setWindowFlags(flags);
 	*/
 	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
-	setWindowFlags((Qt::WindowFlags)(windowFlags()/* | Qt::WindowStaysOnTopHint*/ | Qt::FramelessWindowHint));
+	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint));
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
@@ -383,6 +383,13 @@ void MainWindow::on_Shutdown()
 	}
 	close();
 }
+
+void MainWindow::OnNewInstance(const QString& strMessage)
+{
+	showNormal();
+	activateWindow();
+}
+
 void MainWindow::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() == m_nDateTimer)

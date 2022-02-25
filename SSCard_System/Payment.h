@@ -20,7 +20,7 @@ enum class PayResult
 	OrderCanceled
 };
 
-bool IsDigitString(const char* szStr);
+void  SplitString(const char* szStr, char* szDigit, char* szText);
 
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage);
 

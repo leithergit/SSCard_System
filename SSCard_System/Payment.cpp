@@ -9,15 +9,28 @@ char* g_szPhotoBuffer = new char[PhotoBufferSize];
 #include "./SDK/QREncode/qrencode.h"
 #include "Gloabal.h"
 
-bool IsDigitString(const char* szStr)
+
+bool TestDigit(char ch)
 {
-	int nLen = strlen(szStr);
-	for (int i = 0; i < nLen; i++)
+	if (ch < '0' || ch > '9')
+		return false;
+	else
+		return true;
+}
+
+void  SplitString(const char* szStr, char* szDigit, char* szText)
+{
+	char* p = (char*)szStr;
+	do
 	{
-		if (!isdigit(szStr[i]))
-			return false;
-	}
-	return true;
+		if (!TestDigit(*p))
+		{
+			break;
+		}
+		else
+			*szDigit++ = *p;
+	} while (*p++);
+	strcpy(szText, p);
 }
 
 int  QREnncodeImage(const QString& s, int bulk, QImage& QRImage)
@@ -246,16 +259,17 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 		return -1;
 	}
 	gInfo() << "applyCardReplacement:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
 }
 // 目前在河南无权限 
 int     CancelCardReplacement(QString& strMessage, int& nStatus)
@@ -304,16 +318,17 @@ int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCa
 		return -1;
 	}
 	gInfo() << "registerPayment:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
 }
 
 // 无须实现
@@ -356,16 +371,17 @@ int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 		return -1;
 	}
 	gInfo() << "markCard:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
 }
 
 int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
@@ -380,16 +396,17 @@ int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		return -1;
 	}
 	gInfo() << "cancelMarkCard:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
 }
 
 int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
@@ -585,22 +602,23 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			gInfo() << gQStr(strInfo);
 			return -1;
 		}
-
-		if (IsDigitString(szStatus))
+		char szDigit[16] = { 0 }, szText[1024] = { 0 };
+		SplitString(szStatus, szDigit, szText);
+		if (strlen(szText))
+			strMessage = QString::fromLocal8Bit(szText);
+		if (strlen(szDigit))
 		{
-			nStatus = strtolong(szStatus, 10, 2);
+			nStatus = strtolong(szDigit, 10);
 			if (nStatus == 0)
 			{
 				SaveCardData(pSSCardInfo, strAppPath);
 				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 			}
-			return 0;
+			return nStatus;
 		}
 		else
-		{
-			strMessage = QString::fromLocal8Bit(szStatus);
 			return -1;
-		}
+
 	}
 	//#ifdef _DEBUG
 	//	if (ffile.isFile())
@@ -681,17 +699,17 @@ int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		return -1;
 	}
 	gInfo() << "returnCardData:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
-	return 0;
 }
 
 int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
@@ -705,17 +723,17 @@ int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo
 		gInfo() << gQStr(strInfo);
 		return -1;
 	}
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
-	return 0;
 }
 
 int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
@@ -741,16 +759,17 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 		return nResult;
 	}
 	gInfo() << "getCA:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
 }
 
 
@@ -766,16 +785,17 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 		return nResult;
 	}
 	gInfo() << "queryCardProgress:" << szStatus;
-	if (IsDigitString(szStatus))
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
 	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
+		nStatus = strtolong(szDigit, 10);
+		return nStatus;
 	}
 	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
-	}
 }
 
 int LoadTestData(string& strName, string& strCardID, string& strMobile)

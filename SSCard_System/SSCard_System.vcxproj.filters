@@ -64,6 +64,9 @@
     <Filter Include="json">
       <UniqueIdentifier>{fb4a6581-74aa-4db0-8779-fd671b47cede}</UniqueIdentifier>
     </Filter>
+    <Filter Include="qtsingleton">
+      <UniqueIdentifier>{9557cd4f-5f36-4cf0-b432-f8197e0921a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp">
@@ -200,6 +203,12 @@
     </ClCompile>
     <ClCompile Include="sys_manualmakecard.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QtSingleton\qtlocalpeer.cpp">
+      <Filter>qtsingleton</Filter>
+    </ClCompile>
+    <ClCompile Include="QtSingleton\qtsingleapplication.cpp">
+      <Filter>qtsingleton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -607,7 +616,13 @@
       <Filter>UI</Filter>
     </QtMoc>
     <QtMoc Include="sys_manualmakecard.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="QtSingleton\qtlocalpeer.h">
+      <Filter>qtsingleton</Filter>
+    </QtMoc>
+    <QtMoc Include="QtSingleton\qtsingleapplication.h">
+      <Filter>qtsingleton</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1387</width>
-    <height>637</height>
+    <width>1235</width>
+    <height>752</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -27,19 +27,358 @@ letter-spacing: 1px;
 color: 0
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>85</height>
-      </size>
-     </property>
-    </spacer>
+    <layout class="QHBoxLayout" name="horizontalLayout_13">
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>18</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>20</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 20pt &quot;思源黑体 CN Normal&quot;;</string>
+       </property>
+       <property name="title">
+        <string>信息预览</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_19">
+        <item>
+         <widget class="QLabel" name="label_Pohoto">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>360</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(124, 124, 124);</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>思源黑体 CN Normal</family>
+                <pointsize>20</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>姓名</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_Name">
+              <property name="minimumSize">
+               <size>
+                <width>320</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>思源黑体 CN Medium</family>
+                <pointsize>24</pointsize>
+                <weight>7</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 57 24pt &quot;思源黑体 CN Medium&quot;;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>24</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>身份证号</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_CardID">
+              <property name="minimumSize">
+               <size>
+                <width>600</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>思源黑体 CN Medium</family>
+                <pointsize>24</pointsize>
+                <weight>7</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 57 24pt &quot;思源黑体 CN Medium&quot;;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>24</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>社保卡号</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditl_SSCard">
+              <property name="minimumSize">
+               <size>
+                <width>400</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 57 24pt &quot;思源黑体 CN Medium&quot;;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>24</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>发卡日期</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_Datetime">
+              <property name="minimumSize">
+               <size>
+                <width>400</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 57 24pt &quot;思源黑体 CN Medium&quot;;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>24</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_18">
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>银行卡号</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_Bank">
+              <property name="minimumSize">
+               <size>
+                <width>600</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>思源黑体 CN Medium</family>
+                <pointsize>24</pointsize>
+                <weight>7</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 57 24pt &quot;思源黑体 CN Medium&quot;;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>24</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_15">
@@ -496,22 +835,22 @@ color: rgb(0, 0, 0);</string>
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_3">
+    <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>30</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_13">
+    <layout class="QHBoxLayout" name="horizontalLayout_12">
      <item>
-      <spacer name="horizontalSpacer_7">
+      <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -524,63 +863,31 @@ color: rgb(0, 0, 0);</string>
       </spacer>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
-         <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="styleSheet">
-            <string notr="true">font: 32pt &quot;思源黑体 CN Regular&quot;;
-color: rgb(0, 0, 0);</string>
-           </property>
-           <property name="text">
-            <string>制卡进行中……</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="styleSheet">
-          <string notr="true">font: 32pt &quot;思源黑体 CN Regular&quot;;
-color: rgb(0, 0, 0);</string>
-         </property>
-         <property name="text">
-          <string>期间请勿执行其它操作！</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QPushButton" name="pushButton_OK">
+       <property name="minimumSize">
+        <size>
+         <width>266</width>
+         <height>101</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 25px;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+</string>
+       </property>
+       <property name="text">
+        <string>确认</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_8">
+      <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -602,7 +909,7 @@ color: rgb(0, 0, 0);</string>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>173</height>
+       <height>30</height>
       </size>
      </property>
     </spacer>
