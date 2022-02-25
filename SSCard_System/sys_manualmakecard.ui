@@ -118,16 +118,6 @@ color: 0
          <string>失败回盘</string>
         </property>
        </item>
-       <item>
-        <property name="text">
-         <string>补打照片</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>启用卡片</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item>

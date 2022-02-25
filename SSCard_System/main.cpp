@@ -5,6 +5,7 @@
 #include <QDesktopWidget>
 #include <QScreen>
 #include <fstream>
+#include <QSharedMemory>
 
 #include "DevBase.h"
 
@@ -40,9 +41,14 @@ static void SetupExceptionHandler()
 
 }
 
+//const char* g_pUniqueID = "2F026B66-2CCA-40AB-AD72-435B5AC2E625";
+
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
+	//QSharedMemory Sinlgeton(g_pUniqueID);
+
+
 	//qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

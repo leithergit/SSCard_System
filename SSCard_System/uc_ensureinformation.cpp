@@ -223,7 +223,7 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCa
 	}
 	else
 	{
-		strMessage = szStatus;
+		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
 	}
 	//g_pDataCenter->SetSSCardInfo(pSSCardInfo);
@@ -255,7 +255,7 @@ int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCar
 	}
 	else
 	{
-		strMessage = szStatus;
+		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
 	}
 
@@ -285,7 +285,7 @@ int uc_EnsureInformation::UnRegisterLost(QString& strMessage, int& nStatus, SSCa
 	}
 	else
 	{
-		strMessage = szStatus;
+		strMessage = QString::fromLocal8Bit(szStatus);
 		return -1;
 	}
 	return 0;
@@ -302,14 +302,14 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 		int nStatus = 0;
 		if (QFailed(RegisterLost(strError, nStatus, pSSCardInfo)))
 		{
-			gError() << strError.toLocal8Bit().data();
+			gError() << gQStr(strError);
 			emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
 			return;
 		}
 		else
 		{
 			strError = "社保卡挂失成功,稍后请输入常用手机号码!";
-			gInfo() << strError.toLocal8Bit().data();
+			gInfo() << gQStr(strError);
 			emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
 		}
 	}
@@ -323,7 +323,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			int nStatus = 0;
 			if (QFailed(RegisterLost(strError, nStatus, pSSCardInfo)))
 			{
-				gError() << strError.toLocal8Bit().data();
+				gError() << gQStr(strError);
 				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
 				return;
 			}
@@ -341,7 +341,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			int nStatus = 0;
 			if (QFailed(UnRegisterLost(strError, nStatus, pSSCardInfo)))
 			{
-				gError() << strError.toLocal8Bit().data();
+				gError() << gQStr(strError);
 				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
 				return;
 			}
