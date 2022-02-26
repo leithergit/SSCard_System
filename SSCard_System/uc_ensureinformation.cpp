@@ -223,7 +223,7 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCa
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -251,7 +251,7 @@ int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCar
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -277,7 +277,7 @@ int uc_EnsureInformation::UnRegisterLost(QString& strMessage, int& nStatus, SSCa
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -294,19 +294,13 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 		int nStatus = 0;
 		if (QFailed(RegisterLost(strError, nStatus, pSSCardInfo)))
 		{
-			QString strMessage;
-			if (QFailed(QueryCardProgress(strMessage, nStatus, pSSCardInfo)))
-			{
-				strMessage = "挂失时社保中心返回错误:";
-				strMessage + strError;
-				strMessage += "\n二次确认卡状态时再次失败!";
-				gError() << gQStr(strError);
-				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
-				return;
-			}
-
-			g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus).toStdString();
-			if (g_pDataCenter->strCardMakeProgress == "正式挂失")
+			gError() << gQStr(strError);
+			emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+			return;
+		}
+		else
+		{
+			if (nStatus == 200)
 			{
 				strError = "社保卡挂失成功,稍后请输入常用手机号码!";
 				gInfo() << gQStr(strError);
@@ -314,16 +308,33 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			}
 			else
 			{
-				gError() << gQStr(strError);
-				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
-				return;
+				QString strMessage;
+				if (QFailed(QuerySSCardStatus(strMessage, pSSCardInfo)))
+				{
+					strMessage = "挂失时社保中心返回错误代码:【";
+					strMessage += std::to_string(nStatus).c_str();
+					strMessage += "】二次确认卡状态时再次失败!";
+					gError() << gQStr(strMessage);
+					emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+					return;
+				}
+				QString strCardStatus = pSSCardInfo->strCardStatus;
+				if (strCardStatus == "正式挂失")
+				{
+					strError = "社保卡挂失成功,稍后请输入常用手机号码!";
+					gInfo() << gQStr(strError);
+					emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
+				}
+				else
+				{
+					strMessage = "挂失时社保中心返回错误【";
+					strMessage + strError;
+					strMessage + "】";
+					gError() << gQStr(strMessage);
+					emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+					return;
+				}
 			}
-		}
-		else
-		{
-			strError = "社保卡挂失成功,稍后请输入常用手机号码!";
-			gInfo() << gQStr(strError);
-			emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
 		}
 	}
 	else

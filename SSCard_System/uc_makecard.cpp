@@ -44,7 +44,7 @@ void uc_MakeCard::ShowSSCardInfo()
 	ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName));
 	ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
 	ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum);
-	ui->lineEdit_Bank->setText(pSSCardInfo->strBankNum);
+	//ui->lineEdit_Bank->setText(pSSCardInfo->strBankNum);
 	int nYear = 0, nMonth = 0, nDay;
 	sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
 	char szReleaseDate[32] = { 0 };
@@ -110,8 +110,8 @@ int uc_MakeCard::ProcessBussiness()
 			return -1;
 		}
 	}
-	emit UpdateProgress(MP_PreMakeCard);
-
+	//emit UpdateProgress(MP_PreMakeCard);
+	OnUpdateProgress(MP_PreMakeCard);
 	ShowSSCardInfo();
 
 	return 0;
@@ -151,6 +151,13 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 			{
 				if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 				{
+					if (strMessage.contains("已经有批次号"))
+					{
+						QString strText = strMessage;
+						strText += "\n请转到后台以写卡失败选项手动制卡!";
+						strMessage = strText;
+						break;
+					}
 					if (strMessage.contains("批次"))
 					{
 						strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
@@ -433,5 +440,6 @@ void uc_MakeCard::on_pushButton_OK_clicked()
 			gError() << strError.toLocal8Bit().data();
 			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 		}
+		ui->pushButton_OK->setEnabled(false);
 	}
 }

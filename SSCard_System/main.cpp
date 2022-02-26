@@ -54,10 +54,10 @@ int main(int argc, char* argv[])
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	//QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
+	//QApplication a(argc, argv);
 	QtSingleApplication a(argc, argv);
-	if (a.sendMessage("Wake up!"))
-		return 0;
+	//if (a.sendMessage("Wake up!"))
+	//	return 0;
 	//QApplication a(argc, argv);
 	//google::InitGoogleLogging(argv[0]);
 	//font.setStyleStrategy(QFont::PreferAntialias);

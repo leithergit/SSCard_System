@@ -195,7 +195,7 @@ letter-spacing: 1px;
           <property name="minimumSize">
            <size>
             <width>722</width>
-            <height>110</height>
+            <height>200</height>
            </size>
           </property>
           <property name="maximumSize">

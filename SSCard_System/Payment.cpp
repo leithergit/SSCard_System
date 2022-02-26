@@ -266,7 +266,7 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -325,7 +325,7 @@ int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCa
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -378,7 +378,7 @@ int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -403,7 +403,7 @@ int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -597,7 +597,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 		int nResult = getCardData(*pSSCardInfo, szStatus, bSkipPreStep);
 		if (QFailed(nResult))
 		{
-			strMessage = "获取三代社保卡数据失败!";
+			strMessage = QString::fromLocal8Bit(szStatus);
 			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
 			gInfo() << gQStr(strInfo);
 			return -1;
@@ -614,7 +614,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 				SaveCardData(pSSCardInfo, strAppPath);
 				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 			}
-			return nStatus;
+			return 0;
 		}
 		else
 			return -1;
@@ -706,7 +706,7 @@ int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -730,7 +730,7 @@ int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -766,7 +766,7 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
@@ -792,7 +792,7 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
-		return nStatus;
+		return 0;
 	}
 	else
 		return -1;
