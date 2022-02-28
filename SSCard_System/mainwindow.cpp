@@ -189,7 +189,19 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
 
+	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	{
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
+
+	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
 	ui->stackedWidget->setCurrentWidget(m_pNewCard);
 	m_pNewCard->ResetAllPages();
 	m_pNewCard->show();
@@ -231,7 +243,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-
+	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
 	m_pUpdateCard->show();
@@ -274,6 +286,7 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 		return;
 	}
 
+	g_pDataCenter->nCardServiceType = ServiceType::Service_RegisterLost;
 	ui->stackedWidget->setCurrentWidget(m_pRegiserLost);
 	m_pRegiserLost->ResetAllPages();
 	m_pRegiserLost->show();

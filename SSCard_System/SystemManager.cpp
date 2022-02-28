@@ -11,7 +11,7 @@
 #include "Gloabal.h"
 #include <thread>
 #include "mainwindow.h"
-#include "sscardservicet.h"
+#include "Sys_sscardservicet.h"
 
 SystemManager::SystemManager(QWidget* parent)
 	: QDialog(parent)

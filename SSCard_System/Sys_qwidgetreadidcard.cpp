@@ -9,7 +9,7 @@ QWidgetReadIDCard::QWidgetReadIDCard(IDCardInfo& IDCard, QWidget* parent) :
 	ui->setupUi(this);
 	ui->label_Name->setText(QString::fromLocal8Bit((const char*)IDCard.szName));
 	ui->label_Gender->setText(QString::fromLocal8Bit((const char*)IDCard.szGender));
-	ui->label_Nation->setText(QString::fromLocal8Bit((const char*)IDCard.szNation));
+	ui->label_Nation->setText(QString::fromLocal8Bit((const char*)IDCard.szNationalty));
 	ui->label_Birthday->setText(QString::fromLocal8Bit((const char*)IDCard.szBirthday));
 	ui->label_Identify->setText(QString::fromLocal8Bit((const char*)IDCard.szIdentity));
 	ui->label_Address->setText(QString::fromLocal8Bit((const char*)IDCard.szAddress));

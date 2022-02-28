@@ -728,11 +728,14 @@ struct SysConfig
 		nPageTimeout[Page_InputMobile] = pSettings->value("InputMobile", 30).toUInt();
 		nPageTimeout[Page_Payment] = pSettings->value("Payment", 300).toUInt();
 		nPageTimeout[Page_MakeCard] = pSettings->value("MakeCard", 300).toUInt();
+
 		nPageTimeout[Page_ReadSSCard] = pSettings->value("ReadSSCard", 30).toUInt();
 		nPageTimeout[Page_InputSSCardPWD] = pSettings->value("InputSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_ChangeSSCardPWD] = pSettings->value("ChangeSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_RegisterLost] = pSettings->value("RegisterLost", 30).toUInt();
 		nPageTimeout[Page_AdforFinance] = pSettings->value("AdforFinance", 30).toUInt();
+		nPageTimeout[Page_CommitNewInfo] = pSettings->value("CommitNewInfo", 30).toUInt();
+
 		pSettings->endGroup();
 	}
 
@@ -788,22 +791,8 @@ struct SysConfig
 
 using SysConfigPtr = shared_ptr<SysConfig>;
 
-// struct SSCardInfo
-// {
-// 	string  strName;
-// 	string  strIDNumber;
-// 	string  strSSCardNumber;
-// 	string  strIssuedDate;
-// 	string  strPhotoPath;
-// 	string  strBank;
-// 	string  strStatus;
-// 	void GetInfoFromIDCard(IDCardInfoPtr& pIDCardInfo)
-// 	{
-// 		strName = (const char*)pIDCardInfo->szName;
-// 		strIDNumber = (const char*)pIDCardInfo->szIdentify;
-// 	}
-// };
-using SSCardInfoPtr = shared_ptr<SSCardInfo>;
+
+using SSCardBaseInfoPtr = shared_ptr<SSCardBaseInfo>;
 
 using IDCardInfoPtr = shared_ptr<IDCardInfo>;
 
@@ -843,7 +832,7 @@ public:
 		pIDCard.reset();
 		pSSCardInfo.reset();
 	}
-	SSCardInfoPtr& GetSSCardInfo()
+	SSCardBaseInfoPtr& GetSSCardInfo()
 	{
 		return pSSCardInfo;
 	}
@@ -851,12 +840,12 @@ public:
 	{
 		if (pSSCardInfo && pIDCard)
 		{
-			strcpy_s(pSSCardInfo->strName, (const char*)pIDCard->szName);
+			pSSCardInfo->strName = (const char*)pIDCard->szName;
 			//strcpy_s(pSSCardInfo->strIDNumber = (const char*)pIDCard->szIdentify);
 		}
 	}
 
-	void SetSSCardInfo(SSCardInfoPtr& pCardInfo)
+	void SetSSCardInfo(SSCardBaseInfoPtr& pCardInfo)
 	{
 		pSSCardInfo = pCardInfo;
 	}
@@ -899,11 +888,13 @@ public:
 	// 	}
 	string         strIDImageFile;
 	string		   strSSCardPhotoFile;
+	string		   strSSCardPhotoBase64File;
 	string         strMobilePhone;
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
 	string		   strCardMakeProgress;
 	CardStatus	   nCardStratus;
+	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
 	string		   strPayCode;
 	string		   strCardVersion;
 	bool		   bDebug;
@@ -945,7 +936,7 @@ public:
 public:
 	int OpenDevice(QString& strMessage);
 
-	int OpenSSCardService(ServiceType nServiceType, SSCardService** ppService, QString& strMessage);
+	int OpenSSCardService(SSCardService** ppService, QString& strMessage);
 
 	int CloseSSCardService(QString& strMessage);
 
@@ -967,11 +958,11 @@ public:
 
 	int Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage);
 
-	string MakeCardInfo(SSCardInfoPtr& pSSCardInfo);
+	string MakeCardInfo(SSCardBaseInfoPtr& pSSCardInfo);
 
-	int PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
+	int PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
 
-	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+	int WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
 
 	int MoveCard(QString& strMessage);
 
@@ -992,7 +983,7 @@ private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pSysConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
-	SSCardInfoPtr   pSSCardInfo = nullptr;
+	SSCardBaseInfoPtr   pSSCardInfo = nullptr;
 	KT_PrinterLibPtr	m_pPrinterlib = nullptr;
 	KT_ReaderLibPtr	m_pSSCardReaderLib = nullptr;
 	SSCardServiceLibPtr pSServiceLib = nullptr;

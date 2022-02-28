@@ -46,12 +46,12 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 {
 	Q_UNUSED(strMessage);
 
-	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
-	strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardInfo HNSSCardInfo;
+	strcpy((char*)HNSSCardInfo.strCardID, (const char*)pSSCardInfo->strCardIdentity.c_str());
+	strcpy((char*)HNSSCardInfo.strName, (const char*)pSSCardInfo->strName.c_str());
 	char szStatus[1024] = { 0 };
-	int nResult = queryPayment(*pSSCardInfo, (char*)szStatus);
+	int nResult = queryPayment(HNSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
 		strMessage = "查询付费状态失败";
@@ -61,16 +61,7 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 	}
 	QString strInfo = QString("queryPayment Succeed:%1.").arg(szStatus);
 	gInfo() << gQStr(strInfo);
-	// 	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-	// 		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	// 	{
-	// 		nStatus = strtolong(szStatus, 10, 2);
-	// 	}
-	// 	else
-	// 	{
-	// 		strMessage = szStatus;
-	// 		return -1;
-	// 	}
+
 	if (strcmp(_strupr(szStatus), "OK") == 0)
 	{
 		nStatus = Pay_Succeed;
@@ -103,7 +94,7 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& 
 		strMessage = "身份证信息无效!";
 		return -1;
 	}
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	if (!pSSCardInfo)
 	{
 		strMessage = "社保卡信息无效!";
@@ -223,89 +214,89 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 		return -1;
 	}
 }
-int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = applyCardReplacement(*pSSCardInfo, (char*)szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "申请补换卡失败";
-		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-	gInfo() << "applyCardReplacement:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-}
+//int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	char szStatus[1024] = { 0 };
+//	int nResult = applyCardReplacement(*pSSCardInfo, (char*)szStatus);
+//	if (QFailed(nResult))
+//	{
+//		strMessage = "申请补换卡失败";
+//		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return -1;
+//	}
+//	gInfo() << "applyCardReplacement:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//}
 // 目前在河南无权限 
-int     CancelCardReplacement(QString& strMessage, int& nStatus)
-{
-	return 0;
-	// 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	// 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	// 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	// 	char szStatus[1024] = { 0 };
-	// 	int nResult = cancelCardReplacement(Region.strCMAccount.c_str(),
-	// 		Region.strCMPassword.c_str(),
-	// 		Region.strArea.c_str(),
-	// 		(const char*)pIDCard->szIdentify,
-	// 		(char*)pIDCard->szName,
-	// 		(char*)szStatus);
-	// 	if (QFailed(nResult))
-	// 	{
-	// 		strMessage = "撤销申请补换卡失败";
-	// 		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
-	// 		gInfo() << gQStr(strInfo);
-	// 		return -1;
-	// 	}
-	// 	gInfo() << "cancelCardReplacement:" << szStatus;
-	// 	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-	// 		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	// 	{
-	// 		nStatus = strtolong(szStatus, 10, 2);
-	// 		return 0;
-	// 	}
-	// 	else
-	// 	{
-	// 		strMessage = szStatus;
-	// 		return -1;
-	// 	}
-}
+//int     CancelCardReplacement(QString& strMessage, int& nStatus)
+//{
+//	return 0;
+//	// 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+//	// 	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+//	// 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+//	// 	char szStatus[1024] = { 0 };
+//	// 	int nResult = cancelCardReplacement(Region.strCMAccount.c_str(),
+//	// 		Region.strCMPassword.c_str(),
+//	// 		Region.strArea.c_str(),
+//	// 		(const char*)pIDCard->szIdentify,
+//	// 		(char*)pIDCard->szName,
+//	// 		(char*)szStatus);
+//	// 	if (QFailed(nResult))
+//	// 	{
+//	// 		strMessage = "撤销申请补换卡失败";
+//	// 		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
+//	// 		gInfo() << gQStr(strInfo);
+//	// 		return -1;
+//	// 	}
+//	// 	gInfo() << "cancelCardReplacement:" << szStatus;
+//	// 	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//	// 		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	// 	{
+//	// 		nStatus = strtolong(szStatus, 10, 2);
+//	// 		return 0;
+//	// 	}
+//	// 	else
+//	// 	{
+//	// 		strMessage = szStatus;
+//	// 		return -1;
+//	// 	}
+//}
 
-int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = registerPayment(*pSSCardInfo, (char*)szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "交费登记失败";
-		QString strInfo = QString("registerPayment Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-	gInfo() << "registerPayment:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-}
+//int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	char szStatus[1024] = { 0 };
+//	int nResult = registerPayment(*pSSCardInfo, (char*)szStatus);
+//	if (QFailed(nResult))
+//	{
+//		strMessage = "交费登记失败";
+//		QString strInfo = QString("registerPayment Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return -1;
+//	}
+//	gInfo() << "registerPayment:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//}
 
 // 无须实现
 int  CancelPayment(QString& strMessage, int& nStatus)
@@ -333,73 +324,75 @@ int  CancelPayment(QString& strMessage, int& nStatus)
 
 // nStatus = 0	时标注成功
 //			 1	之前 已经标注
-int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	QString strInfo = QString("Try to markCard(%1,%2)").arg((const char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
-	gInfo() << gQStr(strInfo);
-	int nResult = markCard(*pSSCardInfo, (char*)szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "即制卡标注失败";
-		QString strInfo = QString("markCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-	gInfo() << "markCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-}
+//int  MarkCard(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	char szStatus[1024] = { 0 };
+//	QString strInfo = QString("Try to markCard(%1,%2)").arg(pSSCardInfo->strName.c_str()).arg(pSSCardInfo->strIdentity.c_str());
+//	gInfo() << gQStr(strInfo);
+//	int nResult = markCard(*pSSCardInfo, (char*)szStatus);
+//	if (QFailed(nResult))
+//	{
+//		strMessage = "即制卡标注失败";
+//		QString strInfo = QString("markCard Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return -1;
+//	}
+//	gInfo() << "markCard:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//}
 
-int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = cancelMarkCard(*pSSCardInfo, (char*)szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "即制卡撤销标注失败";
-		QString strInfo = QString("cancelMarkCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-	gInfo() << "cancelMarkCard:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-}
+//int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	char szStatus[1024] = { 0 };
+//	int nResult = cancelMarkCard(*pSSCardInfo, (char*)szStatus);
+//	if (QFailed(nResult))
+//	{
+//		strMessage = "即制卡撤销标注失败";
+//		QString strInfo = QString("cancelMarkCard Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return -1;
+//	}
+//	gInfo() << "cancelMarkCard:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//}
 
-int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
+int SaveCardData(SSCardBaseInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
-#define AddCardFiled(x,s)	x.setValue(#s,pSSCardInfoOut->s);
+#define AddCardFiled(x,s)	x.setValue(#s,pSSCardInfoOut->s.c_str());
 
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
 	CardIni.beginGroup("CardData");
+	//CardIni.setValue("strOrganID", pSSCardInfoOut->strOrganID.c_str());
 	AddCardFiled(CardIni, strOrganID);
 	AddCardFiled(CardIni, strCardNum);
-	AddCardFiled(CardIni, strCardID);
+	AddCardFiled(CardIni, strIdentity);
 	AddCardFiled(CardIni, strBirthday);
 	AddCardFiled(CardIni, strName);
-	AddCardFiled(CardIni, strSex);
+	AddCardFiled(CardIni, strGender);
+	AddCardFiled(CardIni, strGenderCode);
 	AddCardFiled(CardIni, strNation);
 	AddCardFiled(CardIni, strMobile);
-	AddCardFiled(CardIni, strAdress);
+	AddCardFiled(CardIni, strAddress);
 	AddCardFiled(CardIni, strPostalCode);
 	AddCardFiled(CardIni, strEmail);
 	AddCardFiled(CardIni, strCommunity);
@@ -412,11 +405,11 @@ int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	AddCardFiled(CardIni, strCityAccTime);
 	AddCardFiled(CardIni, strCityInfo);
 	AddCardFiled(CardIni, strCardStatus);
-	AddCardFiled(CardIni, strCard);
+	AddCardFiled(CardIni, strCardVender);
 	AddCardFiled(CardIni, strReleaseDate);
 	AddCardFiled(CardIni, strValidDate);
 	AddCardFiled(CardIni, strPhoto);
-	AddCardFiled(CardIni, strIdentifyNum);
+	AddCardFiled(CardIni, strCardIdentity);
 	AddCardFiled(CardIni, strCardATR);
 	AddCardFiled(CardIni, strBankNum);
 	AddCardFiled(CardIni, strPCH);
@@ -425,25 +418,27 @@ int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	return 0;
 }
 
-int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
+int LoadIniCardData(SSCardBaseInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 	QFileInfo fi(strINIFile);
 	if (!fi.isFile())
 	{
 		return -1;
 	}
-#define GetCardField(x,c,f)		strcpy(c->f, x.value(#f).toString().toStdString().c_str());
+#define GetCardField(x,c,f)		c->f = x.value(#f).toString().toStdString();
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
-	strcpy(pSSCardInfoOut->strCardNum, CardIni.value("").toString().toStdString().c_str());
+	pSSCardInfoOut->strCardNum, CardIni.value("").toString().toStdString();
 	CardIni.beginGroup("CardData");
 	GetCardField(CardIni, pSSCardInfoOut, strCardNum);
-	GetCardField(CardIni, pSSCardInfoOut, strCardID);
+	GetCardField(CardIni, pSSCardInfoOut, strIdentity);
 	GetCardField(CardIni, pSSCardInfoOut, strBirthday);
 	GetCardField(CardIni, pSSCardInfoOut, strName);
-	GetCardField(CardIni, pSSCardInfoOut, strSex);
+	GetCardField(CardIni, pSSCardInfoOut, strGender);
+	GetCardField(CardIni, pSSCardInfoOut, strGenderCode);
 	GetCardField(CardIni, pSSCardInfoOut, strNation);
+	GetCardField(CardIni, pSSCardInfoOut, strNationCode);
 	GetCardField(CardIni, pSSCardInfoOut, strMobile);
-	GetCardField(CardIni, pSSCardInfoOut, strAdress);
+	GetCardField(CardIni, pSSCardInfoOut, strAddress);
 	GetCardField(CardIni, pSSCardInfoOut, strPostalCode);
 	GetCardField(CardIni, pSSCardInfoOut, strEmail);
 	GetCardField(CardIni, pSSCardInfoOut, strCommunity);
@@ -456,19 +451,43 @@ int LoadCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	GetCardField(CardIni, pSSCardInfoOut, strCityAccTime);
 	GetCardField(CardIni, pSSCardInfoOut, strCityInfo);
 	GetCardField(CardIni, pSSCardInfoOut, strCardStatus);
-	GetCardField(CardIni, pSSCardInfoOut, strCard);
+	GetCardField(CardIni, pSSCardInfoOut, strCardVender);
 	GetCardField(CardIni, pSSCardInfoOut, strReleaseDate);
 	GetCardField(CardIni, pSSCardInfoOut, strValidDate);
 	QByteArray ba = CardIni.value("strPhoto").toString().toLatin1();
 	qDebug() << "Load photo,size = " << ba.size();
-	pSSCardInfoOut->strPhoto = new char[ba.size() + 1];
-	strcpy_s(pSSCardInfoOut->strPhoto, ba.size() + 1, ba.data());
-	GetCardField(CardIni, pSSCardInfoOut, strIdentifyNum);
+	pSSCardInfoOut->strPhoto = string(ba.data(), ba.size());
+	GetCardField(CardIni, pSSCardInfoOut, strCardIdentity);
 	GetCardField(CardIni, pSSCardInfoOut, strCardATR);
 	GetCardField(CardIni, pSSCardInfoOut, strBankNum);
 	GetCardField(CardIni, pSSCardInfoOut, strPCH);
 	CardIni.endGroup();
 	return 0;
+}
+
+int LoadJsonCardData(SSCardBaseInfoPtr& pSSCardInfoOut, string strJsonFile)
+{
+	try
+	{
+		CJsonObject json;
+		ifstream ifs(strJsonFile, ios::in || ios::binary);
+		stringstream ss;
+		ss << ifs.rdbuf();
+		if (!json.Parse(ss.str()))
+			return -1;
+		CJsonObject ds = json["ds"];
+		ds.Get("xm", pSSCardInfoOut->strName);
+		ds.Get("shbzhm", pSSCardInfoOut->strIdentity);
+		ds.Get("csrq", pSSCardInfoOut->strBirthday);
+		ds.Get("sbkh", pSSCardInfoOut->strCardNum);
+		ds.Get("mz", pSSCardInfoOut->strNationCode);
+		ds.Get("zp", pSSCardInfoOut->strPhoto);
+		return 0;
+	}
+	catch (std::exception& e)
+	{
+		return -1;
+	}
 }
 
 int  GetImageStorePath(string& strFilePath, int nType)
@@ -492,8 +511,19 @@ int  GetImageStorePath(string& strFilePath, int nType)
 	QString strTempPath;
 	if (nType == 0)
 		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+	else if (nType == 1)
+	{
+		if (g_pDataCenter->GetSSCardInfo()->strCardNum.size() == 9)
+			strTempPath = strStorePath + QString("ID_%1_%2.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
+		else
+			strTempPath = strStorePath + QString("ID_%1_SSCard.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+	}
+	else if (nType == 2)		// 原始base64 文本
+	{
+		strTempPath = strStorePath + QString("ID_%1_SSCard.base64").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+	}
 	else
-		strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum);
+		return -1;
 
 	strFilePath = strTempPath.toStdString();
 	return 0;
@@ -512,258 +542,285 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
 	string strPhotoPath;
 	GetImageStorePath(strPhotoPath, 1);
-	photo.save(strPhotoPath.c_str(), "JPG", 90);
+	photo.save(strPhotoPath.c_str(), "bmp");
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
 	return 0;
 }
 
+int SaveSSCardPhotoBase64(QString strMessage, const char* szPhotoBase64)
+{
+	if (!szPhotoBase64)
+	{
+		return -1;
+	}
+
+	string strPhotoPath;
+	GetImageStorePath(strPhotoPath, 2);	// 取base64编码的文件路径
+	//photo.save(strPhotoPath.c_str(), "JPG", 90);
+	try
+	{
+		ofstream ofs(strPhotoPath, ios::out | ios::binary);
+		ofs << szPhotoBase64;
+		ofs.close();
+		g_pDataCenter->strSSCardPhotoBase64File = strPhotoPath.c_str();
+	}
+	catch (std::exception& e)
+	{
+		gInfo() << e.what();
+		return -1;
+	}
+
+	return 0;
+}
+
+
 // nStatus 返回0为成功，其它都为失败
-int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	bool bLoaded = false;
-	QString strAppPath = QCoreApplication::applicationDirPath();
-	strAppPath += "/Debug";
-	QFileInfo fdir(strAppPath);
-	if (fdir.exists())
-	{
-		if (!fdir.isDir())
-		{
-			QFile f(strAppPath);
-			f.remove();
-		}
-	}
-	else
-	{
-		QDir dir;
-		dir.mkdir(strAppPath);
-	}
-
-	strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
-	if (g_pDataCenter->bDebug)
-	{
-		QFileInfo ffile(strAppPath);
-		if (ffile.isFile())
-		{
-#pragma Warning("使用预存制卡数据")
-			SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-			LoadCardData(pSSCardTemp, strAppPath);
-			strcpy(pSSCardInfo->strPCH, pSSCardTemp->strPCH);
-			strcpy(pSSCardInfo->strCardNum, pSSCardTemp->strCardNum);		// 新的卡号
-			strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
-			strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
-			strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
-			strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
-			strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
-			pSSCardInfo->strPhoto = pSSCardTemp->strPhoto;
-			SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
-			bLoaded = true;
-		}
-	}
-	if (!bLoaded)
-	{
-		char szStatus[1014] = { 0 };
-		int nResult = getCardData(*pSSCardInfo, szStatus);
-		if (QFailed(nResult))
-		{
-			strMessage = "获取三代社保卡数据失败!";
-			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
-			gInfo() << gQStr(strInfo);
-			return -1;
-		}
-
-		if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-			(szStatus[1] >= '0' && szStatus[1] <= '9'))
-		{
-			nStatus = strtolong(szStatus, 10, 2);
-			if (nStatus == 0)
-			{
-				SaveCardData(pSSCardInfo, strAppPath);
-				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
-			}
-			return 0;
-		}
-		else
-		{
-			strMessage = QString::fromLocal8Bit(szStatus);
-			return -1;
-		}
-	}
-	//#ifdef _DEBUG
-	//	if (ffile.isFile())
-	//	{
-	//#pragma Warning("使用预存制卡数据")
-	//		LoadCardData(pSSCardInfoOut, strAppPath);
-	//		strcpy(pSSCardInfo->strPCH, pSSCardInfoOut->strPCH);
-	//		strcpy(pSSCardInfo->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
-	//		strcpy(pSSCardInfo->strNation, pSSCardInfoOut->strNation);
-	//		strcpy(pSSCardInfo->strSex, pSSCardInfoOut->strSex);
-	//		strcpy(pSSCardInfo->strBirthday, pSSCardInfoOut->strBirthday);
-	//		strcpy(pSSCardInfo->strReleaseDate, pSSCardInfoOut->strReleaseDate);
-	//		strcpy(pSSCardInfo->strValidDate, pSSCardInfoOut->strValidDate);
-	//		pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
-	//		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
-	//	}
-	//	else
-	//	{
-	//		char szStatus[1024] = { 0 };
-	//		int nResult = getCardData(Region.strCMAccount.c_str(),
-	//			Region.strCMPassword.c_str(),
-	//			*pSSCardInfoIn,
-	//			*pSSCardInfoOut,
-	//			szStatus);
-	//		if (QFailed(nResult))
-	//		{
-	//			strMessage = "获取三代社保卡数据失败!";
-	//			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
-	//			gInfo() << gQStr(strInfo);
-	//			return -1;
-	//		}
-	//
-	//		if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-	//			(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	//		{
-	//			nStatus = strtolong(szStatus, 10, 2);
-	//			if (nStatus == 0)
-	//			{
-	//				strcpy(pSSCardInfo->strPCH, pSSCardInfoOut->strPCH);
-	//				strcpy(pSSCardInfo->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
-	//				strcpy(pSSCardInfo->strNation, pSSCardInfoOut->strNation);
-	//				strcpy(pSSCardInfo->strSex, pSSCardInfoOut->strSex);
-	//				strcpy(pSSCardInfo->strBirthday, pSSCardInfoOut->strBirthday);
-	//				strcpy(pSSCardInfo->strReleaseDate, pSSCardInfoOut->strReleaseDate);
-	//				strcpy(pSSCardInfo->strValidDate, pSSCardInfoOut->strValidDate);
-	//				pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
-	//				SaveCardData(pSSCardInfoIn, strAppPath);
-	//				SaveSSCardPhoto(strMessage, pSSCardInfoIn->strPhoto);
-	//			}
-	//			return 0;
-	//		}
-	//		else
-	//		{
-	//			strMessage = QString::fromLocal8Bit(szStatus);
-	//			return -1;
-	//		}
-	//	}
-	//#else
-	//#endif
-	return 0;
-}
-
-int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = returnCardData(*pSSCardInfo, szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "制卡回盘失败";
-		QString strInfo = QString("returnCardData Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-	gInfo() << "returnCardData:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-	return 0;
-}
-
-int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	char szStatus[1024] = { 0 };
-	int nResult = enableCard(*pSSCardInfo, szStatus);
-	if (QFailed(nResult))
-	{
-		strMessage = "领卡启用失败";
-		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return -1;
-	}
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-	return 0;
-}
-
-int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
-{
-	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
-	SSCardInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
-	int nResult = -1;
-	char szStatus[1024] = { 0 };
-	// std::string name, std::string cardID, std::string cardNum, std::string signatureKey, std::string SF, std::string city, std::string& pOutInfo
-	if (QFailed(nResult = getCA(Region.strCM_CA_Account.c_str(),
-		Region.strCM_CA_Password.c_str(),
-		Region.strCityCode.c_str(),
-		pSSCardInfo->strCardID,
-		pSSCardInfo->strCardNum,
-		QMGY,
-		pSSCardInfo->strName,
-		szAlgorithm,
-		caInfo,
-		szStatus)))
-	{
-		strMessage = "获取CA信息失败";
-		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return nResult;
-	}
-	gInfo() << "getCA:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-}
-
-
-int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	int nResult = -1;
-	char szStatus[1024] = { 0 };
-	if (QFailed(nResult = queryCardProgress(*pSSCardInfo, szStatus)))
-	{
-		strMessage = "获取制卡进度信息失败!";
-		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
-		return nResult;
-	}
-	gInfo() << "queryCardProgress:" << szStatus;
-	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	{
-		nStatus = strtolong(szStatus, 10, 2);
-		return 0;
-	}
-	else
-	{
-		strMessage = QString::fromLocal8Bit(szStatus);
-		return -1;
-	}
-}
-
-int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo, string& strMobile)
+//int     GetCardData(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	bool bLoaded = false;
+//	QString strAppPath = QCoreApplication::applicationDirPath();
+//	strAppPath += "/Debug";
+//	QFileInfo fdir(strAppPath);
+//	if (fdir.exists())
+//	{
+//		if (!fdir.isDir())
+//		{
+//			QFile f(strAppPath);
+//			f.remove();
+//		}
+//	}
+//	else
+//	{
+//		QDir dir;
+//		dir.mkdir(strAppPath);
+//	}
+//
+//	strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strIdentity);
+//	if (g_pDataCenter->bDebug)
+//	{
+//		QFileInfo ffile(strAppPath);
+//		if (ffile.isFile())
+//		{
+//#pragma Warning("使用预存制卡数据")
+//			SSCardBaseInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
+//			LoadCardData(pSSCardTemp, strAppPath);
+//			strcpy(pSSCardInfo->strPCH, pSSCardTemp->strPCH);
+//			strcpy(pSSCardInfo->strCardNum, pSSCardTemp->strCardNum);		// 新的卡号
+//			strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
+//			strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
+//			strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
+//			strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
+//			strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
+//			pSSCardInfo->strPhoto = pSSCardTemp->strPhoto;
+//			SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+//			bLoaded = true;
+//		}
+//	}
+//	if (!bLoaded)
+//	{
+//		char szStatus[1014] = { 0 };
+//		int nResult = getCardData(*pSSCardInfo, szStatus);
+//		if (QFailed(nResult))
+//		{
+//			strMessage = "获取三代社保卡数据失败!";
+//			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
+//			gInfo() << gQStr(strInfo);
+//			return -1;
+//		}
+//
+//		if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//			(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//		{
+//			nStatus = strtolong(szStatus, 10, 2);
+//			if (nStatus == 0)
+//			{
+//				SaveCardData(pSSCardInfo, strAppPath);
+//				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+//			}
+//			return 0;
+//		}
+//		else
+//		{
+//			strMessage = QString::fromLocal8Bit(szStatus);
+//			return -1;
+//		}
+//	}
+//	//#ifdef _DEBUG
+//	//	if (ffile.isFile())
+//	//	{
+//	//#pragma Warning("使用预存制卡数据")
+//	//		LoadCardData(pSSCardInfoOut, strAppPath);
+//	//		strcpy(pSSCardInfo->strPCH, pSSCardInfoOut->strPCH);
+//	//		strcpy(pSSCardInfo->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
+//	//		strcpy(pSSCardInfo->strNation, pSSCardInfoOut->strNation);
+//	//		strcpy(pSSCardInfo->strSex, pSSCardInfoOut->strSex);
+//	//		strcpy(pSSCardInfo->strBirthday, pSSCardInfoOut->strBirthday);
+//	//		strcpy(pSSCardInfo->strReleaseDate, pSSCardInfoOut->strReleaseDate);
+//	//		strcpy(pSSCardInfo->strValidDate, pSSCardInfoOut->strValidDate);
+//	//		pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
+//	//		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+//	//	}
+//	//	else
+//	//	{
+//	//		char szStatus[1024] = { 0 };
+//	//		int nResult = getCardData(Region.strCMAccount.c_str(),
+//	//			Region.strCMPassword.c_str(),
+//	//			*pSSCardInfoIn,
+//	//			*pSSCardInfoOut,
+//	//			szStatus);
+//	//		if (QFailed(nResult))
+//	//		{
+//	//			strMessage = "获取三代社保卡数据失败!";
+//	//			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
+//	//			gInfo() << gQStr(strInfo);
+//	//			return -1;
+//	//		}
+//	//
+//	//		if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//	//			(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	//		{
+//	//			nStatus = strtolong(szStatus, 10, 2);
+//	//			if (nStatus == 0)
+//	//			{
+//	//				strcpy(pSSCardInfo->strPCH, pSSCardInfoOut->strPCH);
+//	//				strcpy(pSSCardInfo->strCardNum, pSSCardInfoOut->strCardNum);		// 新的卡号
+//	//				strcpy(pSSCardInfo->strNation, pSSCardInfoOut->strNation);
+//	//				strcpy(pSSCardInfo->strSex, pSSCardInfoOut->strSex);
+//	//				strcpy(pSSCardInfo->strBirthday, pSSCardInfoOut->strBirthday);
+//	//				strcpy(pSSCardInfo->strReleaseDate, pSSCardInfoOut->strReleaseDate);
+//	//				strcpy(pSSCardInfo->strValidDate, pSSCardInfoOut->strValidDate);
+//	//				pSSCardInfoIn->strPhoto = pSSCardInfoOut->strPhoto;
+//	//				SaveCardData(pSSCardInfoIn, strAppPath);
+//	//				SaveSSCardPhoto(strMessage, pSSCardInfoIn->strPhoto);
+//	//			}
+//	//			return 0;
+//	//		}
+//	//		else
+//	//		{
+//	//			strMessage = QString::fromLocal8Bit(szStatus);
+//	//			return -1;
+//	//		}
+//	//	}
+//	//#else
+//	//#endif
+//	return 0;
+//}
+//
+//int     ReturnCardData(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	char szStatus[1024] = { 0 };
+//	int nResult = returnCardData(*pSSCardInfo, szStatus);
+//	if (QFailed(nResult))
+//	{
+//		strMessage = "制卡回盘失败";
+//		QString strInfo = QString("returnCardData Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return -1;
+//	}
+//	gInfo() << "returnCardData:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//	return 0;
+//}
+//
+//int     EnalbeCard(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	char szStatus[1024] = { 0 };
+//	int nResult = enableCard(*pSSCardInfo, szStatus);
+//	if (QFailed(nResult))
+//	{
+//		strMessage = "领卡启用失败";
+//		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return -1;
+//	}
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//	return 0;
+//}
+//
+//int GetCA(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
+//{
+//	RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
+//	SSCardBaseInfoPtr pSSCardInfoIn = g_pDataCenter->GetSSCardInfo();
+//	int nResult = -1;
+//	char szStatus[1024] = { 0 };
+//	// std::string name, std::string cardID, std::string cardNum, std::string signatureKey, std::string SF, std::string city, std::string& pOutInfo
+//	if (QFailed(nResult = getCA(Region.strCM_CA_Account.c_str(),
+//		Region.strCM_CA_Password.c_str(),
+//		Region.strCityCode.c_str(),
+//		pSSCardInfo->strIdentity,
+//		pSSCardInfo->strCardNum,
+//		QMGY,
+//		pSSCardInfo->strName,
+//		szAlgorithm,
+//		caInfo,
+//		szStatus)))
+//	{
+//		strMessage = "获取CA信息失败";
+//		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return nResult;
+//	}
+//	gInfo() << "getCA:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//}
+//
+//
+//int QueryCardProgress(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo)
+//{
+//	int nResult = -1;
+//	char szStatus[1024] = { 0 };
+//	if (QFailed(nResult = queryCardProgress(*pSSCardInfo, szStatus)))
+//	{
+//		strMessage = "获取制卡进度信息失败!";
+//		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
+//		gInfo() << gQStr(strInfo);
+//		return nResult;
+//	}
+//	gInfo() << "queryCardProgress:" << szStatus;
+//	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
+//		(szStatus[1] >= '0' && szStatus[1] <= '9'))
+//	{
+//		nStatus = strtolong(szStatus, 10, 2);
+//		return 0;
+//	}
+//	else
+//	{
+//		strMessage = QString::fromLocal8Bit(szStatus);
+//		return -1;
+//	}
+//}
+//
+int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo, string& strMobile)
 {
 	if (g_pDataCenter->bDebug)
 	{
@@ -779,15 +836,16 @@ int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo, string& s
 		PersonSetting.beginGroup("Person");
 		strcpy((char*)pIDCard->szName, UTF8_GBK(PersonSetting.value("Name").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szIdentity, UTF8_GBK(PersonSetting.value("CardID").toString().toStdString().c_str()).c_str());
-		strcpy((char*)pIDCard->szNation, UTF8_GBK(PersonSetting.value("Nationalty").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szNationalty, UTF8_GBK(PersonSetting.value("Nationalty").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szNationaltyCode, UTF8_GBK(PersonSetting.value("NationaltyCode").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szGender, UTF8_GBK(PersonSetting.value("Gender").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szBirthday, UTF8_GBK(PersonSetting.value("Birthday").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szExpirationDate1, UTF8_GBK(PersonSetting.value("Issuedate").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szExpirationDate2, UTF8_GBK(PersonSetting.value("ExpireDate").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szAddress, UTF8_GBK(PersonSetting.value("Address").toString().toStdString().c_str()).c_str());
-		strcpy((char*)pSSCardInfo->strCardATR, PersonSetting.value("CardATR").toString().toStdString().c_str());
-		strcpy((char*)pSSCardInfo->strIdentifyNum, PersonSetting.value("CardIdentityNum").toString().toStdString().c_str());
-		strcpy((char*)pSSCardInfo->strBankNum, PersonSetting.value("BankNum").toString().toStdString().c_str());
+		pSSCardInfo->strCardATR = PersonSetting.value("CardATR").toString().toStdString();
+		pSSCardInfo->strCardIdentity = PersonSetting.value("CardIdentityNum").toString().toStdString();
+		pSSCardInfo->strBankNum = PersonSetting.value("BankNum").toString().toStdString();
 		g_pDataCenter->strCardVersion = "3.00";
 
 		strMobile = UTF8_GBK(PersonSetting.value("Mobile").toString().toStdString().c_str());

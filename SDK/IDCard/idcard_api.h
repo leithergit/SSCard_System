@@ -96,8 +96,8 @@ struct IDCardInfo
 {
 	unsigned char     szName[32];             // 姓名
 	unsigned char     szGender[8];            // 性别
-	unsigned char     szNation[20];           // 民族
-	unsigned char     szNationCode[20];       // 民族代码
+	unsigned char     szNationalty[20];       // 民族
+	unsigned char     szNationaltyCode[20];   // 民族代码
 	unsigned char     szBirthday[24];         // 出生
 	unsigned char     szAddress[80];          // 户籍
 	unsigned char     szIdentity[36];         // 身份证号

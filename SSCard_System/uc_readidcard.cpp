@@ -44,7 +44,7 @@ int uc_ReadIDCard::ProcessBussiness()
 	qDebug() << "Height = " << WindowsSize.height() << "Width = " << WindowsSize.width();
 	m_bSucceed = false;
 
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 
 	IDCardInfoPtr pIDCardInfo = make_shared<IDCardInfo>();

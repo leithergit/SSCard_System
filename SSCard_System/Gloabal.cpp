@@ -407,10 +407,9 @@ int DataCenter::OpenDevice(QString& strMessage)
 	return 0;
 }
 
-int DataCenter::OpenSSCardService(ServiceType nServiceType, SSCardService** ppService, QString& strMessage)
+int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage)
 {
 	int nResult = -1;
-	char szRCode[32] = { 0 };
 	RegionInfo& Regcfg = pSysConfig->Region;
 	string strAppPath = QCoreApplication::applicationDirPath().toStdString();
 	string strServiceMudule = strAppPath + "/" + Regcfg.strSSCardSeriveModule;
@@ -419,6 +418,11 @@ int DataCenter::OpenSSCardService(ServiceType nServiceType, SSCardService** ppSe
 	{
 		do
 		{
+			if (nCardServiceType == ServiceType::Service_Unknown)
+			{
+				strMessage = "未知服务或不支持的服务类型!";
+				return -1;
+			}
 			if (!pSServiceLib)
 			{
 				pSServiceLib = make_shared<KTModule<SSCardService>>(strServiceMudule);
@@ -469,7 +473,7 @@ int DataCenter::OpenSSCardService(ServiceType nServiceType, SSCardService** ppSe
 				strMessage = QString::fromLocal8Bit(strErrText.c_str());
 				break;
 			}
-			if (QFailed(pSScardSerivce->SetSerivdeType(nServiceType)))
+			if (QFailed(pSScardSerivce->SetSerivdeType(nCardServiceType)))
 			{
 				strMessage = "设置业务类型失败,只能是新办卡,补办和挂失/解挂";
 				break;
@@ -548,6 +552,7 @@ int DataCenter::OpenPrinter(QString& strMessage)
 						strMessage = QString("打开打印机‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
 					break;
 				}
+				nResult = 0;
 			}
 			else
 				return 0;
@@ -689,7 +694,7 @@ int DataCenter::OpenSSCardReader(QString& strMessage)
 
 			char szOutInfo[1024] = { 0 };
 			DriverInit(m_pSSCardReader, (char*)Region.strCountry.c_str(), (char*)Region.strSSCardDefaulutPin.c_str(), (char*)Region.strPrimaryKey.c_str(), szOutInfo);
-
+			nResult = 0;
 		} while (0);
 		if (QFailed(nResult))
 			return -1;
@@ -742,7 +747,7 @@ int DataCenter::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QStrin
 					break;
 				}
 			}
-
+			nResult = 0;
 		} while (0);
 		if (QFailed(nResult))
 			return -1;
@@ -1038,25 +1043,25 @@ int DataCenter::Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& st
 	return nResult;
 }
 
-string DataCenter::MakeCardInfo(SSCardInfoPtr& pSSCardInfo)
+string DataCenter::MakeCardInfo(SSCardBaseInfoPtr& pSSCardInfo)
 {
 	string strCardInfo = "";
 	//RegionInfo& Region = g_pDataCenter->GetSysConfigure()->Region;
 	//卡识别码|初始化机构编码|发卡日期|卡有效期|卡号|社会保障号码|姓名|姓名拓展|性别|民族|出生日期|
 	strCardInfo = "||";	// 卡识别码|初始化机构编码 两者为空
-	//strCardInfo += pSSCardInfo->strOrganID;					strCardInfo += "|";
+	//strCardInfo += pSSCardInfo->strOrganID;				strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strReleaseDate;				strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strValidDate;				strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strCardNum;					strCardInfo += "|";
-	strCardInfo += pSSCardInfo->strCardID;					strCardInfo += "|";
+	strCardInfo += pSSCardInfo->strIdentity;				strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strName;					strCardInfo += "||";//跳过姓名拓展
-	strCardInfo += pSSCardInfo->strSex;						strCardInfo += "|";
-	strCardInfo += pSSCardInfo->strNation;					strCardInfo += "|";
+	strCardInfo += pSSCardInfo->strGenderCode;				strCardInfo += "|";
+	strCardInfo += pSSCardInfo->strNationCode;				strCardInfo += "|";
 	strCardInfo += pSSCardInfo->strBirthday;				strCardInfo += "|";
 	return strCardInfo;
 }
 
-int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText)
+int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText)
 {
 	char szBuffer[1024] = { 0 };
 	int nBufferSize = sizeof(szBuffer);
@@ -1077,11 +1082,11 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 		TextPosition* pFieldPos = &pCardForm->posName;
 		if (bPrintText)
 		{
-			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posIDNumber;
-			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardID, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strIdentity.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posSSCardID;
-			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum, pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posIssueDate;
 			QDate dt = QDate::currentDate();
 			char szReleaseDate[32] = { 0 };
@@ -1139,14 +1144,8 @@ int DataCenter::MoveCard(QString& strMessage)
 
 }
 
-int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
+int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 {
-	if (!m_pSSCardReader)
-	{
-		strMessage = "读卡器未就绪!";
-		gInfo() << strMessage.toLocal8Bit().data();
-		return -1;
-	}
 	int nResult = -1;
 	DeviceConfig& DevConfig = pSysConfig->DevConfig;
 	RegionInfo& Region = pSysConfig->Region;
@@ -1159,11 +1158,8 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 	char szSignatureKey[1024] = { 0 };
 	char szWriteCARes[1024] = { 0 };
 	int nCardATRLen = 0;
-	CAInfo caInfo;
 	QString strInfo;
 	HSMInfo  HsmInfo;
-	int nStatus = 0;
-	SSCardService* pService = g_pDataCenter->GetSSCardService();
 
 	do
 	{
@@ -1173,19 +1169,20 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 			break;
 		}
 
-		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, pSSCardInfo->strCardATR, nCardATRLen, szRCode)))
+		if (QFailed(nResult = m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, (char*)pSSCardInfo->strCardATR.c_str(), nCardATRLen, szRCode)))
 		{
 			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
 			nResult = -4;
 			break;
 		}
 		gInfo() << "CardATR:" << pSSCardInfo->strCardATR;
-
-		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, pSSCardInfo->strBankNum)))
+		char szBankNum[32] = { 0 };
+		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
 		{
 			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
 			break;
 		}
+		pSSCardInfo->strBankNum = szBankNum;
 		gInfo() << "BankNum:" << pSSCardInfo->strBankNum;
 
 		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
@@ -1218,7 +1215,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		}
 		gInfo() << "CardBaseRead:" << szCardBaseRead;
 
-		strcpy(pSSCardInfo->strIdentifyNum, strFieldList[3].toStdString().c_str());
+		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
 		strCardVersion = strFieldList[6].toStdString();
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
@@ -1233,13 +1230,13 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 		//strcpy(HsmInfo.strSystemID, "410700006");
 		strcpy(HsmInfo.strRegionCode, Region.strCityCode.c_str());
-		strcpy(HsmInfo.strCardNum, pSSCardInfo->strCardNum); //用最新的卡号	   
+		strcpy(HsmInfo.strCardNum, pSSCardInfo->strCardNum.c_str()); //用最新的卡号	   
 		//strcpy(HsmInfo.strTerminalCode, DevConfig.strTerminalCode.c_str());	// 
-		strcpy(HsmInfo.strCardID, pSSCardInfo->strCardID);
+		strcpy(HsmInfo.strCardID, pSSCardInfo->strIdentity.c_str());
 		strcpy(HsmInfo.strBusinessType, "026");	// 写卡为026，读卡为028
-		strcpy(HsmInfo.strIdentifyNum, pSSCardInfo->strIdentifyNum);
-		strcpy(HsmInfo.strName, pSSCardInfo->strName);
-		strcpy(HsmInfo.strCardATR, pSSCardInfo->strCardATR);
+		strcpy(HsmInfo.strIdentifyNum, pSSCardInfo->strCardIdentity.c_str());
+		strcpy(HsmInfo.strName, pSSCardInfo->strName.c_str());
+		strcpy(HsmInfo.strCardATR, pSSCardInfo->strCardATR.c_str());
 		strcpy(HsmInfo.stralgoCode, "03");
 		strcpy(HsmInfo.strKeyAddr, "0094");
 		// 		strcpy(HsmInfo.strReleaseDate, pSSCardInfo->strReleaseDate);
@@ -1281,14 +1278,14 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		// CardID,Name,City,CardNum,SignatureKey
 
 		CJsonObject jsonIn;
-		jsonIn.Add("CardID", (char*)pSSCardInfo->strCardID);
-		jsonIn.Add("Name", (char*)pSSCardInfo->strName);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", pSSCardInfo->strCity);
 		jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 		jsonIn.Add("SignatureKey", strPublicKey);
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
-		if (QFailed(nResult = pService->GetCA(strJsonIn, strJsonOut)))
+		if (QFailed(nResult = pSScardSerivce->GetCA(strJsonIn, strJsonOut)))
 		{
 			strMessage = QString("GetCA,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;

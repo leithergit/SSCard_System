@@ -14,12 +14,52 @@ uc_MakeCard::uc_MakeCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex
 {
 	ui->setupUi(this);
 	m_nTimeout = 300;
+	m_LableStep.push_back(ui->label_MakeCard);
+	//m_LableStep.push_back(ui->label_Depanse);
+	m_LableStep.push_back(ui->label_Write);
+	m_LableStep.push_back(ui->label_Print);
+	m_LableStep.push_back(ui->label_ReturnData);
+	m_LableStep.push_back(ui->label_Reject);
+
+	connect(this, &uc_MakeCard::UpdateProgress, this, &uc_MakeCard::OnUpdateProgress, Qt::BlockingQueuedConnection);
 }
 
 uc_MakeCard::~uc_MakeCard()
 {
 	ShutDown();
 	delete ui;
+}
+
+void uc_MakeCard::OnUpdateProgress(int nStep)
+{
+	qDebug() << __FUNCTION__ << "nStep = " << nStep;
+	if (nStep >= 0 && nStep < m_LableStep.size())
+		m_LableStep[nStep]->setStyleSheet(QString::fromUtf8("image: url(:/Image/Status_Finish.png);"));
+}
+
+void uc_MakeCard::ShowSSCardInfo()
+{
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	if (g_pDataCenter->bDebug)
+	{
+		string strJsonFile = "./Debug/Carddata_" + pSSCardInfo->strIdentity + ".json";
+		if (QFailed(LoadJsonCardData(pSSCardInfo, strJsonFile)))
+			return;
+	}
+
+	ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
+	ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
+	ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum.c_str());
+	QDateTime dt = QDateTime::currentDateTime();
+	QString strIssueDate = dt.toString("yyyy年MM月");
+	//int nYear = 0, nMonth = 0, nDay;
+	//sscanf_s(pSSCardInfo->strReleaseDate.c_str(), "%04d%02d%02d", &nYear, &nMonth, &nDay);
+	//char szReleaseDate[32] = { 0 };
+	//sprintf_s(szReleaseDate, 32, "%d年%d月", nYear, nMonth);
+	ui->lineEdit_Datetime->setText(strIssueDate);
+
+	QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+	ui->label_Photo->setStyleSheet(strStyle);
 }
 
 int uc_MakeCard::ProcessBussiness()
@@ -49,19 +89,34 @@ int uc_MakeCard::ProcessBussiness()
 			return nResult;
 		}
 	}
-	m_pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	if (!m_pWorkThread)
+	//m_pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+
+	if (QFailed(this->CommitPersionInfo(strMessage)))
 	{
-		m_bWorkThreadRunning = true;
-		m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
-		if (!m_pWorkThread)
-		{
-			QString strError = QString("内存不足,创建制卡线程失败!");
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-			return -1;
-		}
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
 	}
+
+	if (QFailed(this->PremakeCard(strMessage)))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+	ShowSSCardInfo();
+	ui->pushButton_OK->setEnabled(true);
+	//if (!m_pWorkThread)
+	//{
+	//	m_bWorkThreadRunning = true;
+	//	m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
+	//	if (!m_pWorkThread)
+	//	{
+	//		QString strError = QString("内存不足,创建制卡线程失败!");
+	//		gError() << strError.toLocal8Bit().data();
+	//		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+	//		return -1;
+	//	}
+	//}
+
 	return 0;
 }
 
@@ -77,6 +132,7 @@ void  uc_MakeCard::ShutDown()
 	if (m_pWorkThread && m_pWorkThread->joinable())
 	{
 		m_pWorkThread->join();
+		delete m_pWorkThread;
 		m_pWorkThread = nullptr;
 	}
 	g_pDataCenter->CloseDevice();
@@ -85,7 +141,7 @@ void  uc_MakeCard::ShutDown()
 int  uc_MakeCard::PremakeCard(QString& strMessage)
 {
 	int nResult = -1;
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
 
@@ -93,7 +149,7 @@ int  uc_MakeCard::PremakeCard(QString& strMessage)
 	{
 		CJsonObject jsonIn;
 		jsonIn.Add("Name", pSSCardInfo->strName);
-		jsonIn.Add("CardID", pSSCardInfo->strCardID);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("City", pSSCardInfo->strCity);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		strJsonIn = jsonIn.ToString();
@@ -103,7 +159,7 @@ int  uc_MakeCard::PremakeCard(QString& strMessage)
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
 			jsonOut.Get("Message", strErrText);
-			strMessage = strErrText.c_str();
+			strMessage = QString("预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
 			break;
 		}
 		gInfo() << "JsonOut = " << strJsonOut;
@@ -116,9 +172,10 @@ int  uc_MakeCard::PremakeCard(QString& strMessage)
 		}
 		string strPhoto;
 		string strSSCardNum;
-		jsonOut.Get("CardNum", strSSCardNum);
-		jsonOut.Get("Photo", strPhoto);
-		SaveSSCardPhoto(strMessage, strPhoto.c_str());
+		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
+		jsonOut.Get("NationalityCode", pSSCardInfo->strNationCode);
+		jsonOut.Get("Photo", pSSCardInfo->strPhoto);
+		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto.c_str());
 		nResult = 0;
 	} while (0);
 	return nResult;
@@ -128,34 +185,86 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 {
 	int nResult = -1;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
+	RegionInfo RegInfo = g_pDataCenter->GetSysConfigure()->Region;
+	pSSCardInfo->strBankCode = RegInfo.strBankCode;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
 	do
 	{
 		CJsonObject jsonIn;
-		jsonIn.Add("Name", (char*)pSSCardInfo->strName);
-		jsonIn.Add("CardID", (char*)pSSCardInfo->strCardID);
-		jsonIn.Add("City", (char*)pSSCardInfo->strCity);
-		jsonIn.Add("Mobile", (char*)pSSCardInfo->strMobile);
 		jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
-		jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate1);
-		jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
-		jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
-		jsonIn.Add("Nation", (char*)pIDCardInfo->szNation);
-		jsonIn.Add("Address", (char*)pIDCardInfo->szAddress);
+		jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
+
+		jsonIn.Add("Name", pSSCardInfo->strName);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+		jsonIn.Add("Gender", pSSCardInfo->strGender);
+		jsonIn.Add("City", pSSCardInfo->strCity);
+
+		jsonIn.Add("Mobile", pSSCardInfo->strMobile);
+		jsonIn.Add("Birthday", pSSCardInfo->strBirthday);
+		jsonIn.Add("Nation", pSSCardInfo->strNationCode);
+		jsonIn.Add("Address", pSSCardInfo->strAddress);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
-		jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+		switch (g_pDataCenter->nCardServiceType)
+		{
+		case ServiceType::Service_NewCard:
+		{
+			if (g_pDataCenter->strSSCardPhotoFile.empty())
+			{
+				strMessage = "提示", "未找到照片数据,请先下载照片";
+				break;
+			}
+
+			try
+			{
+				ifstream ifs(g_pDataCenter->strSSCardPhotoBase64File, ios::in | ios::binary);
+				stringstream ss;
+				ss << ifs.rdbuf();
+				// 读取jpg图片并转base64
+				//QByteArray ba(ss.str().c_str(), ss.str().size());
+				//QByteArray baBase64 = ba.toBase64();
+				//jsonIn.Add("Photo", baBase64.data());
+
+				// 直接使用base64数据
+				jsonIn.Add("Photo", ss.str());
+
+			}
+			catch (std::exception& e)
+			{
+				gInfo() << e.what();
+				return -1;
+			}
+		}
+		break;
+		case ServiceType::Service_ReplaceCard:
+		{
+			CJsonObject jsonIn;
+
+			jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+		}
+		break;
+		case ServiceType::Service_RegisterLost:
+		default:
+		{
+			strMessage = "不支持的制卡服务!";
+			gInfo() << gQStr(strMessage);
+			break;
+		}
+		}
+
 		strJsonIn = jsonIn.ToString();
 		gInfo() << "JsonIn = " << strJsonIn;
+
 		if (QFailed(pService->CommitPersonInfo(strJsonIn, strJsonOut)))
 		{
 			gInfo() << "JsonOut = " << strJsonOut;
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
 			jsonOut.Get("Message", strErrText);
-			strMessage = strErrText.c_str();
+			strMessage = QString("提交用户信息失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+			nResult = -1;
 			break;
 		}
 		gInfo() << "JsonOut = " << strJsonOut;
@@ -167,7 +276,7 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 int	 uc_MakeCard::WriteCard(QString& strMessage)
 {
 	int nResult = -1;
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
 	QString strInfo;
@@ -202,7 +311,7 @@ int  uc_MakeCard::EnsureData(QString& strMessage)
 {
 	int nResult = -1;
 	char szRCode[32] = { 0 };
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 
 	QString strInfo;
@@ -215,13 +324,13 @@ int  uc_MakeCard::EnsureData(QString& strMessage)
 	do
 	{
 		CJsonObject jsonIn;
-		jsonIn.Add("CardID", pSSCardInfo->strCardID);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("City", pSSCardInfo->strCity);
 		jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 		jsonIn.Add("CardATR", pSSCardInfo->strCardATR);
-		jsonIn.Add("CardIdentity", pSSCardInfo->strIdentifyNum);
+		jsonIn.Add("CardIdentity", pSSCardInfo->strCardIdentity);
 		jsonIn.Add("ChipNum", pSSCardInfo->strBankNum);
 		jsonIn.Add("MagNum", pSSCardInfo->strBankNum);
 		jsonIn.Add("CardVersion", g_pDataCenter->strCardVersion);
@@ -249,7 +358,7 @@ int  uc_MakeCard::ActiveCard(QString& strMessage)
 	char szRCode[32] = { 0 };
 	int nResult = -1;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	QString strInfo;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
@@ -258,7 +367,7 @@ int  uc_MakeCard::ActiveCard(QString& strMessage)
 	{
 		CJsonObject jsonIn;
 
-		jsonIn.Add("CardID", pSSCardInfo->strCardID);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("City", pSSCardInfo->strCity);
@@ -283,19 +392,13 @@ int  uc_MakeCard::ActiveCard(QString& strMessage)
 
 void uc_MakeCard::ThreadWork()
 {
-	char szRCode[32] = { 0 };
 	int nResult = -1;
 	QString strMessage;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	QString strInfo;
 	do
 	{
-		if (QFailed(this->CommitPersionInfo(strMessage)))
-			break;
-
-		if (QFailed(this->PremakeCard(strMessage)))
-			break;
 
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 			break;
@@ -323,5 +426,21 @@ void uc_MakeCard::ThreadWork()
 	else
 	{
 		emit ShowMaskWidget("提示", "制卡成功,请及时取走卡片", Success, Return_MainPage);
+	}
+}
+
+void uc_MakeCard::on_pushButton_OK_clicked()
+{
+	if (!m_pWorkThread)
+	{
+		m_bWorkThreadRunning = true;
+		m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
+		if (!m_pWorkThread)
+		{
+			QString strError = QString("内存不足,创建制卡线程失败!");
+			gError() << strError.toLocal8Bit().data();
+			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+		}
+		ui->pushButton_OK->setEnabled(false);
 	}
 }

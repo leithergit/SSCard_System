@@ -24,8 +24,8 @@ int uc_InputMobile::ProcessBussiness()
 	ui->lineEdit_Mobile->setText("");
 	//ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
-	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
+	SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	pSSCardInfo->strMobile = g_pDataCenter->strMobilePhone;
 	m_strMobile = "";
 	return 0;
 }
@@ -151,8 +151,8 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 	if (m_strMobile.size() == m_nMobilePhoneSize)
 	{
 		g_pDataCenter->strMobilePhone = m_strMobile.toStdString();
-		SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-		strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
+		SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+		pSSCardInfo->strMobile = g_pDataCenter->strMobilePhone;
 		QString strMessage;
 		PayResult nPayResult = PayResult::Pay_Unsupport;
 		string strPayMessage;

@@ -204,11 +204,11 @@
     <ClCompile Include="SystemManager.cpp">
       <Filter>SystemManager</Filter>
     </ClCompile>
-    <ClCompile Include="sscardservicet.cpp">
-      <Filter>SystemManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\utility\Markup.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_sscardservicet.cpp">
+      <Filter>SystemManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -416,7 +416,7 @@
     <QtUic Include="SystemManager.ui">
       <Filter>SystemManager</Filter>
     </QtUic>
-    <QtUic Include="sscardservicet.ui">
+    <QtUic Include="Sys_sscardservicet.ui">
       <Filter>SystemManager</Filter>
     </QtUic>
   </ItemGroup>
@@ -621,7 +621,7 @@
     <QtMoc Include="SystemManager.h">
       <Filter>SystemManager</Filter>
     </QtMoc>
-    <QtMoc Include="sscardservicet.h">
+    <QtMoc Include="Sys_sscardservicet.h">
       <Filter>SystemManager</Filter>
     </QtMoc>
   </ItemGroup>

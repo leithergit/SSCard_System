@@ -301,7 +301,7 @@ color: #414141;
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>1294</x>
@@ -407,7 +407,7 @@ color: #414141;
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QPushButton" name="pushButton_ChangePWD">
+         <widget class="QPushButton" name="pushButton_RegisterLost">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -435,7 +435,7 @@ color: #414141;
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QPushButton" name="pushButton_RegisterLost">
+         <widget class="QPushButton" name="pushButton_ChangePWD">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>

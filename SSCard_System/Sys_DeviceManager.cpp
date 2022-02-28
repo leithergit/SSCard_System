@@ -701,7 +701,7 @@ void DeviceManager::on_pushButton_PrinterTest_clicked()
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
 	/*strcpy_s(pSSCardInfo->strName, UTF8_GBK("测试用户").c_str());
 	strcpy_s(pSSCardInfo->strCardID, "123456789012345678");
 	strcpy_s(pSSCardInfo->strCardNum, "PP123456N");
@@ -1093,15 +1093,16 @@ void DeviceManager::on_pushButton_MakePhoto_clicked()
 	{
 		return;
 	}
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-	if (LoadCardData(pSSCardInfo, strFile) == 0)
+	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+	if (LoadIniCardData(pSSCardInfo, strFile) == 0)
 	{
 		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 		g_pDataCenter->SetIDCardInfo(pIDCard);
 
-		strcpy((char*)g_pDataCenter->GetIDCardInfo()->szIdentity, pSSCardInfo->strCardID);
+		strcpy((char*)g_pDataCenter->GetIDCardInfo()->szIdentity, pSSCardInfo->strIdentity.c_str());
+
 		QString strMessage;
-		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto.c_str());
 	}
 }
 
@@ -1176,11 +1177,11 @@ void DeviceManager::on_pushButton_Excute_clicked()
 
 	case 3:
 	{
-		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-		strcpy_s(pSSCardInfo->strName, UTF8_GBK("测试用户").c_str());
-		strcpy_s(pSSCardInfo->strCardID, "123456789012345678");
-		strcpy_s(pSSCardInfo->strCardNum, "PP123456N");
-		strcpy_s(pSSCardInfo->strValidDate, "20220101");
+		SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+		pSSCardInfo->strName = UTF8_GBK("测试用户");
+		pSSCardInfo->strIdentity = "123456789012345678";
+		pSSCardInfo->strCardNum = "PP123456N";
+		pSSCardInfo->strValidDate = "20220101";
 		QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
 
 		if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))

@@ -428,7 +428,6 @@ bool GetHardwareCode2(std::string& strMachineCode)
 		return false;
 	}
 	char szHardWareID[128] = { 0 };
-	int nSize = 0;
 	strcpy(szHardWareID, szResult);
 	AES_KEY key;
 	AES_set_encrypt_key((const unsigned char*)g_szKey, 128, &key);

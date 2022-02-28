@@ -25,7 +25,6 @@ SOURCES += \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
     Payment.cpp \
-    SDK/dvtldcamocx/dvtldcamocxlib.cpp \
     Sys_DeviceManager.cpp \
     Sys_cardmanger.cpp \
     Sys_dialogcameratest.cpp \
@@ -35,6 +34,7 @@ SOURCES += \
     Sys_pageconfigure.cpp \
     Sys_qwidgetreadidcard.cpp \
     Sys_regionconfigure.cpp \
+    Sys_sscardservicet.cpp \
     SystemManager.cpp \
     WMIQuery.cpp \
     imageviewlabel.cpp \
@@ -43,16 +43,13 @@ SOURCES += \
     mainpage.cpp \
     mainwindow.cpp \
     nc_commitpersoninfo.cpp \
-    nc_commitpersoninfo_Sandong.cpp \
     nc_makephoto.cpp \
     newcard.cpp \
-    openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
     registerlost.cpp \
     showlicense.cpp \
-    sscardservicet.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -75,7 +72,6 @@ HEADERS += \
     OperatorSucceed.h \
     Payment.h \
     SDK/KT_Define.h \
-    SDK/dvtldcamocx/dvtldcamocxlib.h \
     Sys_DeviceManager.h \
     Sys_cardmanger.h \
     Sys_dialogcameratest.h \
@@ -85,6 +81,7 @@ HEADERS += \
     Sys_pageconfigure.h \
     Sys_qwidgetreadidcard.h \
     Sys_regionconfigure.h \
+    Sys_sscardservicet.h \
     SystemManager.h \
     WMIQuery.h \
     imageviewlabel.h \
@@ -92,90 +89,13 @@ HEADERS += \
     mainpage.h \
     mainwindow.h \
     nc_commitpersoninfo.h \
-    nc_commitpersoninfo_Sandong.h \
     nc_makephoto.h \
     newcard.h \
-    openssl-1.0.1g/include/openssl/aes.h \
-    openssl-1.0.1g/include/openssl/asn1.h \
-    openssl-1.0.1g/include/openssl/asn1_mac.h \
-    openssl-1.0.1g/include/openssl/asn1t.h \
-    openssl-1.0.1g/include/openssl/bio.h \
-    openssl-1.0.1g/include/openssl/blowfish.h \
-    openssl-1.0.1g/include/openssl/bn.h \
-    openssl-1.0.1g/include/openssl/buffer.h \
-    openssl-1.0.1g/include/openssl/camellia.h \
-    openssl-1.0.1g/include/openssl/cast.h \
-    openssl-1.0.1g/include/openssl/cmac.h \
-    openssl-1.0.1g/include/openssl/cms.h \
-    openssl-1.0.1g/include/openssl/comp.h \
-    openssl-1.0.1g/include/openssl/conf.h \
-    openssl-1.0.1g/include/openssl/conf_api.h \
-    openssl-1.0.1g/include/openssl/crypto.h \
-    openssl-1.0.1g/include/openssl/des.h \
-    openssl-1.0.1g/include/openssl/des_old.h \
-    openssl-1.0.1g/include/openssl/dh.h \
-    openssl-1.0.1g/include/openssl/dsa.h \
-    openssl-1.0.1g/include/openssl/dso.h \
-    openssl-1.0.1g/include/openssl/dtls1.h \
-    openssl-1.0.1g/include/openssl/e_os2.h \
-    openssl-1.0.1g/include/openssl/ebcdic.h \
-    openssl-1.0.1g/include/openssl/ec.h \
-    openssl-1.0.1g/include/openssl/ecdh.h \
-    openssl-1.0.1g/include/openssl/ecdsa.h \
-    openssl-1.0.1g/include/openssl/engine.h \
-    openssl-1.0.1g/include/openssl/err.h \
-    openssl-1.0.1g/include/openssl/evp.h \
-    openssl-1.0.1g/include/openssl/hmac.h \
-    openssl-1.0.1g/include/openssl/idea.h \
-    openssl-1.0.1g/include/openssl/krb5_asn.h \
-    openssl-1.0.1g/include/openssl/kssl.h \
-    openssl-1.0.1g/include/openssl/lhash.h \
-    openssl-1.0.1g/include/openssl/md4.h \
-    openssl-1.0.1g/include/openssl/md5.h \
-    openssl-1.0.1g/include/openssl/mdc2.h \
-    openssl-1.0.1g/include/openssl/modes.h \
-    openssl-1.0.1g/include/openssl/obj_mac.h \
-    openssl-1.0.1g/include/openssl/objects.h \
-    openssl-1.0.1g/include/openssl/ocsp.h \
-    openssl-1.0.1g/include/openssl/opensslconf.h \
-    openssl-1.0.1g/include/openssl/opensslv.h \
-    openssl-1.0.1g/include/openssl/ossl_typ.h \
-    openssl-1.0.1g/include/openssl/pem.h \
-    openssl-1.0.1g/include/openssl/pem2.h \
-    openssl-1.0.1g/include/openssl/pkcs12.h \
-    openssl-1.0.1g/include/openssl/pkcs7.h \
-    openssl-1.0.1g/include/openssl/pqueue.h \
-    openssl-1.0.1g/include/openssl/rand.h \
-    openssl-1.0.1g/include/openssl/rc2.h \
-    openssl-1.0.1g/include/openssl/rc4.h \
-    openssl-1.0.1g/include/openssl/ripemd.h \
-    openssl-1.0.1g/include/openssl/rsa.h \
-    openssl-1.0.1g/include/openssl/safestack.h \
-    openssl-1.0.1g/include/openssl/seed.h \
-    openssl-1.0.1g/include/openssl/sha.h \
-    openssl-1.0.1g/include/openssl/srp.h \
-    openssl-1.0.1g/include/openssl/srtp.h \
-    openssl-1.0.1g/include/openssl/ssl.h \
-    openssl-1.0.1g/include/openssl/ssl2.h \
-    openssl-1.0.1g/include/openssl/ssl23.h \
-    openssl-1.0.1g/include/openssl/ssl3.h \
-    openssl-1.0.1g/include/openssl/stack.h \
-    openssl-1.0.1g/include/openssl/symhacks.h \
-    openssl-1.0.1g/include/openssl/tls1.h \
-    openssl-1.0.1g/include/openssl/ts.h \
-    openssl-1.0.1g/include/openssl/txt_db.h \
-    openssl-1.0.1g/include/openssl/ui.h \
-    openssl-1.0.1g/include/openssl/ui_compat.h \
-    openssl-1.0.1g/include/openssl/whrlpool.h \
-    openssl-1.0.1g/include/openssl/x509.h \
-    openssl-1.0.1g/include/openssl/x509_vfy.h \
-    openssl-1.0.1g/include/openssl/x509v3.h \
     qmainstackpage.h \
     qpinkeybroad.h \
     qstackpage.h \
     registerlost.h \
     showlicense.h \
-    sscardservicet.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -207,16 +127,14 @@ FORMS += \
     Sys_pageconfigure.ui \
     Sys_qwidgetreadidcard.ui \
     Sys_regionconfigure.ui \
+    Sys_sscardservicet.ui \
     SystemManager.ui \
-    license.ui \
     mainpage.ui \
     mainwindow.ui \
     nc_commitpersoninfo.ui \
-    nc_commitpersoninfo_Sandong.ui \
     nc_makephoto.ui \
     registerlost.ui \
     showlicense.ui \
-    sscardservicet.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \
@@ -229,7 +147,6 @@ FORMS += \
     up_readsscard.bak.ui \
     up_readsscard.ui \
     updatecard.ui \
-    updatecard_copy.ui \
     updatepassword.ui
 
 # Default rules for deployment.
@@ -240,34 +157,53 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     Image.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/IDCard/ -lIDCard_API
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/IDCard/ -lIDCard_API
+win32:CONFIG(release, debug|release): LIBS += -L ../SDK/IDCard/ -lIDCard_API
+else:win32:CONFIG(debug, debug|release): LIBS += -L ../SDK/IDCard/ -lIDCard_API
 
-INCLUDEPATH += $$PWD/SDK/IDCard
-DEPENDPATH += $$PWD/SDK/IDCard
+INCLUDEPATH += ../SDK/IDCard
+DEPENDPATH += ../SDK/IDCard
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/glog/ -lglog
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/glog/ -lglogd
+win32:CONFIG(release, debug|release): LIBS += -L ../glog/ -lglog
+else:win32:CONFIG(debug, debug|release): LIBS += -L ../glog/ -lglogd
 
 
-INCLUDEPATH += $$PWD/glog
-DEPENDPATH += $$PWD/glog
+INCLUDEPATH += ../SDK/glog
+DEPENDPATH += ../SDK/glog
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencode
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/SDK/QREncode/ -lqrencoded
+win32:CONFIG(release, debug|release): LIBS += -L ../SDK/QREncode/ -lqrencode
+else:win32:CONFIG(debug, debug|release): LIBS += -L ../SDK/QREncode/ -lqrencoded
 
-INCLUDEPATH += $$PWD/SDK/QREncode
-DEPENDPATH += $$PWD/SDK/QREncode
+INCLUDEPATH += ../SDK/QREncode
+DEPENDPATH += ../SDK/QREncode
 
-win32: LIBS += -L$$PWD/SDK/KT_Printer/ -lKT_Printer
+win32: LIBS += -L ../SDK/KT_Printer/ -lKT_Printer
 
-INCLUDEPATH += $$PWD/SDK/KT_Printer
-DEPENDPATH += $$PWD/SDK/KT_Printer
+INCLUDEPATH += ../SDK/KT_Printer
+DEPENDPATH += ../SDK/KT_Printer
 
-win32: LIBS += -L$$PWD/SDK/KT_Reader/ -lKT_Reader
+win32: LIBS += -L ../SDK/KT_Reader/ -lKT_Reader
 
-INCLUDEPATH += $$PWD/SDK/KT_Reader
-DEPENDPATH += $$PWD/SDK/KT_Reader
+INCLUDEPATH += ../SDK/KT_Reader
+DEPENDPATH += ../SDK/KT_Reader
 
-INCLUDEPATH += $$PWD/SDK
-DEPENDPATH += $$PWD/SDK
+INCLUDEPATH += ../SDK
+DEPENDPATH += ../SDK
+
+INCLUDEPATH += ../utility
+DEPENDPATH += ../utility
+
+
+win32: LIBS += -L$$PWD/../SDK/bugtrap/ -lBugTrapU
+
+INCLUDEPATH += $$PWD/../SDK/bugtrap
+DEPENDPATH += $$PWD/../SDK/bugtrap
+
+win32: LIBS += -L$$PWD/../openssl-1.0.1g/lib/ -llibssl
+
+INCLUDEPATH += $$PWD/../openssl-1.0.1g/include
+DEPENDPATH += $$PWD/../openssl-1.0.1g/include
+
+win32: LIBS += -L$$PWD/../openssl-1.0.1g/lib/ -llibssl
+
+INCLUDEPATH += $$PWD/../openssl-1.0.1g/include
+DEPENDPATH += $$PWD/../openssl-1.0.1g/include

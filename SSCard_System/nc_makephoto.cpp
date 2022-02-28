@@ -1,4 +1,4 @@
-#include "nc_makephoto.h"
+﻿#include "nc_makephoto.h"
 #include "ui_nc_makephoto.h"
 
 nc_MakePhoto::nc_MakePhoto(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
@@ -204,9 +204,9 @@ int  nc_MakePhoto::GetFaceCaptureStorePath(QString& strFilePath, int nFull)
         }
     }
     if (nFull == 0)
-        strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+        strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
     else
-        strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+        strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
     return 0;
 }
 

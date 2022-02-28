@@ -1,4 +1,4 @@
-#ifndef NC_MAKEPHOTO_H
+﻿#ifndef NC_MAKEPHOTO_H
 #define NC_MAKEPHOTO_H
 
 #include <QWidget>

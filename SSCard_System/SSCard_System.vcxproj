@@ -208,7 +208,7 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath) z:\</Command>
+copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>@call updatesdk.bat $(Configuration)
@@ -229,7 +229,6 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
     <ClCompile Include="showlicense.cpp" />
-    <ClCompile Include="sscardservicet.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
     <ClCompile Include="Sys_cardmanger.cpp" />
     <ClCompile Include="Sys_dialogcameratest.cpp" />
@@ -250,6 +249,7 @@ copy /y $(TargetPath) z:\</Command>
     <ClCompile Include="qpinkeybroad.cpp" />
     <ClCompile Include="qstackpage.cpp" />
     <ClCompile Include="registerlost.cpp" />
+    <ClCompile Include="Sys_sscardservicet.cpp" />
     <ClCompile Include="uc_adforfinance.cpp" />
     <ClCompile Include="uc_ensureinformation.cpp" />
     <ClCompile Include="uc_facecapture.cpp" />
@@ -272,8 +272,8 @@ copy /y $(TargetPath) z:\</Command>
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
     <QtMoc Include="newcard.h" />
     <QtMoc Include="nc_commitPersonInfo.h" />
-    <QtMoc Include="sscardservicet.h" />
     <ClInclude Include="..\utility\Markup.h" />
+    <QtMoc Include="Sys_sscardservicet.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -379,7 +379,6 @@ copy /y $(TargetPath) z:\</Command>
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
     <QtUic Include="showlicense.ui" />
-    <QtUic Include="sscardservicet.ui" />
     <QtUic Include="Sys_DeviceManager.ui">
     </QtUic>
     <QtUic Include="Sys_cardmanger.ui">
@@ -405,6 +404,7 @@ copy /y $(TargetPath) z:\</Command>
     </QtUic>
     <QtUic Include="registerlost.ui">
     </QtUic>
+    <QtUic Include="Sys_sscardservicet.ui" />
     <QtUic Include="uc_adforfinance.ui">
     </QtUic>
     <QtUic Include="uc_ensureinformation.ui">
