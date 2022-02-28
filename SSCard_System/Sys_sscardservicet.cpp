@@ -1,5 +1,5 @@
-﻿#include "sscardservicet.h"
-#include "ui_sscardservicet.h"
+﻿#include "Sys_sscardservicet.h"
+#include "ui_Sys_sscardservicet.h"
 #include "Gloabal.h"
 #include "Payment.h"
 #include <memory>
@@ -7,9 +7,12 @@ using namespace std;
 
 SSCardServiceT::SSCardServiceT(QWidget* parent) :
 	QWidget(parent),
-	ui(new Ui::SSCardServiceT)
+	ui(new Ui::Sys_SSCardServiceT)
 {
 	ui->setupUi(this);
+	pBtnGroup = new QButtonGroup(this);
+	pBtnGroup->addButton(ui->radioButton_New, 0);
+	pBtnGroup->addButton(ui->radioButton_ReplaceCard, 1);
 }
 
 SSCardServiceT::~SSCardServiceT()
@@ -21,11 +24,11 @@ void SSCardServiceT::on_pushButton_LoadCardID_clicked()
 {
 	QString strMessage;
 	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
 	string strMobile;
 	if (QSucceed(LoadTestIDData(pIDCard, pSSCardInfo, strMobile)))
 	{
-		strcpy(pSSCardInfo->strMobile, strMobile.c_str());
+		pSSCardInfo->strMobile = strMobile;
 	}
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	g_pDataCenter->SetIDCardInfo(pIDCard);
@@ -39,7 +42,7 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 	CJsonObject jsonIn;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
 #pragma  Warning("姓名是用什么编码?UTF-8 or GBK?")
 	jsonIn.Add("Name", (const char*)pIDCard->szName);
@@ -53,7 +56,12 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 	QString strMessage;
 	do
 	{
-		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))					// 查不到职业类型
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+		jsonIn.Add("Name", pSSCardInfo->strName);
+		jsonIn.Add("City", pSSCardInfo->strCity);
+		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
+
+		if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))					// 查不到职业类型
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText;
@@ -65,76 +73,100 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 		}
 		CJsonObject jsonOut(strJsonOut);
 
-		string strName, strCardID, strSSCardNum, strBankCode, strMobile;
-		int nCardStatus;
-		if (!jsonOut.Get("Name", strName) ||
-			!jsonOut.Get("CardID", strCardID) ||
-			!jsonOut.Get("CardNum", strSSCardNum) ||
-			!jsonOut.Get("CardStatus", nCardStatus) ||
-			!jsonOut.Get("BankCode", strBankCode) ||
-			!jsonOut.Get("Mobile", strMobile))
+
+		string strText;
+		if (!jsonOut.Get("Result", nResult) ||
+			!jsonOut.Get("Message", strText))
 		{
-			strMessage = "姓名,身份证,社保卡号,社保卡状态,银行代码存在无效字段!";
 			gInfo() << strJsonOut;
 			break;
 		}
-		strcpy((char*)pSSCardInfo->strCardNum, strSSCardNum.c_str());
-		strcpy((char*)pSSCardInfo->strBankCode, strBankCode.c_str());
-		g_pDataCenter->nCardStratus = (CardStatus)nCardStatus;
+
+		QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
+
 	} while (0);
-
-
-}
-
-
-void SSCardServiceT::on_pushButton_RestisterLost_clicked()
-{
-
 }
 
 
 void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 {
-	char szRCode[32] = { 0 };
-	int nResult = -1;
 	QString strMessage;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransType, "5");
-	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+	pSSCardInfo->strTransType = "5";
+	pSSCardInfo->strCity = Reginfo.strCityCode;
+	pSSCardInfo->strSSQX = Reginfo.strCountry;
+	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
 
-	char szBuffer[1024] = { 0 };
-	int nBufferSize = sizeof(szBuffer);
-	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-	int nStatus = 0;
 	QString strInfo;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
+	ServiceType nSvr = (ServiceType)pBtnGroup->checkedId();
 
 	do
 	{
 		CJsonObject jsonIn;
-		jsonIn.Add("Name", (char*)pIDCardInfo->szName);
-		jsonIn.Add("CardID", (char*)pIDCardInfo->szIdentity);
-		jsonIn.Add("City", Reginfo.strCityCode);
-		jsonIn.Add("Mobile", (char*)pSSCardInfo->strMobile);
-		//jsonIn.Add("Operator", Reginfo.strOperator);
-		jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
-		jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate1);
-		jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
-		jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
-		jsonIn.Add("Nation", (char*)pIDCardInfo->szNation);
-		jsonIn.Add("Address", (char*)pIDCardInfo->szAddress);
-		jsonIn.Add("BankCode", Reginfo.strBankCode);
-		jsonIn.Add("CardNum", "M82492669");
+		switch (nSvr)
+		{
+		case ServiceType::Service_NewCard:
+		{
+			if (g_pDataCenter->strSSCardPhotoFile.empty())
+			{
+				QMessageBox_CN(QMessageBox::Information, "提示", "未找到照片数据,请先下载照片", QMessageBox::Ok, this);
+				return;
+			}
+			jsonIn.Add("Name", (char*)pIDCardInfo->szName);
+			jsonIn.Add("CardID", (char*)pIDCardInfo->szIdentity);
+			jsonIn.Add("City", Reginfo.strCityCode);
+			jsonIn.Add("Mobile", pSSCardInfo->strMobile);
+			jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
+			jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
+			jsonIn.Add("Mobile", pSSCardInfo->strMobile);
+			jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
+			jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
+			jsonIn.Add("Nation", (char*)pIDCardInfo->szNationaltyCode);
+			jsonIn.Add("Address", (char*)pIDCardInfo->szAddress);
+			jsonIn.Add("BankCode", Reginfo.strBankCode);
+			ifstream ifs(g_pDataCenter->strSSCardPhotoFile, ios::in | ios::binary);
+			stringstream ss;
+			ss << ifs.rdbuf();
+			QByteArray ba(ss.str().c_str(), ss.str().size());
+			QByteArray baBase64 = ba.toBase64();
+			jsonIn.Add("Photo", baBase64.data());
+		}
+		break;
+		case ServiceType::Service_ReplaceCard:
+		{
+			jsonIn.Add("Name", (char*)pIDCardInfo->szName);
+			jsonIn.Add("CardID", (char*)pIDCardInfo->szIdentity);
+			jsonIn.Add("City", Reginfo.strCityCode);
+			jsonIn.Add("Mobile", pSSCardInfo->strMobile);
+			//jsonIn.Add("Operator", Reginfo.strOperator);
+			jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
+			jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate1);
+			jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
+			jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
+			jsonIn.Add("Nation", (char*)pIDCardInfo->szNationalty);
+			jsonIn.Add("Address", (char*)pIDCardInfo->szAddress);
+			jsonIn.Add("BankCode", Reginfo.strBankCode);
+			jsonIn.Add("CardNum", "M82492669");
+		}
+		break;
+		case ServiceType::Service_RegisterLost:
+		default:
+		{
+			QMessageBox_CN(QMessageBox::Information, "提示", "不支持的服务！", QMessageBox::Ok, this);
+		}
+		break;
+
+		}
+
 		strJsonIn = jsonIn.ToString();
 
 		if (QFailed(pService->CommitPersonInfo(strJsonIn, strJsonOut)))
@@ -149,7 +181,9 @@ void SSCardServiceT::on_pushButton_CreateService_clicked()
 	SSCardService* pService = nullptr;
 	QString strMessage;
 
-	if (QFailed(g_pDataCenter->OpenSSCardService(ServiceType::Service_ReplaceCard, &pService, strMessage)))
+	g_pDataCenter->nCardServiceType = (ServiceType)pBtnGroup->checkedId();
+
+	if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
 	{
 		QMessageBox::information(nullptr, "Information", "Failed in OpenSSCardService", QMessageBox::Ok);
 		return;
@@ -163,28 +197,95 @@ void SSCardServiceT::on_pushButton_CreateService_clicked()
 	}
 }
 
-
-void SSCardServiceT::on_pushButton_PremakeCard_clicked()
+void SSCardServiceT::on_pushButton_QueryCardInfo_clicked()
 {
-	char szRCode[32] = { 0 };
 	int nResult = -1;
 	QString strMessage;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	IDCardInfoPtr pIDCardInfo = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+	pSSCardInfo->strTransType = "5";
+	pSSCardInfo->strCity = Reginfo.strCityCode;
+	pSSCardInfo->strSSQX = Reginfo.strCountry;
+	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+
+
+	QString strInfo;
+	SSCardService* pService = g_pDataCenter->GetSSCardService();
+	string strJsonIn, strJsonOut;
+
+	do
+	{
+		CJsonObject jsonIn;
+		nResult = -1;
+		strJsonIn = jsonIn.ToString();
+		auto BankList = { "96588","95566","95533","95559","95580","95599","95588","96288","95555","95558","96688","96699" };
+		for (auto var : BankList)
+		{
+			jsonIn.Clear();
+			jsonIn.Add("Name", (char*)pIDCardInfo->szName);
+			jsonIn.Add("CardID", (char*)pIDCardInfo->szIdentity);
+			jsonIn.Add("City", Reginfo.strCityCode);
+			jsonIn.Add("BankCode", var);
+			strJsonIn = jsonIn.ToString();
+			if (QSucceed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
+				//if (QSucceed(pService->SetExtraInterface("QueryPersonInfo", strJsonIn, strJsonOut)))
+			{
+				nResult = 0;
+				break;
+			}
+		}
+		if (QFailed(nResult))
+		{
+			string strText;
+			CJsonObject jsonOut(strJsonOut);
+			jsonOut.Get("Result", nResult);
+			jsonOut.Get("Message", strText);
+			QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
+			break;
+		}
+
+		CJsonObject jsonOut(strJsonOut);
+		if (!jsonOut.KeyExist("CardNum") ||
+			!jsonOut.KeyExist("Photo"))
+		{
+			QMessageBox::information(nullptr, "information", "Failed in get carddata!");
+			break;
+		}
+		string strPhoto;
+		string strSSCardNum;
+		jsonOut.Get("CardNum", strSSCardNum);
+		jsonOut.Get("Photo", strPhoto);
+		QString strMessage;
+		SaveSSCardPhoto(strMessage, strPhoto.c_str());
+
+	} while (0);
+}
+
+void SSCardServiceT::on_pushButton_PremakeCard_clicked()
+{
+
+	QString strMessage;
+
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransType, "5");
-	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+	pSSCardInfo->strTransType = "5";
+	pSSCardInfo->strCity = Reginfo.strCityCode;
+	pSSCardInfo->strSSQX = Reginfo.strCountry;
+	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
 
-	char szBuffer[1024] = { 0 };
-	int nBufferSize = sizeof(szBuffer);
-	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-	int nStatus = 0;
+
 	QString strInfo;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
@@ -212,7 +313,7 @@ void SSCardServiceT::on_pushButton_PremakeCard_clicked()
 		string strSSCardNum;
 		jsonOut.Get("CardNum", strSSCardNum);
 		jsonOut.Get("Photo", strPhoto);
-
+		QString strMessage;
 		SaveSSCardPhoto(strMessage, strPhoto.c_str());
 
 	} while (0);
@@ -221,29 +322,22 @@ void SSCardServiceT::on_pushButton_PremakeCard_clicked()
 
 void SSCardServiceT::on_pushButton_WriteCard_clicked()
 {
-	char szRCode[32] = { 0 };
 	int nResult = -1;
 	QString strMessage;
 
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransType, "5");
-	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+	pSSCardInfo->strTransType = "5";
+	pSSCardInfo->strCity = Reginfo.strCityCode;
+	pSSCardInfo->strSSQX = Reginfo.strCountry;
+	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
 
-	char szBuffer[1024] = { 0 };
-	int nBufferSize = sizeof(szBuffer);
-	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-	int nStatus = 0;
 	QString strInfo;
-	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
 
 	int nWriteCardCount = 0;
@@ -279,22 +373,18 @@ void SSCardServiceT::on_pushButton_ReturnCard_clicked()
 	int nResult = -1;
 	QString strMessage;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransType, "5");
-	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+	pSSCardInfo->strTransType = "5";
+	pSSCardInfo->strCity = Reginfo.strCityCode;
+	pSSCardInfo->strSSQX = Reginfo.strCountry;
+	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
 
-	char szBuffer[1024] = { 0 };
-	int nBufferSize = sizeof(szBuffer);
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-	int nStatus = 0;
 	QString strInfo;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
@@ -311,7 +401,7 @@ void SSCardServiceT::on_pushButton_ReturnCard_clicked()
 			break;
 		}
 		gInfo() << "CardATR:" << szCardATR;
-		strcpy(pSSCardInfo->strCardATR, szCardATR);
+		pSSCardInfo->strCardATR = szCardATR;
 		char szBankNum[64] = { 0 };
 		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
 		{
@@ -319,7 +409,7 @@ void SSCardServiceT::on_pushButton_ReturnCard_clicked()
 			break;
 		}
 		gInfo() << "BankNum:" << szBankNum;
-		strcpy(pSSCardInfo->strBankNum, szBankNum);
+		pSSCardInfo->strBankNum = szBankNum;
 		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
 		{
 			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
@@ -350,17 +440,16 @@ void SSCardServiceT::on_pushButton_ReturnCard_clicked()
 		}
 		gInfo() << "CardBaseRead:" << szCardBaseRead;
 
-		string strCardIdentify = strFieldList[3].toStdString();
-		strcpy(pSSCardInfo->strIdentifyNum, strCardIdentify.c_str());
+		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
 
 		CJsonObject jsonIn;
-		jsonIn.Add("CardID", pSSCardInfo->strCardID);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("City", pSSCardInfo->strCity);
 		jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 		jsonIn.Add("CardATR", pSSCardInfo->strCardATR);
-		jsonIn.Add("CardIdentity", pSSCardInfo->strIdentifyNum);
+		jsonIn.Add("CardIdentity", pSSCardInfo->strCardIdentity);
 
 		jsonIn.Add("ChipNum", pSSCardInfo->strBankNum);
 		jsonIn.Add("MagNum", pSSCardInfo->strBankNum);
@@ -382,27 +471,22 @@ void SSCardServiceT::on_pushButton_ActiveCard_clicked()
 	int nResult = -1;
 	QString strMessage;
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransType, "5");
-	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strOrganID = Reginfo.strAgency;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
+	pSSCardInfo->strTransType = "5";
+	pSSCardInfo->strCity = Reginfo.strCityCode;
+	pSSCardInfo->strSSQX = Reginfo.strCountry;
+	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+	pSSCardInfo->strBankCode = Reginfo.strBankCode;
 
-	char szBuffer[1024] = { 0 };
-	int nBufferSize = sizeof(szBuffer);
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-	int nStatus = 0;
 	QString strInfo;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
 	char szCardATR[1024] = { 0 };
-	char szCardBaseRead[1024] = { 0 };
 	int nCardATRLen = 0;
 
 	do
@@ -415,7 +499,7 @@ void SSCardServiceT::on_pushButton_ActiveCard_clicked()
 			break;
 		}
 		gInfo() << "CardATR:" << szCardATR;
-		strcpy(pSSCardInfo->strCardATR, szCardATR);
+		pSSCardInfo->strCardATR = szCardATR;
 		char szBankNum[64] = { 0 };
 		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
 		{
@@ -424,7 +508,7 @@ void SSCardServiceT::on_pushButton_ActiveCard_clicked()
 		}
 		CJsonObject jsonIn;
 
-		jsonIn.Add("CardID", pSSCardInfo->strCardID);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("BankCode", Reginfo.strBankCode);
 		jsonIn.Add("City", Reginfo.strCityCode);
@@ -446,6 +530,8 @@ void SSCardServiceT::on_pushButton_LoadPreMakeCard_clicked()
 		return;
 	}
 	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	try
 	{
 		string strOutputFile = "./Debug/Carddata_";
@@ -478,17 +564,7 @@ void SSCardServiceT::on_pushButton_LoadPreMakeCard_clicked()
 			"zzbh": "3716010958",
 			"zzmc": "山东黄三角传媒有限公司"
 		}*/
-		/*
-		 pSSCardInfo->strReleaseDa
-		 pSSCardInfo->strValidDate
-		 pSSCardInfo->strCardNum;
-		 pSSCardInfo->strCardID;
-		 pSSCardInfo->strName;
-		 pSSCardInfo->strSex;
-		 pSSCardInfo->strNation;
-		 pSSCardInfo->strBirthday;
 
-		*/
 		string strName, strCardNum, strGender, strNatioinality, strBirthday, strIdentity;
 		ds.Get("xm", strName);
 		ds.Get("shbzhm", strIdentity);
@@ -496,18 +572,16 @@ void SSCardServiceT::on_pushButton_LoadPreMakeCard_clicked()
 		ds.Get("xb", strGender);
 		ds.Get("mz", strNatioinality);
 		ds.Get("csrq", strBirthday);
-		SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+
 		if (pSSCardInfo)
 		{
-			strcpy(pSSCardInfo->strReleaseDate, "20220224");
-			strcpy(pSSCardInfo->strValidDate, "20320224");
-			strcpy(pSSCardInfo->strCardNum, strCardNum.c_str());
-			strcpy(pSSCardInfo->strCardID, strIdentity.c_str());
-			strcpy(pSSCardInfo->strName, strName.c_str());
-			strcpy(pSSCardInfo->strSex, strGender.c_str());
-			strcpy(pSSCardInfo->strNation, strNatioinality.c_str());
-			strcpy(pSSCardInfo->strBirthday, strBirthday.c_str());
-
+			pSSCardInfo->strOrganID = Reginfo.strAgency;
+			pSSCardInfo->strBankCode = Reginfo.strBankCode;
+			pSSCardInfo->strTransType = "5";
+			pSSCardInfo->strCity = Reginfo.strCityCode;
+			pSSCardInfo->strSSQX = Reginfo.strCountry;
+			pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+			pSSCardInfo->strBankCode = Reginfo.strBankCode;
 		}
 
 		fs.close();
@@ -515,5 +589,172 @@ void SSCardServiceT::on_pushButton_LoadPreMakeCard_clicked()
 	catch (std::exception& e)
 	{
 		string strException = e.what();
+	}
+}
+
+void SSCardServiceT::on_pushButton_GetPhoto_clicked()
+{
+	QString strMessage;
+
+	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+	QString strInfo;
+	SSCardService* pService = g_pDataCenter->GetSSCardService();
+	string strJsonIn, strJsonOut;
+
+	do
+	{
+		CJsonObject jsonIn;
+
+		jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
+		jsonIn.Add("Name", (char*)pIDCard->szName);
+		jsonIn.Add("City", (char*)Reginfo.strCityCode.c_str());
+
+		strJsonIn = jsonIn.ToString();
+		string strJsonout;
+		string strCommand = "QueryPersonPhoto";
+
+		if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+		{
+			break;
+		}
+		CJsonObject jsonOut(strJsonOut);
+		string strPhoto;
+		if (jsonOut.Get("Photo", strPhoto))
+		{
+			SaveSSCardPhoto(strMessage, strPhoto.c_str());
+		}
+
+		QMessageBox::information(nullptr, "提示", "照片取得成功!");
+	} while (0);
+}
+
+void SSCardServiceT::on_pushButton_UnRegisterLost_clicked()
+{
+	QString strMessage;
+
+	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+	QString strInfo;
+	SSCardService* pService = g_pDataCenter->GetSSCardService();
+	string strJsonIn, strJsonOut;
+
+	do
+	{
+		CJsonObject jsonIn;
+
+		jsonIn.Add("CardID", (const char*)pIDCard->szIdentity);
+		jsonIn.Add("Name", (const char*)pIDCard->szName);
+		jsonIn.Add("City", Reginfo.strCityCode);
+		jsonIn.Add("BankCode", Reginfo.strBankCode);
+		jsonIn.Add("CardNum", "M83029393");
+
+		strJsonIn = jsonIn.ToString();
+		string strJsonout;
+		string strCommand = "QueryPersonPhoto";
+
+		if (QFailed(pService->RegisterLost(strJsonIn, strJsonOut)))
+		{
+			break;
+		}
+		CJsonObject jsonOut(strJsonOut);
+		string strPhoto;
+		if (jsonOut.Get("Photo", strPhoto))
+		{
+			SaveSSCardPhoto(strMessage, strPhoto.c_str());
+		}
+
+		QMessageBox::information(nullptr, "提示", "照片取得成功!");
+	} while (0);
+}
+
+void SSCardServiceT::on_pushButton_ReadBankNum_clicked()
+{
+	int nResult = -1;
+	QString strMessage;
+	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
+
+
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	char szRCode[32] = { 0 };
+	char szCardBaseRead[1024] = { 0 };
+	int nCardATRLen = 0;
+	QString strInfo;
+
+
+	do
+	{
+		if (QFailed(g_pDataCenter->OpenDevice(strMessage)))
+		{
+			break;
+		}
+		KT_Reader* pSSCardReader = g_pDataCenter->GetSSCardReader();
+		if (!pSSCardReader)
+		{
+			strMessage = "读卡器未就绪!";
+			break;
+		}
+		if (QFailed(g_pDataCenter->MoveCard(strMessage)))
+			break;
+
+		if (QFailed(nResult = pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, (char*)pSSCardInfo->strCardATR.c_str(), nCardATRLen, szRCode)))
+		{
+			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			nResult = -4;
+			break;
+		}
+		gInfo() << "CardATR:" << pSSCardInfo->strCardATR;
+		char szBankNum[32] = { 0 };
+		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
+		{
+			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			break;
+		}
+
+		pSSCardInfo->strBankNum = szBankNum;
+		gInfo() << "BankNum:" << pSSCardInfo->strBankNum;
+
+		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
+		{
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+		/*
+		发卡地区行政区划代码（卡识别码前6位）、社会保障号码、 卡号、 卡识别码、 姓名、 卡复位信息（仅取历史字节）、 规范版本、 发卡日期、 卡有效期、终端机编号、终端设备号。各数据项之间以 “ | ” 分割，且最后一个数据项以 “ I,, 结尾。
+		639900|l111111198101011110|X00000019|639900D15600000500BF7C7A48FB4966|张三|00814E43238697159900BF7C7A|1.00|20101001
+		区号|社会保障号码(空)|卡号(空)|卡识别码|姓名(空)|卡复位信息(ATR)|Ver|发卡日期|有效期限|
+		411600|||411600D156000005C38275EEFC9B9648||008C544CB386844116018593CA|3.00|20211203|20311202|
+		Field[ 0 ] "371600"
+		Field[ 1 ] ""
+		Field[ 2 ] ""
+		Field[ 3 ] "371600D156000005004B9CF763FBBE5C"
+		Field[ 4 ] ""
+		Field[ 5 ] "0081544C9686843716008F3D97"
+		Field[ 6 ] "3.00"
+		Field[ 7 ] "20220224"
+		Field[ 8 ] "20320224"
+		Field[ 9 ] ""
+		*/
+		QStringList strFieldList = QString(szCardBaseRead).split("|", Qt::KeepEmptyParts);
+		int nIndex = 0;
+		for (auto var : strFieldList)
+		{
+			qDebug() << "Field[" << nIndex << "]" << var;
+			nIndex++;
+		}
+		gInfo() << "CardBaseRead:" << szCardBaseRead;
+
+		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
+		nResult = 0;
+	} while (0);
+	if (QFailed(nResult))
+	{
+		QMessageBox::information(nullptr, "提示", strMessage);
+	}
+	else
+	{
+		QMessageBox::information(nullptr, "提示", pSSCardInfo->strBankNum.c_str());
 	}
 }

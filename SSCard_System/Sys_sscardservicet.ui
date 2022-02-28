@@ -1,38 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SSCardServiceT</class>
- <widget class="QWidget" name="SSCardServiceT">
+ <class>Sys_SSCardServiceT</class>
+ <widget class="QWidget" name="Sys_SSCardServiceT">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>904</width>
-    <height>639</height>
+    <width>1139</width>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton_CreateService">
-       <property name="minimumSize">
-        <size>
-         <width>320</width>
-         <height>60</height>
-        </size>
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
        </property>
-       <property name="text">
-        <string>CreateService</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="radioButton_New">
+          <property name="font">
+           <font>
+            <family>思源黑体 CN Medium</family>
+            <pointsize>28</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>新办卡</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_ReplaceCard">
+          <property name="font">
+           <font>
+            <family>思源黑体 CN Medium</family>
+            <pointsize>28</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>补换卡</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
@@ -51,44 +70,6 @@
        </property>
        <property name="text">
         <string>Load IDCard</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_QueryCardStatus">
-       <property name="minimumSize">
-        <size>
-         <width>320</width>
-         <height>60</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Query CardStatus</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_RestisterLost">
-       <property name="minimumSize">
-        <size>
-         <width>320</width>
-         <height>60</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>RegisterLost</string>
        </property>
       </widget>
      </item>
@@ -112,6 +93,82 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_CreateService">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>CreateService</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_QueryCardStatus">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Query CardStatus</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_QueryCardInfo">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Query CardInfo</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_UnRegisterLost">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>UnRegisterLost</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer_2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -128,6 +185,25 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="pushButton_GetPhoto">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Get Photo</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QPushButton" name="pushButton_CommitInfo">
        <property name="minimumSize">
@@ -220,6 +296,25 @@
        </property>
        <property name="text">
         <string>ActieCard</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_ReadBankNum">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>ReadBankNum</string>
        </property>
       </widget>
      </item>
