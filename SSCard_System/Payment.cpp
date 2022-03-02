@@ -846,6 +846,7 @@ int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo, strin
 		pSSCardInfo->strCardATR = PersonSetting.value("CardATR").toString().toStdString();
 		pSSCardInfo->strCardIdentity = PersonSetting.value("CardIdentityNum").toString().toStdString();
 		pSSCardInfo->strBankNum = PersonSetting.value("BankNum").toString().toStdString();
+		pSSCardInfo->strCardNum = PersonSetting.value("CardNum").toString().toStdString();
 		g_pDataCenter->strCardVersion = "3.00";
 
 		strMobile = UTF8_GBK(PersonSetting.value("Mobile").toString().toStdString().c_str());

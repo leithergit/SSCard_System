@@ -38,6 +38,10 @@ uc_ReadIDCard::~uc_ReadIDCard()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
+	if (g_pDataCenter->OpenCamera())
+	{
+		gInfo() << "Failed in OpenCamera";
+	}
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
 	QSize WindowsSize = size();
@@ -204,6 +208,9 @@ int uc_ReadIDCard::ReaderIDCard()
 		{
 			break;
 		}
+		int nNationalityCode = strtol((char*)m_pIDCard->szNationaltyCode, nullptr, 10);
+		if (nNationalityCode < 10)
+			sprintf_s((char*)m_pIDCard->szNationaltyCode, sizeof(m_pIDCard->szNationaltyCode), "%02d", nNationalityCode);
 		g_pDataCenter->SetIDCardInfo(m_pIDCard);
 
 		if (QSucceed(GetImageStorePath(g_pDataCenter->strIDImageFile)))

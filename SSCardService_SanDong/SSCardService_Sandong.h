@@ -721,8 +721,8 @@ public:
 				break;
 			}
 			CJsonObject ds = tmpJson["ds"];
-			if (!tmpJson.KeyExist("xm") ||
-				!tmpJson.KeyExist("shbzhm"))
+			if (!ds.KeyExist("xm") ||
+				!ds.KeyExist("shbzhm"))
 			{
 				strMessage = "can't locate field 'xm' or 'shbzhm' from output of queryCardZksqList!";
 				break;
@@ -852,14 +852,14 @@ public:
 			string strErrFlag;
 			if (!tmpJson.Get("errflag", strErrFlag))
 			{
-				strMessage = "can't locate field 'errflag' in output of queryCardZksqList!";
+				strMessage = "can't locate field 'errflag' in output of saveCardBhList!";
 				break;
 			}
 			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
 			if (nErrFlag)
 			{
 				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
+					strMessage = "can't locate field 'errtext' in output of saveCardBhList!";
 				else
 				{
 					tmpJson.Get("errtext", strMessage);
@@ -884,7 +884,7 @@ public:
 
 			if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
 			{
-				strMessage = "Faled in queryCardZksqList:";
+				strMessage = "Faled in saveCardBhList:";
 				strMessage += strOutInfo;
 				break;
 			}
@@ -902,13 +902,13 @@ public:
 
 			if (!tmpJson.Parse(strOutInfo))
 			{
-				strMessage = "queryCardZksqList output is invalid:";
+				strMessage = "saveCardBhList output is invalid:";
 				strMessage += strOutInfo;
 			}
 
 			if (!tmpJson.Get("errflag", strErrFlag))
 			{
-				strMessage = "can't locate field 'errflag' in output of queryCardZksqList!";
+				strMessage = "can't locate field 'errflag' in output of saveCardBhList!";
 				break;
 			}
 			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
@@ -927,14 +927,14 @@ public:
 			CJsonObject ds = tmpJson["ds"];
 			if (ds.IsEmpty())
 			{
-				strMessage = "ds from output of queryCardZksqList is invalid !";
+				strMessage = "ds from output of saveCardBhList is invalid !";
 				break;
 			}
 
 			if (!ds.KeyExist("xm") ||
 				!ds.KeyExist("shbzhm"))
 			{
-				strMessage = "can't locate field 'xm' or 'shbzhm' from output of queryCardZksqList!";
+				strMessage = "can't locate field 'xm' or 'shbzhm' from output of saveCardBhList!";
 				break;
 			}
 
@@ -942,7 +942,7 @@ public:
 			ds.Get("sjhm", CardInfo.strMobile);
 
 			// cardID,cardType,name,bankCode,city,cardNum,operator
-			if (QFailed(nSSResult = saveCardBhk(CardInfo, strOutInfo)))
+			/*if (QFailed(nSSResult = saveCardBhk(CardInfo, strOutInfo)))
 			{
 				strMessage = "Faled in saveCardBhk:";
 				strMessage += strOutInfo;
@@ -971,7 +971,7 @@ public:
 					tmpJson.Get("errcode", strErrcode);
 				}
 				break;
-			}
+			}*/
 
 			nResult = 0;
 

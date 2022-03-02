@@ -67,6 +67,9 @@
     <Filter Include="SystemManager">
       <UniqueIdentifier>{af433a36-d47d-44a0-bea6-ea5cd8f82955}</UniqueIdentifier>
     </Filter>
+    <Filter Include="qtsingleton">
+      <UniqueIdentifier>{73fb14f0-8922-4660-b1b9-b4a9ae12f050}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp">
@@ -209,6 +212,12 @@
     </ClCompile>
     <ClCompile Include="Sys_sscardservicet.cpp">
       <Filter>SystemManager</Filter>
+    </ClCompile>
+    <ClCompile Include="QtSingleton\qtlocalpeer.cpp">
+      <Filter>qtsingleton</Filter>
+    </ClCompile>
+    <ClCompile Include="QtSingleton\qtsingleapplication.cpp">
+      <Filter>qtsingleton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -623,6 +632,12 @@
     </QtMoc>
     <QtMoc Include="Sys_sscardservicet.h">
       <Filter>SystemManager</Filter>
+    </QtMoc>
+    <QtMoc Include="QtSingleton\qtlocalpeer.h">
+      <Filter>qtsingleton</Filter>
+    </QtMoc>
+    <QtMoc Include="QtSingleton\qtsingleapplication.h">
+      <Filter>qtsingleton</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

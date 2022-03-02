@@ -412,6 +412,7 @@ struct RegionInfo
 		strEMURL = pSettings->value("EMURL").toString().toStdString();
 		strEMAccount = pSettings->value("EMAccount").toString().toStdString();							// 加密机帐号
 		strEMPassword = pSettings->value("EMPassword").toString().toStdString();						// 加密机密码
+		strEMLicense = pSettings->value("EMLicense").toString().toStdString();						// 加密机密码
 
 		strCMURL = pSettings->value("CMURL").toString().toStdString();
 		strCMAccount = pSettings->value("CMAccount", "").toString().toStdString();
@@ -477,6 +478,7 @@ struct RegionInfo
 	string		strEMURL;							    // 加密机ip http://10.120.6.239:7777/
 	string		strEMAccount;							// 加密机帐号
 	string		strEMPassword;							// 加密机密码
+	string		strEMLicense;							// 加密机密码
 	string		strCMURL;							    // 卡管ip   http://10.120.1.18:7001/hnCardService/services/CardService
 	string		strCMAccount;							// 卡管帐号
 	string		strCMPassword;							// 卡管中心密码

@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget* parent)
 	strcpy(Bi.strEMUrl, region.strEMURL.c_str());
 	strcpy(Bi.strAccount, region.strEMAccount.c_str());
 	strcpy(Bi.strPassword, region.strEMPassword.c_str());
+	strcpy(Bi.strLicense, region.strEMLicense.c_str());
 	/*
 	* char strArea[16];				// 区域代码
 	char strLicense[64];			// 授权代码
@@ -34,11 +35,6 @@ MainWindow::MainWindow(QWidget* parent)
 	if (!InitEnv(Bi))
 	{
 		gInfo() << "Failed in InitEnv";
-	}
-
-	if (g_pDataCenter->OpenCamera())
-	{
-		gInfo() << "Failed in OpenCamera";
 	}
 
 	//setStyleSheet(QString::fromUtf8("background-image:url(./Image/backgroud.jpg);"));
@@ -436,4 +432,10 @@ void MainWindow::fnThreadUploadlog()
 #pragma Warning("日志上传功能尚未完成!")
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
+}
+
+void MainWindow::OnNewInstance(const QString& strMessage)
+{
+	showNormal();
+	activateWindow();
 }

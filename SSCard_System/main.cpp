@@ -6,7 +6,8 @@
 #include <QScreen>
 #include <fstream>
 #include <sstream>
-
+#include <QSharedMemory>
+#include "qtsingleapplication.h"
 #include "DevBase.h"
 
 #include "Gloabal.h"
@@ -49,7 +50,8 @@ int main(int argc, char* argv[])
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	//QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-	QApplication a(argc, argv);
+	//QApplication a(argc, argv);
+	QtSingleApplication a(argc, argv);
 	//google::InitGoogleLogging(argv[0]);
 	//font.setStyleStrategy(QFont::PreferAntialias);
 //    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
@@ -99,7 +101,6 @@ int main(int argc, char* argv[])
 	google::SetStderrLogging(google::GLOG_INFO);	// 大于该级别的日志输出到stderr
 	google::SetLogFilenameExtension(".log");
 	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
-
 
 	ifstream ifs("./AppRuning.json");
 	int nRunCount = 0;
@@ -164,7 +165,9 @@ int main(int argc, char* argv[])
 	}
 
 	MainWindow w;
+	a.setActivationWindow(&w);
 
+	QObject::connect(&a, &QtSingleApplication::messageReceived, &w, &MainWindow::OnNewInstance);
 	auto listScreens = QApplication::screens();
 	g_pCurScreen = listScreens.at(0);
 	if (listScreens.size() > 1)		// 若多块屏幕，只在1080p的屏幕上显示

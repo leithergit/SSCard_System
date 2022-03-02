@@ -94,8 +94,16 @@ int nc_commitPersonInfo::ProcessBussiness()
 			jsonOut.Get("Message", strText);
 			jsonOut.Get("errcode", strErrcode);
 			int nErrcode = strtol(strErrcode.c_str(), nullptr, 10);
-			strMessage = QString("查询制卡状态失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-			break;
+			if (nErrcode == 3)	// 已经申请过,则继续制卡
+			{
+				strMessage = QString::fromLocal8Bit(strText.c_str());
+				emit ShowMaskWidget("操作成功", strMessage, Success, Skip_NextPage);
+			}
+			else
+			{
+				strMessage = QString("查询制卡状态失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+				break;
+			}
 		}
 		//if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
 		//{

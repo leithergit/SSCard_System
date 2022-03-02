@@ -19,6 +19,16 @@ namespace Ui {
 	class MakeCard;
 }
 
+enum MakeCard_Progress
+{
+	MP_PreMakeCard = 0,
+	//Depense,
+	MP_WriteCard,
+	MP_PrintCard,
+	MP_EnableCard,
+	MP_RejectCard
+};
+
 class uc_MakeCard : public QStackPage
 {
 	Q_OBJECT

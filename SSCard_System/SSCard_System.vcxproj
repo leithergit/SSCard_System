@@ -149,7 +149,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;./QtSingleton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -159,7 +159,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;_DEBUG;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;_DEBUG;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -228,6 +228,8 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
+    <ClCompile Include="QtSingleton\qtlocalpeer.cpp" />
+    <ClCompile Include="QtSingleton\qtsingleapplication.cpp" />
     <ClCompile Include="showlicense.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
     <ClCompile Include="Sys_cardmanger.cpp" />
@@ -274,6 +276,8 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     <QtMoc Include="nc_commitPersonInfo.h" />
     <ClInclude Include="..\utility\Markup.h" />
     <QtMoc Include="Sys_sscardservicet.h" />
+    <QtMoc Include="QtSingleton\qtlocalpeer.h" />
+    <QtMoc Include="QtSingleton\qtsingleapplication.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">

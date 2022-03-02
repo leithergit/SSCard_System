@@ -66,6 +66,9 @@ int uc_MakeCard::ProcessBussiness()
 {
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
+	for (auto var : m_LableStep)
+		var->setStyleSheet(QString::fromUtf8("image: url(:/Image/todo.png);"));
+
 	m_nSocketRetryInterval = g_pDataCenter->GetSysConfigure()->PaymentConfig.nQueryPayResultInterval;            // 支付结构查询时间间隔单 毫秒
 	m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount;
 	int nResult = -1;
@@ -102,6 +105,7 @@ int uc_MakeCard::ProcessBussiness()
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;
 	}
+	OnUpdateProgress(MP_PreMakeCard);
 	ShowSSCardInfo();
 	ui->pushButton_OK->setEnabled(true);
 	//if (!m_pWorkThread)
@@ -142,6 +146,7 @@ int  uc_MakeCard::PremakeCard(QString& strMessage)
 {
 	int nResult = -1;
 	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	string strJsonIn, strJsonOut;
 
@@ -173,7 +178,8 @@ int  uc_MakeCard::PremakeCard(QString& strMessage)
 		string strPhoto;
 		string strSSCardNum;
 		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
-		jsonOut.Get("NationalityCode", pSSCardInfo->strNationCode);
+		jsonIn.Add("Nation", pSSCardInfo->strNationCode);
+		//jsonOut.Get("NationalityCode", pSSCardInfo->strNationCode);
 		jsonOut.Get("Photo", pSSCardInfo->strPhoto);
 		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto.c_str());
 		nResult = 0;
@@ -205,6 +211,7 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 		jsonIn.Add("Mobile", pSSCardInfo->strMobile);
 		jsonIn.Add("Birthday", pSSCardInfo->strBirthday);
 		jsonIn.Add("Nation", pSSCardInfo->strNationCode);
+		//jsonIn.Add("Nation", (char*)pIDCardInfo->szNationaltyCode);
 		jsonIn.Add("Address", pSSCardInfo->strAddress);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		switch (g_pDataCenter->nCardServiceType)
@@ -262,7 +269,15 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 			gInfo() << "JsonOut = " << strJsonOut;
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
+			string strErrcode;
 			jsonOut.Get("Message", strErrText);
+			jsonOut.Get("errcode", strErrcode);
+			QString strMessage = QString::fromLocal8Bit(strErrText.c_str());
+			if (strMessage.contains("申卡人存在有效的制卡申请"))
+			{
+				nResult = 0;
+				break;
+			}
 			strMessage = QString("提交用户信息失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
 			nResult = -1;
 			break;
@@ -394,27 +409,31 @@ void uc_MakeCard::ThreadWork()
 {
 	int nResult = -1;
 	QString strMessage;
-
+	char szRCode[128] = { 0 };
 	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	QString strInfo;
 	do
 	{
-
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 			break;
 
 		if (QFailed(this->WriteCard(strMessage)))
 			break;
-
+		emit UpdateProgress(MP_WriteCard);
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
 			break;
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
+		emit UpdateProgress(MP_PrintCard);
+
 		if (QFailed(this->EnsureData(strMessage)))
 			break;
 
 		if (QFailed(this->ActiveCard(strMessage)))
 			break;
+		emit UpdateProgress(MP_EnableCard);
+		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+
 		nResult = 0;
 	} while (0);
 
@@ -427,6 +446,8 @@ void uc_MakeCard::ThreadWork()
 	{
 		emit ShowMaskWidget("提示", "制卡成功,请及时取走卡片", Success, Return_MainPage);
 	}
+	emit UpdateProgress(MP_RejectCard);
+	this_thread::sleep_for(chrono::milliseconds(2000));
 }
 
 void uc_MakeCard::on_pushButton_OK_clicked()

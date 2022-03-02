@@ -85,38 +85,9 @@ int uc_EnsureInformation::ProcessBussiness()
 			break;
 		}
 		g_pDataCenter->nCardStratus = (CardStatus)nCardStatus;
-		//if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
-		//{
-		//	if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))					// 查不到职业类型
-		//	{
-		//		CJsonObject jsonOut(strJsonOut);
-		//		string strText;
-		//		jsonOut.Get("Result", nResult);
-		//		jsonOut.Get("Message", strText);
-		//		strMessage = QString("查询制卡状态失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-		//		break;
-		//	}
-		//}
-		//pService->SetExtraInterface("QueryPersonInfo", strJsonIn, strJsonOut);		// 查不到职业类型
-		//pService->SetExtraInterface("QueryPersonPhoto", strJsonIn, strJsonOut);
-		//jsonOut.Clear();
-		//jsonOut.Parse(strJsonOut);
-		//CJsonObject jsonOut(strJsonOut);
-		//string strSSCardNum, strBankCode, strMobile;
-		//int nCardStatus;
-		if (!jsonOut.Get("CardNum", strSSCardNum) ||
-			!jsonOut.Get("CardStatus", nCardStatus) ||
-			!jsonOut.Get("BankCode", strBankCode) ||
-			!jsonOut.Get("Mobile", strMobile))
-		{
-			strMessage = "姓名,身份证,社保卡号,社保卡状态,银行代码存在无效字段!";
-			gInfo() << strJsonOut;
-			break;
-		}
-		g_pDataCenter->nCardStratus = (CardStatus)nCardStatus;
 
 		pSSCardInfo->strCardNum = strSSCardNum;
-		pSSCardInfo->strBankCode = strBankCode;
+		pSSCardInfo->strBankCode = Reginfo.strBankCode;
 		pSSCardInfo->strOrganID = Reginfo.strAgency;
 		pSSCardInfo->strTransType = "5";
 		pSSCardInfo->strCity = Reginfo.strCityCode;
