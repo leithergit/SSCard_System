@@ -126,7 +126,13 @@ void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 			jsonIn.Add("City", Reginfo.strCityCode);
 			jsonIn.Add("Mobile", pSSCardInfo->strMobile);
 			jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
-			jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
+
+			QString strExpireDate = QString::fromLocal8Bit((const char*)pIDCardInfo->szExpirationDate2);
+			if (strExpireDate == "长期")
+				jsonIn.Add("ExpireDate", "99991231");
+			else
+				jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
+
 			jsonIn.Add("Mobile", pSSCardInfo->strMobile);
 			jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
 			jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
@@ -149,7 +155,12 @@ void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 			jsonIn.Add("Mobile", pSSCardInfo->strMobile);
 			//jsonIn.Add("Operator", Reginfo.strOperator);
 			jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
-			jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate1);
+			QString strExpireDate = QString::fromLocal8Bit((const char*)pIDCardInfo->szExpirationDate2);
+			if (strExpireDate == "长期")
+				jsonIn.Add("ExpireDate", "99991231");
+			else
+				jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
+
 			jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
 			jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
 			jsonIn.Add("Nation", (char*)pIDCardInfo->szNationalty);

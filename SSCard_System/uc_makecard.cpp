@@ -201,7 +201,11 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 	{
 		CJsonObject jsonIn;
 		jsonIn.Add("IssueDate", (char*)pIDCardInfo->szExpirationDate1);
-		jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
+		QString strExpireDate = QString::fromLocal8Bit((const char*)pIDCardInfo->szExpirationDate2);
+		if (strExpireDate == "长期")
+			jsonIn.Add("ExpireDate", "99991231");
+		else
+			jsonIn.Add("ExpireDate", (char*)pIDCardInfo->szExpirationDate2);
 
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
