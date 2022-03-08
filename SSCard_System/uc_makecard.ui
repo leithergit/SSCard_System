@@ -819,6 +819,9 @@ color: rgb(0, 0, 0);</string>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_OK">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="minimumSize">
         <size>
          <width>266</width>
@@ -834,6 +837,8 @@ line-height: 49px;
 letter-spacing: 1px;
 color: #ffffff;}
 QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+
 </string>
        </property>
        <property name="text">

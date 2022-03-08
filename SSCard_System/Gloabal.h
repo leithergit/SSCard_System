@@ -918,6 +918,8 @@ public:
 
 	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 
+	int ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+
 	int MoveCard(QString& strMessage);
 
 	KT_Reader* GetSSCardReader()

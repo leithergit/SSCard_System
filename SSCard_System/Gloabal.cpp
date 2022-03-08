@@ -1093,6 +1093,91 @@ int DataCenter::MoveCard(QString& strMessage)
 
 }
 
+int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
+{
+	if (!m_pSSCardReader)
+	{
+		strMessage = "读卡器未就绪!";
+		gInfo() << strMessage.toLocal8Bit().data();
+		return -1;
+	}
+	int nResult = -1;
+	DeviceConfig& DevConfig = pSysConfig->DevConfig;
+	RegionInfo& Region = pSysConfig->Region;
+	char szRCode[32] = { 0 };
+	char szCardBaseRead[1024] = { 0 };
+	char szCardBaseWrite[1024] = { 0 };
+	char szExAuthData[1024] = { 0 };
+	char szWHSM1[1024] = { 0 };
+	/*char szWHSM2[1024] = { 0 };*/
+	char szSignatureKey[1024] = { 0 };
+	char szWriteCARes[1024] = { 0 };
+	char szCardATR[1024] = { 0 };
+	int nCardATRLen = 0;
+	CAInfo caInfo;
+	QString strInfo;
+	HSMInfo  HsmInfo;
+	int nStatus = 0;
+
+	do
+	{
+		if (!m_pSSCardReader)
+		{
+			strMessage = "读卡器未就绪!";
+			break;
+		}
+
+		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+		{
+			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			nResult = -4;
+			break;
+		}
+		gInfo() << "CardATR:" << szCardATR;
+		strcpy(pSSCardInfo->strCardATR, szCardATR);
+		char szBankNum[64] = { 0 };
+		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
+		{
+			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			break;
+		}
+		gInfo() << "BankNum:" << szBankNum;
+		strcpy(pSSCardInfo->strBankNum, szBankNum);
+		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
+		//{
+		//	gInfo() << gQStr(strMessage);
+		//	break;
+		//}
+
+		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
+		{
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+		/*
+		发卡地区行政区划代码（卡识别码前6位）、社会保障号码、 卡号、 卡识别码、 姓名、 卡复位信息（仅取历史字节）、 规范版本、 发卡日期、 卡有效期、终端机编号、终端设备号。各数据项之间以 “ | ” 分割，且最后一个数据项以 “ I,, 结尾。
+		639900|l111111198101011110|X00000019|639900D15600000500BF7C7A48FB4966|张三|00814E43238697159900BF7C7A|1.00|20101001
+		区号|社会保障号码(空)|卡号(空)|卡识别码|姓名(空)|卡复位信息(ATR)|Ver|发卡日期|有效期限|
+		411600|||411600D156000005C38275EEFC9B9648||008C544CB386844116018593CA|3.00|20211203|20311202|
+		*/
+		QStringList strFieldList = QString(szCardBaseRead).split("|", Qt::KeepEmptyParts);
+		int nIndex = 0;
+		for (auto var : strFieldList)
+		{
+			qDebug() << "Field[" << nIndex << "]" << var;
+			nIndex++;
+		}
+		gInfo() << "CardBaseRead:" << szCardBaseRead;
+
+		string strCardIdentify = strFieldList[3].toStdString();
+		strcpy(pSSCardInfo->strIdentifyNum, strCardIdentify.c_str());
+
+
+		nResult = 0;
+
+	} while (0);
+	return nResult;
+}
 int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 {
 	if (!m_pSSCardReader)

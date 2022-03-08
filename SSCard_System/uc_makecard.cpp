@@ -82,7 +82,7 @@ int uc_MakeCard::ProcessBussiness()
 			return nResult;
 		}
 	}
-
+	ui->pushButton_OK->setEnabled(true);
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());

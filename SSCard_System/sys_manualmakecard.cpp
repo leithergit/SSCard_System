@@ -533,7 +533,106 @@ void Sys_ManualMakeCard::PrintPhoto()
 }
 void Sys_ManualMakeCard::EnableCard()
 {
+	int nResult = -1;
+	QString strMessage;
 
+	int nStatus = 0;
+	QString strInfo;
+	SSCardInfoPtr pSSCardInfo;
+	char szRCode[128] = { 0 };
+	do
+	{
+		if (QFailed(LoadPersonSSCardData(strMessage)))
+		{
+			break;
+		}
+		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+
+		if (!g_pDataCenter->GetPrinter())
+		{
+			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+				break;
+		}
+		if (!g_pDataCenter->GetSSCardReader())
+		{
+			if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
+				break;
+		}
+
+		if (QFailed(g_pDataCenter->Depense(strMessage)))
+			break;
+		strInfo = "进卡成功";
+		gInfo() << gQStr(strInfo);
+
+		int nWriteCardCount = 0;
+		nResult = -1;
+		while (nWriteCardCount < 3)
+		{
+			strInfo = QString("尝试第%1次读卡!").arg(nWriteCardCount + 1);
+			gInfo() << gQStr(strInfo);
+			nResult = g_pDataCenter->ReadCard(pSSCardInfo, strMessage);
+			if (nResult == 0)
+				break;
+			if (nResult == -4)
+			{
+				nWriteCardCount++;
+				strMessage = "读卡上电失败!";
+				gInfo() << gQStr(strMessage);
+				g_pDataCenter->MoveCard(strMessage);
+				continue;
+			}
+			else if (QFailed(nResult))
+			{
+				strMessage = "读卡失败!";
+				break;
+			}
+		}
+
+		if (QFailed(nResult))
+		{
+			strInfo = "读卡失败";
+			gInfo() << gQStr(strInfo);
+			break;
+		}
+
+		// 数据回盘
+		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+		{
+			gError() << strMessage.toLocal8Bit().data();
+			break;
+		}
+
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = "数据回盘失败,请稍后重试!";
+			break;
+		}
+
+		// 启用
+		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+		{
+			gError() << strMessage.toLocal8Bit().data();
+			break;
+		}
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = "卡片启用失败,请稍后重试!";
+			break;
+		}
+
+		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+		strInfo = "卡片打印成功";
+		gInfo() << gQStr(strInfo);
+		nResult = 0;
+	} while (0);
+
+	char* szResCode[128] = { 0 };
+	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
+
+	if (QFailed(nResult))
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	else
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "启用成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
 
 void Sys_ManualMakeCard::PrintCardData()
@@ -568,6 +667,37 @@ void Sys_ManualMakeCard::PrintCardData()
 			break;
 		strInfo = "进卡成功";
 		gInfo() << gQStr(strInfo);
+
+		int nWriteCardCount = 0;
+		nResult = -1;
+		while (nWriteCardCount < 3)
+		{
+			strInfo = QString("尝试第%1次读卡!").arg(nWriteCardCount + 1);
+			gInfo() << gQStr(strInfo);
+			nResult = g_pDataCenter->ReadCard(pSSCardInfo, strMessage);
+			if (nResult == 0)
+				break;
+			if (nResult == -4)
+			{
+				nWriteCardCount++;
+				strMessage = "读卡上电失败!";
+				gInfo() << gQStr(strMessage);
+				g_pDataCenter->MoveCard(strMessage);
+				continue;
+			}
+			else if (QFailed(nResult))
+			{
+				strMessage = "读卡失败!";
+				break;
+			}
+		}
+
+		if (QFailed(nResult))
+		{
+			strInfo = "读卡失败";
+			gInfo() << gQStr(strInfo);
+			break;
+		}
 
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
 		{
@@ -762,6 +892,11 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 			gError() << strMessage.toLocal8Bit().data();
 			break;
 		}
+		break;
+	}
+	case 4:
+	{
+		this->EnableCard();
 		break;
 	}
 

@@ -19,9 +19,13 @@ MainWindow::MainWindow(QWidget* parent)
 	installEventFilter(this);
 	BaseInfo Bi;
 	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
+	strcpy(Bi.strLicense, "1234567890");
+	//strcpy(Bi.strLicense, region.strLicense.c_str());
+	strcpy(Bi.strArea, region.strCityCode.c_str());
 	strcpy(Bi.strEMUrl, region.strEMURL.c_str());
 	strcpy(Bi.strAccount, region.strEMAccount.c_str());
 	strcpy(Bi.strPassword, region.strEMPassword.c_str());
+	gInfo() << "InitEnv" << "EMUrl:" << Bi.strEMUrl << "EMAccount:" << Bi.strAccount << "EMPassword:" << Bi.strPassword;
 	if (!InitEnv(Bi))
 	{
 		gInfo() << "Failed in InitEnv";
