@@ -71,8 +71,8 @@ int uc_EnsureInformation::ProcessBussiness()
 			strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
-		CJsonObject jsonOut(strJsonOut);
 
+		CJsonObject jsonOut(strJsonOut);
 		string strSSCardNum, strBankCode, strMobile;
 		int nCardStatus;
 		if (!jsonOut.Get("CardNum", strSSCardNum) ||
@@ -85,7 +85,6 @@ int uc_EnsureInformation::ProcessBussiness()
 			break;
 		}
 		g_pDataCenter->nCardStratus = (CardStatus)nCardStatus;
-
 		pSSCardInfo->strCardNum = strSSCardNum;
 		pSSCardInfo->strBankCode = Reginfo.strBankCode;
 		pSSCardInfo->strOrganID = Reginfo.strAgency;
@@ -93,7 +92,6 @@ int uc_EnsureInformation::ProcessBussiness()
 		pSSCardInfo->strCity = Reginfo.strCityCode;
 		pSSCardInfo->strSSQX = Reginfo.strCountry;
 		pSSCardInfo->strCardVender = Reginfo.strCardVendor;
-
 		nResult = 0;
 	} while (0);
 

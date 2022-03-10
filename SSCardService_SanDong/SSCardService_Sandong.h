@@ -31,10 +31,12 @@ class SSCardService_Sandong :
 {
 private:
 	SD_SSCardInfo CardInfo;
+	std::string strOperator;
 public:
 
 	SSCardService_Sandong()
 	{
+		strOperator = "金乔炜煜移动制卡机";
 	}
 
 	//SSCardService_Sandong(/*ServiceType nSvrType*/)	/*	:SSCardService(nSvrType)*/
@@ -54,10 +56,23 @@ public:
 		}
 	}
 
-	virtual int Initialize(string& strInitJson, string& szOutInfo) override
+	virtual int Initialize(string& strInitJson, string& strOutInfo) override
 	{
+		CJsonObject jsonInit;
+		if (!jsonInit.Parse(strInitJson))
+		{
+			strOutInfo = "Invliad strInitJson,it's a valid json string!";
+			return -1;
+		}
+
+		string strTemp;
+		if (jsonInit.Get("Operator", strTemp))
+		{
+			strOperator = strTemp;
+		}
+
 		//Warning("需要确定initCardInfo输入数据的Json定义!");
-		return initCardInfo(strInitJson.c_str(), szOutInfo);
+		return initCardInfo(strInitJson.c_str(), strOutInfo);
 	}
 	~SSCardService_Sandong()
 	{
@@ -588,7 +603,7 @@ public:
 			}
 			string strGender;
 			CardInfo.strDealType = "0";	// new card
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 			CardInfo.strCardType = "A";
 			jsonIn.Get("CardID", CardInfo.strCardID);
 			jsonIn.Get("Name", CardInfo.strName);
@@ -786,7 +801,7 @@ public:
 			json.Get("City", CardInfo.strCity);
 			json.Get("Mobile", CardInfo.strMobile);
 			CardInfo.strReason = "Replace Card!";
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 			//json.Get("Reason", CardInfo.strReason);
 			//json.Get("Operator", CardInfo.strOperator);
 			//json.Get("OccupType", CardInfo.strOccupType);
@@ -1057,7 +1072,7 @@ public:
 			string strGender, strNationality, strPhoto;
 			CardInfo.strDealType = "1";	// replace card
 			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 			json.Get("CardID", CardInfo.strCardID);
 			json.Get("Name", CardInfo.strName);
 			json.Get("BankCode", CardInfo.strBankCode);
@@ -1195,7 +1210,7 @@ public:
 
 			CardInfo.strDealType = "1";	// replace card
 			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 
 			json.Get("CardID", CardInfo.strCardID);
 			json.Get("Name", CardInfo.strName);
@@ -1292,7 +1307,7 @@ public:
 
 			CardInfo.strDealType = "1";	// replace card
 			CardInfo.strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 
 			json.Get("CardID", CardInfo.strCardID);
 			json.Get("Name", CardInfo.strName);
@@ -1418,16 +1433,16 @@ public:
 			json.Parse(strJsonIn);
 			CJsonObject tmpJson;
 			string strFunction = "saveCardLsgs";
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 			json.Get("CardID", CardInfo.strCardID);
 			json.Get("Name", CardInfo.strName);
 			json.Get("BankCode", CardInfo.strBankCode);
 			json.Get("City", CardInfo.strCity);
 			json.Get("cardNum", CardInfo.strCardNum);
 
-			json.Get("Operator", CardInfo.strOperator);
+			CardInfo.strOperator = strOperator;
 			CardInfo.strCardType = "A";
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||
 				CardInfo.strCity.empty() ||
@@ -1541,9 +1556,9 @@ public:
 			json.Get("City", CardInfo.strCity);
 			json.Get("BankCode", CardInfo.strBankCode);
 			json.Get("CardNum", CardInfo.strCardNum);
-			json.Get("Operator", CardInfo.strOperator);
+			CardInfo.strOperator = strOperator;
 			CardInfo.strCardType = "A";
-			CardInfo.strOperator = "Administrator";
+			CardInfo.strOperator = strOperator;
 
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||

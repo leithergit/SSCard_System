@@ -947,9 +947,10 @@ int DataCenter::TestPrinter(QString& strMessage)
 		switch (PrinterStatus.fwToner)
 		{
 		case 0:
+			bSucceed = true;
 		case 1:
 		{
-			bSucceed = true;
+			strMessage = QString("打印机色带耗余量不足,请更换色带!");
 			break;
 		}
 		case 2:

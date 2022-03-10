@@ -1,13 +1,13 @@
 {
     "Wechat1": {
         "QR_Photo": "qr_wechat1.png",
-        "FolowWechat": "关注河南农信微信公众号",
+        "FolowWechat": "关注滨州人社发布微信公众号",
         "SocialService": "提供查询社保服务",
         "PayService": "提供缴费通知服务"
     },
   "Wechat2": {
         "QR_Photo": "qr_wechat2.png",
-        "FolowWechat": "关注周口农商银行微信公众号",
+        "FolowWechat": "电子社保卡微信小程序",
         "SocialService": "提供查询社保服务",
         "PayService": "提供缴费通知服务"
     }

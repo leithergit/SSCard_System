@@ -224,8 +224,43 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 		{
 			if (g_pDataCenter->strSSCardPhotoFile.empty())
 			{
-				strMessage = "提示", "未找到照片数据,请先下载照片";
-				break;
+				jsonIn.Clear();
+
+				jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+				jsonIn.Add("Name", pSSCardInfo->strName);
+				jsonIn.Add("City", pSSCardInfo->strCity);
+
+				strJsonIn = jsonIn.ToString();
+				string strJsonout;
+				string strCommand = "QueryPersonPhoto";
+
+				if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+				{
+					CJsonObject jsonOut(strJsonOut);
+					string strText;
+					jsonOut.Get("Result", nResult);
+					jsonOut.Get("Message", strText);
+					strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+					break;
+				}
+				CJsonObject jsonOut(strJsonOut);
+				string strPhoto;
+				if (jsonOut.Get("Photo", strPhoto))
+				{
+					SaveSSCardPhoto(strMessage, strPhoto.c_str());
+					if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
+					{
+						strMessage = QString("保存照片数据失败!");
+						break;
+					}
+				}
+				else
+				{
+					strMessage = QString("社保后台未返回个人照片!");
+					break;
+				}
+				/*strMessage = "提示", "未找到照片数据,请先下载照片";
+				break;*/
 			}
 
 			try
@@ -237,10 +272,8 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 				//QByteArray ba(ss.str().c_str(), ss.str().size());
 				//QByteArray baBase64 = ba.toBase64();
 				//jsonIn.Add("Photo", baBase64.data());
-
 				// 直接使用base64数据
 				jsonIn.Add("Photo", ss.str());
-
 			}
 			catch (std::exception& e)
 			{

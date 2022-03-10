@@ -495,6 +495,9 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
   <ItemGroup>
     <ResourceCompile Include="SSCard_System.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="SSCard_System.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

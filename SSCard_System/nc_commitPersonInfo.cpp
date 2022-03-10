@@ -73,6 +73,7 @@ int nc_commitPersonInfo::ProcessBussiness()
 			strMessage = "社保卡卡管服务不可用!";
 			break;
 		}
+
 		/*
 		"CardID":"33333333333333",
 		 "Name":"",
@@ -97,7 +98,7 @@ int nc_commitPersonInfo::ProcessBussiness()
 			if (nErrcode == 3)	// 已经申请过,则继续制卡
 			{
 				strMessage = QString::fromLocal8Bit(strText.c_str());
-				emit ShowMaskWidget("操作成功", strMessage, Success, Skip_NextPage);
+				emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
 			}
 			else
 			{
@@ -105,17 +106,7 @@ int nc_commitPersonInfo::ProcessBussiness()
 				break;
 			}
 		}
-		//if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
-		//{
-		//	CJsonObject jsonOut(strJsonOut);
-		//	string strText, strErrcode;
-		//	jsonOut.Get("Result", nResult);
-		//	jsonOut.Get("Message", strText);
-		//	jsonOut.Get("errcode", strErrcode);
-		//	int nErrcode = strtol(strErrcode.c_str(), nullptr, 10);
-		//	strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-		//	break;
-		//}
+
 		pSSCardInfo->strName = (const char*)pIDCard->szName;
 		pSSCardInfo->strGender = (const char*)pIDCard->szGender;
 		pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
