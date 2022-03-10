@@ -196,7 +196,6 @@ int main(int argc, char* argv[])
 	jsonT.Get("pwd", strpwd);
 	jsonT.Get("city", strcity);
 
-
 	if (!CheckLocalLicense(Code_License))
 	{
 		ShowLicense s;

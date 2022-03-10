@@ -13,6 +13,8 @@
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"OleAut32.lib")
 #pragma comment(lib,"Version.lib")
+#pragma comment(lib, "libarcsoft_face_engine.lib")
+#pragma comment(lib, "setupapi.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printerd")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")
@@ -25,6 +27,10 @@
 #pragma comment(lib, "../SDK/glog/glogd")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z_d.lib")
+
+#pragma comment(lib, "opencv_core2413d.lib")
+#pragma comment(lib, "opencv_highgui2413d.lib")
+#pragma comment(lib, "opencv_imgproc2413d.lib")
 #else
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printer")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
@@ -37,6 +43,9 @@
 #pragma comment(lib, "../SDK/glog/glog")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z.lib")
+#pragma comment(lib, "opencv_core2413.lib")
+#pragma comment(lib, "opencv_highgui2413.lib")
+#pragma comment(lib, "opencv_imgproc2413.lib")
 #endif
 
 const char* szPrinterTypeList[PRINTER_MAX] =
@@ -856,8 +865,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		case 1:
 		{
-			bSucceed = true;
-			strMessage = QString("打印机色带耗余量低,请注意检查或更换色带!");
+			strMessage = QString("打印机色带耗余量不足,请更换色带!");
 			break;
 		}
 		case 2:
@@ -1110,6 +1118,8 @@ int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 	DeviceConfig& DevConfig = pSysConfig->DevConfig;
 	char szRCode[32] = { 0 };
 	char szCardBaseRead[1024] = { 0 };
+
+	/*char szWHSM2[1024] = { 0 };*/
 	char szCardATR[1024] = { 0 };
 	int nCardATRLen = 0;
 	QString strInfo;

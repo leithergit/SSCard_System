@@ -742,8 +742,8 @@ struct SysConfig
 		{
 			QString strValue = pSettings->value(var).toString();
 			qDebug() << strValue.toStdString().c_str() << "=" << var.toStdString().c_str();
-			//strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
-			auto [it, Inserted] = strMapBank.try_emplace(var.toStdString(), strValue.toStdString());
+			strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
+			//auto [it, Inserted] = strMapBank.try_emplace(var.toStdString(), strValue.toStdString());
 		}
 		pSettings->endGroup();
 	}
