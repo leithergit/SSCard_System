@@ -249,19 +249,26 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 				break;
 			}
 
-			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
+			int nStatus2 = 0;
+			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus2, pSSCardInfo)))
 			{
 				strMessage = "因获取制卡数据失败,尝试取消即制卡标注时再次失败!";
 				nResult = -1;
 				break;
 			}
-			if (nStatus != 0 && nStatus != 1)
+			if (nStatus2 != 0 && nStatus2 != 1)
 			{
 				strMessage = QString("因获取制卡数据失败,尝试取消即制卡标失败:%1!").arg(strMessage);
 				nResult = -1;
 				break;
 			}
-			break;
+			if (nStatus != 0 && nStatus != 1)
+			{
+				strMessage = QString("因获取制卡数据失败:%1!").arg(strMessage);
+				nResult = -1;
+				break;
+			}
+			nResult = -1;
 		}
 		if (nStatus != 0 && nStatus != 1)
 		{
