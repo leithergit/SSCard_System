@@ -850,9 +850,14 @@ int DataCenter::TestPrinter(QString& strMessage)
 		switch (PrinterStatus.fwToner)
 		{
 		case 0:
+		{
+			bSucceed = true;
+			break;
+		}
 		case 1:
 		{
 			bSucceed = true;
+			strMessage = QString("打印机色带耗余量低,请注意检查或更换色带!");
 			break;
 		}
 		case 2:
@@ -1103,21 +1108,11 @@ int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 	}
 	int nResult = -1;
 	DeviceConfig& DevConfig = pSysConfig->DevConfig;
-	RegionInfo& Region = pSysConfig->Region;
 	char szRCode[32] = { 0 };
 	char szCardBaseRead[1024] = { 0 };
-	char szCardBaseWrite[1024] = { 0 };
-	char szExAuthData[1024] = { 0 };
-	char szWHSM1[1024] = { 0 };
-	/*char szWHSM2[1024] = { 0 };*/
-	char szSignatureKey[1024] = { 0 };
-	char szWriteCARes[1024] = { 0 };
 	char szCardATR[1024] = { 0 };
 	int nCardATRLen = 0;
-	CAInfo caInfo;
 	QString strInfo;
-	HSMInfo  HsmInfo;
-	int nStatus = 0;
 
 	do
 	{
