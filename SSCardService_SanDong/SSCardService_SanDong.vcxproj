@@ -165,7 +165,7 @@
     </ResourceCompile>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
+copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

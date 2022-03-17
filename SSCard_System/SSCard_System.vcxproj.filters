@@ -144,9 +144,6 @@
     <ClCompile Include="license.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\utility\json\cJSON.c">
       <Filter>json</Filter>
     </ClCompile>
@@ -218,6 +215,12 @@
     </ClCompile>
     <ClCompile Include="QtSingleton\qtsingleapplication.cpp">
       <Filter>qtsingleton</Filter>
+    </ClCompile>
+    <ClCompile Include="sys_manualmakecard.cpp">
+      <Filter>SystemManager</Filter>
+    </ClCompile>
+    <ClCompile Include="waitingprogress.cpp">
+      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -312,6 +315,9 @@
       <Filter>json</Filter>
     </ClInclude>
     <ClInclude Include="..\utility\Markup.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MakCard.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -427,6 +433,12 @@
     </QtUic>
     <QtUic Include="Sys_sscardservicet.ui">
       <Filter>SystemManager</Filter>
+    </QtUic>
+    <QtUic Include="sys_manualmakecard.ui">
+      <Filter>SystemManager</Filter>
+    </QtUic>
+    <QtUic Include="waitingprogress.ui">
+      <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -638,6 +650,12 @@
     </QtMoc>
     <QtMoc Include="QtSingleton\qtsingleapplication.h">
       <Filter>qtsingleton</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_manualmakecard.h">
+      <Filter>SystemManager</Filter>
+    </QtMoc>
+    <QtMoc Include="waitingprogress.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

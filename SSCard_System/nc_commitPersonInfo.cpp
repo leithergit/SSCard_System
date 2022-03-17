@@ -57,9 +57,11 @@ int nc_commitPersonInfo::ProcessBussiness()
 		if (g_pDataCenter->bDebug)
 		{
 			string strMobile;
-			if (QSucceed(LoadTestIDData(pIDCard, pSSCardInfo, strMobile)))
+			if (QFailed(LoadTestIDData(pIDCard, pSSCardInfo)))
 			{
-				pSSCardInfo->strMobile = strMobile.c_str();
+				//pSSCardInfo->strMobile = strMobile.c_str();
+				strMessage = "测试用户数据不存在!";
+				break;
 			}
 		}
 		SSCardService* pService = nullptr;

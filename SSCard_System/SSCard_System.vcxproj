@@ -67,11 +67,11 @@
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets;</QtModules>
+    <QtModules>core;network;gui;widgets;</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets;</QtModules>
+    <QtModules>core;network;gui;widgets;</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
@@ -88,7 +88,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>release\</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;QT_QMLMODELS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>
       </ProgramDataBaseFileName>
@@ -208,15 +208,14 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
+copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>@call updatesdk.bat $(Configuration)
+      <Command>::@call updatesdk.bat $(Configuration)
 ::@call  $(SolutionDir)updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
     <ClCompile Include="..\utility\json\cJSON.c" />
     <ClCompile Include="..\utility\json\CJsonObject.cpp" />
     <ClCompile Include="..\utility\Markup.cpp" />
@@ -236,6 +235,7 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     <ClCompile Include="Sys_dialogcameratest.cpp" />
     <ClCompile Include="Sys_dialogidcardinfo.cpp" />
     <ClCompile Include="Sys_logmanager.cpp" />
+    <ClCompile Include="sys_manualmakecard.cpp" />
     <ClCompile Include="Sys_otheroptions.cpp" />
     <ClCompile Include="Sys_pageconfigure.cpp" />
     <ClCompile Include="Sys_qwidgetreadidcard.cpp" />
@@ -264,6 +264,7 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     <ClCompile Include="up_readsscard.cpp" />
     <ClCompile Include="updatecard.cpp" />
     <ClCompile Include="updatepassword.cpp" />
+    <ClCompile Include="waitingprogress.cpp" />
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -278,6 +279,9 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     <QtMoc Include="Sys_sscardservicet.h" />
     <QtMoc Include="QtSingleton\qtlocalpeer.h" />
     <QtMoc Include="QtSingleton\qtsingleapplication.h" />
+    <QtMoc Include="sys_manualmakecard.h" />
+    <ClInclude Include="MakCard.h" />
+    <QtMoc Include="waitingprogress.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -393,6 +397,7 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     </QtUic>
     <QtUic Include="Sys_logmanager.ui">
     </QtUic>
+    <QtUic Include="sys_manualmakecard.ui" />
     <QtUic Include="Sys_otheroptions.ui">
     </QtUic>
     <QtUic Include="Sys_pageconfigure.ui">
@@ -435,6 +440,7 @@ copy /y $(TargetPath) z:\SSCardSystem.mvc</Command>
     </QtUic>
     <QtUic Include="updatepassword.ui">
     </QtUic>
+    <QtUic Include="waitingprogress.ui" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png" />

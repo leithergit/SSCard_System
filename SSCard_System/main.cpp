@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <QSharedMemory>
-#include "qtsingleapplication.h"
+#include "./QtSingleton/qtsingleapplication.h"
 #include "DevBase.h"
 
 #include "Gloabal.h"
@@ -16,6 +16,7 @@
 #include "BugTrap.h"
 #include "../utility/json/CJsonObject.hpp"
 #include "../Utility/Markup.h"
+#include "waitingprogress.h"
 
 extern QScreen* g_pCurScreen;
 
@@ -137,13 +138,6 @@ int main(int argc, char* argv[])
 	ofs << RunJson.ToString();
 	ofs.close();
 
-	if (!CheckLocalLicense(Code_License))
-	{
-		ShowLicense s;
-		s.show();
-		return a.exec();
-	}
-
 	curl_global_init(CURL_GLOBAL_WIN32);
 
 	g_pDataCenter = make_shared<DataCenter>();
@@ -163,6 +157,23 @@ int main(int argc, char* argv[])
 		gError() << QString("加载卡片打印模板失败:%1").arg(strError).toLocal8Bit().data();
 		return -1;
 	}
+
+	//WaitingProgress WaitingUI;
+	//WaitingUI.show();
+	//a.exec();
+	//if (!WaitingUI.bPrinterReady)
+	//{
+	//	QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+	//	return 0;
+	//}
+	//if (!CheckLocalLicense(Code_License))
+	//{
+	//	ShowLicense s;
+	//	s.show();
+	//	return a.exec();
+	//}
+
+
 
 	MainWindow w;
 	a.setActivationWindow(&w);

@@ -51,6 +51,37 @@ public:
 			return -1;
 		else
 		{
+			const char* szJsonTemplate = "{"
+				"\"ServiceType\": \"-1\","
+				"\"Persion\": {"
+				"\"Identity\": \"\","
+				"\"Name\": \"\","
+				"\"Gender\": \"\","
+				"\"City\": \"\","
+				"\"Mobile\": \"\","
+				"\"Bank\": \"\""
+				"},"
+				"\"Progress\": {"
+				"\chkCanCardSq\": \"-1\","
+				"\saveCardSqList\": \"-1\","
+				"\queryCardZksqList\": \"-1\","
+				"\saveCardCompleted\": \"-1\","
+				"\queryCardInfoBySfzhm\": \"-1\","
+				"\saveCardLsgs\": \"-1\","
+				"\saveCardLsgsjg\": \"-1\","
+				"\saveCardGs\": \"-1\","
+				"\chkCanCardBh\": \"-1\","
+				"\queryCardInfoBySfzhm\": \"-1\","
+				"\saveCardBhList\": \"-1\","
+				"\queryCardZksqList\": \"-1\","
+				"\saveCardOpen\": \"-1\","
+				"\saveCardCompleted\": \"-1\","
+				"\saveCardActive\": \"-1\","
+				"\saveCardJrzhActive\": \"-1\","
+				"}"
+				"}";
+			CJsonObject json;
+
 			nServiceType = nSvrType;
 			return 0;
 		}
@@ -79,108 +110,108 @@ public:
 
 	}
 
-	virtual int SaveCardData(string& strINIFile) override
+	virtual int SaveCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) override
 	{
-#define AddCardFiled(x,s)	x.setValue(#s,CardInfo.s.c_str());
-
-		QSettings CardIni(strINIFile.c_str(), QSettings::IniFormat);
-		CardIni.beginGroup("CardData");
-
-		AddCardFiled(CardIni, strCardNum);			//社保卡号
-		AddCardFiled(CardIni, strCardID);			//身份证号
-		AddCardFiled(CardIni, strBirthday);			//出生日期
-		AddCardFiled(CardIni, strName);				//姓名
-		AddCardFiled(CardIni, strSex);				//性别
-		AddCardFiled(CardIni, strNation);			//民族
-		AddCardFiled(CardIni, strMobile);			//手机号
-		AddCardFiled(CardIni, strAdress);			//通讯地址
-		AddCardFiled(CardIni, strPostalCode);		//邮政编码
-		AddCardFiled(CardIni, strEmail);			//电子邮箱
-		AddCardFiled(CardIni, strGuardianName);		//监护人姓名
-		AddCardFiled(CardIni, strCity);				//所属城市
-		AddCardFiled(CardIni, strSSQX);				//所属区县
-		AddCardFiled(CardIni, strBankCode);			//银行代码
-		AddCardFiled(CardIni, strReleaseDate);		//发卡日期
-		AddCardFiled(CardIni, strValidDate);		//有效日期
-		AddCardFiled(CardIni, strIdentifyNum);		//卡识别码
-		AddCardFiled(CardIni, strCardATR);			//卡复位信息
-		AddCardFiled(CardIni, strBankNum);			//银行卡号
-		AddCardFiled(CardIni, strCardType);			//证件类型
-		AddCardFiled(CardIni, strOperator);			//经办人
-		AddCardFiled(CardIni, strOccupType);		//职业类别
-		AddCardFiled(CardIni, strDealType);			//办卡类型
-		AddCardFiled(CardIni, strChipNum);			//卡芯片账号
-		AddCardFiled(CardIni, strMagNum);			//卡磁条账号
-		AddCardFiled(CardIni, strCardVersion);		//卡规范版本
-		AddCardFiled(CardIni, strChipType);			//芯片类型
-		AddCardFiled(CardIni, strCardUnit);			//发证机关
-		AddCardFiled(CardIni, strBirthPlace);		//出生地
-		AddCardFiled(CardIni, strPerAddr);			//户籍所在地
-		AddCardFiled(CardIni, strRegAttr);			//户口性质
-		AddCardFiled(CardIni, strEducation);		//文化程度
-		AddCardFiled(CardIni, strMarital);			//婚姻状况
-		AddCardFiled(CardIni, strContactsName);		//联系人姓名
-		AddCardFiled(CardIni, strContactsMobile);	//联系人电话
-		AddCardFiled(CardIni, strReason);			//补换原因
-		AddCardFiled(CardIni, strPhoto);			//相片
-
-		CardIni.endGroup();
+		//#define AddCardFiled(x,s)	x.setValue(#s,CardInfo.s.c_str());
+		//
+		//		QSettings CardIni(strINIFile.c_str(), QSettings::IniFormat);
+		//		CardIni.beginGroup("CardData");
+		//
+		//		AddCardFiled(CardIni, strCardNum);			//社保卡号
+		//		AddCardFiled(CardIni, strCardID);			//身份证号
+		//		AddCardFiled(CardIni, strBirthday);			//出生日期
+		//		AddCardFiled(CardIni, strName);				//姓名
+		//		AddCardFiled(CardIni, strSex);				//性别
+		//		AddCardFiled(CardIni, strNation);			//民族
+		//		AddCardFiled(CardIni, strMobile);			//手机号
+		//		AddCardFiled(CardIni, strAdress);			//通讯地址
+		//		AddCardFiled(CardIni, strPostalCode);		//邮政编码
+		//		AddCardFiled(CardIni, strEmail);			//电子邮箱
+		//		AddCardFiled(CardIni, strGuardianName);		//监护人姓名
+		//		AddCardFiled(CardIni, strCity);				//所属城市
+		//		AddCardFiled(CardIni, strSSQX);				//所属区县
+		//		AddCardFiled(CardIni, strBankCode);			//银行代码
+		//		AddCardFiled(CardIni, strReleaseDate);		//发卡日期
+		//		AddCardFiled(CardIni, strValidDate);		//有效日期
+		//		AddCardFiled(CardIni, strIdentifyNum);		//卡识别码
+		//		AddCardFiled(CardIni, strCardATR);			//卡复位信息
+		//		AddCardFiled(CardIni, strBankNum);			//银行卡号
+		//		AddCardFiled(CardIni, strCardType);			//证件类型
+		//		AddCardFiled(CardIni, strOperator);			//经办人
+		//		AddCardFiled(CardIni, strOccupType);		//职业类别
+		//		AddCardFiled(CardIni, strDealType);			//办卡类型
+		//		AddCardFiled(CardIni, strChipNum);			//卡芯片账号
+		//		AddCardFiled(CardIni, strMagNum);			//卡磁条账号
+		//		AddCardFiled(CardIni, strCardVersion);		//卡规范版本
+		//		AddCardFiled(CardIni, strChipType);			//芯片类型
+		//		AddCardFiled(CardIni, strCardUnit);			//发证机关
+		//		AddCardFiled(CardIni, strBirthPlace);		//出生地
+		//		AddCardFiled(CardIni, strPerAddr);			//户籍所在地
+		//		AddCardFiled(CardIni, strRegAttr);			//户口性质
+		//		AddCardFiled(CardIni, strEducation);		//文化程度
+		//		AddCardFiled(CardIni, strMarital);			//婚姻状况
+		//		AddCardFiled(CardIni, strContactsName);		//联系人姓名
+		//		AddCardFiled(CardIni, strContactsMobile);	//联系人电话
+		//		AddCardFiled(CardIni, strReason);			//补换原因
+		//		AddCardFiled(CardIni, strPhoto);			//相片
+		//
+		//		CardIni.endGroup();
 		return 0;
 	}
 
-	virtual int LoadCardData(string& strINIFile) override
+	virtual int LoadCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) override
 	{
-		QFileInfo fi(strINIFile.c_str());
-		if (!fi.isFile())
-		{
-			return -1;
-		}
-#define GetCardField(x,c,f)		c.f =  x.value(#f).toString().toStdString();
-		QSettings CardIni(strINIFile.c_str(), QSettings::IniFormat);
-		CardInfo.strCardNum = "";
-		CardIni.beginGroup("CardData");
-
-		GetCardField(CardIni, CardInfo, strCardNum);		//社保卡号
-		GetCardField(CardIni, CardInfo, strCardID);			//身份证号
-		GetCardField(CardIni, CardInfo, strBirthday);		//出生日期
-		GetCardField(CardIni, CardInfo, strName);			//姓名
-		GetCardField(CardIni, CardInfo, strSex);			//性别
-		GetCardField(CardIni, CardInfo, strNation);			//民族
-		GetCardField(CardIni, CardInfo, strMobile);			//手机号
-		GetCardField(CardIni, CardInfo, strAdress);			//通讯地址
-		GetCardField(CardIni, CardInfo, strPostalCode);		//邮政编码
-		GetCardField(CardIni, CardInfo, strEmail);			//电子邮箱
-		GetCardField(CardIni, CardInfo, strGuardianName);	//监护人姓名
-		GetCardField(CardIni, CardInfo, strCity);			//所属城市
-		GetCardField(CardIni, CardInfo, strSSQX);			//所属区县
-		GetCardField(CardIni, CardInfo, strBankCode);		//银行代码
-		GetCardField(CardIni, CardInfo, strReleaseDate);	//发卡日期
-		GetCardField(CardIni, CardInfo, strValidDate);		//有效日期
-		GetCardField(CardIni, CardInfo, strIdentifyNum);	//卡识别码
-		GetCardField(CardIni, CardInfo, strCardATR);		//卡复位信息
-		GetCardField(CardIni, CardInfo, strBankNum);		//银行卡号
-		GetCardField(CardIni, CardInfo, strCardType);		//证件类型
-		GetCardField(CardIni, CardInfo, strOperator);		//经办人
-		GetCardField(CardIni, CardInfo, strOccupType);		//职业类别
-		GetCardField(CardIni, CardInfo, strDealType);		//办卡类型
-		GetCardField(CardIni, CardInfo, strChipNum);		//卡芯片账号
-		GetCardField(CardIni, CardInfo, strMagNum);			//卡磁条账号
-		GetCardField(CardIni, CardInfo, strCardVersion);	//卡规范版本
-		GetCardField(CardIni, CardInfo, strChipType);		//芯片类型
-		GetCardField(CardIni, CardInfo, strCardUnit);		//发证机关
-		GetCardField(CardIni, CardInfo, strBirthPlace);		//出生地
-		GetCardField(CardIni, CardInfo, strPerAddr);		//户籍所在地
-		GetCardField(CardIni, CardInfo, strRegAttr);		//户口性质
-		GetCardField(CardIni, CardInfo, strEducation);		//文化程度
-		GetCardField(CardIni, CardInfo, strMarital);		//婚姻状况
-		GetCardField(CardIni, CardInfo, strContactsName);	//联系人姓名
-		GetCardField(CardIni, CardInfo, strContactsMobile);	//联系人电话
-		GetCardField(CardIni, CardInfo, strReason);			//补换原因
-		//GetCardField(CardIni, CardInfo,strPhoto);			//相片
-		QByteArray ba = CardIni.value("strPhoto").toString().toLatin1();
-		qDebug() << "Load photo,size = " << ba.size();
-		CardInfo.strPhoto = string(ba.data(), ba.size());
-		CardIni.endGroup();
+		//		QFileInfo fi(strINIFile.c_str());
+		//		if (!fi.isFile())
+		//		{
+		//			return -1;
+		//		}
+		//#define GetCardField(x,c,f)		c.f =  x.value(#f).toString().toStdString();
+		//		QSettings CardIni(strINIFile.c_str(), QSettings::IniFormat);
+		//		CardInfo.strCardNum = "";
+		//		CardIni.beginGroup("CardData");
+		//
+		//		GetCardField(CardIni, CardInfo, strCardNum);		//社保卡号
+		//		GetCardField(CardIni, CardInfo, strCardID);			//身份证号
+		//		GetCardField(CardIni, CardInfo, strBirthday);		//出生日期
+		//		GetCardField(CardIni, CardInfo, strName);			//姓名
+		//		GetCardField(CardIni, CardInfo, strSex);			//性别
+		//		GetCardField(CardIni, CardInfo, strNation);			//民族
+		//		GetCardField(CardIni, CardInfo, strMobile);			//手机号
+		//		GetCardField(CardIni, CardInfo, strAdress);			//通讯地址
+		//		GetCardField(CardIni, CardInfo, strPostalCode);		//邮政编码
+		//		GetCardField(CardIni, CardInfo, strEmail);			//电子邮箱
+		//		GetCardField(CardIni, CardInfo, strGuardianName);	//监护人姓名
+		//		GetCardField(CardIni, CardInfo, strCity);			//所属城市
+		//		GetCardField(CardIni, CardInfo, strSSQX);			//所属区县
+		//		GetCardField(CardIni, CardInfo, strBankCode);		//银行代码
+		//		GetCardField(CardIni, CardInfo, strReleaseDate);	//发卡日期
+		//		GetCardField(CardIni, CardInfo, strValidDate);		//有效日期
+		//		GetCardField(CardIni, CardInfo, strIdentifyNum);	//卡识别码
+		//		GetCardField(CardIni, CardInfo, strCardATR);		//卡复位信息
+		//		GetCardField(CardIni, CardInfo, strBankNum);		//银行卡号
+		//		GetCardField(CardIni, CardInfo, strCardType);		//证件类型
+		//		GetCardField(CardIni, CardInfo, strOperator);		//经办人
+		//		GetCardField(CardIni, CardInfo, strOccupType);		//职业类别
+		//		GetCardField(CardIni, CardInfo, strDealType);		//办卡类型
+		//		GetCardField(CardIni, CardInfo, strChipNum);		//卡芯片账号
+		//		GetCardField(CardIni, CardInfo, strMagNum);			//卡磁条账号
+		//		GetCardField(CardIni, CardInfo, strCardVersion);	//卡规范版本
+		//		GetCardField(CardIni, CardInfo, strChipType);		//芯片类型
+		//		GetCardField(CardIni, CardInfo, strCardUnit);		//发证机关
+		//		GetCardField(CardIni, CardInfo, strBirthPlace);		//出生地
+		//		GetCardField(CardIni, CardInfo, strPerAddr);		//户籍所在地
+		//		GetCardField(CardIni, CardInfo, strRegAttr);		//户口性质
+		//		GetCardField(CardIni, CardInfo, strEducation);		//文化程度
+		//		GetCardField(CardIni, CardInfo, strMarital);		//婚姻状况
+		//		GetCardField(CardIni, CardInfo, strContactsName);	//联系人姓名
+		//		GetCardField(CardIni, CardInfo, strContactsMobile);	//联系人电话
+		//		GetCardField(CardIni, CardInfo, strReason);			//补换原因
+		//		//GetCardField(CardIni, CardInfo,strPhoto);			//相片
+		//		QByteArray ba = CardIni.value("strPhoto").toString().toLatin1();
+		//		qDebug() << "Load photo,size = " << ba.size();
+		//		CardInfo.strPhoto = string(ba.data(), ba.size());
+		//		CardIni.endGroup();
 		return 0;
 	}
 

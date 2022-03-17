@@ -152,9 +152,9 @@ public:
 	// 正式挂失/解挂
 	virtual int RegisterLost(string& strJsonIn, string& strJsonOut, int nOperation = 0) = 0;
 
-	virtual int LoadCardData(string& strINIFile) = 0;
+	virtual int LoadCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) = 0;
 
-	virtual int SaveCardData(string& strINIFile) = 0;
+	virtual int SaveCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) = 0;
 
 	virtual int QueryPayResult(string& strJsonIn, string& strJsonOut) = 0;
 

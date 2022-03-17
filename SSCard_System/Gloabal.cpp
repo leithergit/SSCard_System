@@ -81,10 +81,75 @@ QWaitCursor::~QWaitCursor()
 
 
 extern DataCenterPtr g_pDataCenter;
+
+
 QScreen* g_pCurScreen = nullptr;
+vector<NationaltyCode> g_vecNationCode = {
+			{"01", "汉族"},
+			{ "02","蒙古族" },
+			{ "03","回族" },
+			{ "04","藏族" },
+			{ "05","维吾尔族" },
+			{ "06","苗族" },
+			{ "07","彝族" },
+			{ "08","壮族" },
+			{ "09","布依族" },
+			{ "10","朝鲜族" },
+			{ "11","满族" },
+			{ "12","侗族" },
+			{ "13","瑶族" },
+			{ "14","白族" },
+			{ "15","土家族" },
+			{ "16","哈尼族" },
+			{ "17","哈萨克族" },
+			{ "18","傣族" },
+			{ "19","黎族" },
+			{ "20","傈傈族" },
+			{ "21","佤族" },
+			{ "22","畲族" },
+			{ "23","高山族" },
+			{ "24","拉祜族" },
+			{ "25","水族" },
+			{ "26","东乡族" },
+			{ "27","纳西族" },
+			{ "28","景颇族" },
+			{ "29","柯尔克孜族" },
+			{ "30","土族" },
+			{ "31","达翰尔族" },
+			{ "32","仫佬族" },
+			{ "33","羌族" },
+			{ "34","布朗族" },
+			{ "35","撒拉族" },
+			{ "36","毛南族" },
+			{ "37","仡佬族" },
+			{ "38","锡伯族" },
+			{ "39","阿昌族" },
+			{ "40","普米族" },
+			{ "41","塔吉克族" },
+			{ "42","怒族" },
+			{ "43","乌孜别克族" },
+			{ "44","俄罗斯族" },
+			{ "45","鄂温克族" },
+			{ "46","德昂族" },
+			{ "47","保安族" },
+			{ "48","裕固族" },
+			{ "49","京族" },
+			{ "50","塔塔尔族" },
+			{ "51","独龙族" },
+			{ "52","鄂伦春族" },
+			{ "53","赫哲族" },
+			{ "54","门巴族" },
+			{ "55","珞巴族" },
+			{ "56","基诺族" },
+			{ "57","穿青人" },
+			{ "90","外籍人士" },
+			{ "99","其他" }
+};
 DataCenter::DataCenter()
 {
 	DVTGKLDCam_Init();
+
+
 }
 
 DataCenter::~DataCenter()
@@ -114,6 +179,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			return -1;
 		}
 		bDebug = GetSysConfigure()->bDebug;
+		bTestCard = GetSysConfigure()->bTestCard;
 		return 0;
 	}
 
@@ -822,6 +888,11 @@ int DataCenter::TestCard(QString& strMessage)
 		{
 			if (!m_pSSCardReader)
 				break;
+			if (!g_pDataCenter->bTestCard)
+			{
+				bSucceed = true;
+				break;
+			}
 			char szCardATR[128] = { 0 };
 			char szRCode[128] = { 0 };
 			int nCardATRLen = 0;
@@ -894,6 +965,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
+
 		if (PrinterStatus.fwDevice != 0)
 		{
 			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
@@ -947,7 +1019,10 @@ int DataCenter::TestPrinter(QString& strMessage)
 		switch (PrinterStatus.fwToner)
 		{
 		case 0:
+		{
 			bSucceed = true;
+			break;
+		}
 		case 1:
 		{
 			strMessage = QString("打印机色带耗余量不足,请更换色带!");
@@ -1152,6 +1227,79 @@ int DataCenter::MoveCard(QString& strMessage)
 	}
 	return 0;
 
+}
+
+int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
+{
+	if (!m_pSSCardReader)
+	{
+		strMessage = "读卡器未就绪!";
+		gInfo() << strMessage.toLocal8Bit().data();
+		return -1;
+	}
+	int nResult = -1;
+	DeviceConfig& DevConfig = pSysConfig->DevConfig;
+	char szRCode[32] = { 0 };
+	char szCardBaseRead[1024] = { 0 };
+	char szCardATR[1024] = { 0 };
+	int nCardATRLen = 0;
+	QString strInfo;
+
+	do
+	{
+		if (!m_pSSCardReader)
+		{
+			strMessage = "读卡器未就绪!";
+			break;
+		}
+
+		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+		{
+			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			nResult = -4;
+			break;
+		}
+		gInfo() << "CardATR:" << szCardATR;
+		pSSCardInfo->strCardATR = szCardATR;
+		char szBankNum[64] = { 0 };
+		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
+		{
+			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			break;
+		}
+		gInfo() << "BankNum:" << szBankNum;
+		pSSCardInfo->strBankNum = szBankNum;
+		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
+		//{
+		//	gInfo() << gQStr(strMessage);
+		//	break;
+		//}
+
+		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
+		{
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+		/*
+		发卡地区行政区划代码（卡识别码前6位）、社会保障号码、 卡号、 卡识别码、 姓名、 卡复位信息（仅取历史字节）、 规范版本、 发卡日期、 卡有效期、终端机编号、终端设备号。各数据项之间以 “ | ” 分割，且最后一个数据项以 “ I,, 结尾。
+		639900|l111111198101011110|X00000019|639900D15600000500BF7C7A48FB4966|张三|00814E43238697159900BF7C7A|1.00|20101001
+		区号|社会保障号码(空)|卡号(空)|卡识别码|姓名(空)|卡复位信息(ATR)|Ver|发卡日期|有效期限|
+		411600|||411600D156000005C38275EEFC9B9648||008C544CB386844116018593CA|3.00|20211203|20311202|
+		*/
+		QStringList strFieldList = QString(szCardBaseRead).split("|", Qt::KeepEmptyParts);
+		int nIndex = 0;
+		for (auto var : strFieldList)
+		{
+			qDebug() << "Field[" << nIndex << "]" << var;
+			nIndex++;
+		}
+		gInfo() << "CardBaseRead:" << szCardBaseRead;
+		string strCardIdentify = strFieldList[3].toStdString();
+		pSSCardInfo->strCardIdentity = strCardIdentify;
+		nResult = 0;
+
+	} while (0);
+	return nResult;
 }
 
 int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)

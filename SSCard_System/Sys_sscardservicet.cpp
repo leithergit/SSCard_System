@@ -25,10 +25,10 @@ void SSCardServiceT::on_pushButton_LoadCardID_clicked()
 	QString strMessage;
 	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
-	string strMobile;
-	if (QSucceed(LoadTestIDData(pIDCard, pSSCardInfo, strMobile)))
+	if (QFailed(LoadTestIDData(pIDCard, pSSCardInfo)))
 	{
-		pSSCardInfo->strMobile = strMobile;
+		QMessageBox_CN(QMessageBox::Information, "提示", "加载测试数据失败!", QMessageBox::Ok, this);
+		return;
 	}
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	g_pDataCenter->SetIDCardInfo(pIDCard);
@@ -183,9 +183,7 @@ void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 		if (QFailed(pService->CommitPersonInfo(strJsonIn, strJsonOut)))
 			break;
 	} while (0);
-
 }
-
 
 void SSCardServiceT::on_pushButton_CreateService_clicked()
 {

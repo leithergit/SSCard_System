@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent)
 	char strPassword[64];			// 加密机密码
 	*/
 
-	if (!InitEnv(Bi))
+	if (!InitEnv(SD_SSCARD, Bi))
 	{
 		gInfo() << "Failed in InitEnv";
 	}
@@ -180,11 +180,6 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		return;
 	}
 
-	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
-	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-		return;
-	}
 	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
 	{
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);

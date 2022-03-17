@@ -1,4 +1,4 @@
-QT       += core gui quickwidgets axcontainer
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +14,12 @@ DEFINES += _WINDOWS
 DEFINES += WIN32
 DEFINES += _ENABLE_EXTENDED_ALIGNED_STORAGE
 DEFINES += WIN32_LEAN_AND_MEAN
+DEFINES += MARKUP_STL
 
 TRANSLATIONS += SSCardSystem_zh_CN.ts
 
 SOURCES += \
+    ../utility/Markup.cpp \
     ../utility/TimeUtility.cpp \
     ../utility/Utility.cpp \
     CheckPassword.cpp \
@@ -25,6 +27,8 @@ SOURCES += \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
     Payment.cpp \
+    QtSingleton/qtlocalpeer.cpp \
+    QtSingleton/qtsingleapplication.cpp \
     Sys_DeviceManager.cpp \
     Sys_cardmanger.cpp \
     Sys_dialogcameratest.cpp \
@@ -43,7 +47,6 @@ SOURCES += \
     mainpage.cpp \
     mainwindow.cpp \
     nc_commitpersoninfo.cpp \
-    nc_makephoto.cpp \
     newcard.cpp \
     qmainstackpage.cpp \
     qpinkeybroad.cpp \
@@ -65,6 +68,7 @@ SOURCES += \
     updatepassword.cpp \
 
 HEADERS += \
+    ../utility/Markup.h \
     CheckPassword.h \
     ConfigurePage.h \
     DevBase.h \
@@ -72,6 +76,8 @@ HEADERS += \
     MaskWidget.h \
     OperatorSucceed.h \
     Payment.h \
+    QtSingleton/qtlocalpeer.h \
+    QtSingleton/qtsingleapplication.h \
     SDK/KT_Define.h \
     Sys_DeviceManager.h \
     Sys_cardmanger.h \
@@ -90,7 +96,6 @@ HEADERS += \
     mainpage.h \
     mainwindow.h \
     nc_commitpersoninfo.h \
-    nc_makephoto.h \
     newcard.h \
     qmainstackpage.h \
     qpinkeybroad.h \
@@ -134,7 +139,6 @@ FORMS += \
     mainpage.ui \
     mainwindow.ui \
     nc_commitpersoninfo.ui \
-    nc_makephoto.ui \
     registerlost.ui \
     showlicense.ui \
     sys_manualmakecard.ui \
@@ -160,31 +164,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     Image.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L ../SDK/IDCard/ -lIDCard_API
-else:win32:CONFIG(debug, debug|release): LIBS += -L ../SDK/IDCard/ -lIDCard_API
-
 INCLUDEPATH += ../SDK/IDCard
 DEPENDPATH += ../SDK/IDCard
-
-win32:CONFIG(release, debug|release): LIBS += -L ../glog/ -lglog
-else:win32:CONFIG(debug, debug|release): LIBS += -L ../glog/ -lglogd
-
 
 INCLUDEPATH += ../SDK/glog
 DEPENDPATH += ../SDK/glog
 
-win32:CONFIG(release, debug|release): LIBS += -L ../SDK/QREncode/ -lqrencode
-else:win32:CONFIG(debug, debug|release): LIBS += -L ../SDK/QREncode/ -lqrencoded
-
 INCLUDEPATH += ../SDK/QREncode
 DEPENDPATH += ../SDK/QREncode
 
-win32: LIBS += -L ../SDK/KT_Printer/ -lKT_Printer
-
 INCLUDEPATH += ../SDK/KT_Printer
 DEPENDPATH += ../SDK/KT_Printer
-
-win32: LIBS += -L ../SDK/KT_Reader/ -lKT_Reader
 
 INCLUDEPATH += ../SDK/KT_Reader
 DEPENDPATH += ../SDK/KT_Reader
@@ -195,18 +185,17 @@ DEPENDPATH += ../SDK
 INCLUDEPATH += ../utility
 DEPENDPATH += ../utility
 
-
-win32: LIBS += -L$$PWD/../SDK/bugtrap/ -lBugTrapU
+INCLUDEPATH += ../QtSingleton
+DEPENDPATH += ../QtSingleton
 
 INCLUDEPATH += $$PWD/../SDK/bugtrap
 DEPENDPATH += $$PWD/../SDK/bugtrap
 
-win32: LIBS += -L$$PWD/../openssl-1.0.1g/lib/ -llibssl
+INCLUDEPATH += $$PWD/../openssl-1.0.1g/include
+DEPENDPATH += $$PWD/../openssl-1.0.1g/include
 
 INCLUDEPATH += $$PWD/../openssl-1.0.1g/include
 DEPENDPATH += $$PWD/../openssl-1.0.1g/include
 
-win32: LIBS += -L$$PWD/../openssl-1.0.1g/lib/ -llibssl
-
-INCLUDEPATH += $$PWD/../openssl-1.0.1g/include
-DEPENDPATH += $$PWD/../openssl-1.0.1g/include
+INCLUDEPATH += $$PWD/../SDK/IDCard
+DEPENDPATH += $$PWD/../SDK/IDCard

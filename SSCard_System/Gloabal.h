@@ -708,6 +708,7 @@ struct SysConfig
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
+		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
 
 		bUpoadlog = pSettings->value("logUpload", false).toBool();;
 		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
@@ -715,6 +716,7 @@ struct SysConfig
 		strLogServer = pSettings->value("logServer", "").toString().toStdString();   // 日志服务器
 		nLogServerPort = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
 		nLogSavePeroid = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
+		nTimeWaitForPrinter = pSettings->value("TimeWaitForPrinter", 300).toInt();
 
 		pSettings->endGroup();
 	}
@@ -787,7 +789,9 @@ struct SysConfig
 	string          strLogServer = "";                  // 日志服务器
 	int             nLogServerPort = 80;                // 日志服务器端口
 	int             nLogSavePeroid = 30;                // 日志保存天数
+	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
 	bool			bDebug = false;
+	bool			bTestCard = false;
 	std::map<string, string> strMapBank;
 };
 
@@ -797,6 +801,12 @@ using SysConfigPtr = shared_ptr<SysConfig>;
 using SSCardBaseInfoPtr = shared_ptr<SSCardBaseInfo>;
 
 using IDCardInfoPtr = shared_ptr<IDCardInfo>;
+
+struct NationaltyCode
+{
+	string strCode;
+	string strNationalty;
+};
 
 class DataCenter
 {
@@ -900,6 +910,7 @@ public:
 	string		   strPayCode;
 	string		   strCardVersion;
 	bool		   bDebug;
+	bool		   bTestCard = false;
 public:
 	bool m_bDetectStarted = false;
 	bool m_bVideoStarted = false;
@@ -966,6 +977,8 @@ public:
 
 	int WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
 
+	int ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
+
 	int MoveCard(QString& strMessage);
 
 	KT_Reader* GetSSCardReader()
@@ -999,6 +1012,7 @@ private:
 
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
+extern vector<NationaltyCode> g_vecNationCode;
 bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage);
 
 struct HttpBuffer

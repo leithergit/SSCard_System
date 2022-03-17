@@ -820,7 +820,7 @@ int SaveSSCardPhotoBase64(QString strMessage, const char* szPhotoBase64)
 //	}
 //}
 //
-int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo, string& strMobile)
+int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo)
 {
 	if (g_pDataCenter->bDebug)
 	{
@@ -847,9 +847,8 @@ int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo, strin
 		pSSCardInfo->strCardIdentity = PersonSetting.value("CardIdentityNum").toString().toStdString();
 		pSSCardInfo->strBankNum = PersonSetting.value("BankNum").toString().toStdString();
 		pSSCardInfo->strCardNum = PersonSetting.value("CardNum").toString().toStdString();
+		pSSCardInfo->strMobile = PersonSetting.value("Mobile").toString().toStdString();
 		g_pDataCenter->strCardVersion = "3.00";
-
-		strMobile = UTF8_GBK(PersonSetting.value("Mobile").toString().toStdString().c_str());
 
 		PersonSetting.endGroup();
 

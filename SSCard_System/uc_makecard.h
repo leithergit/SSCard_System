@@ -39,11 +39,11 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	void ThreadWork();
-	int  PremakeCard(QString& strMessage);
-	int  CommitPersionInfo(QString& strMessage);
-	int	 WriteCard(QString& strMessage);
+	static int  PremakeCard(QString& strMessage);
+	static int  CommitPersionInfo(QString& strMessage);
+	static int	 WriteCard(QString& strMessage);
 	int  EnsureData(QString& strMessage);
-	int  ActiveCard(QString& strMessage);
+	static int  ActiveCard(QString& strMessage);
 	void ShowSSCardInfo();
 	//int  PrintCard(QString& strMessage);
 

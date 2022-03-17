@@ -2,7 +2,7 @@
 #define SYS_DIALOGCAMERATEST_H
 
 #include <QDialog>
-#include "../SDK/dvtldcamocx/dvtldcamocxlib.h"
+//#include "../SDK/dvtldcamocx/dvtldcamocxlib.h"
 #include <QImage>
 
 namespace Ui {
@@ -16,7 +16,7 @@ class DialogCameraTest : public QDialog
 public:
 	explicit DialogCameraTest(QWidget* parent = nullptr);
 	~DialogCameraTest();
-	DVTLDCamOCXLib::DVTLDCamOCX* m_pFaceDetectOcx = nullptr;
+	//DVTLDCamOCXLib::DVTLDCamOCX* m_pFaceDetectOcx = nullptr;
 	QImage  ImageDetected;
 	void OpenCamera();
 

@@ -36,10 +36,10 @@ int uc_EnsureInformation::ProcessBussiness()
 	{
 		if (g_pDataCenter->bDebug)
 		{
-			string strMobile;
-			if (QSucceed(LoadTestIDData(pIDCard, pSSCardInfo, strMobile)))
+			if (QFailed(LoadTestIDData(pIDCard, pSSCardInfo)))
 			{
-				pSSCardInfo->strMobile = strMobile;
+				strMessage = "测试用户数据不存在!";
+				break;
 			}
 		}
 

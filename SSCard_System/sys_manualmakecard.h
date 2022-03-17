@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "Gloabal.h"
 #include "Payment.h"
+#include <QButtonGroup>
 
 namespace Ui {
 	class Sys_ManualMakeCard;
@@ -22,15 +23,13 @@ public:
 	bool bThreadReadIDCardRunning = false;
 	std::thread* pThreadReadIDCard;
 	void EnableUI(QObject* pUIObj, bool bEnable = true);
-
-	int ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
-	int	QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
-	void ProceBatchLock();
+	QButtonGroup* pButtonGrpGender = nullptr;
+	QButtonGroup* pButtonGrpBusiness = nullptr;
+	QButtonGroup* pButtonGrpServiceType = nullptr;
 	void ProcessPowerOnFailed();
 	void PrintCardData();
 	void PrintPhoto();
 	void EnableCard();
-
 	int LoadPersonSSCardData(QString& strMesssage);
 
 signals:
@@ -39,13 +38,21 @@ signals:
 private slots:
 	void on_pushButton_ReadID_clicked();
 
-	void on_pushButton_QueryCardStatus_clicked();
+	void on_pushButton_QueryCardInfo_clicked();
 
 	void on_pushButton_LoadCardData_clicked();
 
 	void on_pushButton_MakeCard_clicked();
 
 	void on_ShowIDCardInfo(bool bSucceed, QString strMessage);
+
+	void on_checkBox_WithoutIDCard_stateChanged(int arg1);
+
+	void on_radioButton_NewCard_clicked();
+
+	void on_radioButton_ReplaceCard_clicked();
+
+    void on_checkBox_Debug_stateChanged(int arg1);
 
 private:
 	Ui::Sys_ManualMakeCard* ui;
