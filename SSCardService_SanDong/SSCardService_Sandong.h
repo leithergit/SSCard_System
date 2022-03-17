@@ -6,6 +6,7 @@
 #include <fstream>
 #include "../SSCardService/SSCardService.h"
 #include "../SDK/SSCardInfo_Sandong/SD_SSCardInfo.h"
+#include "../SDK/glog/logging.h"
 #include "Utility.h"
 #include "CJsonObject.hpp"
 #include "Markup.h"
@@ -14,6 +15,9 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <map>
+#include <vector>
+#include<filesystem>
+using namespace std::filesystem;
 
 //宏定义
 #define __STR2__(x) #x
@@ -22,7 +26,20 @@
 #define Warning(strMessage) message( __LOC__ " Warning: " strMessage)
 
 extern map<string, string>g_mapNationnaltyCode;
-#define  QFailed(x)		(x!= 0)
+#define  QFailed(x)		(x != 0)
+#define  QSucceed(x)	(x == 0)
+
+#define  X_UNUSED(x)	(void )x;
+
+#ifdef _DEBUG
+#pragma comment(lib,"glogd")
+#else
+#pragma comment(lib,"glog")
+#endif
+
+#define gInfo()      LOG(INFO)
+#define gError()     LOG(ERROR)
+#define gWarning()   LOG(WARNING)
 
 using namespace std;
 using namespace neb;
@@ -32,6 +49,8 @@ class SSCardService_Sandong :
 private:
 	SD_SSCardInfo CardInfo;
 	std::string strOperator;
+	string strCurProgress = "";
+	string strJsonFile;
 public:
 
 	SSCardService_Sandong()
@@ -39,51 +58,266 @@ public:
 		strOperator = "金乔炜煜移动制卡机";
 	}
 
-	//SSCardService_Sandong(/*ServiceType nSvrType*/)	/*	:SSCardService(nSvrType)*/
+	bool LoadProgress(CJsonObject& json)
+	{
+		try
+		{
+			ifstream ifs(strJsonFile, ios::in | ios::binary);
+			stringstream ss;
+			ss << ifs.rdbuf();
+			return json.Parse(ss.str());
+		}
+		catch (std::exception& e)
+		{
+			gError() << "Catch a exception:" << e.what();
+			return false;
+		}
+	}
+
+	bool SaveProgress(CJsonObject& json)
+	{
+		try
+		{
+			ofstream ifs(strJsonFile, ios::out | ios::binary);
+			ifs << json.ToFormattedString();
+			return true;
+		}
+		catch (std::exception& e)
+		{
+			gError() << "Catch a exception:" << e.what();
+			return false;
+		}
+	}
+
+	bool IsFinishedProgress()
+	{
+		CJsonObject MainProgress;
+		std::vector<string> vecKey;
+
+		if (nServiceType == ServiceType::Service_NewCard)
+		{
+			if (!LoadProgress(MainProgress))
+				return false;
+			vecKey = std::move(vector<string>(
+				{
+					"chkCanCardSq",
+					"saveCardSqList",
+					"queryCardZksqList",
+					"saveCardOpen",
+					"saveCardCompleted",
+					"saveCardActive",
+					"saveCardJrzhActive"
+				}));
+		}
+		else if (nServiceType == ServiceType::Service_ReplaceCard)
+		{
+			if (!LoadProgress(MainProgress))
+				return false;
+			vecKey = std::move(vector<string>(
+				{
+					"saveCardGs",
+					"chkCanCardBh",
+					"queryCardInfoBySfzhm",
+					"saveCardBhList",
+					"queryCardZksqList",
+					"saveCardOpen",
+					"saveCardCompleted",
+					"saveCardActive",
+					"saveCardJrzhActive"
+				}));
+		}
+		else
+			return true;
+
+		if (!MainProgress.KeyExist(strCurProgress))
+		{
+			gError() << "Key " << strCurProgress << " not exist!";
+			return false;
+		}
+		CJsonObject CurProgress = MainProgress[strCurProgress];
+		for (auto var : vecKey)
+		{
+			if (!CurProgress.KeyExist(var))
+				return false;
+			CJsonObject jsonProc = CurProgress[var];
+			int nCode = -1;
+			jsonProc.Get("code", nCode);
+			if (nCode)
+				return false;
+		}
+		return true;
+	}
+
+	//bool UpdateProgress(string strKey, int nValue)
 	//{
+	//	CJsonObject MainProgress;
+	//	if (!LoadProgress(MainProgress))
+	//	{
+	//		gError() << "Faled in load progress!";
+	//		return false;
+	//	}
+
+	//	if (!MainProgress.Replace(strKey, nValue))
+	//		return false;
+	//	return SaveProgress(MainProgress);
 	//}
 
-	virtual int SetSerivdeType(ServiceType nSvrType) override
+	bool UpdatePerson()
 	{
+		CJsonObject MainProgress;
+		if (!LoadProgress(MainProgress))
+		{
+			gError() << "Faled in load progress!";
+			return false;
+		}
+		string strPerson = "Person";
+		if (MainProgress.KeyExist(strPerson))
+			return false;
 
+		CJsonObject jsonPerson = MainProgress[strPerson];
+		if (!CardInfo.strName.empty())
+			jsonPerson.Replace("Name", CardInfo.strName);
+		if (!CardInfo.strCardID.empty())
+			jsonPerson.Replace("Identity", CardInfo.strCardID);
+		if (!CardInfo.strSex.empty())
+			jsonPerson.Replace("Gender", CardInfo.strSex);
+		if (!CardInfo.strBirthday.empty())
+			jsonPerson.Replace("Birthday", CardInfo.strBirthday);
+		if (!CardInfo.strNation.empty())
+			jsonPerson.Replace("Nantion", CardInfo.strNation);
+		if (!CardInfo.strReleaseDate.empty())
+			jsonPerson.Replace("PaperIssuedate", CardInfo.strReleaseDate);
+		if (!CardInfo.strValidDate.empty())
+			jsonPerson.Replace("PaperExpiredate", CardInfo.strValidDate);
+		if (!CardInfo.strMobile.empty())
+			jsonPerson.Replace("Mobile", CardInfo.strMobile);
+		if (!CardInfo.strAdress.empty())
+			jsonPerson.Replace("Address", CardInfo.strAdress);
+		if (!CardInfo.strBankCode.empty())
+			jsonPerson.Replace("BankCode", CardInfo.strBankCode);
+		if (!CardInfo.strCity.empty())
+			jsonPerson.Replace("City", CardInfo.strCity);
+
+		if (!MainProgress.Replace(strPerson, jsonPerson))
+			return false;
+
+		return SaveProgress(MainProgress);
+	}
+
+	//bool UpdateCurProgress(string strKey, int nResult, const char* szDatagram = "")
+	//{
+	//	string strDatagram(szDatagram);
+	//	return UpdateCurProgress(strKey, nResult, (string&)strDatagram);
+	//}
+
+	bool UpdateCurProgress(string& strKey, int nResult, string strDatagram, bool bFinised = false)
+	{
+		CJsonObject MainProgress;
+		if (!LoadProgress(MainProgress))
+		{
+			gError() << "Faled in load progress!";
+			return false;
+		}
+		if (MainProgress.KeyExist(strCurProgress))
+			return false;
+
+		CJsonObject CurProgress = MainProgress[strCurProgress];
+		if (bFinised)
+		{
+			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			stringstream curdate;
+
+			// date1 = "2022-01-26 09:51:00"
+			// date1 << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
+			curdate << std::put_time(std::localtime(&tNow), "%Y%m%d");
+			CurProgress.Replace("ServiceDate", curdate.str());
+			CurProgress.Replace("CardNum", CardInfo.strCardNum);
+		}
+
+		if (!CurProgress.KeyExist(strKey))
+			return false;
+
+		CJsonObject jsonProc = CurProgress[strKey];
+		jsonProc.Replace("Code", nResult);
+		if (!strDatagram.empty())
+			jsonProc.Replace("datagram", strDatagram);
+		CurProgress.Replace(strKey, jsonProc);
+
+		if (!MainProgress.Replace(strCurProgress, CurProgress))
+			return false;
+
+		return SaveProgress(MainProgress);
+	}
+
+	int GetProgressStatus(string strKey, int nResult, string& strDatagram)
+	{
+		CJsonObject MainProgress;
+		if (!LoadProgress(MainProgress))
+		{
+			gError() << "Faled in load progress!";
+			return false;
+		}
+		if (MainProgress.KeyExist(strCurProgress))
+			return false;
+
+		CJsonObject CurProgress = MainProgress[strCurProgress];
+
+		if (!CurProgress.KeyExist(strKey))
+			return false;
+
+		CJsonObject jsonProc = CurProgress[strKey];
+		jsonProc.Get("Code", nResult);
+		if (QFailed(nResult))
+			return false;
+		jsonProc.Get("Datagram", strDatagram);
+		gInfo() << strKey << " get Datagram from progress file!";
+		return true;
+	}
+
+
+	virtual int SetServiceType(ServiceType nSvrType, string& strIdentity) override
+	{
 		if (nSvrType < ServiceType::Service_NewCard ||
 			nSvrType > ServiceType::Service_RegisterLost)
 			return -1;
 		else
 		{
-			const char* szJsonTemplate = "{"
-				"\"ServiceType\": \"-1\","
-				"\"Persion\": {"
-				"\"Identity\": \"\","
-				"\"Name\": \"\","
-				"\"Gender\": \"\","
-				"\"City\": \"\","
-				"\"Mobile\": \"\","
-				"\"Bank\": \"\""
-				"},"
-				"\"Progress\": {"
-				"\chkCanCardSq\": \"-1\","
-				"\saveCardSqList\": \"-1\","
-				"\queryCardZksqList\": \"-1\","
-				"\saveCardCompleted\": \"-1\","
-				"\queryCardInfoBySfzhm\": \"-1\","
-				"\saveCardLsgs\": \"-1\","
-				"\saveCardLsgsjg\": \"-1\","
-				"\saveCardGs\": \"-1\","
-				"\chkCanCardBh\": \"-1\","
-				"\queryCardInfoBySfzhm\": \"-1\","
-				"\saveCardBhList\": \"-1\","
-				"\queryCardZksqList\": \"-1\","
-				"\saveCardOpen\": \"-1\","
-				"\saveCardCompleted\": \"-1\","
-				"\saveCardActive\": \"-1\","
-				"\saveCardJrzhActive\": \"-1\","
-				"}"
-				"}";
-			CJsonObject json;
+			try
+			{
+				switch (nServiceType)
+				{
+				case ServiceType::Service_NewCard:
+					strCurProgress = "NewCard";
+					break;
+				case ServiceType::Service_ReplaceCard:
+					strCurProgress = "UpdateCard";
+					break;
+				case ServiceType::Service_RegisterLost:
+					strCurProgress = "";
+					break;
+				case ServiceType::Service_Unknown:
+				default:
+					return -1;
+					break;
+				}
+				strJsonFile = "./Data/Progress_" + strIdentity + ".json";
 
-			nServiceType = nSvrType;
-			return 0;
+				if (!exists(strJsonFile) || IsFinishedProgress())
+				{
+					string strPathFinished = "./Data/Finished/Progress_" + strIdentity + ".json";
+					filesystem::copy(strJsonFile, strPathFinished);
+					filesystem::copy("./Data/ProgressTemplate.json", strJsonFile);
+					gInfo() << "Start a new progress for :" << strIdentity;
+				}
+
+				//UpdateProgress("ServiceType", (int)nSvrType);
+				return 0;
+			}
+			catch (std::exception& e)
+			{
+				gError() << "Catch a exception:" << e.what();
+				return -1;
+			}
 		}
 	}
 
@@ -93,6 +327,7 @@ public:
 		if (!jsonInit.Parse(strInitJson))
 		{
 			strOutInfo = "Invliad strInitJson,it's a valid json string!";
+			gError() << strOutInfo;
 			return -1;
 		}
 
@@ -112,6 +347,8 @@ public:
 
 	virtual int SaveCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) override
 	{
+		X_UNUSED(SSCardInfo);
+		X_UNUSED(strCardID);
 		//#define AddCardFiled(x,s)	x.setValue(#s,CardInfo.s.c_str());
 		//
 		//		QSettings CardIni(strINIFile.c_str(), QSettings::IniFormat);
@@ -161,6 +398,8 @@ public:
 
 	virtual int LoadCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) override
 	{
+		X_UNUSED(SSCardInfo);
+		X_UNUSED(strCardID);
 		//		QFileInfo fi(strINIFile.c_str());
 		//		if (!fi.isFile())
 		//		{
@@ -256,6 +495,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrCode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -273,6 +514,8 @@ public:
 			jsonIn.Get("Name", CardInfo.strName);
 			jsonIn.Get("City", CardInfo.strCity);
 			jsonIn.Get("BankCode", CardInfo.strBankCode);
+
+
 			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
 			if (CardInfo.strCardID.empty()
@@ -286,34 +529,40 @@ public:
 				break;
 			}
 
-			if (QFailed(nSSResult = chkCanCardSq(CardInfo, strOutInfo)))
+			UpdatePerson();
+			strKey = "chkCanCardSq";
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "Faled in chkCanCardSq:";
-				strMessage += std::to_string(nSSResult);
-				break;
-			}
+				if (QFailed(nSSResult = chkCanCardSq(CardInfo, strOutInfo)))
+				{
+					strMessage = "Faled in chkCanCardSq:";
+					strMessage += std::to_string(nSSResult);
+					break;
+				}
 
-			CJsonObject OutJson(strOutInfo);
-			if (!OutJson.KeyExist("errflag") ||
-				!OutJson.KeyExist("errtext"))
-			{
-				strMessage = "can't locate errflag or errtext!";
-				break;
+				CJsonObject OutJson(strOutInfo);
+				if (!OutJson.KeyExist("errflag") ||
+					!OutJson.KeyExist("errtext"))
+				{
+					strMessage = "can't locate errflag or errtext!";
+					break;
+				}
+				string strErrFlag;
+				OutJson.Get("errflag", strErrFlag);
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					OutJson.Get("errcode", strErrCode);
+					int nErrCode = strtol(strErrCode.c_str(), nullptr, 10);
+					UpdateCurProgress(strKey, nErrCode, OutJson.ToFormattedString());
+					OutJson.Get("errtext", strMessage);
+					break;
+				}
+				UpdateCurProgress(strKey, 0, OutJson.ToFormattedString());
 			}
-			string strErrFlag;
-			OutJson.Get("errflag", strErrFlag);
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				OutJson.Get("errcode", strErrCode);
-				OutJson.Get("errtext", strMessage);
-				//int nErrCode = strtol(strErrCode.c_str(), nullptr, 10);
-				//ProcessErrcode(nErrCode, strMessage);
-				break;
-			}
-
 			strMessage = "Succeed";
 			nResult = 0;
+
 		} while (0);
 
 		CJsonObject jsonOut;
@@ -350,6 +599,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -366,39 +617,45 @@ public:
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||
 				CardInfo.strCity.empty() ||
-				CardInfo.strBankCode.empty() ||
-				CardInfo.strCardType.empty())
+				CardInfo.strBankCode.empty())
 			{
 				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
 				break;
 			}
-
-			if (QFailed(nSSResult = chkCanCardBh(CardInfo, strOutInfo)))
+			UpdatePerson();
+			strKey = "chkCanCardBh";
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "Faled in chkCanCardSq:";
-				strMessage += std::to_string(nSSResult);
-				break;
-			}
-
-			CJsonObject outJson(strOutInfo);
-			string strErrFlag;
-
-			if (!outJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field errflag from output of chkCanCardBh!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!outJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' from output of chkCanCardBh!";
-				else
+				if (QFailed(nSSResult = chkCanCardBh(CardInfo, strOutInfo)))
 				{
-					outJson.Get("errtext", strMessage);
-					outJson.Get("errcode", strErrcode);
+					strMessage = "Faled in chkCanCardSq:";
+					strMessage += std::to_string(nSSResult);
+					break;
 				}
-				break;
+
+				CJsonObject outJson(strOutInfo);
+				string strErrFlag;
+
+				if (!outJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field errflag from output of chkCanCardBh!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!outJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' from output of chkCanCardBh!";
+					else
+					{
+						outJson.Get("errtext", strMessage);
+						outJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, outJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, outJson.ToFormattedString());
 			}
 
 			strMessage = "Succeed";
@@ -438,6 +695,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -451,36 +710,56 @@ public:
 			jsonIn.Get("BankCode", CardInfo.strBankCode);
 			CardInfo.strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
-			if (QFailed(nSSResult = queryCardInfoBySfzhm(CardInfo, strOutInfo)))
+			if (CardInfo.strCardID.empty() ||
+				CardInfo.strName.empty() ||
+				CardInfo.strCity.empty() ||
+				CardInfo.strBankCode.empty())
 			{
-				strMessage = "Failed in queryCardInfoBySfzhm:";
-				strMessage += std::to_string(nSSResult);
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
 				break;
 			}
-			CJsonObject outJson(strOutInfo);
-			if (!outJson.Parse(strOutInfo))
+			UpdatePerson();
+			strKey = "queryCardInfoBySfzhm";
+			CJsonObject outJson;
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "queryCardInfoBySfzhm output invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
-			string strErrFlag;
-			if (!outJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field 'errflag' from output of queryCardInfoBySfzhm!";
-				break;
-			}
-			int nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!outJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' from output of queryCardInfoBySfzhm!";
-				else
+				if (QFailed(nSSResult = queryCardInfoBySfzhm(CardInfo, strOutInfo)))
 				{
-					outJson.Get("errtext", strMessage);
-					outJson.Get("errcode", strErrcode);
+					strMessage = "Failed in queryCardInfoBySfzhm:";
+					strMessage += std::to_string(nSSResult);
+					break;
 				}
-				break;
+				if (!outJson.Parse(strOutInfo))
+				{
+					strMessage = "queryCardInfoBySfzhm output invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+				string strErrFlag;
+				if (!outJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' from output of queryCardInfoBySfzhm!";
+					break;
+				}
+				int nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!outJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' from output of queryCardInfoBySfzhm!";
+					else
+					{
+						outJson.Get("errtext", strMessage);
+						outJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, outJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, outJson.ToFormattedString());
+			}
+			else
+			{
+				outJson.Parse(strDatagram);
 			}
 			CJsonObject ds = outJson["ds"];
 			if (ds.IsEmpty())
@@ -620,6 +899,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -690,38 +971,45 @@ public:
 			//	strMessage = "民族无效!";
 			//	break;
 			//}
-
-			if (QFailed(nSSResult = saveCardSqList(CardInfo, strOutInfo)))
-			{
-				strMessage = "Failed in saveCardSqList:";
-				strMessage += strOutInfo;
-				break;
-			}
-
-			CJsonObject tmpJson;
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "saveCardSqList output is invalid:";
-				strMessage += strOutInfo;
-			}
 			string strErrFlag;
-
-			if (!tmpJson.Get("errflag", strErrFlag))
+			UpdatePerson();
+			strKey = "saveCardSqList";
+			CJsonObject tmpJson;
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "can't locate field 'errflag' from output of saveCardSqList!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' from output of saveCardSqList!";
-				else
+				if (QFailed(nSSResult = saveCardSqList(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed in saveCardSqList:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardSqList output is invalid:";
+					strMessage += strOutInfo;
+				}
+
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' from output of saveCardSqList!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' from output of saveCardSqList!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::days(1));
@@ -735,37 +1023,46 @@ public:
 
 			CardInfo.strReleaseDate = date1.str();
 			CardInfo.strValidDate = date2.str();
-
-			// city,bankcode,validDate,dealType,releaseDate
-			if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
+			strKey = "queryCardZksqList";
+			//CJsonObject outJson;
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "Faled in queryCardZksqList:";
-				strMessage += strOutInfo;
-				break;
-			}
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "queryCardZksqList output is invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
-			if (!tmpJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field 'errflag' in output of queryCardZksqList!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
-				else
+				// city,bankcode,validDate,dealType,releaseDate
+				if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					jsonIn.Get("errcode", strErrcode);
+					strMessage = "Faled in queryCardZksqList:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "queryCardZksqList output is invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of queryCardZksqList!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
+			else
+				tmpJson.Parse(strDatagram);
 			CJsonObject ds = tmpJson["ds"];
 			if (!ds.KeyExist("xm") ||
 				!ds.KeyExist("shbzhm"))
@@ -816,6 +1113,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (json.IsEmpty())
@@ -881,37 +1180,46 @@ public:
 			// 				break;
 			// 			}
 
-			if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
-			{
-				strMessage = "Failed in saveCardSqList:";
-				strMessage += strOutInfo;
-				break;
-			}
-
-			CJsonObject tmpJson;
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "saveCardBhList output is invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
+			UpdatePerson();
+			strKey = "saveCardBhList";
 			string strErrFlag;
-			if (!tmpJson.Get("errflag", strErrFlag))
+			CJsonObject tmpJson;
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "can't locate field 'errflag' in output of saveCardBhList!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of saveCardBhList!";
-				else
+				if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed in saveCardSqList:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardBhList output is invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of saveCardBhList!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of saveCardBhList!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::days(1));
@@ -926,49 +1234,57 @@ public:
 			CardInfo.strReleaseDate = date1.str();
 			CardInfo.strValidDate = date2.str();
 
-			// city,bankcode,validDate,dealType,releaseDate
-
-			if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
+			strKey = "queryCardZksqList";
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "Faled in saveCardBhList:";
-				strMessage += strOutInfo;
-				break;
-			}
-			try
-			{
-				string strOutputFile = "./Debug/Carddata_" + CardInfo.strCardID + ".json";
-				fstream fs(strOutputFile, ios::out);
-				fs << strOutInfo;
-				fs.close();
-			}
-			catch (std::exception& e)
-			{
-				strMessage = e.what();
-			}
-
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "saveCardBhList output is invalid:";
-				strMessage += strOutInfo;
-			}
-
-			if (!tmpJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field 'errflag' in output of saveCardBhList!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
-				else
+				// city,bankcode,validDate,dealType,releaseDate
+				if (QFailed(nSSResult = queryCardZksqList(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Faled in saveCardBhList:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+				try
+				{
+					string strOutputFile = "./Data/Carddata_" + CardInfo.strCardID + ".json";
+					fstream fs(strOutputFile, ios::out);
+					fs << strOutInfo;
+					fs.close();
+				}
+				catch (std::exception& e)
+				{
+					strMessage = e.what();
+				}
+
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardBhList output is invalid:";
+					strMessage += strOutInfo;
+				}
+
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of saveCardBhList!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
+			else
+				tmpJson.Parse(strDatagram);
 
 			CJsonObject ds = tmpJson["ds"];
 			if (ds.IsEmpty())
@@ -1092,6 +1408,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		CJsonObject json(strJsonIn);
 		do
 		{
@@ -1118,51 +1436,60 @@ public:
 				break;
 			}
 
-			// cardID,cardType,name,bankCode,operator,city
-			if (QFailed(nSSResult = saveCardOpen(CardInfo, strOutInfo)))
-			{
-				strMessage = "Failed in saveCardSqList:";
-				strMessage += strOutInfo;
-				break;
-			}
-
+			strKey = "saveCardOpen";
 			CJsonObject tmpJson;
-			if (!tmpJson.Parse(strOutInfo))
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "saveCardOpen output is invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
-
-			string strErrFlag;
-			if (!tmpJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field 'errflag' in output of queryCardZksqList!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
-				else
+				// cardID,cardType,name,bankCode,operator,city
+				if (QFailed(nSSResult = saveCardOpen(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed in saveCardSqList:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardOpen output is invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+
+				string strErrFlag;
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of queryCardZksqList!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of queryCardZksqList!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
+				try
+				{
+					string strOutputFile = "./Debug/Carddata_" + CardInfo.strCardID + ".json";
+					fstream fs(strOutputFile, ios::out);
+					fs << strOutInfo;
+					fs.close();
+				}
+				catch (std::exception& e)
+				{
+					string strException = e.what();
+				}
 			}
-			try
-			{
-				string strOutputFile = "./Debug/Carddata_" + CardInfo.strCardID + ".json";
-				fstream fs(strOutputFile, ios::out);
-				fs << strOutInfo;
-				fs.close();
-			}
-			catch (std::exception& e)
-			{
-				string strException = e.what();
-			}
+			else
+				tmpJson.Parse(strDatagram);
 
 			CJsonObject ds = tmpJson["ds"];
 			if (ds.IsEmpty())
@@ -1197,12 +1524,16 @@ public:
 	// 读卡
 	virtual int ReadCard(string& strJsonIn, string& strJsonOut) override
 	{
+		X_UNUSED(strJsonIn);
+		X_UNUSED(strJsonOut);
 		return 0;
 	}
 
 	// 写卡
 	virtual int WriteCard(string& strJsonIn, string& strJsonOut) override
 	{
+		X_UNUSED(strJsonIn);
+		X_UNUSED(strJsonOut);
 		return -1;
 	}
 
@@ -1210,6 +1541,8 @@ public:
 	// 
 	virtual int PrintCard(string& strJsonIn, string& strJsonOut) override
 	{
+		X_UNUSED(strJsonIn);
+		X_UNUSED(strJsonOut);
 		return -1;
 	}
 
@@ -1231,6 +1564,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (json.IsEmpty())
@@ -1255,7 +1590,6 @@ public:
 			json.Get("CardVersion", CardInfo.strCardVersion);
 			json.Get("ChipType", CardInfo.strChipType);
 
-
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||
 				CardInfo.strCity.empty() ||
@@ -1271,36 +1605,45 @@ public:
 				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号,卡芯片号,磁条号,ATR,卡识别码,卡版本或芯片类型不能为空!";
 				break;
 			}
-			if (QFailed(nSSResult = saveCardCompleted(CardInfo, strOutInfo)))
-			{
-				strMessage = "Failed in saveCardCompleted:";
-				strMessage += strOutInfo;
-				break;
-			}
+			//UpdatePerson();
+			strKey = "saveCardCompleted";
 			CJsonObject tmpJson;
-			if (!tmpJson.Parse(strOutInfo))
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "saveCardCompleted output is invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
-			string strErrFlag;
-			if (!tmpJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field 'errflag' in output of saveCardCompleted!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of saveCardCompleted!";
-				else
+				if (QFailed(nSSResult = saveCardCompleted(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed in saveCardCompleted:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardCompleted output is invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+				string strErrFlag;
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of saveCardCompleted!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of saveCardCompleted!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString(), true);
 			}
 
 			nResult = 0;
@@ -1328,6 +1671,8 @@ public:
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (json.IsEmpty())
@@ -1357,70 +1702,86 @@ public:
 				break;
 			}
 
-			if (QFailed(nSSResult = saveCardActive(CardInfo, strOutInfo)))
-			{
-				strMessage = "Failed in saveCardCompleted:";
-				strMessage += strOutInfo;
-				break;
-			}
-
+			strKey = "saveCardActive";
 			CJsonObject tmpJson;
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "saveCardActive output is invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
 			int nErrFlag;
 			string strErrFlag;
-			if (!tmpJson.Get("errflag", strErrFlag))
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "can't locate field 'errflag' in output of saveCardActive!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of saveCardActive!";
-				else
+				if (QFailed(nSSResult = saveCardActive(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed in saveCardCompleted:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardActive output is invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of saveCardActive!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of saveCardActive!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 
-			// cardID,cardType,name,magNum,bankCode,operator,city
-			if (QFailed(nSSResult = saveCardJrzhActive(CardInfo, strOutInfo)))
+			strKey = "saveCardJrzhActive";
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "Failed in saveCardJrzhActive:";
-				strMessage += strOutInfo;
-				break;
-			}
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "saveCardJrzhActive output is invalid:";
-				strMessage += strOutInfo;
-				break;
-			}
-
-			if (!tmpJson.Get("errflag", strErrFlag))
-			{
-				strMessage = "can't locate field 'errflag' in output of saveCardJrzhActive!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of saveCardJrzhActive!";
-				else
+				// cardID,cardType,name,magNum,bankCode,operator,city
+				if (QFailed(nSSResult = saveCardJrzhActive(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed in saveCardJrzhActive:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "saveCardJrzhActive output is invalid:";
+					strMessage += strOutInfo;
+					break;
+				}
+
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of saveCardJrzhActive!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of saveCardJrzhActive!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
+
 			}
 
 			nResult = 0;
@@ -1459,6 +1820,8 @@ public:
 		int nResult = -1;
 		int nErrFlag = 0;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			json.Parse(strJsonIn);
@@ -1566,6 +1929,8 @@ public:
 	*/
 	virtual int RegisterLost(string& strJsonIn, string& strJsonOut, int nOperation = 0) override
 	{
+		X_UNUSED(nOperation);
+
 		SD_SSCardInfo CardInfo;
 		CJsonObject json(strJsonIn);
 		string strOutInfo;
@@ -1574,6 +1939,8 @@ public:
 		int nResult = -1;
 		int nErrFlag = 0;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (json.IsEmpty())
@@ -1600,36 +1967,45 @@ public:
 				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号不能为空!";
 				break;
 			}
-			if (QFailed(nSSResult = saveCardGs(CardInfo, strOutInfo)))
-			{
-				strMessage = "Failed saveCardGs:";
-				strMessage += strOutInfo;
-				break;
-			}
-			CJsonObject tmpJson;
-			if (!tmpJson.Parse(strOutInfo))
-			{
-				strMessage = "Output of saveCardGs is invalid!";
-				break;
-			}
 
-			string strErrFlag;
-			if (!tmpJson.Get("errflag", strErrFlag))
+			UpdatePerson();
+			strKey = "saveCardGs";
+			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				strMessage = "can't locate field 'errflag' in output of saveCardBhk!";
-				break;
-			}
-			nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
-			if (nErrFlag)
-			{
-				if (!tmpJson.KeyExist("errtext"))
-					strMessage = "can't locate field 'errtext' in output of saveCardBhk!";
-				else
+				if (QFailed(nSSResult = saveCardGs(CardInfo, strOutInfo)))
 				{
-					tmpJson.Get("errtext", strMessage);
-					tmpJson.Get("errcode", strErrcode);
+					strMessage = "Failed saveCardGs:";
+					strMessage += strOutInfo;
+					break;
 				}
-				break;
+				CJsonObject tmpJson;
+				if (!tmpJson.Parse(strOutInfo))
+				{
+					strMessage = "Output of saveCardGs is invalid!";
+					break;
+				}
+
+				string strErrFlag;
+				if (!tmpJson.Get("errflag", strErrFlag))
+				{
+					strMessage = "can't locate field 'errflag' in output of saveCardBhk!";
+					break;
+				}
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				if (nErrFlag)
+				{
+					if (!tmpJson.KeyExist("errtext"))
+						strMessage = "can't locate field 'errtext' in output of saveCardBhk!";
+					else
+					{
+						tmpJson.Get("errtext", strMessage);
+						tmpJson.Get("errcode", strErrcode);
+						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
+					}
+					break;
+				}
+				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 			nResult = 0;
 		} while (0);
@@ -1647,6 +2023,7 @@ public:
 	// 
 	virtual int QueryPayResult(string& strJsonIn, string& strJsonOut) override
 	{
+		X_UNUSED(strJsonIn);
 		CJsonObject jsonOut;
 		jsonOut.Add("Result", (int)PayResult::Pay_Unsupport);
 		jsonOut.Add("Message", "无须支付或没有支付流程!");
@@ -1685,12 +2062,14 @@ public:
 	{
 		SD_SSCardInfo CardInfo;
 		CJsonObject jsonIn;
-		int nSSResult = -1;
+		//int nSSResult = -1;
 		int nResult = -1;
 		int nErrFlag = 0;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -1710,6 +2089,7 @@ public:
 				strMessage = "身份证,姓名,城市代码!";
 				break;
 			}
+
 			if (QFailed(queryPersonInfo(CardInfo, strJsonOut)))
 			{
 				strMessage = "Failed in queryPersonInfo!";
@@ -1783,12 +2163,14 @@ public:
 	{
 		SD_SSCardInfo CardInfo;
 		CJsonObject jsonIn;
-		int nSSResult = -1;
+		//int nSSResult = -1;
 		int nResult = -1;
 		int nErrFlag = 0;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode;
+		string strKey = "";
+		string strDatagram = "";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -1866,6 +2248,8 @@ public:
 
 	int ModifyPersonInfo(string& strJsonIn, string& strJsonOut)
 	{
+		X_UNUSED(strJsonIn);
+		X_UNUSED(strJsonOut);
 		return -1;
 	}
 

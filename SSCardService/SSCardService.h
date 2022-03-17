@@ -111,7 +111,7 @@ public:
 	//{
 	//}
 
-	virtual int SetSerivdeType(ServiceType nSvrType) = 0;
+	virtual int SetServiceType(ServiceType nSvrType, string& strIdentity) = 0;
 
 	virtual int Initialize(string& szJson, string& szOut) = 0;
 
