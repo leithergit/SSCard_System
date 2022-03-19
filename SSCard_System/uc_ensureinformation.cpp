@@ -39,14 +39,14 @@ int uc_EnsureInformation::ProcessBussiness()
 			string strCardID, strName, strMobile;
 			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
 			{
-				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentify;
+				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentity;
 				strcpy((char*)pIDCard->szName, strName.c_str());
-				strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
-				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentify;
+				strcpy((char*)pIDCard->szIdentity, strCardID.c_str());
+				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentity;
 			}
 		}
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 		strcpy((char*)pSSCardInfo->strTransType, "5");
@@ -58,7 +58,7 @@ int uc_EnsureInformation::ProcessBussiness()
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
 		strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 
 		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
 		{

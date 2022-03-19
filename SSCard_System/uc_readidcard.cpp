@@ -38,6 +38,12 @@ uc_ReadIDCard::~uc_ReadIDCard()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
+	if (!g_pDataCenter->OpenCamera())
+	{
+		gInfo() << "Failed in OpenCamera";
+		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
+		return -1;
+	}
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
 	QSize WindowsSize = size();
@@ -151,7 +157,7 @@ void uc_ReadIDCard::ThreadWork()
 // 			return -1;
 // 		}
 // 	}
-// 	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+// 	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 // 	strFilePath = strTempPath.toStdString();
 // 	return 0;
 // }

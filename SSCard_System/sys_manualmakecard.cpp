@@ -32,7 +32,7 @@ void Sys_ManualMakeCard::on_ShowIDCardInfo(bool bSucceed, QString strMessage)
 		W.exec();
 		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>(CardInfo);
 		g_pDataCenter->SetIDCardInfo(pIDCard);
-		ui->lineEdit_CardID->setText((char*)pIDCard->szIdentify);
+		ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit((const char*)pIDCard->szName));
 	}
 	else
@@ -145,8 +145,8 @@ void Sys_ManualMakeCard::on_pushButton_ReadID_clicked()
 			IDCardInfoPtr pIDCard = make_shared<IDCardInfo>(CardInfo);
 			g_pDataCenter->SetIDCardInfo(pIDCard);
 			strcpy((char*)pIDCard->szName, strName.c_str());
-			strcpy((char*)pIDCard->szIdentify, strCardID.c_str());
-			ui->lineEdit_CardID->setText((char*)pIDCard->szIdentify);
+			strcpy((char*)pIDCard->szIdentity, strCardID.c_str());
+			ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
 			ui->lineEdit_Name->setText(QString::fromLocal8Bit((const char*)pIDCard->szName));
 		}
 		else
@@ -228,7 +228,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardStatus_clicked()
 	do
 	{
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 		strcpy((char*)pSSCardInfo->strTransType, "5");
@@ -240,7 +240,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardStatus_clicked()
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
 		strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
-		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 
 		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
 		{
@@ -308,7 +308,7 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage)
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 	QString strAppPath = QCoreApplication::applicationDirPath();
 	strAppPath += "/Debug";
-	strAppPath += QString("/Carddata_%1.ini").arg((const char*)pIDCard->szIdentify);
+	strAppPath += QString("/Carddata_%1.ini").arg((const char*)pIDCard->szIdentity);
 	QString strMessage;
 
 	QFileInfo ffile(strAppPath);

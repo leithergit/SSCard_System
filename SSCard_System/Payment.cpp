@@ -72,7 +72,7 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentify);
+	strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 	strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 	char szStatus[1024] = { 0 };
 	int nResult = queryPayment(*pSSCardInfo, (char*)szStatus);
@@ -147,7 +147,7 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& 
 	strUrl += PayOption.strFieldMobile;			strUrl += "=";
 	strUrl += g_pDataCenter->strMobilePhone;	strUrl += "&";
 	strUrl += PayOption.strFieldCardID;			strUrl += "=";
-	strUrl += (char*)pIDCard->szIdentify;		strUrl += "&";
+	strUrl += (char*)pIDCard->szIdentity;		strUrl += "&";
 	strUrl += PayOption.strFiledamount;			strUrl += "=";
 	strUrl += PayOption.strAmount;
 	gInfo() << "Payment request url = " << strUrl.c_str();
@@ -282,7 +282,7 @@ int     CancelCardReplacement(QString& strMessage, int& nStatus)
 	// 	int nResult = cancelCardReplacement(Region.strCMAccount.c_str(),
 	// 		Region.strCMPassword.c_str(),
 	// 		Region.strArea.c_str(),
-	// 		(const char*)pIDCard->szIdentify,
+	// 		(const char*)pIDCard->szIdentity,
 	// 		(char*)pIDCard->szName,
 	// 		(char*)szStatus);
 	// 	if (QFailed(nResult))
@@ -340,7 +340,7 @@ int  CancelPayment(QString& strMessage, int& nStatus)
 	//char szStatus[1024] = { 0 };
 	//int nResult = cancelPayment(Region.strCMAccount.c_str(),
 	//	Region.strCMPassword.c_str(),
-	//	(const char*)pIDCard->szIdentify,
+	//	(const char*)pIDCard->szIdentity,
 	//	(char*)pIDCard->szName,
 	//	(char*)szStatus);
 	//if (QFailed(nResult))
@@ -515,9 +515,9 @@ int  GetImageStorePath(string& strFilePath, int nType)
 	}
 	QString strTempPath;
 	if (nType == 0)
-		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 	else
-		strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum);
+		strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum);
 
 	strFilePath = strTempPath.toStdString();
 	return 0;

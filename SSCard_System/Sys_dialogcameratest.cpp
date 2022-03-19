@@ -15,13 +15,16 @@ DialogCameraTest::DialogCameraTest(QWidget* parent) :
 	ui->label_FaceCapture->setStyleSheet(strQSS);
 	QTimer::singleShot(50, this, [=]()
 		{
-			OpenCamera();
+			QString strError;
+			g_pDataCenter->OpenCamera();
+			OpenCamara(strError);
 		});
 }
 
 DialogCameraTest::~DialogCameraTest()
 {
-	CloseCamera();
+	QString strError;
+	CloseCamera(strError);
 	delete ui;
 }
 
@@ -30,39 +33,51 @@ void DialogCameraTest::on_pushButton_clicked()
 	QDialog::accept();
 }
 
-void DialogCameraTest::OpenCamera()
+int DialogCameraTest::OpenCamara(QString& strError)
 {
-	m_pFaceDetectOcx = new DVTLDCamOCXLib::DVTLDCamOCX(ui->label_FaceDetect);
-	m_pFaceDetectOcx->setObjectName(QString::fromUtf8("axWidget_FaceDetect"));
-	m_pFaceDetectOcx->setMinimumSize(ui->label_FaceDetect->size());
-	m_pFaceDetectOcx->setMaximumSize(ui->label_FaceDetect->size());
-	m_pFaceDetectOcx->show();
-	/*HWND hWndOcx = (HWND)m_pFaceDetectOcx->winId();
-	HWND hWndLabel = (HWND)ui->label_FaceDetect->winId();
-	RECT rtWndLabel;
-	GetWindowRect(hWndLabel, &rtWndLabel);
-	::MoveWindow(hWndOcx, 0, 0, rtWndLabel.right - rtWndLabel.left, rtWndLabel.bottom - rtWndLabel.top, true);
-	RECT rtWndOcx;
-	GetWindowRect(hWndOcx, &rtWndOcx);*/
-	connect(m_pFaceDetectOcx, SIGNAL(LiveDetectStatusEvent(int, int)), this, SLOT(OnLiveDetectStatusEvent(int, int)));
-
-	if (m_pFaceDetectOcx->OpenCamera())
+	int nResult = 0;
+	do
 	{
-		QMessageBox_CN(QMessageBox::Information, "提示", "打开摄像机失败!", QMessageBox::Ok, this);
-		return;
-	}
-	m_pFaceDetectOcx->StartLiveDetection(30);
+		g_pDataCenter->StopDetect();
+		if (g_pDataCenter->IsVideoStart())
+		{
+			if (!g_pDataCenter->SwitchVideoWnd((HWND)ui->label_FaceDetect->winId()))
+			{
+				strError = "切换视频显示窗口失败!";
+				nResult = -1;
+				break;
+			}
+		}
+		else
+		{
+			if (!g_pDataCenter->StartVideo((HWND)ui->label_FaceDetect->winId()))
+			{
+				strError = "获取视频数据失败!";
+				return -1;
+			}
+
+		}
+		// 		if (!g_pDataCenter->StartDetect(this, 2000, m_nTimeout * 1000))
+		// 		{
+		// 			strError = "启动人脸检测失败!";
+		// 			return -1;
+		// 		}
+				//connect(this, SIGNAL(LiveDetectStatusEvent(int, int)), this, SLOT(OnLiveDetectStatusEvent(int, int)));
+				//m_bDetectionStart = true;
+	} while (0);
+	return nResult;
 }
 
-void DialogCameraTest::CloseCamera()
+int DialogCameraTest::CloseCamera(QString& strError)
 {
-	if (m_pFaceDetectOcx)
+	int nResult = 0;
+	do
 	{
-		m_pFaceDetectOcx->EndLiveDectection();
-		m_pFaceDetectOcx->CloseCamera();
-		delete m_pFaceDetectOcx;
-		m_pFaceDetectOcx = nullptr;
-	}
+		g_pDataCenter->StopVideo();
+		g_pDataCenter->StopDetect();
+
+	} while (0);
+	return nResult;
 }
 
 void DialogCameraTest::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
@@ -74,7 +89,7 @@ void DialogCameraTest::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 		strEvent = "人脸检测成功";
 		ui->label_Info->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
 		//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
-		QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(1);
+		QString strPhotoBase64;// m_pFaceDetectOcx->GetImageData(1);
 		if (strPhotoBase64.size())
 		{
 			ImageDetected = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));

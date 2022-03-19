@@ -7,6 +7,7 @@
 #include <fstream>
 #include <QSharedMemory>
 #include "qtsingleapplication.h"
+#include "waitingprogress.h"
 
 #include "DevBase.h"
 
@@ -47,8 +48,6 @@ static void SetupExceptionHandler()
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
-	//QSharedMemory Sinlgeton(g_pUniqueID);
-
 
 	//qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
@@ -153,7 +152,7 @@ int main(int argc, char* argv[])
 	{
 		if (!g_pDataCenter)
 		{
-			strMessage = "内存不足,初始数据中心失败!";
+			strMessage = "内存不足,初始化数据中心失败!";
 			break;
 		}
 		QString strError;
@@ -196,6 +195,14 @@ int main(int argc, char* argv[])
 	jsonT.Get("pwd", strpwd);
 	jsonT.Get("city", strcity);
 
+	WaitingProgress WaitingUI;
+	WaitingUI.show();
+	a.exec();
+	if (!WaitingUI.bPrinterReady)
+	{
+		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+		return 0;
+	}
 
 	if (!CheckLocalLicense(Code_License))
 	{

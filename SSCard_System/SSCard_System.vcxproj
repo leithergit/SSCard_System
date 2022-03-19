@@ -67,7 +67,7 @@
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets;</QtModules>
+    <QtModules>core;network;gui;widgets;</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
@@ -205,7 +205,7 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath) Z:\SSCard_System</Command>
+copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>::@call updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
@@ -237,7 +237,6 @@ copy /y $(TargetPath) Z:\SSCard_System</Command>
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="..\utility\TimeUtility.cpp" />
     <ClCompile Include="..\utility\Utility.cpp" />
-    <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
     <ClCompile Include="imageviewlabel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainpage.cpp" />
@@ -258,6 +257,7 @@ copy /y $(TargetPath) Z:\SSCard_System</Command>
     <ClCompile Include="up_readsscard.cpp" />
     <ClCompile Include="updatecard.cpp" />
     <ClCompile Include="updatepassword.cpp" />
+    <ClCompile Include="waitingprogress.cpp" />
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +270,7 @@ copy /y $(TargetPath) Z:\SSCard_System</Command>
     <QtMoc Include="QtSingleton\qtsingleapplication.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="sys_manualmakecard.h" />
+    <QtMoc Include="waitingprogress.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -305,7 +306,6 @@ copy /y $(TargetPath) Z:\SSCard_System</Command>
     </QtMoc>
     <ClInclude Include="..\utility\TimeUtility.h" />
     <ClInclude Include="..\utility\Utility.h" />
-    <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h" />
     <QtMoc Include="imageviewlabel.h">
     </QtMoc>
     <QtMoc Include="mainpage.h">
@@ -427,6 +427,7 @@ copy /y $(TargetPath) Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="updatepassword.ui">
     </QtUic>
+    <QtUic Include="waitingprogress.ui" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png" />

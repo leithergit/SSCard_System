@@ -26,7 +26,7 @@ enum PageOperation
 	Stay_CurrentPage,
 	Switch_NextPage,
 	Skip_NextPage,
-	Retry_CurrentPage=1024
+	Retry_CurrentPage = 1024
 };
 extern const char* g_szPageOperation[4];
 
@@ -122,7 +122,9 @@ signals:
 	void SwitchPage(int nPage);
 	void ErrorMessage(QString strMessage);
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
-
+	void LiveDetectStatusEvent(int nEventID, int nFrameStatus);
+	void   FaceCaptureSucceed();
+	void   FaceCaptureFailed();
 };
 
 #endif // QSTACKPAGE_H

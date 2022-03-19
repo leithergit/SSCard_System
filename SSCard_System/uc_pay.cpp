@@ -236,7 +236,7 @@ int  uc_Pay::GetQRCodeStorePath(QString& strFilePath)
 			return -1;
 		}
 	}
-	strFilePath = strStorePath + QString("QRCode_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+	strFilePath = strStorePath + QString("QRCode_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
 	return 0;
 }
 

@@ -63,6 +63,7 @@ SOURCES += \
     up_readsscard.cpp \
     updatecard.cpp \
     updatepassword.cpp \
+    waitingprogress.cpp
 
 HEADERS += \
     CheckPassword.h \
@@ -187,7 +188,8 @@ HEADERS += \
     ../utility/AutoLock.h \
     ../utility/TimeUtility.h \
     ../utility/Utility.h\
-    ./SDK/KT_Define.h
+    ./SDK/KT_Define.h \
+    waitingprogress.h
 
 FORMS += \
     CheckPassword.ui \
@@ -222,7 +224,8 @@ FORMS += \
     up_readsscard.bak.ui \
     up_readsscard.ui \
     updatecard.ui \
-    updatepassword.ui
+    updatepassword.ui \
+    waitingprogress.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

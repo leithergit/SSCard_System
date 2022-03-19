@@ -117,9 +117,6 @@
     <ClCompile Include="..\utility\Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\dvtldcamocx\dvtldcamocxlib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imageviewlabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -210,6 +207,9 @@
     <ClCompile Include="QtSingleton\qtsingleapplication.cpp">
       <Filter>qtsingleton</Filter>
     </ClCompile>
+    <ClCompile Include="waitingprogress.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -270,9 +270,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\utility\Utility.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\dvtldcamocx\dvtldcamocxlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <QtMoc Include="imageviewlabel.h">
@@ -417,6 +414,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="sys_manualmakecard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="waitingprogress.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -623,6 +623,9 @@
     </QtMoc>
     <QtMoc Include="QtSingleton\qtsingleapplication.h">
       <Filter>qtsingleton</Filter>
+    </QtMoc>
+    <QtMoc Include="waitingprogress.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

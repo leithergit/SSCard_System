@@ -59,6 +59,7 @@
 #include "../SDK/7Z/include/bitarchiveinfo.hpp"
 #include "../SDK/7Z/include/bitcompressor.hpp"
 #include "../SDK/7Z/include/bitexception.hpp"
+#include "../SDK/FaceCapture/DVTGKLDCamSDK.h"
 
 //宏定义
 #define __STR2__(x) #x
@@ -695,6 +696,7 @@ struct SysConfig
 		strLogServer = pSettings->value("logServer", "").toString().toStdString();   // 日志服务器
 		nLogServerPort = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
 		nLogSavePeroid = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
+		nTimeWaitForPrinter = pSettings->value("TimeWaitForPrinter", 300).toInt();
 
 		pSettings->endGroup();
 	}
@@ -764,6 +766,7 @@ struct SysConfig
 	string          strLogServer = "";                  // 日志服务器
 	int             nLogServerPort = 80;                // 日志服务器端口
 	int             nLogSavePeroid = 30;                // 日志保存天数
+	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
 	bool			bDebug = false;
 	bool			bTestCard = false;
 	std::map<string, string> strMapBank;
@@ -783,7 +786,7 @@ using SysConfigPtr = shared_ptr<SysConfig>;
 // 	void GetInfoFromIDCard(IDCardInfoPtr& pIDCardInfo)
 // 	{
 // 		strName = (const char*)pIDCardInfo->szName;
-// 		strIDNumber = (const char*)pIDCardInfo->szIdentify;
+// 		strIDNumber = (const char*)pIDCardInfo->szIdentity;
 // 	}
 // };
 using SSCardInfoPtr = shared_ptr<SSCardInfo>;
@@ -801,7 +804,7 @@ public:
 	}
 	void SetIDCardInfo(IDCardInfoPtr& pCardInfo)
 	{
-		gInfo() << "Name:" << pCardInfo->szName << "\tID:" << pCardInfo->szIdentify;
+		gInfo() << "Name:" << pCardInfo->szName << "\tID:" << pCardInfo->szIdentity;
 		pIDCard = pCardInfo;
 	}
 
@@ -836,7 +839,7 @@ public:
 		if (pSSCardInfo && pIDCard)
 		{
 			strcpy_s(pSSCardInfo->strName, (const char*)pIDCard->szName);
-			//strcpy_s(pSSCardInfo->strIDNumber = (const char*)pIDCard->szIdentify);
+			//strcpy_s(pSSCardInfo->strIDNumber = (const char*)pIDCard->szIdentity);
 		}
 	}
 
@@ -890,7 +893,40 @@ public:
 	string		   strPayCode;
 	bool		   bDebug;
 	bool		   bTestCard = false;
+public:
+	bool m_bDetectStarted = false;
+	bool m_bVideoStarted = false;
+	HANDLE  m_hCamera = nullptr;
+	int m_nWidth = 640;
+	int m_nHeight = 480;
+	int nWndIndex = 0;
+	byte* pImageBuffer = nullptr;
+	int		nBufferSize = 0;
+	string strFullCapture;
+	string strFaceCapture;
+	//int FaceCamera_EventCallback(int nEventID, int nFrameStatus);
 
+	bool IsVideoStart();
+
+	bool OpenCamera();
+
+	bool StartVideo(HWND hWnd);
+
+	void StopVideo();
+
+	void CloseCamera();
+
+	bool StartDetect(void* pContext, int nDetectMilliSeconds = 2000, int nTimeoutMilliSeconds = 15000);
+
+	bool SaveFaceImage(string strPhotoFile, bool bFull = true);
+
+	bool FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, float& dfSimilarity);
+
+	void StopDetect();
+
+	bool SwitchVideoWnd(HWND hWnd);
+
+	bool Snapshot(string strFilePath);
 public:
 	int OpenDevice(QString& strMessage);
 

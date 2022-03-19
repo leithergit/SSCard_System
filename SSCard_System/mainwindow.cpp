@@ -118,6 +118,7 @@ void MainWindow::mousePressEvent(QMouseEvent* e)
 
 MainWindow::~MainWindow()
 {
+	g_pDataCenter->CloseCamera();
 	delete ui;
 }
 
@@ -213,20 +214,13 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-	QString strInfo = "尝试对卡片进行上电测试！";
-	if (g_pDataCenter->bTestCard)
+
+	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 	{
-		if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
-		{
-			m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-			return;
-		}
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
 	}
-	else
-	{
-		strInfo = "跳过卡片上电测试！";
-	}
-	gInfo() << gQStr(strInfo);
+
 
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->ResetAllPages();
