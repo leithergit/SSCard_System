@@ -30,6 +30,8 @@ void SSCardServiceT::on_pushButton_LoadCardID_clicked()
 		QMessageBox_CN(QMessageBox::Information, "提示", "加载测试数据失败!", QMessageBox::Ok, this);
 		return;
 	}
+	ui->label_Identity->setText((char*)pIDCard->szIdentity);
+	ui->label_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	g_pDataCenter->SetIDCardInfo(pIDCard);
 	g_pDataCenter->OpenSSCardReader(strMessage);
@@ -54,6 +56,7 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 	//pService->SetExtraInterface("QueryPersonPhoto", strJsonIn, strJsonOut);
 	int nResult = 0;
 	QString strMessage;
+	string strText;
 	do
 	{
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
@@ -64,17 +67,15 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 		if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))					// 查不到职业类型
 		{
 			CJsonObject jsonOut(strJsonOut);
-			string strText;
 			jsonOut.Get("Result", nResult);
 			jsonOut.Get("Message", strText);
 
-			strMessage = QString("查询制卡信息失败:%1").arg(strText.c_str());
+			//strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
 		CJsonObject jsonOut(strJsonOut);
 
 
-		string strText;
 		if (!jsonOut.Get("Result", nResult) ||
 			!jsonOut.Get("Message", strText))
 		{
@@ -82,9 +83,8 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 			break;
 		}
 
-		QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
-
 	} while (0);
+	QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
 }
 
 
@@ -163,7 +163,7 @@ void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 
 			jsonIn.Add("Birthday", (char*)pIDCardInfo->szBirthday);
 			jsonIn.Add("Gender", (char*)pIDCardInfo->szGender);
-			jsonIn.Add("Nation", (char*)pIDCardInfo->szNationalty);
+			jsonIn.Add("Nation", (char*)pIDCardInfo->szNationaltyCode);
 			jsonIn.Add("Address", (char*)pIDCardInfo->szAddress);
 			jsonIn.Add("BankCode", Reginfo.strBankCode);
 			jsonIn.Add("CardNum", "M82492669");
@@ -261,18 +261,12 @@ void SSCardServiceT::on_pushButton_QueryCardInfo_clicked()
 		}
 
 		CJsonObject jsonOut(strJsonOut);
-		if (!jsonOut.KeyExist("CardNum") ||
-			!jsonOut.KeyExist("Photo"))
+		if (!jsonOut.KeyExist("CardNum"))
 		{
 			QMessageBox::information(nullptr, "information", "Failed in get carddata!");
 			break;
 		}
-		string strPhoto;
-		string strSSCardNum;
-		jsonOut.Get("CardNum", strSSCardNum);
-		jsonOut.Get("Photo", strPhoto);
-		QString strMessage;
-		SaveSSCardPhoto(strMessage, strPhoto.c_str());
+		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
 
 	} while (0);
 }

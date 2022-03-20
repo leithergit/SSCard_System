@@ -187,6 +187,74 @@ int  uc_MakeCard::PremakeCard(QString& strMessage)
 	return nResult;
 }
 
+int uc_MakeCard::LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage)
+{
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
+	int nResult = -1;
+	if (g_pDataCenter->strSSCardPhotoFile.empty())
+	{
+		CJsonObject jsonQuery;
+		jsonQuery.Clear();
+
+		jsonQuery.Add("CardID", pSSCardInfo->strIdentity);
+		jsonQuery.Add("Name", pSSCardInfo->strName);
+		jsonQuery.Add("City", pSSCardInfo->strCity);
+
+		string strJsonQuery = jsonQuery.ToString();
+		string strJsonOut;
+		string strCommand = "QueryPersonPhoto";
+
+		if (QFailed(pService->SetExtraInterface(strCommand, strJsonQuery, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText;
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			return -1;
+		}
+		CJsonObject jsonOut(strJsonOut);
+		string strPhoto;
+		if (jsonOut.Get("Photo", strPhoto))
+		{
+			SaveSSCardPhoto(strMessage, strPhoto.c_str());
+			if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
+			{
+				strMessage = QString("保存照片数据失败!");
+				return -1;
+			}
+		}
+		else
+		{
+			strMessage = QString("社保后台未返回个人照片!");
+			return 1;
+		}
+		/*strMessage = "提示", "未找到照片数据,请先下载照片";
+		break;*/
+	}
+
+	try
+	{
+		ifstream ifs(g_pDataCenter->strSSCardPhotoBase64File, ios::in | ios::binary);
+		stringstream ss;
+		ss << ifs.rdbuf();
+		// 读取jpg图片并转base64
+		//QByteArray ba(ss.str().c_str(), ss.str().size());
+		//QByteArray baBase64 = ba.toBase64();
+		//jsonIn.Add("Photo", baBase64.data());
+		// 直接使用base64数据
+		strPhoto = ss.str();
+		//jsonIn.Add("Photo", );
+		return 0;
+	}
+	catch (std::exception& e)
+	{
+		gInfo() << e.what();
+		return -1;
+	}
+}
 int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 {
 	int nResult = -1;
@@ -218,74 +286,22 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 		//jsonIn.Add("Nation", (char*)pIDCardInfo->szNationaltyCode);
 		jsonIn.Add("Address", pSSCardInfo->strAddress);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
+		if QFailed(LoadPhoto(pService, pSSCardInfo->strPhoto, strMessage))
+		{
+			break;
+		}
+		gInfo() << "JsonIn(without photo) = " << strJsonIn;
+		jsonIn.Add("Photo", pSSCardInfo->strPhoto);
+
 		switch (g_pDataCenter->nCardServiceType)
 		{
 		case ServiceType::Service_NewCard:
 		{
-			if (g_pDataCenter->strSSCardPhotoFile.empty())
-			{
-				jsonIn.Clear();
 
-				jsonIn.Add("CardID", pSSCardInfo->strIdentity);
-				jsonIn.Add("Name", pSSCardInfo->strName);
-				jsonIn.Add("City", pSSCardInfo->strCity);
-
-				strJsonIn = jsonIn.ToString();
-				string strJsonout;
-				string strCommand = "QueryPersonPhoto";
-
-				if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
-				{
-					CJsonObject jsonOut(strJsonOut);
-					string strText;
-					jsonOut.Get("Result", nResult);
-					jsonOut.Get("Message", strText);
-					strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-					break;
-				}
-				CJsonObject jsonOut(strJsonOut);
-				string strPhoto;
-				if (jsonOut.Get("Photo", strPhoto))
-				{
-					SaveSSCardPhoto(strMessage, strPhoto.c_str());
-					if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
-					{
-						strMessage = QString("保存照片数据失败!");
-						break;
-					}
-				}
-				else
-				{
-					strMessage = QString("社保后台未返回个人照片!");
-					break;
-				}
-				/*strMessage = "提示", "未找到照片数据,请先下载照片";
-				break;*/
-			}
-
-			try
-			{
-				ifstream ifs(g_pDataCenter->strSSCardPhotoBase64File, ios::in | ios::binary);
-				stringstream ss;
-				ss << ifs.rdbuf();
-				// 读取jpg图片并转base64
-				//QByteArray ba(ss.str().c_str(), ss.str().size());
-				//QByteArray baBase64 = ba.toBase64();
-				//jsonIn.Add("Photo", baBase64.data());
-				// 直接使用base64数据
-				jsonIn.Add("Photo", ss.str());
-			}
-			catch (std::exception& e)
-			{
-				gInfo() << e.what();
-				return -1;
-			}
 		}
 		break;
 		case ServiceType::Service_ReplaceCard:
 		{
-			CJsonObject jsonIn;
-
 			jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 		}
 		break;
@@ -299,7 +315,6 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 		}
 
 		strJsonIn = jsonIn.ToString();
-		gInfo() << "JsonIn = " << strJsonIn;
 
 		if (QFailed(pService->CommitPersonInfo(strJsonIn, strJsonOut)))
 		{
@@ -309,13 +324,13 @@ int  uc_MakeCard::CommitPersionInfo(QString& strMessage)
 			string strErrcode;
 			jsonOut.Get("Message", strErrText);
 			jsonOut.Get("errcode", strErrcode);
-			QString strMessage = QString::fromLocal8Bit(strErrText.c_str());
-			if (strMessage.contains("申卡人存在有效的制卡申请"))
+			QString qstrErrText = QString::fromLocal8Bit(strErrText.c_str());
+			if (qstrErrText.contains("申卡人存在有效的制卡申请"))
 			{
 				nResult = 0;
 				break;
 			}
-			strMessage = QString("提交用户信息失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+			strMessage = QString("提交用户信息失败:%1").arg(qstrErrText);
 			nResult = -1;
 			break;
 		}

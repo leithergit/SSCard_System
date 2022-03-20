@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="GB2312"?>
+<opencv_storage>
+        <ThresholdFHValue>1.7</ThresholdFHValue>
+		<ThresholdEYEValue>1.7</ThresholdEYEValue>
+		<ThresholdMTValue>1.7</ThresholdMTValue>
+		<LableFlagDim>6</LableFlagDim>
+</opencv_storage>

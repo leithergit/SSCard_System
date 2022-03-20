@@ -17,6 +17,13 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 	installEventFilter(this);
+	QString strAppPath = QApplication::applicationFilePath();
+	unsigned short nMajorVer = 0, nMinorVer = 0, nBuildNum = 0, nRevsion = 0;
+	if (GetModuleVersion(QApplication::applicationFilePath(), nMajorVer, nMinorVer, nBuildNum, nRevsion))
+	{
+		QString strVersion = QString("当前版本:%1.%2.%3.%4").arg(nMajorVer).arg(nMinorVer).arg(nBuildNum).arg(nRevsion);
+		ui->label_Version->setText(strVersion);
+	}
 
 	BaseInfo Bi;
 	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
@@ -164,15 +171,15 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		pLastStackPage->ResetAllPages(0);
 		pLastStackPage = nullptr;
 	}
-	QString strError;
-	if (LoadConfigure(strError))		// 加载配置时会自动关闭已经打开的打印和读卡器
+	QString strMessage;
+	if (LoadConfigure(strMessage))		// 加载配置时会自动关闭已经打开的打印和读卡器
 	{
-		gError() << strError.toLatin1().data();
-		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		gError() << strMessage.toLocal8Bit().data();
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
-	QString strMessage;
+	m_pNewCard->ResetAllPages();
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
@@ -191,13 +198,10 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-
 	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
 	ui->stackedWidget->setCurrentWidget(m_pNewCard);
-	m_pNewCard->ResetAllPages();
 	m_pNewCard->show();
 	pLastStackPage = m_pNewCard;
-
 }
 
 void MainWindow::on_pushButton_Updatecard_clicked()
@@ -207,15 +211,14 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		pLastStackPage->ResetAllPages(0);
 		pLastStackPage = nullptr;
 	}
-	QString strError;
-	if (LoadConfigure(strError))		// 加载配置时会自动关闭已经打开的打印和读卡器
+	QString strMessage;
+	if (LoadConfigure(strMessage))		// 加载配置时会自动关闭已经打开的打印和读卡器
 	{
-		gError() << strError.toLatin1().data();
-		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		gError() << strMessage.toLocal8Bit().data();
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-
-	QString strMessage;
+	m_pUpdateCard->ResetAllPages();
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
@@ -223,7 +226,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		return;
 	}
 
-	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	/*if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
 	{
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
@@ -233,10 +236,10 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	{
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
-	}
+
+	}*/
 	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
-	m_pUpdateCard->ResetAllPages();
 	m_pUpdateCard->show();
 	pLastStackPage = m_pUpdateCard;
 }
@@ -248,11 +251,11 @@ void MainWindow::on_pushButton_ChangePWD_clicked()
 		pLastStackPage->ResetAllPages(0);
 		pLastStackPage = nullptr;
 	}
-	QString strError;
-	if (LoadConfigure(strError))
+	QString strMessage;
+	if (LoadConfigure(strMessage))		// 加载配置时会自动关闭已经打开的打印和读卡器
 	{
-		gError() << strError.toLatin1().data();
-		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		gError() << strMessage.toLocal8Bit().data();
+		m_pUpdatePassword->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
@@ -269,11 +272,11 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 		pLastStackPage->ResetAllPages(0);
 		pLastStackPage = nullptr;
 	}
-	QString strError;
-	if (LoadConfigure(strError))
+	QString strMessage;
+	if (LoadConfigure(strMessage))		// 加载配置时会自动关闭已经打开的打印和读卡器
 	{
-		gError() << strError.toLatin1().data();
-		QMessageBox::critical(this, tr(""), tr(""), QMessageBox::Ok);
+		gError() << strMessage.toLocal8Bit().data();
+		m_pRegiserLost->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
@@ -287,6 +290,9 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 void MainWindow::on_pushButton_MainPage_clicked()
 {
 	gInfo() << "Return mainPage!";
+	char szRCode[128] = { 0 };
+	if (g_pDataCenter->GetPrinter())
+		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 	// 回到主页时需清空所有身份数据
 	if (pLastStackPage)
 	{
@@ -298,6 +304,7 @@ void MainWindow::on_pushButton_MainPage_clicked()
 		}
 		pLastStackPage = nullptr;
 	}
+
 	g_pDataCenter->ResetIDData();
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
 	m_pMainpage->show();
@@ -318,6 +325,12 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 		m_pMaskWindow->setGeometry(pCurPageSender->geometry());
 		QPoint ptLeftTop = pCurPageSender->mapToGlobal(QPoint(0, 0));
 		m_pMaskWindow->move(ptLeftTop);
+	}
+	if (nPageOperation == Return_MainPage)
+	{
+		char szRCode[128] = { 0 };
+		if (g_pDataCenter->GetPrinter())
+			g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 	}
 
 	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);

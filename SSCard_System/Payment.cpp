@@ -848,6 +848,7 @@ int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo)
 		pSSCardInfo->strBankNum = PersonSetting.value("BankNum").toString().toStdString();
 		pSSCardInfo->strCardNum = PersonSetting.value("CardNum").toString().toStdString();
 		pSSCardInfo->strMobile = PersonSetting.value("Mobile").toString().toStdString();
+        pSSCardInfo->strBankCode = PersonSetting.value("BankCode").toString().toStdString();
 		g_pDataCenter->strCardVersion = "3.00";
 
 		PersonSetting.endGroup();

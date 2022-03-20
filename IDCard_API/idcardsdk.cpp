@@ -257,8 +257,8 @@ int IDCardSDK::LoadCardInfo(IDCardInfo& IDCard)
 	nLen = sizeof(IDCard.szGender);
 	GetPeopleSex(IDCard.szGender, &nLen);
 
-	nLen = sizeof(IDCard.szNation);
-	GetPeopleNation(IDCard.szNation, &nLen);
+	nLen = sizeof(IDCard.szNationalty);
+	GetPeopleNation(IDCard.szNationalty, &nLen);
 
 	nLen = sizeof(IDCard.szBirthday);
 	GetPeopleBirthday(IDCard.szBirthday, &nLen);
@@ -266,8 +266,8 @@ int IDCardSDK::LoadCardInfo(IDCardInfo& IDCard)
 	nLen = sizeof(IDCard.szBirthday);
 	GetPeopleAddress(IDCard.szAddress, &nLen);
 
-	nLen = sizeof(IDCard.szIdentify);
-	GetPeopleIDCode(IDCard.szIdentify, &nLen);
+	nLen = sizeof(IDCard.szNationalty);
+	GetPeopleIDCode(IDCard.szNationalty, &nLen);
 
 	nLen = sizeof(IDCard.szIszssueAuthority);
 	GetDepartment(IDCard.szIszssueAuthority, &nLen);
@@ -278,8 +278,8 @@ int IDCardSDK::LoadCardInfo(IDCardInfo& IDCard)
 	nLen = sizeof(IDCard.szExpirationDate2);
 	GetEndDate(IDCard.szExpirationDate2, &nLen);
 
-	nLen = sizeof(IDCard.szNationCode);
-	GetNationCode(IDCard.szNationCode, &nLen);
+	nLen = sizeof(IDCard.szNationaltyCode);
+	GetNationCode(IDCard.szNationaltyCode, &nLen);
 
 	nLen = sizeof(IDCard.szPhoto);
 	GetBmpData(IDCard.szPhoto, (int*)&IDCard.nPhotoSize);

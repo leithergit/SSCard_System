@@ -66,7 +66,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText;
-			jsonOut.Get("Result", nResult);
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
 			strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
@@ -95,6 +96,13 @@ int uc_EnsureInformation::ProcessBussiness()
 		nResult = 0;
 	} while (0);
 
+	if (QFailed(nResult))
+	{
+		gError() << gQStr(strMessage);
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return nResult;
+	}
+
 	pSSCardInfo->strName = (const char*)pIDCard->szName;
 	pSSCardInfo->strGender = (const char*)pIDCard->szGender;
 	pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
@@ -104,12 +112,6 @@ int uc_EnsureInformation::ProcessBussiness()
 	pSSCardInfo->strAddress = (const char*)pIDCard->szAddress;
 
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
-	if (QFailed(nResult))
-	{
-		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-		return nResult;
-	}
 
 	QString strCardStatus2 = "未知";
 	switch (g_pDataCenter->nCardStratus)

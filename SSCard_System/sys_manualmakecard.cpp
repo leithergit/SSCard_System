@@ -293,7 +293,6 @@ void Sys_ManualMakeCard::PrintPhoto()
 {
 	int nResult = -1;
 	QString strMessage;
-	int nStatus = 0;
 	QString strInfo;
 	char szRCode[128] = { 0 };
 	do
@@ -433,7 +432,6 @@ void Sys_ManualMakeCard::PrintCardData()
 	int nResult = -1;
 	QString strMessage;
 
-	int nStatus = 0;
 	QString strInfo;
 	char szRCode[128] = { 0 };
 	do
@@ -518,7 +516,6 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 {
 	int nResult = -1;
 	QString strMessage;
-	int nStatus = 0;
 	QString strInfo;
 	do
 	{
@@ -595,8 +592,6 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 		break;
 	case 3:		// 打印卡面
 	{
-		int nResult = 0;
-		int nStatus = 0;
 		if (QFailed(LoadPersonSSCardData(strMessage)))
 		{
 			break;
@@ -715,7 +710,8 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText, strErrcode;
-			jsonOut.Get("Result", nResult);
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
 			jsonOut.Get("errcode", strErrcode);
 			ui->textEdit->setText(strText.c_str());
@@ -757,7 +753,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 		ui->lineEdit_Bank->setText(QString::fromLocal8Bit(strBankName.c_str()));
 		ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum.c_str());
 		ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile.c_str());
-        ui->lineEdit_Status->setText(pSSCardInfo->strCardStatus.c_str());
+		ui->lineEdit_Status->setText(pSSCardInfo->strCardStatus.c_str());
 
 		nResult = 0;
 	} while (0);

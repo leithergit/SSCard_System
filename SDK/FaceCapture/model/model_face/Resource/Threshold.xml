@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="GB2312"?>
+<opencv_storage>
+        <ThresholdValue>2.1963</ThresholdValue>
+        <AddImageLibs>1</AddImageLibs>
+        <ScoreLevel1>1.45615</ScoreLevel1>
+        <ScoreLevel2>1.70485</ScoreLevel2>
+        <ScoreLevel3>3.47715</ScoreLevel3>
+        <ThresholdAge>0.1</ThresholdAge>
+        <ThresholdGender>0.1</ThresholdGender>
+	<InputWidth>1920</InputWidth>
+	<InputHeight>1080</InputHeight>
+	<MiniSize>64</MiniSize>
+</opencv_storage>

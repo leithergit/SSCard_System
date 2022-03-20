@@ -18,14 +18,14 @@ public:
 	~DialogCameraTest();
 	//DVTLDCamOCXLib::DVTLDCamOCX* m_pFaceDetectOcx = nullptr;
 	QImage  ImageDetected;
-	void OpenCamera();
-
-	void CloseCamera();
+	int    OpenCamara(QString& strError);
+	int    CloseCamera(QString& strError);
 
 private slots:
 	void on_pushButton_clicked();
 	void OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
-
+	//void   OnFaceCaptureSucceed();
+	//void   OnFaceCaptureFailed();
 private:
 	Ui::DialogCameraTest* ui;
 };

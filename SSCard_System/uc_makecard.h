@@ -41,7 +41,8 @@ public:
 	void ThreadWork();
 	static int  PremakeCard(QString& strMessage);
 	static int  CommitPersionInfo(QString& strMessage);
-	static int	 WriteCard(QString& strMessage);
+	static int	WriteCard(QString& strMessage);
+	static int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
 	int  EnsureData(QString& strMessage);
 	static int  ActiveCard(QString& strMessage);
 	void ShowSSCardInfo();

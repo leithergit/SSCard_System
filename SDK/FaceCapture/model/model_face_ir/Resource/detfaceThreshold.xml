@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="GB2312"?>
+<opencv_storage>
+      <Common>
+	    <AlgorithmMode>2</AlgorithmMode>  <!--0:Alg0 1:Alg1 2:Alg0+Alg1-->
+      </Common>
+</opencv_storage>

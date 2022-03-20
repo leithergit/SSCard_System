@@ -10,7 +10,7 @@ MaskWidget::MaskWidget(QWidget* parent) :
 	ui(new Ui::MaskWidget)
 {
 	ui->setupUi(this);
-	ui->pushButton_OK->hide();
+	//ui->pushButton_OK->hide();
 	hide();
 }
 
@@ -78,13 +78,23 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
 	show();
 	setFocus();
-	//ui->pushButton_OK->show();
 
 	if (nPageOpteration != Retry_CurrentPage)
 	{
 		m_nTimeout = nTimeout;
 		m_nTimerID = startTimer(m_nTimerInterval);
 
+	}
+	if (m_nTimeout <= 5000)
+	{
+		ui->pushButton_OK->hide();
+		ui->pushButton_OK->setText("确定");
+	}
+	else
+	{
+		QString strText = QString("确定(%1)").arg(m_nTimeout / 1000);
+		ui->pushButton_OK->setText(strText);
+		ui->pushButton_OK->show();
 	}
 
 	ui->label_Title->setText(strTitle);
@@ -98,6 +108,8 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 	if (event->timerId() == m_nTimerID)
 	{
 		m_nTimeout -= m_nTimerInterval;
+		QString strText = QString("确定(%1)").arg(m_nTimeout / 1000);
+		ui->pushButton_OK->setText(strText);
 		if (m_nTimeout <= 0)
 		{
 			hide();

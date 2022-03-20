@@ -139,7 +139,6 @@ int main(int argc, char* argv[])
 	ofs.close();
 
 	curl_global_init(CURL_GLOBAL_WIN32);
-
 	g_pDataCenter = make_shared<DataCenter>();
 	if (!g_pDataCenter)
 	{
@@ -158,22 +157,20 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	//WaitingProgress WaitingUI;
-	//WaitingUI.show();
-	//a.exec();
-	//if (!WaitingUI.bPrinterReady)
-	//{
-	//	QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
-	//	return 0;
-	//}
-	//if (!CheckLocalLicense(Code_License))
-	//{
-	//	ShowLicense s;
-	//	s.show();
-	//	return a.exec();
-	//}
-
-
+	// 	WaitingProgress WaitingUI;
+	// 	WaitingUI.show();
+	// 	a.exec();
+	// 	if (!WaitingUI.bPrinterReady)
+	// 	{
+	// 		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+	// 		return 0;
+	// 	}
+	// 	if (!CheckLocalLicense(Code_License))
+	// 	{
+	// 		ShowLicense s;
+	// 		s.show();
+	// 		return a.exec();
+	// 	}
 
 	MainWindow w;
 	a.setActivationWindow(&w);

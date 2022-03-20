@@ -218,7 +218,7 @@ public:
 			gError() << "Faled in load progress!";
 			return false;
 		}
-		if (MainProgress.KeyExist(strCurProgress))
+		if (!MainProgress.KeyExist(strCurProgress))
 			return false;
 
 		CJsonObject CurProgress = MainProgress[strCurProgress];
@@ -249,7 +249,7 @@ public:
 		return SaveProgress(MainProgress);
 	}
 
-	int GetProgressStatus(string strKey, int nResult, string& strDatagram)
+	int GetProgressStatus(string strKey, int& nResult, string& strDatagram)
 	{
 		CJsonObject MainProgress;
 		if (!LoadProgress(MainProgress))
@@ -257,7 +257,7 @@ public:
 			gError() << "Faled in load progress!";
 			return false;
 		}
-		if (MainProgress.KeyExist(strCurProgress))
+		if (!MainProgress.KeyExist(strCurProgress))
 			return false;
 
 		CJsonObject CurProgress = MainProgress[strCurProgress];
@@ -274,7 +274,6 @@ public:
 		return true;
 	}
 
-
 	virtual int SetServiceType(ServiceType nSvrType, string& strIdentity) override
 	{
 		if (nSvrType < ServiceType::Service_NewCard ||
@@ -284,6 +283,7 @@ public:
 		{
 			try
 			{
+				nServiceType = nSvrType;
 				switch (nServiceType)
 				{
 				case ServiceType::Service_NewCard:
@@ -301,15 +301,26 @@ public:
 					break;
 				}
 				strJsonFile = "./Data/Progress_" + strIdentity + ".json";
+				if (!exists("./Data/Finished"))
+					filesystem::create_directories("./Data/Finished");
 
-				if (!exists(strJsonFile) || IsFinishedProgress())
+				if (exists(strJsonFile))
 				{
-					string strPathFinished = "./Data/Finished/Progress_" + strIdentity + ".json";
-					filesystem::copy(strJsonFile, strPathFinished);
+					if (IsFinishedProgress())
+					{
+						string strPathFinished = "./Data/Finished/Progress_" + strIdentity + ".json";
+						filesystem::copy(strJsonFile, strPathFinished);
+						filesystem::copy("./Data/ProgressTemplate.json", strJsonFile);
+						gInfo() << "Start a new progress for :" << strIdentity;
+					}
+					else
+						gInfo() << "continue a exist progress for :" << strIdentity;
+				}
+				else
+				{
 					filesystem::copy("./Data/ProgressTemplate.json", strJsonFile);
 					gInfo() << "Start a new progress for :" << strIdentity;
 				}
-
 				//UpdateProgress("ServiceType", (int)nSvrType);
 				return 0;
 			}
@@ -491,7 +502,7 @@ public:
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 1;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrCode = "0";
@@ -553,15 +564,14 @@ public:
 				if (nErrFlag)
 				{
 					OutJson.Get("errcode", strErrCode);
-					int nErrCode = strtol(strErrCode.c_str(), nullptr, 10);
-					UpdateCurProgress(strKey, nErrCode, OutJson.ToFormattedString());
 					OutJson.Get("errtext", strMessage);
 					break;
 				}
-				UpdateCurProgress(strKey, 0, OutJson.ToFormattedString());
+				UpdateCurProgress(strKey, nErrFlag, OutJson.ToFormattedString());
 			}
 			strMessage = "Succeed";
 			nResult = 0;
+			nErrFlag = 0;
 
 		} while (0);
 
@@ -595,7 +605,7 @@ public:
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -650,17 +660,17 @@ public:
 					{
 						outJson.Get("errtext", strMessage);
 						outJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, outJson.ToFormattedString());
 					}
 					break;
 				}
-				UpdateCurProgress(strKey, 0, outJson.ToFormattedString());
+				UpdateCurProgress(strKey, nErrFlag, outJson.ToFormattedString());
 			}
 
 			strMessage = "Succeed";
 			nResult = 0;
+			nErrFlag = 0;
 		} while (0);
+
 		CJsonObject jsonOut;
 		jsonOut.Add("Result", nErrFlag);
 		jsonOut.Add("Message", strMessage);
@@ -691,7 +701,7 @@ public:
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -718,9 +728,9 @@ public:
 				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
 				break;
 			}
+			CJsonObject outJson;
 			UpdatePerson();
 			strKey = "queryCardInfoBySfzhm";
-			CJsonObject outJson;
 			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
 				if (QFailed(nSSResult = queryCardInfoBySfzhm(CardInfo, strOutInfo)))
@@ -741,7 +751,7 @@ public:
 					strMessage = "can't locate field 'errflag' from output of queryCardInfoBySfzhm!";
 					break;
 				}
-				int nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
+				nErrFlag = strtol(strErrFlag.c_str(), nullptr, 10);
 				if (nErrFlag)
 				{
 					if (!outJson.KeyExist("errtext"))
@@ -750,17 +760,14 @@ public:
 					{
 						outJson.Get("errtext", strMessage);
 						outJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, outJson.ToFormattedString());
 					}
 					break;
 				}
-				UpdateCurProgress(strKey, 0, outJson.ToFormattedString());
+				UpdateCurProgress(strKey, nErrFlag, outJson.ToFormattedString());
 			}
 			else
-			{
 				outJson.Parse(strDatagram);
-			}
+
 			CJsonObject ds = outJson["ds"];
 			if (ds.IsEmpty())
 			{
@@ -808,7 +815,6 @@ public:
 			//PersionInfo.strBankCode = ds["yhmc"] .ToString();		// 银行名称
 
 			outJson.Clear();
-			nResult = 0;
 			outJson.Add("Result", nResult);
 			outJson.Add("Name", CardInfo.strName);
 			outJson.Add("CardID", CardInfo.strCardID);
@@ -818,6 +824,8 @@ public:
 			outJson.Add("CardStatus", (int)nCardStatus);
 			outJson.Add("Mobile", CardInfo.strMobile);
 			strJsonOut = outJson.ToString();
+			nResult = 0;
+			nErrFlag = 0;
 
 		} while (0);
 		if (nResult)
@@ -895,7 +903,7 @@ public:
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -917,6 +925,7 @@ public:
 			CardInfo.strDealType = "0";	// new card
 			CardInfo.strOperator = strOperator;
 			CardInfo.strCardType = "A";
+			CardInfo.strOccupType = "2000000";
 			jsonIn.Get("CardID", CardInfo.strCardID);
 			jsonIn.Get("Name", CardInfo.strName);
 			jsonIn.Get("BankCode", CardInfo.strBankCode);
@@ -930,7 +939,6 @@ public:
 			jsonIn.Get("Nation", CardInfo.strNation);
 			jsonIn.Get("Address", CardInfo.strAdress);
 			jsonIn.Get("Photo", CardInfo.strPhoto);
-			CardInfo.strOccupType = "3000000";
 
 			if (strGender == "男")
 				CardInfo.strSex = "1";
@@ -1004,15 +1012,13 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
 				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::days(1));
+			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::hours(24));
 			stringstream date1, date2;
 
 			// date1 = "2022-01-26 09:51:00"
@@ -1054,8 +1060,6 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
@@ -1087,7 +1091,7 @@ public:
 			outJson.Add("Mobile", CardInfo.strMobile);
 			outJson.Add("BankCode", tmpJson["yhbh"].ToString());
 			strJsonOut = outJson.ToString();
-
+			nErrFlag = 0;
 			nResult = 0;
 		} while (0);
 		if (nResult)
@@ -1098,18 +1102,16 @@ public:
 			jsonOut.Add("errcode", strErrcode);
 			strJsonOut = jsonOut.ToString();
 		}
-
 		return nResult;
 	}
 
 	// cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo
 	int CommitReplaceCardInfo(string& strJsonIn, string& strJsonOut)
 	{
-		SD_SSCardInfo CardInfo;
 		CJsonObject json(strJsonIn);
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -1135,6 +1137,7 @@ public:
 			//json.Get("Reason", CardInfo.strReason);
 			//json.Get("Operator", CardInfo.strOperator);
 			//json.Get("OccupType", CardInfo.strOccupType);
+			CardInfo.strOccupType = "2000000";
 			json.Get("IssueDate", CardInfo.strReleaseDate);
 			json.Get("ExpireDate", CardInfo.strValidDate);
 			json.Get("Birthday", CardInfo.strBirthday);
@@ -1142,6 +1145,7 @@ public:
 			json.Get("Nation", CardInfo.strNation);
 			json.Get("Address", CardInfo.strAdress);
 			json.Get("CardNum", CardInfo.strCardNum);
+			json.Get("Photo", CardInfo.strPhoto);
 
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||
@@ -1186,6 +1190,7 @@ public:
 			CJsonObject tmpJson;
 			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
+				int nSize = sizeof(CardInfo);
 				if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
 				{
 					strMessage = "Failed in saveCardSqList:";
@@ -1214,15 +1219,13 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
 				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::days(1));
+			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::hours(24));
 			stringstream date1, date2;
 
 			// date1 = "2022-01-26 09:51:00"
@@ -1276,8 +1279,6 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
@@ -1336,7 +1337,7 @@ public:
 			}*/
 
 			nResult = 0;
-
+			nErrFlag = 0;
 		} while (0);
 		if (nErrFlag)
 		{
@@ -1404,7 +1405,7 @@ public:
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -1470,8 +1471,6 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
@@ -1507,7 +1506,7 @@ public:
 			outJson.Add("NationalityCode", CardInfo.strNation);
 			strJsonOut = outJson.ToString();
 			nResult = 0;
-
+			nErrFlag = 0;
 		} while (0);
 		if (nErrFlag)
 		{
@@ -1560,7 +1559,7 @@ public:
 		CJsonObject json(strJsonIn);
 		int nResult = -1;
 		int nSSResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -1638,14 +1637,12 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
 				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString(), true);
 			}
-
+			nErrFlag = 0;
 			nResult = 0;
 		} while (0);
 		if (nResult)
@@ -1667,7 +1664,7 @@ public:
 		CJsonObject json(strJsonIn);
 		int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -1704,7 +1701,7 @@ public:
 
 			strKey = "saveCardActive";
 			CJsonObject tmpJson;
-			int nErrFlag;
+			int nErrFlag = -1;
 			string strErrFlag;
 			if (!GetProgressStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
@@ -1736,8 +1733,6 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
@@ -1775,15 +1770,12 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
 				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
-
 			}
-
+			nErrFlag = 0;
 			nResult = 0;
 		} while (0);
 		if (nResult)
@@ -1818,7 +1810,7 @@ public:
 		string strMessage;
 		int nSSResult = 0;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strErrcode = "0";
 		string strKey = "";
 		string strDatagram = "";
@@ -1904,6 +1896,7 @@ public:
 				break;
 			}
 			nResult = 0;
+			nErrFlag = 0;
 		} while (0);
 		if (nResult)
 		{
@@ -1937,7 +1930,7 @@ public:
 		string strMessage;
 		int nSSResult = 0;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strErrcode = "0";
 		string strKey = "";
 		string strDatagram = "";
@@ -2000,14 +1993,13 @@ public:
 					{
 						tmpJson.Get("errtext", strMessage);
 						tmpJson.Get("errcode", strErrcode);
-						int nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-						UpdateCurProgress(strKey, nErrCode, tmpJson.ToFormattedString());
 					}
 					break;
 				}
 				UpdateCurProgress(strKey, 0, tmpJson.ToFormattedString());
 			}
 			nResult = 0;
+			nErrFlag = 0;
 		} while (0);
 		if (nResult)
 		{
@@ -2064,7 +2056,7 @@ public:
 		CJsonObject jsonIn;
 		//int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode = "0";
@@ -2142,7 +2134,7 @@ public:
 			jsonOut.Add("Address", CardInfo.strAdress);
 			jsonOut.Add("Mobile", CardInfo.strMobile);
 			jsonOut.Add("OccupType", CardInfo.strOccupType);
-
+			nErrFlag = 0;
 			nResult = 0;
 		} while (0);
 		if (nResult)
@@ -2165,7 +2157,7 @@ public:
 		CJsonObject jsonIn;
 		//int nSSResult = -1;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strErrcode;
@@ -2232,7 +2224,7 @@ public:
 			CJsonObject jsonOut;
 			jsonOut.Add("Photo", CardInfo.strPhoto);
 			strJsonOut = jsonOut.ToString();
-
+			nErrFlag = 0;
 			nResult = 0;
 		} while (0);
 		if (nResult)
@@ -2258,7 +2250,7 @@ public:
 	{
 		CJsonObject jsonIn;
 		int nResult = -1;
-		int nErrFlag = 0;
+		int nErrFlag = -1;
 		string strMessage;
 		string strOutInfo;
 		string strSignatureKey;
@@ -2336,7 +2328,7 @@ public:
 			CardInfo.strCardID = strCardID;
 			CardInfo.strName = strName;
 			CardInfo.strCity = strCity;
-
+			nErrFlag = 0;
 			nResult = 0;
 		} while (0);
 		if (nResult)

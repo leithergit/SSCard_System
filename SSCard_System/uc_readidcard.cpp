@@ -38,9 +38,11 @@ uc_ReadIDCard::~uc_ReadIDCard()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
-	if (g_pDataCenter->OpenCamera())
+	if (!g_pDataCenter->OpenCamera())
 	{
 		gInfo() << "Failed in OpenCamera";
+		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
+		return -1;
 	}
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/

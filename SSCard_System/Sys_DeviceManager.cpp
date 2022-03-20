@@ -11,54 +11,7 @@
 #include "Sys_dialogcameratest.h"
 #include "Payment.h"
 
-DWORD GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, WORD& nBuildNum, WORD& nRevsion)
-{
-	DWORD dwHnd;
-	DWORD dwVerInfoSize;
-	wchar_t pszVersion[2048] = { 0 };
-	wchar_t szModulePath[4096] = { 0 };
-	wcscpy_s(szModulePath, 4096, strModulePath.toStdWString().c_str());
-	do
-	{
-		if (0 >= (dwVerInfoSize = GetFileVersionInfoSizeW(szModulePath, &dwHnd)))
-		{
-			break;
-		}
 
-		// get file version info
-		if (!GetFileVersionInfoW(szModulePath, dwHnd, dwVerInfoSize, pszVersion))
-		{
-			break;
-		}
-
-		// Read the list of languages and code pages.
-		struct LANGANDCODEPAGE
-		{
-			WORD    wLanguage;
-			WORD    wCodePage;
-		}*lpTranslate;
-		unsigned int cbTranslate;
-		if (!VerQueryValueW(pszVersion, L"\\VarFileInfo\\Translation", (void**)&lpTranslate, &cbTranslate))
-		{
-			break;
-		}
-
-		// get FileVersion string from resource
-		VS_FIXEDFILEINFO* p_version;
-		unsigned int version_len = 0;
-		if (!VerQueryValue(pszVersion, L"\\", (void**)&p_version, &version_len))
-		{
-			break;
-		}
-
-		nMajorVer = (p_version->dwFileVersionMS >> 16) & 0x0000FFFF;
-		nMinorVer = p_version->dwFileVersionMS & 0x0000FFFF;
-		nBuildNum = (p_version->dwFileVersionLS >> 16) & 0x0000FFFF;
-		nRevsion = p_version->dwFileVersionLS & 0x0000FFFF;
-		qDebug() << szModulePath << "Version=" << nMajorVer << "." << nMinorVer << "." << nBuildNum << "." << nRevsion;
-	} while (0);
-	return GetLastError();
-}
 
 DeviceManager::DeviceManager(QWidget* parent)
 	: QWidget(parent)

@@ -93,11 +93,12 @@ int nc_commitPersonInfo::ProcessBussiness()
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText, strErrcode;
-			jsonOut.Get("Result", nResult);
+			int nErrCode = -1;
+			//jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
 			jsonOut.Get("errcode", strErrcode);
-			int nErrcode = strtol(strErrcode.c_str(), nullptr, 10);
-			if (nErrcode == 3)	// 已经申请过,则继续制卡
+			nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+			if (nErrCode == 3)	// 已经申请过,则继续制卡
 			{
 				strMessage = QString::fromLocal8Bit(strText.c_str());
 				emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
@@ -138,7 +139,8 @@ int nc_commitPersonInfo::ProcessBussiness()
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText;
-			jsonOut.Get("Result", nResult);
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
 			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
