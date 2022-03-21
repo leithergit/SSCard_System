@@ -6,12 +6,12 @@
     <RemoteDebuggerServerName>192.168.0.12</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2022-03-17T02:07:54.5112524Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-03-20T09:01:53.8143761Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2022-03-17T02:07:56.4670115Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-03-20T09:01:51.8994896Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

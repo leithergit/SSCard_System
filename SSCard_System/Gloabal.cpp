@@ -1616,7 +1616,10 @@ bool DataCenter::OpenCamera()
 	do
 	{
 		if (m_hCamera)
+		{
+			nRet = LD_RET_OK;
 			break;
+		}
 
 		nBufferSize = m_nWidth * m_nHeight * 4;
 		pImageBuffer = new byte[nBufferSize];
@@ -1862,4 +1865,101 @@ bool GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, W
 		bResult = true;
 	} while (0);
 	return bResult;
+}
+
+
+void EnableWidgets(QWidget* pUIObj, bool bEnable)
+{
+	if (!pUIObj)
+		return;
+
+	QObjectList list = pUIObj->children();
+	if (pUIObj->inherits("QWidget"))
+	{
+		QWidget* pWidget = qobject_cast<QWidget*>(pUIObj);
+		pWidget->setEnabled(bEnable);
+		return;
+	}
+	else if (list.isEmpty())
+	{
+		return;
+	}
+	foreach(QObject * pObj, list)
+	{
+		qDebug() << pObj->metaObject()->className();
+		EnableWidgets((QWidget*)pObj, bEnable);
+	}
+	pUIObj->setEnabled(true);
+}
+
+
+void ShowWidgets(QWidget* pUIObj, bool bShow)
+{
+	if (!pUIObj)
+		return;
+
+	QObjectList list = pUIObj->children();
+	qDebug() << "Name = " << pUIObj->objectName();
+
+	foreach(QObject * pObj, list)
+	{
+		qDebug() << pObj->metaObject()->className();
+		ShowWidgets((QWidget*)pObj, bShow);
+	}
+	if (pUIObj->inherits("QWidget"))
+	{
+		QWidget* pWidget = qobject_cast<QWidget*>(pUIObj);
+		pWidget->setVisible(bShow);
+		return;
+	}
+}
+
+
+char VerifyCardID(const char* pszSrc)
+{
+	int iS = 0;
+	int iW[] = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+	static char szVerCode[] = "10X98765432";
+	int i;
+	for (i = 0; i < 17; i++)
+	{
+		iS += (int)(pszSrc[i] - '0') * iW[i];
+	}
+	int iY = iS % 11;
+	return szVerCode[iY];
+}
+
+QString CardStatusString(CardStatus nCardStratus)
+{
+	switch (nCardStratus)
+	{
+	case CardStatus::Card_Release:
+		return "放号";
+		break;
+	case CardStatus::Card_Normal:
+		return  "正常";
+		break;
+	case CardStatus::Card_RegisterLost:
+		return "挂失";
+		break;
+	case CardStatus::Card_RegisgerTempLost:
+		return "临时挂失";
+		break;
+	case CardStatus::Card_CanceledOnRegisterLost:
+		return "挂失后注销";
+		break;
+	case CardStatus::Card_Canceled:
+		return "注销";
+		break;
+	case CardStatus::Card_DeActived:
+		return "未启用";
+		break;
+	case CardStatus::Card_Making:
+		return "制卡中";
+		break;
+	default:
+	case CardStatus::Card_Unknow:
+		return "未知";
+		break;
+	}
 }

@@ -5,6 +5,8 @@
 #include <memory>
 #include "qstackpage.h"
 #include "../SDK/IDCard/idcard_api.h"
+#include "uc_inputidcardinfo.h"
+#include "qnationwidget.h"
 
 namespace Ui {
 	class ReadIDCard;
@@ -25,21 +27,29 @@ public:
 	~uc_ReadIDCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-	//int     m_nTimerReaderIDCard = 0;
+	void StartDetect();
+	void StopDetect();
 	virtual void timerEvent(QTimerEvent* event) override;
 	int     m_nDelayCount = 0;
 	int     m_bSucceed = false;
-	/*    int     GetIDImageStorePath(string &strFilePath);*/
+	//int     GetIDImageStorePath(string &strFilePath);
 	int     ReaderIDCard();
 	void    ThreadWork();
 	virtual void  ShutDown() override;
 	string  m_strDevPort;
 	ushort  m_nBaudreate = 9600;
 	ReadID_Type  nReadIDType = ReadID_UpdateCard;
-
 	IDCardInfoPtr m_pIDCard = nullptr;
+	uc_InputIDCardInfo* pInputIDCardWidget = nullptr;
+	QNationWidget* pQNationWidget = nullptr;
+	void RemoveUI();
+
+signals:
+	void ShowNationWidget(bool bShow);
 private slots:
 	void OnErrorMessage(QString strErrorMsg);
+	void on_checkBox_WithoutIDCard_stateChanged(int arg1);
+	void on_ShowNationWidget(bool bShow);
 private:
 	Ui::ReadIDCard* ui;
 };

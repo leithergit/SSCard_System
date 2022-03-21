@@ -222,6 +222,7 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     <ClCompile Include="..\utility\json\CJsonObject.cpp" />
     <ClCompile Include="..\utility\Markup.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
+    <ClCompile Include="clickablelabel.cpp" />
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
@@ -229,6 +230,8 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
+    <ClCompile Include="qclickablelineedit.cpp" />
+    <ClCompile Include="qnationwidget.cpp" />
     <ClCompile Include="QtSingleton\qtlocalpeer.cpp" />
     <ClCompile Include="QtSingleton\qtsingleapplication.cpp" />
     <ClCompile Include="showlicense.cpp" />
@@ -257,6 +260,7 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     <ClCompile Include="uc_adforfinance.cpp" />
     <ClCompile Include="uc_ensureinformation.cpp" />
     <ClCompile Include="uc_facecapture.cpp" />
+    <ClCompile Include="uc_inputidcardinfo.cpp" />
     <ClCompile Include="uc_inputmobile.cpp" />
     <ClCompile Include="uc_makecard.cpp" />
     <ClCompile Include="uc_pay.cpp" />
@@ -282,8 +286,12 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     <QtMoc Include="QtSingleton\qtlocalpeer.h" />
     <QtMoc Include="QtSingleton\qtsingleapplication.h" />
     <QtMoc Include="sys_manualmakecard.h" />
+    <QtMoc Include="clickablelabel.h" />
     <ClInclude Include="MakCard.h" />
     <QtMoc Include="waitingprogress.h" />
+    <QtMoc Include="uc_inputidcardinfo.h" />
+    <QtMoc Include="qclickablelineedit.h" />
+    <QtMoc Include="qnationwidget.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -377,6 +385,7 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="SSCardSystem_zh_CN.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -388,6 +397,7 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
+    <QtUic Include="qnationwidget.ui" />
     <QtUic Include="showlicense.ui" />
     <QtUic Include="Sys_DeviceManager.ui">
     </QtUic>
@@ -422,6 +432,7 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     </QtUic>
     <QtUic Include="uc_facecapture.ui">
     </QtUic>
+    <QtUic Include="uc_inputidcardinfo.ui" />
     <QtUic Include="uc_inputmobile.ui">
     </QtUic>
     <QtUic Include="uc_makecard.ui">

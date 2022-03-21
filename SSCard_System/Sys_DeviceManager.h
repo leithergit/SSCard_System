@@ -22,7 +22,7 @@ public:
 	void fnThreadReadIDCard(QString strPort);
 	void fnThreadReadPin();
 	IDCardInfo CardInfo;
-	void EnableUI(QObject* pUIObj, bool bEnable = true);
+
 	bool DetectPinBroadPort(QString& strPort);
 
 	bool Save(QString& strMessage);
@@ -72,9 +72,9 @@ private slots:
 
 	void on_comboBox_PrinterTest_activated(int index);
 
-    void on_pushButton_MakePhoto_clicked();
+	void on_pushButton_MakePhoto_clicked();
 
-    void on_pushButton_Excute_clicked();
+	void on_pushButton_Excute_clicked();
 
 private:
 	Ui::DeviceManager ui;

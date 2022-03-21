@@ -1072,4 +1072,12 @@ bool GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, W
 
 #define WaitCursor()  QWaitCursor qWait;
 
+void EnableWidgets(QWidget* pUIObj, bool bEnable = true);
+
+void ShowWidgets(QWidget* pUIObj, bool bShow = true);
+
+char VerifyCardID(const char* pszSrc);
+
+QString CardStatusString(CardStatus nCardStratus);
+
 #endif // GLOABAL_H

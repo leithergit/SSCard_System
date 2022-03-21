@@ -31,7 +31,7 @@ public:
 	explicit UpdateCard(QWidget* parent = nullptr);
 	~UpdateCard();
 	virtual void OnTimerEvent() override;
-	virtual void  SetTimeOut(int nTimeout) override;
+	virtual void  ShowTimeOut(int nTimeout) override;
 	uc_InputMobile* m_pInputMobile = nullptr;
 
 private slots:

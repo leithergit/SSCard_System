@@ -515,29 +515,6 @@ int DeviceManager::ReaderIDCard(const char* szPort, IDCardInfo& CardInfo)
 	return nResult;
 }
 
-void DeviceManager::EnableUI(QObject* pUIObj, bool bEnable)
-{
-	if (!pUIObj)
-		return;
-
-	QObjectList list = pUIObj->children();
-	if (pUIObj->inherits("QWidget"))
-	{
-		QWidget* pWidget = qobject_cast<QWidget*>(pUIObj);
-		pWidget->setEnabled(bEnable);
-		return;
-	}
-	else if (list.isEmpty())
-	{
-		return;
-	}
-	foreach(QObject * pObj, list)
-	{
-		qDebug() << pObj->metaObject()->className();
-		EnableUI(pObj, bEnable);
-	}
-	this->setEnabled(true);
-}
 void DeviceManager::on_pushButton_IDCardReaderTest_clicked()
 {
 	QString strPort = ui.lineEdit_IDCardReaderPort->text();
@@ -558,7 +535,7 @@ void DeviceManager::on_pushButton_IDCardReaderTest_clicked()
 	QMessageBox_CN(QMessageBox::Information, tr("提示"), "请将身份证放置于读卡区,并每隔2秒取走一次,重复放置于读卡区!", QMessageBox::Ok, this);
 	//ui.pushButton_IDCardReaderTest->setEnabled(false);
 	//ui.pushButton_DetectIDCardReadPort->setEnabled(false);
-	EnableUI(this, false);
+	EnableWidgets(this, false);
 
 	bThreadReadIDCardRunning = true;
 	ThreadReadIDCard = std::thread(&DeviceManager::fnThreadReadIDCard, this, strPort);
@@ -579,7 +556,7 @@ void DeviceManager::on_ShowIDCardInfo(bool bSucceed, QString strMessage)
 	}
 	else
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
-	EnableUI(this, true);
+	EnableWidgets(this, true);
 
 }
 
@@ -591,7 +568,7 @@ void DeviceManager::on_InputPin(char ch)
 	{
 		bThreadReadPinRunning = false;
 		ThreadReadPin.join();
-		EnableUI(this, true);
+		EnableWidgets(this, true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
 		break;
 	}
@@ -611,7 +588,7 @@ void DeviceManager::on_InputPin(char ch)
 		qDebug("confirm...");
 		bThreadReadPinRunning = false;
 		ThreadReadPin.join();
-		EnableUI(this, true);
+		EnableWidgets(this, true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
 		break;
 	}
@@ -797,7 +774,7 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 			return;
 		}
 		ZeroMemory(szPin, sizeof(szPin));
-		EnableUI(this, false);
+		EnableWidgets(this, false);
 		ui.lineEdit_PinBroadPort->setEnabled(true);
 		ui.pushButton_PinBroadTest->setEnabled(true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
@@ -806,7 +783,7 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 	}
 	else
 	{
-		EnableUI(this, true);
+		EnableWidgets(this, true);
 		bThreadReadPinRunning = false;
 		ui.pushButton_PinBroadTest->setText("输入测试");
 		ThreadReadPin.join();

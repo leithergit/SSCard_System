@@ -6,8 +6,11 @@
 #include <algorithm>
 #include "Payment.h"
 #include "MaskWidget.h"
+#include "uc_inputidcardinfo.h"
 #include <QMovie>
 extern MaskWidget* g_pMaskWindow;
+
+#include "mainwindow.h"
 //#include "mainwindow.h"
 using namespace std;
 using namespace chrono;
@@ -26,6 +29,11 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 	QMovie* movie = new QMovie("./Image/SwipeIDCard.gif");
 	ui->label_Swipecard->setMovie(movie);
 	movie->start();
+
+	ui->checkBox_WithoutIDCard->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
+		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
+		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
+		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
 	connect(this, &QStackPage::ErrorMessage, this, &uc_ReadIDCard::OnErrorMessage);
 }
 
@@ -35,6 +43,33 @@ uc_ReadIDCard::~uc_ReadIDCard()
 	delete ui;
 }
 
+void uc_ReadIDCard::StartDetect()
+{
+	if (!m_pWorkThread)
+	{
+		m_bWorkThreadRunning = true;
+		m_pWorkThread = new std::thread(&uc_ReadIDCard::ThreadWork, this);
+		if (!m_pWorkThread)
+		{
+			QString strError = QString("内存不足,创建读卡线程失败!");
+			gError() << strError.toLocal8Bit().data();
+			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+			return;
+		}
+	}
+}
+
+void uc_ReadIDCard::StopDetect()
+{
+	m_bWorkThreadRunning = false;
+	if (m_pWorkThread && m_pWorkThread->joinable())
+	{
+		m_pWorkThread->join();
+		m_pWorkThread = nullptr;
+	}
+	m_pIDCard = nullptr;
+	CloseReader();
+}
 
 int uc_ReadIDCard::ProcessBussiness()
 {
@@ -61,19 +96,7 @@ int uc_ReadIDCard::ProcessBussiness()
 	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
 	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
 	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
-	if (!m_pWorkThread)
-	{
-		m_bWorkThreadRunning = true;
-		m_pWorkThread = new std::thread(&uc_ReadIDCard::ThreadWork, this);
-		if (!m_pWorkThread)
-		{
-			QString strError = QString("内存不足,创建读卡线程失败!");
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-			return -1;
-		}
-	}
-
+	StartDetect();
 	return 0;
 }
 
@@ -85,15 +108,7 @@ void uc_ReadIDCard::OnTimeout()
 void  uc_ReadIDCard::ShutDown()
 {
 	gInfo() << __FUNCTION__;
-
-	m_bWorkThreadRunning = false;
-	if (m_pWorkThread && m_pWorkThread->joinable())
-	{
-		m_pWorkThread->join();
-		m_pWorkThread = nullptr;
-	}
-	m_pIDCard = nullptr;
-	CloseReader();
+	StopDetect();
 }
 
 void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
@@ -227,10 +242,91 @@ int uc_ReadIDCard::ReaderIDCard()
 		gInfo() << "Try to close IDCard Reader!";
 		CloseReader();
 	}
-
 	return nResult;
 }
+
 void uc_ReadIDCard::timerEvent(QTimerEvent* event)
 {
 
+}
+
+void uc_ReadIDCard::on_checkBox_WithoutIDCard_stateChanged(int arg1)
+{
+	if (arg1)
+	{
+		//ui->label_Swipecard->setParent(nullptr);
+		ui->horizontalLayout_2->removeWidget(ui->label_Swipecard);
+		ui->label_Swipecard->hide();
+		ui->label_Notify->hide();
+		ui->checkBox_WithoutIDCard->hide();
+		if (!pInputIDCardWidget)
+		{
+			pInputIDCardWidget = new uc_InputIDCardInfo(this);
+			connect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
+		}
+		pInputIDCardWidget->setParent(this);
+		ui->horizontalLayout_2->addWidget(pInputIDCardWidget);
+		pInputIDCardWidget->show();
+		StopDetect();
+	}
+	else
+	{
+		//ui->label_Swipecard->setParent(this);
+		ui->horizontalLayout_2->addWidget(ui->label_Swipecard);
+		ui->label_Swipecard->show();
+		ui->label_Notify->show();
+		ui->checkBox_WithoutIDCard->show();
+		if (pInputIDCardWidget)
+		{
+			pInputIDCardWidget->setParent(nullptr);
+			pInputIDCardWidget->hide();
+			ui->horizontalLayout_2->removeWidget(pInputIDCardWidget);
+			disconnect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
+		}
+		StartDetect();
+	}
+	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
+	pMainWind->pLastStackPage->ResetTimer(arg1 != 0, this);
+	QRect rt = ui->horizontalSpacer_3->geometry();
+	//adjustSize();
+}
+
+void uc_ReadIDCard::RemoveUI()
+{
+
+}
+void uc_ReadIDCard::on_ShowNationWidget(bool bShow)
+{
+	if (!pQNationWidget)
+	{
+		pQNationWidget = new QNationWidget(this);
+	}
+	QRect rt;
+	if (bShow)
+	{
+		pQNationWidget->setParent(this);
+		ui->horizontalLayout_2->addWidget(pQNationWidget);
+		pQNationWidget->show();
+		if (pInputIDCardWidget)
+		{
+			pInputIDCardWidget->setParent(nullptr);
+			pInputIDCardWidget->hide();
+			ui->horizontalLayout_2->removeWidget(pInputIDCardWidget);
+		}
+		rt = ui->horizontalSpacer_3->geometry();
+	}
+	else
+	{
+		if (pInputIDCardWidget)
+		{
+			pInputIDCardWidget->setParent(this);
+			ui->horizontalLayout_2->addWidget(pInputIDCardWidget);
+			pInputIDCardWidget->show();
+		}
+		pQNationWidget->setParent(nullptr);
+		pQNationWidget->hide();
+		ui->horizontalLayout_2->removeWidget(pQNationWidget);
+		rt = ui->horizontalSpacer_3->geometry();
+	}
+	adjustSize();
 }

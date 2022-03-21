@@ -57,7 +57,7 @@ UpdateCard::~UpdateCard()
 	delete ui;
 }
 
-void  UpdateCard::SetTimeOut(int nTimeout)
+void  UpdateCard::ShowTimeOut(int nTimeout)
 {
 	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
 }

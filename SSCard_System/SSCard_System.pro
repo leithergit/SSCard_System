@@ -42,6 +42,7 @@ SOURCES += \
     Sys_sscardservicet.cpp \
     SystemManager.cpp \
     WMIQuery.cpp \
+    clickablelabel.cpp \
     imageviewlabel.cpp \
     license.cpp \
     main.cpp \
@@ -49,7 +50,9 @@ SOURCES += \
     mainwindow.cpp \
     nc_commitpersoninfo.cpp \
     newcard.cpp \
+    qclickablelineedit.cpp \
     qmainstackpage.cpp \
+    qnationwidget.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
     registerlost.cpp \
@@ -58,6 +61,7 @@ SOURCES += \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
+    uc_inputidcardinfo.cpp \
     uc_inputmobile.cpp \
     uc_makecard.cpp \
     uc_pay.cpp \
@@ -92,13 +96,16 @@ HEADERS += \
     Sys_sscardservicet.h \
     SystemManager.h \
     WMIQuery.h \
+    clickablelabel.h \
     imageviewlabel.h \
     license.h \
     mainpage.h \
     mainwindow.h \
     nc_commitpersoninfo.h \
     newcard.h \
+    qclickablelineedit.h \
     qmainstackpage.h \
+    qnationwidget.h \
     qpinkeybroad.h \
     qstackpage.h \
     registerlost.h \
@@ -107,6 +114,7 @@ HEADERS += \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
+    uc_inputidcardinfo.h \
     uc_inputmobile.h \
     uc_makecard.h \
     uc_pay.h \
@@ -140,12 +148,14 @@ FORMS += \
     mainpage.ui \
     mainwindow.ui \
     nc_commitpersoninfo.ui \
+    qnationwidget.ui \
     registerlost.ui \
     showlicense.ui \
     sys_manualmakecard.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \
+    uc_inputidcardinfo.ui \
     uc_inputmobile.ui \
     uc_makecard.ui \
     uc_pay.ui \

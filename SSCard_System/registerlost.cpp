@@ -40,7 +40,7 @@ RegisterLost::~RegisterLost()
 	delete ui;
 }
 
-void  RegisterLost::SetTimeOut(int nTimeout)
+void  RegisterLost::ShowTimeOut(int nTimeout)
 {
 	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
 }

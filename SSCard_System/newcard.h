@@ -17,7 +17,7 @@ public:
     NewCard(QWidget* parent = nullptr);
     ~NewCard();
     virtual void OnTimerEvent() override;
-    virtual void  SetTimeOut(int nTimeout) override;
+    virtual void  ShowTimeOut(int nTimeout) override;
 private slots:
 
 

@@ -26,7 +26,8 @@ public:
 	virtual void OnTimerEvent();
 	bool eventFilter(QObject* object, QEvent* event) override;
 	virtual void  ResetAllPages(int nStartPage = 1);
-	virtual void  SetTimeOut(int nTimeout) {};
+	virtual void  ShowTimeOut(int nTimeout) {};
+	virtual void  ResetTimer(bool boolStop, QStackPage* pCurPage = nullptr);
 	// 	virtual void paintEvent(QPaintEvent* event) override
 	// 	{
 	// 		QPainter painter(this);

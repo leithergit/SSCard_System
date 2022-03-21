@@ -171,9 +171,6 @@
     <ClCompile Include="SystemManager.cpp">
       <Filter>SystemManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\utility\Markup.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sys_sscardservicet.cpp">
       <Filter>SystemManager</Filter>
     </ClCompile>
@@ -185,9 +182,6 @@
     </ClCompile>
     <ClCompile Include="sys_manualmakecard.cpp">
       <Filter>SystemManager</Filter>
-    </ClCompile>
-    <ClCompile Include="waitingprogress.cpp">
-      <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>MainPage</Filter>
@@ -224,6 +218,24 @@
     </ClCompile>
     <ClCompile Include="nc_commitPersonInfo.cpp">
       <Filter>Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_inputidcardinfo.cpp">
+      <Filter>Page</Filter>
+    </ClCompile>
+    <ClCompile Include="clickablelabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utility\Markup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qclickablelineedit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qnationwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="waitingprogress.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -287,11 +299,11 @@
     <ClInclude Include="..\utility\json\CJsonObject.hpp">
       <Filter>json</Filter>
     </ClInclude>
-    <ClInclude Include="..\utility\Markup.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="MakCard.h">
-      <Filter>Generated Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utility\Markup.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +318,7 @@
     <None Include="SSCardSystem_zh_CN.ts">
       <Filter>Translation Files</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CheckPassword.ui">
@@ -411,6 +424,12 @@
       <Filter>SystemManager</Filter>
     </QtUic>
     <QtUic Include="waitingprogress.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="uc_inputidcardinfo.ui">
+      <Filter>Page</Filter>
+    </QtUic>
+    <QtUic Include="qnationwidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -624,9 +643,6 @@
     <QtMoc Include="sys_manualmakecard.h">
       <Filter>SystemManager</Filter>
     </QtMoc>
-    <QtMoc Include="waitingprogress.h">
-      <Filter>Generated Files</Filter>
-    </QtMoc>
     <QtMoc Include="uc_adforfinance.h">
       <Filter>Page</Filter>
     </QtMoc>
@@ -659,6 +675,21 @@
     </QtMoc>
     <QtMoc Include="nc_commitPersonInfo.h">
       <Filter>Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_inputidcardinfo.h">
+      <Filter>Page</Filter>
+    </QtMoc>
+    <QtMoc Include="clickablelabel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qclickablelineedit.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qnationwidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="waitingprogress.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
