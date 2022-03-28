@@ -25,15 +25,13 @@ Sys_ManualMakeCard::Sys_ManualMakeCard(QWidget* parent) :
 	pButtonGrpServiceType->addButton(ui->radioButton_NewCard, 0);
 	pButtonGrpServiceType->addButton(ui->radioButton_ReplaceCard, 1);
 	pButtonGrpServiceType->setExclusive(true);
-
-	pButtonGrpBusiness = new QButtonGroup(this);
-	pButtonGrpBusiness->addButton(ui->radioButton_commitInfo, 0);
-	pButtonGrpBusiness->addButton(ui->radioButton_PremakeCard, 1);
-	pButtonGrpBusiness->addButton(ui->radioButton_WriteCard, 2);
-	pButtonGrpBusiness->addButton(ui->radioButton_PrintCard, 3);
-	pButtonGrpBusiness->addButton(ui->radioButton_EnableCard, 4);
-	pButtonGrpBusiness->setExclusive(true);
-
+	//pButtonGrpBusiness = new QButtonGroup(this);
+	//pButtonGrpBusiness->addButton(ui->radioButton_commitInfo, 0);
+	//pButtonGrpBusiness->addButton(ui->radioButton_PremakeCard, 1);
+	//pButtonGrpBusiness->addButton(ui->radioButton_WriteCard, 2);
+	//pButtonGrpBusiness->addButton(ui->radioButton_PrintCard, 3);
+	//pButtonGrpBusiness->addButton(ui->radioButton_EnableCard, 4);
+	//pButtonGrpBusiness->setExclusive(true);
 	pButtonGrpGender = new QButtonGroup(this);
 	pButtonGrpGender->addButton(ui->radioButton_Male, 0);
 	pButtonGrpGender->addButton(ui->radioButton_Female, 1);
@@ -46,6 +44,15 @@ Sys_ManualMakeCard::Sys_ManualMakeCard(QWidget* parent) :
 	}
 
 	ui->comboBox_Nationality->setCurrentIndex(0);
+
+	m_LableStep.push_back(ui->label_MakeCard);
+	//m_LableStep.push_back(ui->label_Depanse);
+	m_LableStep.push_back(ui->label_Write);
+	m_LableStep.push_back(ui->label_Print);
+	m_LableStep.push_back(ui->label_ReturnData);
+	m_LableStep.push_back(ui->label_Reject);
+
+	connect(this, &Sys_ManualMakeCard::UpdateProgress, this, &Sys_ManualMakeCard::OnUpdateProgress);
 }
 
 Sys_ManualMakeCard::~Sys_ManualMakeCard()
@@ -68,6 +75,30 @@ void Sys_ManualMakeCard::on_ShowIDCardInfo(bool bSucceed, QString strMessage)
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 	EnableUI(this, true);
 }
+
+void Sys_ManualMakeCard::on_ShowMessage(QMessageBox::Icon nIcon, QString strTitle, QString strMessage)
+{
+	QMessageBox_CN(nIcon, strTitle, strMessage, QMessageBox::Ok, this);
+	EnableUI(this, true);
+}
+
+void Sys_ManualMakeCard::OnUpdateProgress(int nStep)
+{
+	qDebug() << __FUNCTION__ << "nStep = " << nStep;
+	if (nStep >= 0 && nStep < m_LableStep.size())
+		m_LableStep[nStep]->setStyleSheet(QString::fromUtf8("image: url(:/Image/Status_Finish.png);"));
+}
+
+void Sys_ManualMakeCard::ShowSSCardInfo()
+{
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	//ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
+	//ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
+	ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum.c_str());
+	QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+	ui->label_Photo->setStyleSheet(strStyle);
+}
+
 
 void Sys_ManualMakeCard::fnThreadReadIDCard(string strPort)
 {
@@ -270,20 +301,170 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage)
 void Sys_ManualMakeCard::on_pushButton_LoadCardData_clicked()
 {
 	QString strMessage;
+	int nSelID = pButtonGrpServiceType->checkedId();
+	if (nSelID == -1)
+	{
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), "请选择制卡业务类型!", QMessageBox::Ok, this);
+		return;
+	}
+	g_pDataCenter->nCardServiceType = (ServiceType)nSelID;
+	SSCardService* pService = nullptr;
+	if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
+	{
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return;
+	}
+
+	if (!pService)
+	{
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), "社保卡卡管库不可用!", QMessageBox::Ok, this);
+		return;
+	}
+	int nResult = -1;
+	if (ui->checkBox_WithoutIDCard->isChecked())
+	{//无证办卡，检查身分证输入状态
+		QString strName = ui->lineEdit_Name->text();
+		if (strName.isEmpty())
+		{
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), "姓名不能为空!", QMessageBox::Ok, this);
+			return;
+		}
+		QString strIDentity = ui->lineEdit_CardID->text();
+		if (strIDentity.isEmpty())
+		{
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), "身份证号不能为空!", QMessageBox::Ok, this);
+			return;
+		}
+
+		QString strGender = "男";
+		int nID = pButtonGrpGender->checkedId();
+		if (nID == 1)
+			strGender = "女";
+		QString strNationalCode = ui->comboBox_Nationality->currentData().toString();
+		QString strNational = ui->comboBox_Nationality->currentText();
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+		// 012345
+		// 362331197612164214
+		strcpy_s((char*)pIDCard->szName, 32, strName.toLocal8Bit().data());
+		strcpy_s((char*)pIDCard->szIdentity, 36, strIDentity.toLocal8Bit().data());
+		strcpy_s((char*)pIDCard->szBirthday, 24, strIDentity.toStdString().substr(6, 8).c_str());
+		strcpy_s((char*)pIDCard->szGender, 8, strGender.toLocal8Bit().data());
+		strcpy_s((char*)pIDCard->szNationalty, 20, strNational.toLocal8Bit().data());
+		strcpy_s((char*)pIDCard->szNationaltyCode, 20, strNationalCode.toLocal8Bit().data());
+		g_pDataCenter->SetIDCardInfo(pIDCard);
+	}
+	else
+	{
+		QString strCardProgress;
+		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+		if (!pIDCard)
+		{
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), "身份证数据无效,请先读取身份证或输入身份证信息!", QMessageBox::Ok, this);
+			return;
+		}
+	}
+
+	ui->pushButton_MakeCard->setEnabled(true);
+	ui->pushButton_MakeCard->setEnabled(true);
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+	string strBankName;
+	do
+	{
+		pSSCardInfo->strName = (const char*)pIDCard->szName;
+		pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
+		pSSCardInfo->strOrganID = Reginfo.strAgency;
+		pSSCardInfo->strBankCode = Reginfo.strBankCode;
+		pSSCardInfo->strTransType = "5";
+		pSSCardInfo->strCity = Reginfo.strCityCode;
+		pSSCardInfo->strSSQX = Reginfo.strCountry;
+		pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+
+		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+		SSCardBaseInfoPtr pTempSSCardInfo = make_shared<SSCardBaseInfo>();
+		pTempSSCardInfo->strName = (const char*)pIDCard->szName;
+		pTempSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
+
+		CJsonObject jsonIn;
+		jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
+		jsonIn.Add("Name", (const char*)pIDCard->szName);
+		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+		jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
+		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText, strErrcode;
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			jsonOut.Get("errcode", strErrcode);
+			ui->textEdit->setText(strText.c_str());
+			strMessage = QString("查询制卡状态失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			break;
+		}
+		CJsonObject jsonOut(strJsonOut);
+		/*
+			outJson.Add("Name", CardInfo.strName);
+			outJson.Add("CardID", CardInfo.strCardID);
+			outJson.Add("CardNum", CardInfo.strCardNum);
+			outJson.Add("BankName", strBankName);
+			outJson.Add("BankCode", CardInfo.strBankCode);
+			outJson.Add("CardStatus", (int)nCardStatus);
+			outJson.Add("Mobile", CardInfo.strMobile);
+		*/
+		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
+		string strBankName;
+		jsonOut.Get("BankName", strBankName);
+
+		jsonOut.Get("Mobile", pSSCardInfo->strMobile);
+
+		const char* szStatus[] = {
+				"放号",
+				"正常",
+				"挂失",
+				"临时挂失",
+				"挂失后注销",
+				"注销",
+				"未启用"
+		};
+		int nCardStatus = -1;
+		jsonOut.Get("CardStatus", nCardStatus);
+		if (nCardStatus >= 0 && nCardStatus <= sizeof(szStatus) / sizeof(char*))
+			pSSCardInfo->strCardStatus = szStatus[(int)nCardStatus];
+		else
+			pSSCardInfo->strCardStatus = "未知";
+		ui->lineEdit_Status->setText(pSSCardInfo->strCardStatus.c_str());
+		ui->lineEdit_Bank->setText(QString::fromLocal8Bit(strBankName.c_str()));
+		ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum.c_str());
+		ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile.c_str());
+		ui->lineEdit_Status->setText(pSSCardInfo->strCardStatus.c_str());
+
+		nResult = 0;
+	} while (0);
+
+	if (QFailed(nResult))
+	{
+		ui->textEdit->setText(strMessage);
+		gError() << gQStr(strMessage);
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	}
+
 
 	if (QFailed(LoadPersonSSCardData(strMessage)))
 	{
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
-	SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+
 	QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
 	ui->label_Photo->setStyleSheet(strStyle);
 	ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
 	ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
 	ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum.c_str());
 	//ui->lineEdit_Datetime->setText(pSSCardInfo->strReleaseDate);
-	string strBankName;
 	g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName);
 
 	ui->lineEdit_Bank->setText(strBankName.c_str());
@@ -567,48 +748,17 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 
 void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 {
-	QString strMessage;
-
-	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	pSSCardInfo->strOrganID = Reginfo.strAgency;
-	pSSCardInfo->strOrganID = Reginfo.strAgency;
-	pSSCardInfo->strBankCode = Reginfo.strBankCode;
-	pSSCardInfo->strTransType = "5";
-	pSSCardInfo->strCity = Reginfo.strCityCode;
-	pSSCardInfo->strSSQX = Reginfo.strCountry;
-	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
-	pSSCardInfo->strBankCode = Reginfo.strBankCode;
-	int nIndex = pButtonGrpBusiness->checkedId();
-	switch (nIndex)
+	if (!pThreadMakeCard)
 	{
-	case 0:     // 提交数据
-		ProcessPowerOnFailed();
-		break;
-	case 1:		// 预制卡开户
-		break;
-	case 2:		// 写入数据
-		PrintCardData();
-		break;
-	case 3:		// 打印卡面
-	{
-		if (QFailed(LoadPersonSSCardData(strMessage)))
+		bThreadMakeCardRunning = true;
+		pThreadMakeCard = new std::thread(&Sys_ManualMakeCard::ThreadMakeCard, this);
+		if (!pThreadMakeCard)
 		{
-			break;
+			QString strError = QString("内存不足,创建制卡线程失败!");
+			gError() << strError.toLocal8Bit().data();
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), strError, QMessageBox::Ok, this);
 		}
-
-		break;
-	}
-	case 4:		// 打印卡面
-	{
-		this->EnableCard();
-		break;
-	}
-	case 5:		// 启用卡片
-	{
-		break;
-	}
-
+		EnableUI(this, false);
 	}
 }
 
@@ -623,6 +773,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 	g_pDataCenter->nCardServiceType = (ServiceType)nSelID;
 	SSCardService* pService = nullptr;
 	QString strMessage;
+	g_pDataCenter->CloseSSCardService(strMessage);
 	if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
 	{
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -677,7 +828,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 			return;
 		}
 	}
-	ui->pushButton_LoadCardData->setEnabled(true);
+	ui->pushButton_PremakeCard->setEnabled(true);
 	ui->pushButton_MakeCard->setEnabled(true);
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
@@ -693,6 +844,14 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 		pSSCardInfo->strCity = Reginfo.strCityCode;
 		pSSCardInfo->strSSQX = Reginfo.strCountry;
 		pSSCardInfo->strCardVender = Reginfo.strCardVendor;
+
+        pSSCardInfo->strName = (const char*)pIDCard->szName;
+        pSSCardInfo->strGender = (const char*)pIDCard->szGender;
+        pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
+        pSSCardInfo->strNationCode = (const char*)pIDCard->szNationaltyCode;
+        pSSCardInfo->strBirthday = (const char*)pIDCard->szBirthday;
+        pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
+        pSSCardInfo->strAddress = (const char*)pIDCard->szAddress;
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 		SSCardBaseInfoPtr pTempSSCardInfo = make_shared<SSCardBaseInfo>();
@@ -731,9 +890,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
 		string strBankName;
 		jsonOut.Get("BankName", strBankName);
-
 		jsonOut.Get("Mobile", pSSCardInfo->strMobile);
-
 		const char* szStatus[] = {
 				"放号",
 				"正常",
@@ -780,16 +937,6 @@ void Sys_ManualMakeCard::on_checkBox_WithoutIDCard_stateChanged(int arg1)
 	ui->comboBox_Nationality->setEnabled(bStatus);
 }
 
-void Sys_ManualMakeCard::on_radioButton_NewCard_clicked()
-{
-
-}
-
-
-void Sys_ManualMakeCard::on_radioButton_ReplaceCard_clicked()
-{
-
-}
 
 void Sys_ManualMakeCard::on_checkBox_Debug_stateChanged(int arg1)
 {
@@ -833,4 +980,81 @@ void Sys_ManualMakeCard::on_checkBox_Debug_stateChanged(int arg1)
 		//g_pDataCenter->OpenSSCardReader(strMessage);
 		//g_pDataCenter->OpenPrinter(strMessage);
 	}
+}
+
+void Sys_ManualMakeCard::on_pushButton_PremakeCard_clicked()
+{
+	QString strMessage;
+    if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
+    {
+         if (QFailed(g_pDataCenter->RegisterLost(strMessage)))
+         {
+              QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+              return;
+         }
+    }
+
+    if (QFailed(g_pDataCenter->GetCardStatus(strMessage)))
+    {
+        QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+        return ;
+    }
+
+	if (QFailed(g_pDataCenter->CommitPersionInfo(strMessage)))
+	{
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return;
+	}
+
+	if (QFailed(g_pDataCenter->PremakeCard(strMessage)))
+	{
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return;
+	}
+	ShowSSCardInfo();
+}
+
+void Sys_ManualMakeCard::ThreadMakeCard()
+{
+	int nResult = -1;
+	QString strMessage;
+	char szRCode[128] = { 0 };
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	QString strInfo;
+	do
+	{
+		if (QFailed(g_pDataCenter->Depense(strMessage)))
+			break;
+
+		if (QFailed(g_pDataCenter->WriteCard(strMessage)))
+			break;
+		emit UpdateProgress(MP_WriteCard);
+		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+			break;
+		strInfo = "卡片打印成功";
+		gInfo() << gQStr(strInfo);
+		emit UpdateProgress(MP_PrintCard);
+
+		if (QFailed(g_pDataCenter->EnsureData(strMessage)))
+			break;
+
+		if (QFailed(g_pDataCenter->ActiveCard(strMessage)))
+			break;
+		emit UpdateProgress(MP_EnableCard);
+		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+
+		nResult = 0;
+	} while (0);
+
+	if (QFailed(nResult))
+	{
+		emit ShowMessage(QMessageBox::Critical, "操作失败", strMessage);
+		return;
+	}
+	else
+	{
+		emit ShowMessage(QMessageBox::Information, "提示", "制卡成功,请及时取走卡片");
+	}
+	emit UpdateProgress(MP_RejectCard);
+	this_thread::sleep_for(chrono::milliseconds(2000));
 }

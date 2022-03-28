@@ -4,14 +4,14 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QAction>
+#include <thread>
 #include "Gloabal.h"
 #include "DevBase.h"
 #include "Payment.h"
 #include "Sys_dialogidcardinfo.h"
 #include "Sys_dialogcameratest.h"
 #include "Payment.h"
-
-
+using namespace std;
 
 DeviceManager::DeviceManager(QWidget* parent)
 	: QWidget(parent)
@@ -895,16 +895,33 @@ void DeviceManager::on_pushButton_Excute_clicked()
 
 	case 3:
 	{
+		int nDPI = ui.comboBox_DPI->currentIndex();
+
+		string strDPI = "Resolution=DPI300;";
+		if (nDPI == 1)
+		{
+			strDPI = "Resolution=DPI600;";
+		}
+
 		SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
 		pSSCardInfo->strName = UTF8_GBK("测试用户");
 		pSSCardInfo->strIdentity = "123456789012345678";
 		pSSCardInfo->strCardNum = "PP123456N";
 		pSSCardInfo->strValidDate = "20220101";
+		char szRcode[128] = { 0 };
 		QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
 
+		g_pDataCenter->GetPrinter()->Printer_ExtraCommand(strDPI.c_str(), szRcode);
 		if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))
 		{
 			Wait.RestoreCursor();
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+		std::this_thread::sleep_for(chrono::seconds(30));
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject(szRCode)))
+		{
+			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
 			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 			return;
 		}

@@ -36,7 +36,7 @@ void uc_FaceCapture::ShutDown()
 {
 	gInfo() << __FUNCTION__;
 
-	g_pDataCenter->StopDetect();
+	g_pDataCenter->StopFaceDetect();
 
 }
 
@@ -65,7 +65,7 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 	int nResult = 0;
 	do
 	{
-		g_pDataCenter->StopDetect();
+		g_pDataCenter->StopFaceDetect();
 		if (g_pDataCenter->IsVideoStart())
 		{
 			if (!g_pDataCenter->SwitchVideoWnd((HWND)ui->label_FaceDetect->winId()))
@@ -84,7 +84,7 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 			}
 
 		}
-		if (!g_pDataCenter->StartDetect(this, 2000, m_nTimeout * 1000))
+		if (!g_pDataCenter->StartFaceDetect(this, 2000, m_nTimeout * 1000))
 		{
 			strError = "启动人脸检测失败!";
 			return -1;
@@ -101,7 +101,7 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 	do
 	{
 		g_pDataCenter->StopVideo();
-		g_pDataCenter->StopDetect();
+		g_pDataCenter->StopFaceDetect();
 
 	} while (0);
 	return nResult;
@@ -110,7 +110,7 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
 	QString strError;
-	g_pDataCenter->StopDetect();
+	g_pDataCenter->StopFaceDetect();
 
 	gInfo() << "OnFaceCaptureSucceed!";
 	emit ShowMaskWidget("操作成功", "人脸识别成功,稍后请确认卡信息!", Success, Switch_NextPage);
@@ -119,7 +119,7 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 void uc_FaceCapture::OnFaceCaptureFailed()
 {
 	QString strError;
-	g_pDataCenter->StopDetect();
+	g_pDataCenter->StopFaceDetect();
 	gInfo() << "OnFaceCaptureFailed!";
 	emit ShowMaskWidget("操作失败", "身份证照片与当前人脸对比相似度太低,匹配失败!", Failed, Return_MainPage);
 }
@@ -205,7 +205,8 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 			{
 				if (dfSimilarity >= g_pDataCenter->GetSysConfigure()->dfFaceSimilarity)
 				{
-					gInfo() << QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
+					strEvent = "人脸匹配成功!";
+					gInfo() << gQStr(strEvent);
 					if (!m_bFaceDetectSucceed)
 					{
 						gInfo() << QString("切换到下一页面!").toStdString().c_str();

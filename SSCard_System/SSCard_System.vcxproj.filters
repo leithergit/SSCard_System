@@ -64,9 +64,6 @@
     <Filter Include="SystemManager">
       <UniqueIdentifier>{af433a36-d47d-44a0-bea6-ea5cd8f82955}</UniqueIdentifier>
     </Filter>
-    <Filter Include="qtsingleton">
-      <UniqueIdentifier>{73fb14f0-8922-4660-b1b9-b4a9ae12f050}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MainPage">
       <UniqueIdentifier>{21e209da-6e27-499d-9a4e-d4c0473c1eb5}</UniqueIdentifier>
     </Filter>
@@ -174,12 +171,6 @@
     <ClCompile Include="Sys_sscardservicet.cpp">
       <Filter>SystemManager</Filter>
     </ClCompile>
-    <ClCompile Include="QtSingleton\qtlocalpeer.cpp">
-      <Filter>qtsingleton</Filter>
-    </ClCompile>
-    <ClCompile Include="QtSingleton\qtsingleapplication.cpp">
-      <Filter>qtsingleton</Filter>
-    </ClCompile>
     <ClCompile Include="sys_manualmakecard.cpp">
       <Filter>SystemManager</Filter>
     </ClCompile>
@@ -236,6 +227,18 @@
     </ClCompile>
     <ClCompile Include="waitingprogress.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_batchmakecard.cpp">
+      <Filter>SystemManager</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QCheckComboBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sys_dialogreadidcard.cpp">
+      <Filter>SystemManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -426,11 +429,17 @@
     <QtUic Include="waitingprogress.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="uc_inputidcardinfo.ui">
-      <Filter>Page</Filter>
-    </QtUic>
     <QtUic Include="qnationwidget.ui">
       <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="uc_inputidcardinfo.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sys_batchmakecard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="sys_dialogreadidcard.ui">
+      <Filter>SystemManager</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -634,12 +643,6 @@
     <QtMoc Include="Sys_sscardservicet.h">
       <Filter>SystemManager</Filter>
     </QtMoc>
-    <QtMoc Include="QtSingleton\qtlocalpeer.h">
-      <Filter>qtsingleton</Filter>
-    </QtMoc>
-    <QtMoc Include="QtSingleton\qtsingleapplication.h">
-      <Filter>qtsingleton</Filter>
-    </QtMoc>
     <QtMoc Include="sys_manualmakecard.h">
       <Filter>SystemManager</Filter>
     </QtMoc>
@@ -690,6 +693,18 @@
     </QtMoc>
     <QtMoc Include="waitingprogress.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_batchmakecard.h">
+      <Filter>SystemManager</Filter>
+    </QtMoc>
+    <QtMoc Include="ComboDelegate.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="QCheckComboBox.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_dialogreadidcard.h">
+      <Filter>SystemManager</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

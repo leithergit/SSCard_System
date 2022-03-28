@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1307</width>
-    <height>700</height>
+    <width>1594</width>
+    <height>641</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,253 +21,69 @@ color: #707070;
 font:42px &quot;思源黑体 CN Medium&quot;;
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QHBoxLayout" name="horizontalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_9">
+    <spacer name="horizontalSpacer_6">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>90</height>
+      </size>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>60</width>
+       <height>87</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <spacer name="horizontalSpacer_6">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>90</height>
-        </size>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <spacer name="verticalSpacer_2">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_Photo">
+          <widget class="QLabel" name="label_Name">
            <property name="minimumSize">
             <size>
-             <width>240</width>
-             <height>300</height>
+             <width>220</width>
+             <height>40</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>240</width>
-             <height>300</height>
+             <width>220</width>
+             <height>16777215</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgb(124, 124, 124);</string>
+            <string notr="true"/>
            </property>
            <property name="text">
-            <string/>
+            <string>姓  名</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
+          <widget class="QLineEdit" name="lineEdit_Name">
+           <property name="minimumSize">
             <size>
-             <width>20</width>
-             <height>40</height>
+             <width>320</width>
+             <height>60</height>
             </size>
            </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <property name="spacing">
-            <number>0</number>
+           <property name="readOnly">
+            <bool>false</bool>
            </property>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_Name">
-               <property name="minimumSize">
-                <size>
-                 <width>220</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(170, 0, 0);</string>
-               </property>
-               <property name="text">
-                <string>姓  名</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_Name">
-               <property name="minimumSize">
-                <size>
-                 <width>320</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="readOnly">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <property name="topMargin">
-              <number>6</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_Gender">
-               <property name="minimumSize">
-                <size>
-                 <width>220</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(170, 0, 0);</string>
-               </property>
-               <property name="text">
-                <string>性  别</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <property name="spacing">
-                <number>6</number>
-               </property>
-               <property name="sizeConstraint">
-                <enum>QLayout::SetDefaultConstraint</enum>
-               </property>
-               <item>
-                <widget class="QRadioButton" name="radioButton_Male">
-                 <property name="minimumSize">
-                  <size>
-                   <width>80</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QRadioButton::indicator { 
-	width: 32px;
-	height: 32px;
-}
-QRadioButton::indicator::unchecked {
-	image: url(:/Image/RadioUnChecked.png);
-}
-QRadioButton::indicator::checked { 
-	image: url(:/Image/RadioCheck.png);
-}
-</string>
-                 </property>
-                 <property name="text">
-                  <string>男</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::MinimumExpanding</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radioButton_Female">
-                 <property name="minimumSize">
-                  <size>
-                   <width>80</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QRadioButton::indicator { 
-	width: 32px;
-	height: 32px;
-}
-QRadioButton::indicator::unchecked {
-	image: url(:/Image/RadioUnChecked.png);
-}
-QRadioButton::indicator::checked { 
-	image: url(:/Image/RadioCheck.png);
-}
-</string>
-                 </property>
-                 <property name="text">
-                  <string>女</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_7">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-          </layout>
+          </widget>
          </item>
          <item>
           <spacer name="horizontalSpacer">
@@ -276,96 +92,357 @@ QRadioButton::indicator::checked {
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>13</width>
+             <width>40</width>
              <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <widget class="QLabel" name="label_Gender">
+           <property name="minimumSize">
+            <size>
+             <width>220</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>220</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>性  别</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>6</number>
            </property>
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLabel" name="label_Mobile">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>140</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(170, 0, 0);</string>
-               </property>
-               <property name="text">
-                <string>手机</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_Mobile">
-               <property name="minimumSize">
-                <size>
-                 <width>200</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>18017348763</string>
-               </property>
-               <property name="maxLength">
-                <number>11</number>
-               </property>
-               <property name="readOnly">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QRadioButton" name="radioButton_Male">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+             </property>
+             <property name="text">
+              <string>男</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_Nation">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(170, 0, 0);</string>
-               </property>
-               <property name="text">
-                <string>民族</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_Nationality">
-               <property name="minimumSize">
-                <size>
-                 <width>200</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QComboBox{
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>100</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton_Female">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+             </property>
+             <property name="text">
+              <string>女</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>100</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_Nation">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>民族</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_Nationality">
+           <property name="minimumSize">
+            <size>
+             <width>280</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{
+  padding: 1px 15px 1px 3px;
+  border:1px solid rgba(228,228,228,1);
+}
+QComboBox::drop-down {
+      subcontrol-origin: padding;
+      subcontrol-position: top right;
+      width: 36px;
+      border:none;
+}
+QComboBox::down-arrow {
+ 	image: url(:/Image/down_arrow.png);
+  }
+QComboBox QAbstractItemView{
+	margin-top: 8px;
+	margin-left: 6px;
+	margin-bottom: 6px;
+	margin-right: 6px;
+	background:rgba(255,255,255,1);
+    border:1px solid rgba(228,228,228,1);
+    outline: 2px;
+    padding-left: 16px;
+    padding-top: 12px;
+	padding-bottom:12px;
+  }
+QComboBox::QAbstractItemView::item {
+ 	height:56px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+ }
+QComboBox QScrollBar::vertical{
+    width:36px;
+    background:rgb(255,255,255);
+    border:none;
+}
+QComboBox QScrollBar::handle::vertical{
+    border-radius:3px;
+    background-color: rgba(30, 34, 43, 0.2);
+}
+QComboBox QScrollBar::handle::vertical::hover{
+    background-color: rgba(30, 34, 43, 0.2);
+}
+QComboBox QScrollBar::add-line::vertical{
+    border:none;
+}
+QComboBox QScrollBar::sub-line::vertical{
+    border:none;
+}</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_25">
+         <item>
+          <widget class="QLabel" name="label_IDCard">
+           <property name="minimumSize">
+            <size>
+             <width>220</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>220</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>身份证号码</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_CardID">
+           <property name="minimumSize">
+            <size>
+             <width>600</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>18</number>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_ExpireDate">
+           <property name="minimumSize">
+            <size>
+             <width>220</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>220</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>证件有效期</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="dateEdit_Issued">
+           <property name="minimumSize">
+            <size>
+             <width>280</width>
+             <height>60</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="dateEdit_Expired">
+           <property name="minimumSize">
+            <size>
+             <width>280</width>
+             <height>60</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_27">
+         <item>
+          <widget class="QLabel" name="label_Career">
+           <property name="minimumSize">
+            <size>
+             <width>220</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>220</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>职业类型</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_Career">
+           <property name="minimumSize">
+            <size>
+             <width>350</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{
   padding: 1px 15px 1px 3px;
   border:1px solid rgba(228,228,228,1);
 }
@@ -418,75 +495,131 @@ QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
     border:none;
 }
 </string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_25">
-         <item>
-          <widget class="QLabel" name="label_IDCard">
-           <property name="minimumSize">
-            <size>
-             <width>220</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color: rgb(170, 0, 0);</string>
-           </property>
-           <property name="text">
-            <string>身份证号码</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_CardID">
-           <property name="minimumSize">
-            <size>
-             <width>600</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maxLength">
-            <number>18</number>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <layout class="QHBoxLayout" name="horizontalLayout_29">
          <item>
-          <widget class="QLabel" name="label_ExpireDate">
+          <widget class="QLabel" name="label_Address">
            <property name="minimumSize">
             <size>
              <width>220</width>
              <height>40</height>
             </size>
            </property>
+           <property name="maximumSize">
+            <size>
+             <width>220</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="styleSheet">
-            <string notr="true">color: rgb(170, 0, 0);</string>
+            <string notr="true"/>
            </property>
            <property name="text">
-            <string>证件有效期</string>
+            <string>通讯地址</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_IssuedDate">
+          <widget class="QComboBox" name="comboBox_Province">
            <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
             <size>
              <width>280</width>
-             <height>40</height>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{padding: 1px 15px 1px 3px; border:1px solid rgba(228,228,228,1);}
+QComboBox::drop-down {border-style:none;}
+QComboBox QAbstractItemView{margin-top: 8px;margin-left: 6px;margin-bottom: 6px;margin-right: 6px;background:rgba(255,255,255,1);
+border:1px solid rgba(228,228,228,1);outline: 2px; padding-left: 16px;padding-top: 12px;padding-bottom:12px; }
+QComboBox::QAbstractItemView::item {height:56px;margin-top: 8px;margin-bottom: 8px; }
+QComboBox QScrollBar::vertical{width:36px;background:rgb(255,255,255);border:none;}
+QComboBox QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::add-line::vertical{border:none;}
+QComboBox QScrollBar::sub-line::vertical{border:none;}
+</string>
+           </property>
+           <property name="maxVisibleItems">
+            <number>16</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_City">
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{padding: 1px 15px 1px 3px; border:1px solid rgba(228,228,228,1);}
+QComboBox::drop-down {border-style:none;}
+QComboBox QAbstractItemView{margin-top: 8px;margin-left: 6px;margin-bottom: 6px;margin-right: 6px;background:rgba(255,255,255,1);
+border:1px solid rgba(228,228,228,1);outline: 2px; padding-left: 16px;padding-top: 12px;padding-bottom:12px; }
+QComboBox::QAbstractItemView::item {height:56px;margin-top: 8px;margin-bottom: 8px; }
+QComboBox QScrollBar::vertical{width:36px;background:rgb(255,255,255);border:none;}
+QComboBox QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::add-line::vertical{border:none;}
+QComboBox QScrollBar::sub-line::vertical{border:none;}
+</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_County">
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{padding: 1px 15px 1px 3px; border:1px solid rgba(228,228,228,1);}
+QComboBox::drop-down {border-style:none;}
+QComboBox QAbstractItemView{margin-top: 8px;margin-left: 6px;margin-bottom: 6px;margin-right: 6px;background:rgba(255,255,255,1);
+border:1px solid rgba(228,228,228,1);outline: 2px; padding-left: 16px;padding-top: 12px;padding-bottom:12px; }
+QComboBox::QAbstractItemView::item {height:56px;margin-top: 8px;margin-bottom: 8px; }
+QComboBox QScrollBar::vertical{width:36px;background:rgb(255,255,255);border:none;}
+QComboBox QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::add-line::vertical{border:none;}
+QComboBox QScrollBar::sub-line::vertical{border:none;}
+</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_Town">
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>60</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -495,58 +628,18 @@ QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
              <height>16777215</height>
             </size>
            </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="maxLength">
-            <number>8</number>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>60</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_ExpiredDate">
-           <property name="minimumSize">
-            <size>
-             <width>280</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>65535</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="maxLength">
-            <number>8</number>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{padding: 1px 15px 1px 3px; border:1px solid rgba(228,228,228,1);}
+QComboBox::drop-down {border-style:none;}
+QComboBox QAbstractItemView{margin-top: 8px;margin-left: 6px;margin-bottom: 6px;margin-right: 6px;background:rgba(255,255,255,1);
+border:1px solid rgba(228,228,228,1);outline: 2px; padding-left: 16px;padding-top: 12px;padding-bottom:12px; }
+QComboBox::QAbstractItemView::item {height:56px;margin-top: 8px;margin-bottom: 8px; }
+QComboBox QScrollBar::vertical{width:36px;background:rgb(255,255,255);border:none;}
+QComboBox QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::add-line::vertical{border:none;}
+QComboBox QScrollBar::sub-line::vertical{border:none;}
+</string>
            </property>
           </widget>
          </item>
@@ -555,99 +648,54 @@ QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_26">
          <item>
-          <widget class="QLabel" name="label_SSCard">
-           <property name="minimumSize">
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
             <size>
              <width>220</width>
-             <height>40</height>
+             <height>20</height>
             </size>
            </property>
-           <property name="text">
-            <string>社保卡号</string>
-           </property>
-          </widget>
+          </spacer>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEditl_SSCard">
+          <widget class="QComboBox" name="comboBox_Street">
            <property name="minimumSize">
             <size>
-             <width>280</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_CardStatus">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>80</width>
-             <height>16777215</height>
+             <width>300</width>
+             <height>60</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="text">
-            <string>状态</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_Status">
-           <property name="minimumSize">
-            <size>
-             <width>280</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>65535</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_28">
-         <item>
-          <widget class="QLabel" name="label_Bank">
-           <property name="minimumSize">
-            <size>
-             <width>220</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>发卡银行</string>
+            <string notr="true">QComboBox{padding: 1px 15px 1px 3px; border:1px solid rgba(228,228,228,1);}
+QComboBox::drop-down {border-style:none;}
+QComboBox QAbstractItemView{margin-top: 8px;margin-left: 6px;margin-bottom: 6px;margin-right: 6px;background:rgba(255,255,255,1);
+border:1px solid rgba(228,228,228,1);outline: 2px; padding-left: 16px;padding-top: 12px;padding-bottom:12px; }
+QComboBox::QAbstractItemView::item {height:56px;margin-top: 8px;margin-bottom: 8px; }
+QComboBox QScrollBar::vertical{width:36px;background:rgb(255,255,255);border:none;}
+QComboBox QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QComboBox QScrollBar::add-line::vertical{border:none;}
+QComboBox QScrollBar::sub-line::vertical{border:none;}
+</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_Bank">
+          <widget class="QLineEdit" name="lineEdit_Address">
            <property name="minimumSize">
             <size>
-             <width>600</width>
+             <width>400</width>
              <height>40</height>
             </size>
            </property>
            <property name="readOnly">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -656,108 +704,93 @@ QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
       </layout>
      </item>
      <item>
-      <spacer name="horizontalSpacer_5">
+      <spacer name="verticalSpacer_3">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>Qt::Vertical</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>20</height>
+         <height>40</height>
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>188</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_OK">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>266</width>
+           <height>90</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 25px;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
+         </property>
+         <property name="text">
+          <string>确定</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>188</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_Query">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>266</width>
-         <height>90</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: normal;
-line-height: 49px;
-letter-spacing: 1px;
-color: #ffffff;}
-QPushButton:pressed{background:#38a357;}
-QPushButton:!enabled{background:#cacaca;}
-</string>
-       </property>
-       <property name="text">
-        <string>查询</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_OK">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>266</width>
-         <height>90</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
-font-weight: normal;
-line-height: 49px;
-letter-spacing: 1px;
-color: #ffffff;}
-QPushButton:pressed{background:#38a357;}
-QPushButton:!enabled{background:#cacaca;}
-</string>
-       </property>
-       <property name="text">
-        <string>确定</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+    <spacer name="horizontalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>60</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Sys_ReadIDCard</class>
+ <widget class="QWidget" name="Sys_ReadIDCard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>518</width>
+    <height>416</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
+  <widget class="QLabel" name="label_gif">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>500</width>
+     <height>300</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>500</width>
+     <height>300</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>500</width>
+     <height>300</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Notify">
+   <property name="geometry">
+    <rect>
+     <x>56</x>
+     <y>306</y>
+     <width>215</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>80</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #707070;
+font:42px &quot;思源黑体 CN Medium&quot;;
+border-radius: 24px;</string>
+   </property>
+   <property name="text">
+    <string>请刷身份证</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>56</x>
+     <y>356</y>
+     <width>160</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>160</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>取消</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

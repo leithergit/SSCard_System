@@ -69,7 +69,7 @@ struct HSMInfo
 	char strNation[3];			//民族
 	char strCardATR[27];		//卡复位信息
 	char stralgoCode[3];		//算法标识
-	char strKeyAddr[5];			//秘钥地址
+	char strKeyAddr[64];		//秘钥地址
 	char strReleaseDate[9];		//发卡日期
 	char strValidDate[9];		//有效日期
 	char strBirthday[9];		//出生日期
@@ -160,9 +160,6 @@ struct SD_SSCardInfo
 	std::string strContactsName;	//联系人姓名
 	std::string strContactsMobile;	//联系人电话
 	std::string strReason;			//补换原因
-	std::string strGuardianCardType;//监护人证件类型
-	std::string strGuardianCardID;	//监护人证件号
-	std::string strGuardianType;	//监护人关系
 	std::string strPhoto;			//相片
 };
 struct CAInfo 

@@ -7,26 +7,15 @@
         <file>Image/Status_Finish.png</file>
         <file>Image/todo.png</file>
         <file>Image/backgroud.jpg</file>
-        <file>Image/Registerlost.png</file>
-        <file>Image/banklogo.png</file>
-        <file>Image/UpdateCard.png</file>
         <file>Image/Countdown.png</file>
         <file>Image/OP_ReadID.png</file>
         <file>Image/Bkgrnd.png</file>
         <file>Image/zhifubao.png</file>
-        <file>Image/Kingaotech_QR.png</file>
         <file>Image/InputMobile_BK.png</file>
         <file>Image/Mobile_Keybroad_BK.png</file>
         <file>Image/exclamation.png</file>
         <file>Image/failed.png</file>
         <file>Image/Success.png</file>
-        <file>Image/ChangePassword.png</file>
-        <file>Image/ChangePassword_Pressed.png</file>
-        <file>Image/ChangePassword_hover.png</file>
-        <file>Image/Registerlost_hover.png</file>
-        <file>Image/Registerlost_Pressed.png</file>
-        <file>Image/UpdateCard_hover.png</file>
-        <file>Image/UpdateCard_Pressed.png</file>
         <file>Image/RadioCheck.png</file>
         <file>Image/RadioUnChecked.png</file>
         <file>Image/CheckBox_Checked.png</file>

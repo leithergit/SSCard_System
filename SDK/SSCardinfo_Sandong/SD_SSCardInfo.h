@@ -35,6 +35,14 @@ DLL_PUBLIC int chkCanCardSq(SD_SSCardInfo& info, std::string& pOutInfo);
 DLL_PUBLIC int saveCardSqList(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
+* @brief 保存申领名单信息(未成年新办卡)
+* @param[in] info 需要cardID,cardType,name,city,bankcode,mobile,operator,releaseDate,validDate,Birthday,sex,nation,address,GuardianCardType,GuardianCardID,GuardianName,GuardianType,photo
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int saveCardSqListWithChild(SD_SSCardInfo& info, std::string& pOutInfo);
+
+/**
 * @brief 查询申领名单信息
 * @param[in] info 需要city,bankcode,validDate,dealType,releaseDate
 * @param[out] pOutInfo 返回json字符串

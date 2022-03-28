@@ -434,7 +434,7 @@ font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QLabel" name="label_Hello_7">
+          <widget class="QLabel" name="label_Career">
            <property name="minimumSize">
             <size>
              <width>100</width>
@@ -464,7 +464,7 @@ color: #727275;
 font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
            </property>
            <property name="text">
-            <string>职业类别</string>
+            <string>职业</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -472,38 +472,69 @@ font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox_Occupation">
+          <widget class="QComboBox" name="comboBox_Career">
            <property name="minimumSize">
             <size>
              <width>500</width>
-             <height>0</height>
+             <height>50</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QComboBox
-{
-font-weight: bold;
-line-height: 44px;
-letter-spacing: 1px;
+            <string notr="true">QComboBox{
+  padding: 1px 15px 1px 3px;
+  border:1px solid rgba(228,228,228,1);
 color: #727275;
 font: 57 42px &quot;思源黑体 CN Medium&quot;;
 }
-QComboBox::drop-down{
-subcontrol-origin:padding:
-subcontrol-position:top right;
-border-left-width:0px;
-border-left-color:darkgray;
-border-left-style:solid;
-border-top-right-radius:3px;
-width:48px;height:48px;}
-QComboBox::QAbstractItemView{
-background:#FFB6C1; color:#4B0082;
-selection-color:#0OFF7F;
-selection-background-color:#F0FFFF;
-border:2px solid #B6C9CE;
-outline:0px;}
-QComboBox::down-arrow{image: url(:/arrow.png);}
-QComboBox::down-arrow:on{image: url(:/arrow.png);}</string>
+QComboBox::drop-down {			/*下拉按钮*/
+      subcontrol-origin: padding;
+      subcontrol-position: top right;
+      width: 36px;
+      border:none;
+}
+
+QComboBox::down-arrow {		/*下拉按钮*/
+ 	image: url(:/Image/down_arrow.png);
+  }
+
+QComboBox QAbstractItemView{	/*列表 */
+	margin-top: 8px;
+	margin-left: 6px;
+	margin-bottom: 6px;
+	margin-right: 6px;
+	background:rgba(255,255,255,1);
+    border:1px solid rgba(228,228,228,1);
+    outline: 2px;
+    padding-left: 16px;
+    padding-top: 12px;
+	padding-bottom:12px;
+  }
+  
+ QComboBox::QAbstractItemView::item {		/*下拉按钮*/
+ 	height:56px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+ }
+
+QComboBox QScrollBar::vertical{ /*滑条 主体部分*/
+    width:36px;
+    background:rgb(255,255,255);
+    border:none;
+}
+QComboBox QScrollBar::handle::vertical{ /*滑块主体*/
+    border-radius:3px;
+    background-color: rgba(30, 34, 43, 0.2);
+}
+QComboBox QScrollBar::handle::vertical::hover{
+    background-color: rgba(30, 34, 43, 0.2);
+}
+QComboBox QScrollBar::add-line::vertical{/*上箭头*/
+    border:none;
+}
+QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
+    border:none;
+}
+</string>
            </property>
            <item>
             <property name="text">

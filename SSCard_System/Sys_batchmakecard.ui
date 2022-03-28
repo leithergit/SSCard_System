@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Sys_BatchMakeCard</class>
+ <widget class="QWidget" name="Sys_BatchMakeCard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1379</width>
+    <height>728</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_StartReadIDCard">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>读取证件</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_NewCard">
+       <property name="styleSheet">
+        <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+       </property>
+       <property name="text">
+        <string>新办</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_UpdateCard">
+       <property name="styleSheet">
+        <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+       </property>
+       <property name="text">
+        <string>补办</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_ImportList">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>导入列表</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_StartMakeCard">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>开始制卡</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_StopMakeCard">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>停止制卡</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton__ExportList">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>导出列表</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <attribute name="horizontalHeaderVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>序号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>姓名</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>身份证</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>性别</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>民族</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>职业</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>业务类型</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>卡号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>制卡进度</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="textEdit"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

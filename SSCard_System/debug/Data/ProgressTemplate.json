@@ -1,8 +1,8 @@
 {
 	"Person":	{
-		"Name":	"Ã«Ôô¶®",
-		"Identity":	"342321198012104521",
-		"Gender":	"ÄÐ",
+		"Name":	"",
+		"Identity":	"",
+		"Gender":	"",
 		"Birthday":	"",
 		"Nantion":	"",
 		"PaperIssuedate":	"",
@@ -13,83 +13,9 @@
 		"BankCode":	""
 	},
 	"NewCard":	{
-		"chkCanCardSq":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"queryCardInfoBySfzhm":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardSqList":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"queryCardZksqList":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardOpen":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardCompleted":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardActive":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardJrzhActive":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"CardNum":	"",
-		"ServiceDate":	""
+		
 	},
 	"UpdateCard":	{
-		"saveCardGs":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"queryCardInfoBySfzhm":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"chkCanCardBh":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"queryCardInfoBySfzhm":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardBhList":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"queryCardZksqList":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardOpen":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardCompleted":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardActive":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"saveCardJrzhActive":	{
-			"code":	-1,
-			"datagram":	""
-		},
-		"CardNum":	"",
-		"ServiceDate":	""
+		
 	}
 }

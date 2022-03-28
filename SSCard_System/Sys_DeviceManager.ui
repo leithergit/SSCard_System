@@ -300,11 +300,6 @@ color: 0
                 <string>600*300</string>
                </property>
               </item>
-              <item>
-               <property name="text">
-                <string>600*1200</string>
-               </property>
-              </item>
              </widget>
             </item>
             <item>

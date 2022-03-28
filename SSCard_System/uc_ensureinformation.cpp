@@ -172,8 +172,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		case CardStatus::Card_Canceled:
 		{
 			QString strInfo = QString("卡号已注销,请按新办卡流程处理!");
-			gError() << gQStr(strMessage);
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			gError() << gQStr(strInfo);
+			emit ShowMaskWidget("操作失败", strInfo, Fetal, Return_MainPage);
 			return 0;
 		}
 		break;
@@ -237,8 +237,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		{
 			ui->pushButton_OK->setEnabled(false);
 			QString strInfo = QString("卡号已注销,请按新办卡流程处理!");
-			gError() << gQStr(strMessage);
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			gError() << gQStr(strInfo);
+			emit ShowMaskWidget("操作失败", strInfo, Fetal, Return_MainPage);
 			return 0;
 		}
 		break;

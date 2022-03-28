@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,9 +28,8 @@ SOURCES += \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
     Payment.cpp \
-    QtSingleton/qtlocalpeer.cpp \
-    QtSingleton/qtsingleapplication.cpp \
     Sys_DeviceManager.cpp \
+    Sys_batchmakecard.cpp \
     Sys_cardmanger.cpp \
     Sys_dialogcameratest.cpp \
     Sys_dialogidcardinfo.cpp \
@@ -57,7 +56,9 @@ SOURCES += \
     qstackpage.cpp \
     registerlost.cpp \
     showlicense.cpp \
+    sys_dialogreadidcard.cpp \
     sys_manualmakecard.cpp \
+    sys_readidcard.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -81,10 +82,9 @@ HEADERS += \
     MaskWidget.h \
     OperatorSucceed.h \
     Payment.h \
-    QtSingleton/qtlocalpeer.h \
-    QtSingleton/qtsingleapplication.h \
     SDK/KT_Define.h \
     Sys_DeviceManager.h \
+    Sys_batchmakecard.h \
     Sys_cardmanger.h \
     Sys_dialogcameratest.h \
     Sys_dialogidcardinfo.h \
@@ -110,7 +110,9 @@ HEADERS += \
     qstackpage.h \
     registerlost.h \
     showlicense.h \
+    sys_dialogreadidcard.h \
     sys_manualmakecard.h \
+    sys_readidcard.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -135,6 +137,7 @@ FORMS += \
     Newcard.ui \
     OperatorSucceed.ui \
     Sys_DeviceManager.ui \
+    Sys_batchmakecard.ui \
     Sys_cardmanger.ui \
     Sys_dialogcameratest.ui \
     Sys_dialogidcardinfo.ui \
@@ -151,7 +154,9 @@ FORMS += \
     qnationwidget.ui \
     registerlost.ui \
     showlicense.ui \
+    sys_dialogreadidcard.ui \
     sys_manualmakecard.ui \
+    sys_readidcard.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \

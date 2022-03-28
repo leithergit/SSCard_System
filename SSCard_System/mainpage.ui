@@ -317,11 +317,11 @@ color: #414141;
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="sizeType">
-       <enum>QSizePolicy::Expanding</enum>
+       <enum>QSizePolicy::Fixed</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>27</width>
+        <width>20</width>
         <height>845</height>
        </size>
       </property>
@@ -371,7 +371,7 @@ color: #414141;
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">border-image: url(:/Image/ChangePassword.png);</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string/>
@@ -492,7 +492,7 @@ color: #414141;
       </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>73</width>
+        <width>20</width>
         <height>17</height>
        </size>
       </property>

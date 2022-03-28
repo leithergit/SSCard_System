@@ -119,6 +119,9 @@ public:
 	{
 	}
 
+	virtual bool UpdateStage(string& strKey, int nResult, string strDatagram, bool bFinised = false) = 0;
+
+	virtual int GetStageStatus(string strKey, int& nResult, string& strDatagram) = 0;
 	// 查询卡状态
 	virtual int QueryCardStatus(string& strJsonIn, string& strJsonOut) = 0;
 

@@ -43,6 +43,8 @@ public:
 	uc_InputIDCardInfo* pInputIDCardWidget = nullptr;
 	QNationWidget* pQNationWidget = nullptr;
 	void RemoveUI();
+	void ShowReadCardID();
+	void ShowInputCardID();
 
 signals:
 	void ShowNationWidget(bool bShow);

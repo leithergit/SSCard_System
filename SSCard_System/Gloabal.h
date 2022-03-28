@@ -137,6 +137,16 @@ enum class Manager_Level
 	Manager = 1,
 };
 
+enum MakeCard_Progress
+{
+	MP_PreMakeCard = 0,
+	//Depense,
+	MP_WriteCard,
+	MP_PrintCard,
+	MP_EnableCard,
+	MP_RejectCard
+};
+
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
@@ -797,7 +807,6 @@ struct SysConfig
 
 using SysConfigPtr = shared_ptr<SysConfig>;
 
-
 using SSCardBaseInfoPtr = shared_ptr<SSCardBaseInfo>;
 
 using IDCardInfoPtr = shared_ptr<IDCardInfo>;
@@ -934,13 +943,13 @@ public:
 
 	void CloseCamera();
 
-	bool StartDetect(void* pContext, int nDetectMilliSeconds = 2000, int nTimeoutMilliSeconds = 15000);
+	bool StartFaceDetect(void* pContext, int nDetectMilliSeconds = 2000, int nTimeoutMilliSeconds = 15000);
 
 	bool SaveFaceImage(string strPhotoFile, bool bFull = true);
 
 	bool FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, float& dfSimilarity);
 
-	void StopDetect();
+	void StopFaceDetect();
 
 	bool SwitchVideoWnd(HWND hWnd);
 
@@ -994,6 +1003,15 @@ public:
 		return pSScardSerivce;
 	}
 
+public:
+	int  GetCardStatus(QString& strMessage);
+	int  RegisterLost(QString& strMessage);
+	int  PremakeCard(QString& strMessage);
+	int  CommitPersionInfo(QString& strMessage);
+	int	 WriteCard(QString& strMessage);
+	int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
+	int  EnsureData(QString& strMessage);
+	int  ActiveCard(QString& strMessage);
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pSysConfig = nullptr;
@@ -1080,4 +1098,11 @@ char VerifyCardID(const char* pszSrc);
 
 QString CardStatusString(CardStatus nCardStratus);
 
+struct _CareerType
+{
+	QString strCode;
+	QString strName;
+};
+
+extern vector<_CareerType> vecCareer;
 #endif // GLOABAL_H

@@ -37,9 +37,12 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>20</width>
        <height>20</height>
       </size>
      </property>
@@ -333,26 +336,10 @@ QPushButton:pressed{background:#38a357;}
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
      <property name="spacing">
       <number>0</number>
      </property>
-     <item>
-      <spacer name="verticalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>48</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item>
       <spacer name="verticalSpacer_4">
        <property name="orientation">
@@ -449,7 +436,7 @@ QPushButton:pressed{background:#38a357;}
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>128</width>
+       <width>30</width>
        <height>20</height>
       </size>
      </property>

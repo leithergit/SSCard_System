@@ -12,12 +12,12 @@ nc_commitPersonInfo::nc_commitPersonInfo(QLabel* pTitle, QString strStepImage, P
 	ui(new Ui::nc_commitPersonInfo)
 {
 	ui->setupUi(this);
-	struct _occuption
+	struct _CareerType
 	{
 		QString strCode;
 		QString strName;
 	};
-	_occuption occuArray[] = {
+	_CareerType CareetArray[] = {
 							{"1000000","单位负责人"},
 							{"2000000","专业、技术人员"},
 							{"3000000","办事人员"},
@@ -25,9 +25,9 @@ nc_commitPersonInfo::nc_commitPersonInfo(QLabel* pTitle, QString strStepImage, P
 							{"5000000","农林牧渔水利生产人员"},
 							{"6000000","生产运输工人"},
 							{"8000000","其他从业人员"} };
-	ui->comboBox_Occupation->clear();
-	for (auto& var : occuArray)
-		ui->comboBox_Occupation->addItem(var.strName, var.strCode);
+	ui->comboBox_Career->clear();
+	for (auto& var : CareetArray)
+		ui->comboBox_Career->addItem(var.strName, var.strCode);
 }
 
 nc_commitPersonInfo::~nc_commitPersonInfo()
@@ -190,9 +190,10 @@ void nc_commitPersonInfo::on_pushButton_OK_clicked()
 	{
 
 		gInfo() << gQStr(strInfo);
-		emit ShowMaskWidget("操作失败", "未找到照片数据,需要照看能进行新办卡业务", Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", "未找到照片数据,需要照片才能进行新办卡业务", Fetal, Return_MainPage);
 		return;
 	}
+	g_pDataCenter->GetSSCardInfo()->strOccupType = ui->comboBox_Career->currentData().toString().toStdString();
 	strInfo = QString("信息已确认,稍后请输入手机号码!");
 	gInfo() << gQStr(strInfo);
 	emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);

@@ -19,16 +19,6 @@ namespace Ui {
 	class MakeCard;
 }
 
-enum MakeCard_Progress
-{
-	MP_PreMakeCard = 0,
-	//Depense,
-	MP_WriteCard,
-	MP_PrintCard,
-	MP_EnableCard,
-	MP_RejectCard
-};
-
 class uc_MakeCard : public QStackPage
 {
 	Q_OBJECT
@@ -39,12 +29,12 @@ public:
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
 	void ThreadWork();
-	static int  PremakeCard(QString& strMessage);
-	static int  CommitPersionInfo(QString& strMessage);
-	static int	WriteCard(QString& strMessage);
-	static int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
-	int  EnsureData(QString& strMessage);
-	static int  ActiveCard(QString& strMessage);
+	//static int  PremakeCard(QString& strMessage);
+	//static int  CommitPersionInfo(QString& strMessage);
+	//static int	WriteCard(QString& strMessage);
+	//static int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
+	//static int  EnsureData(QString& strMessage);
+	//static int  ActiveCard(QString& strMessage);
 	void ShowSSCardInfo();
 	//int  PrintCard(QString& strMessage);
 

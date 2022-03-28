@@ -84,6 +84,13 @@ public:
 	 * @return 0:成功 1:失败
 	 */
 	virtual int Reader_GetVersion(char* Version, char* resCode) { return 0;}
+	/**
+	 * @brief 获取医保账号
+	 * @param[out] MedicalNum 获取的医保账号
+	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
+	 * @return 0:成功 1:失败
+	 */
+	virtual int Reader_GetMedicalNum(char* MedicalNum, char* resCode) = 0;
 };
 
 #endif // !KT_READER_H

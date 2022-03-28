@@ -38,7 +38,7 @@ int DialogCameraTest::OpenCamara(QString& strError)
 	int nResult = 0;
 	do
 	{
-		g_pDataCenter->StopDetect();
+		g_pDataCenter->StopFaceDetect();
 		if (g_pDataCenter->IsVideoStart())
 		{
 			if (!g_pDataCenter->SwitchVideoWnd((HWND)ui->label_FaceDetect->winId()))
@@ -74,7 +74,7 @@ int DialogCameraTest::CloseCamera(QString& strError)
 	do
 	{
 		g_pDataCenter->StopVideo();
-		g_pDataCenter->StopDetect();
+		g_pDataCenter->StopFaceDetect();
 
 	} while (0);
 	return nResult;

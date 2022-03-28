@@ -112,6 +112,19 @@ DLL_PUBLIC int iVerifyPin(int iType, char* pin, char* pOutInfo);
  * @return 0-成功 1-失败
  */
 DLL_PUBLIC int iChangePin(int iType, char* oldPin, char* newPin, char* pOutInfo);
+/**
+ * @brief 获取医保卡号第一步获取两个随机数
+ * @param[out] pOutInfo 传出信息 random1|random2
+ * @return 0-成功 1-失败
+ */
+DLL_PUBLIC int iGetMedicalNum_Step1(char* pOutInfo);
+/**
+ * @brief 获取医保卡号
+ * @param[in] Key 传入的MAC值
+ * @param[out] pOutInfo 传出信息,成功时为医保账号,失败时为错误码
+ * @return 0-成功 1-失败
+ */
+DLL_PUBLIC int iGetMedicalNum_Step2(const char *Key, char* pOutInfo);
 
 #ifdef __cplusplus
 EXTERN_C_END

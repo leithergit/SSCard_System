@@ -25,11 +25,13 @@ void SSCardServiceT::on_pushButton_LoadCardID_clicked()
 	QString strMessage;
 	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+	g_pDataCenter->bDebug = true;
 	if (QFailed(LoadTestIDData(pIDCard, pSSCardInfo)))
 	{
 		QMessageBox_CN(QMessageBox::Information, "提示", "加载测试数据失败!", QMessageBox::Ok, this);
 		return;
 	}
+	g_pDataCenter->bDebug = false;
 	ui->label_Identity->setText((char*)pIDCard->szIdentity);
 	ui->label_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
@@ -314,8 +316,8 @@ void SSCardServiceT::on_pushButton_PremakeCard_clicked()
 		}
 		string strPhoto;
 		string strSSCardNum;
-		jsonOut.Get("CardNum", strSSCardNum);
-		jsonOut.Get("Photo", strPhoto);
+		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
+		jsonOut.Get("Photo", pSSCardInfo->strPhoto);
 		QString strMessage;
 		SaveSSCardPhoto(strMessage, strPhoto.c_str());
 
@@ -454,7 +456,8 @@ void SSCardServiceT::on_pushButton_ReturnCard_clicked()
 		jsonIn.Add("CardATR", pSSCardInfo->strCardATR);
 		jsonIn.Add("CardIdentity", pSSCardInfo->strCardIdentity);
 
-		jsonIn.Add("ChipNum", pSSCardInfo->strBankNum);
+		string strChipNum = "6221" + pSSCardInfo->strBankNum.substr(4);
+		jsonIn.Add("ChipNum", strChipNum);
 		jsonIn.Add("MagNum", pSSCardInfo->strBankNum);
 		jsonIn.Add("CardVersion", strFieldList[6].toStdString());
 		jsonIn.Add("ChipType", "32");

@@ -79,6 +79,7 @@ int uc_ReadIDCard::ProcessBussiness()
 		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
 		return -1;
 	}
+
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
 	QSize WindowsSize = size();
@@ -96,7 +97,10 @@ int uc_ReadIDCard::ProcessBussiness()
 	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
 	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
 	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
-	StartDetect();
+	ShowReadCardID();
+	//StartDetect();
+	// on_checkBox_WithoutIDCard_stateChanged会调用StartDetect或StopDetect函数
+	ui->checkBox_WithoutIDCard->setChecked(false);
 	return 0;
 }
 
@@ -109,6 +113,8 @@ void  uc_ReadIDCard::ShutDown()
 {
 	gInfo() << __FUNCTION__;
 	StopDetect();
+	//on_checkBox_WithoutIDCard_stateChanged(0);
+
 }
 
 void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
@@ -211,9 +217,9 @@ int uc_ReadIDCard::ReaderIDCard()
 
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
-			bDevOpened = true;
 			break;
 		}
+		bDevOpened = true;
 		nResult = FindIDCard();
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
@@ -250,45 +256,54 @@ void uc_ReadIDCard::timerEvent(QTimerEvent* event)
 
 }
 
+void uc_ReadIDCard::ShowReadCardID()
+{
+	ui->label_Swipecard->show();
+	ui->label_Notify->show();
+	ui->checkBox_WithoutIDCard->show();
+	if (pInputIDCardWidget)
+	{
+		pInputIDCardWidget->ResetPage();
+		pInputIDCardWidget->setParent(nullptr);
+		pInputIDCardWidget->hide();
+		ui->horizontalLayout_2->removeWidget(pInputIDCardWidget);
+		disconnect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
+	}
+}
+void uc_ReadIDCard::ShowInputCardID()
+{
+	ui->label_Swipecard->hide();
+	ui->label_Notify->hide();
+	ui->checkBox_WithoutIDCard->hide();
+	if (!pInputIDCardWidget)
+	{
+		pInputIDCardWidget = new uc_InputIDCardInfo(this);
+		connect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
+	}
+	pInputIDCardWidget->setParent(this);
+	ui->horizontalLayout_2->addWidget(pInputIDCardWidget);
+	pInputIDCardWidget->show();
+
+}
 void uc_ReadIDCard::on_checkBox_WithoutIDCard_stateChanged(int arg1)
 {
 	if (arg1)
 	{
-		//ui->label_Swipecard->setParent(nullptr);
-		ui->horizontalLayout_2->removeWidget(ui->label_Swipecard);
-		ui->label_Swipecard->hide();
-		ui->label_Notify->hide();
-		ui->checkBox_WithoutIDCard->hide();
-		if (!pInputIDCardWidget)
-		{
-			pInputIDCardWidget = new uc_InputIDCardInfo(this);
-			connect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
-		}
-		pInputIDCardWidget->setParent(this);
-		ui->horizontalLayout_2->addWidget(pInputIDCardWidget);
-		pInputIDCardWidget->show();
+		ShowInputCardID();
 		StopDetect();
 	}
 	else
 	{
 		//ui->label_Swipecard->setParent(this);
-		ui->horizontalLayout_2->addWidget(ui->label_Swipecard);
-		ui->label_Swipecard->show();
-		ui->label_Notify->show();
-		ui->checkBox_WithoutIDCard->show();
-		if (pInputIDCardWidget)
-		{
-			pInputIDCardWidget->setParent(nullptr);
-			pInputIDCardWidget->hide();
-			ui->horizontalLayout_2->removeWidget(pInputIDCardWidget);
-			disconnect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
-		}
+		//ui->horizontalLayout_2->addWidget(ui->label_Swipecard);
+		ShowReadCardID();
 		StartDetect();
 	}
 	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
-	pMainWind->pLastStackPage->ResetTimer(arg1 != 0, this);
-	QRect rt = ui->horizontalSpacer_3->geometry();
-	//adjustSize();
+	if (pMainWind && pMainWind->pLastStackPage)
+	{
+		pMainWind->pLastStackPage->ResetTimer(arg1 != 0, this);
+	}
 }
 
 void uc_ReadIDCard::RemoveUI()

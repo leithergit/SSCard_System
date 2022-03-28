@@ -843,12 +843,17 @@ int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo)
 		strcpy((char*)pIDCard->szExpirationDate1, UTF8_GBK(PersonSetting.value("Issuedate").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szExpirationDate2, UTF8_GBK(PersonSetting.value("ExpireDate").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szAddress, UTF8_GBK(PersonSetting.value("Address").toString().toStdString().c_str()).c_str());
+		pSSCardInfo->strName = (char*)pIDCard->szName;
+		pSSCardInfo->strIdentity = (char*)pIDCard->szIdentity;
+		pSSCardInfo->strGender = (char*)pIDCard->szGender;
+		pSSCardInfo->strBirthday = (char*)pIDCard->szBirthday;
+		pSSCardInfo->strAddress = (char*)pIDCard->szAddress;
 		pSSCardInfo->strCardATR = PersonSetting.value("CardATR").toString().toStdString();
 		pSSCardInfo->strCardIdentity = PersonSetting.value("CardIdentityNum").toString().toStdString();
 		pSSCardInfo->strBankNum = PersonSetting.value("BankNum").toString().toStdString();
 		pSSCardInfo->strCardNum = PersonSetting.value("CardNum").toString().toStdString();
 		pSSCardInfo->strMobile = PersonSetting.value("Mobile").toString().toStdString();
-        pSSCardInfo->strBankCode = PersonSetting.value("BankCode").toString().toStdString();
+		pSSCardInfo->strBankCode = PersonSetting.value("BankCode").toString().toStdString();
 		g_pDataCenter->strCardVersion = "3.00";
 
 		PersonSetting.endGroup();
