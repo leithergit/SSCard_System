@@ -35,6 +35,7 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
 		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
 	connect(this, &QStackPage::ErrorMessage, this, &uc_ReadIDCard::OnErrorMessage);
+
 }
 
 uc_ReadIDCard::~uc_ReadIDCard()
@@ -67,7 +68,6 @@ void uc_ReadIDCard::StopDetect()
 		m_pWorkThread->join();
 		m_pWorkThread = nullptr;
 	}
-	m_pIDCard = nullptr;
 	CloseReader();
 }
 
@@ -89,18 +89,17 @@ int uc_ReadIDCard::ProcessBussiness()
 	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 
-	IDCardInfoPtr pIDCardInfo = make_shared<IDCardInfo>();
-	g_pDataCenter->SetIDCardInfo(pIDCardInfo);
-
-	m_pIDCard = g_pDataCenter->GetIDCardInfo();
+	m_pIDCard = make_shared<IDCardInfo>();
+	//g_pDataCenter->SetIDCardInfo(m_pIDCard);;
 
 	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
 	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
 	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
 	ShowReadCardID();
-	//StartDetect();
-	// on_checkBox_WithoutIDCard_stateChanged会调用StartDetect或StopDetect函数
+	disconnect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
+	StartDetect();
 	ui->checkBox_WithoutIDCard->setChecked(false);
+	connect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
 	return 0;
 }
 
@@ -226,7 +225,7 @@ int uc_ReadIDCard::ReaderIDCard()
 			break;
 		}
 
-		nResult = ReadIDCard(*m_pIDCard.get());
+		nResult = ReadIDCard(m_pIDCard.get());
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
 			break;
@@ -270,11 +269,12 @@ void uc_ReadIDCard::ShowReadCardID()
 		disconnect(this, &uc_ReadIDCard::ShowNationWidget, this, &uc_ReadIDCard::on_ShowNationWidget);
 	}
 }
+
 void uc_ReadIDCard::ShowInputCardID()
 {
 	ui->label_Swipecard->hide();
 	ui->label_Notify->hide();
-	ui->checkBox_WithoutIDCard->hide();
+	//ui->checkBox_WithoutIDCard->hide();
 	if (!pInputIDCardWidget)
 	{
 		pInputIDCardWidget = new uc_InputIDCardInfo(this);
@@ -285,8 +285,9 @@ void uc_ReadIDCard::ShowInputCardID()
 	pInputIDCardWidget->show();
 
 }
-void uc_ReadIDCard::on_checkBox_WithoutIDCard_stateChanged(int arg1)
+void uc_ReadIDCard::On_WithoutIDCard(int arg1)
 {
+	QWaitCursor Wait;
 	if (arg1)
 	{
 		ShowInputCardID();

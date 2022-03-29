@@ -17,30 +17,30 @@ class Sys_ManualMakeCard : public QWidget
 public:
 	explicit Sys_ManualMakeCard(QWidget* parent = nullptr);
 	~Sys_ManualMakeCard();
-	int ReaderIDCard(const char* szPort, IDCardInfo& CardInfo);
+	int ReaderIDCard(const char* szPort, IDCardInfo* pCardInfo);
 	void fnThreadReadIDCard(string strPort);
 	IDCardInfo CardInfo;
 	bool bThreadReadIDCardRunning = false;
-    std::thread* pThreadReadIDCard = nullptr;
-    bool bThreadMakeCardRunning = false;
-    std::thread* pThreadMakeCard = nullptr;
+	std::thread* pThreadReadIDCard = nullptr;
+	bool bThreadMakeCardRunning = false;
+	std::thread* pThreadMakeCard = nullptr;
 	void EnableUI(QObject* pUIObj, bool bEnable = true);
 	QButtonGroup* pButtonGrpGender = nullptr;
 	QButtonGroup* pButtonGrpBusiness = nullptr;
 	QButtonGroup* pButtonGrpServiceType = nullptr;
-    void ThreadMakeCard();
+	void ThreadMakeCard();
 	void ProcessPowerOnFailed();
 	void PrintCardData();
 	void PrintPhoto();
 	void EnableCard();
 	void ShowSSCardInfo();
 	int LoadPersonSSCardData(QString& strMesssage);
-    QVector<QLabel*> m_LableStep;
+	QVector<QLabel*> m_LableStep;
 
 signals:
-    void    ShowIDCardInfo(bool bSuccceed, QString strMessage);
-    void	UpdateProgress(int nStep);
-    void    ShowMessage(QMessageBox::Icon nIcon,QString strTitle,QString strMessage);
+	void    ShowIDCardInfo(bool bSuccceed, QString strMessage);
+	void	UpdateProgress(int nStep);
+	void    ShowMessage(QMessageBox::Icon nIcon, QString strTitle, QString strMessage);
 private slots:
 	void on_pushButton_ReadID_clicked();
 
@@ -58,9 +58,9 @@ private slots:
 
 	void on_pushButton_PremakeCard_clicked();
 
-    void on_ShowMessage(QMessageBox::Icon nIcon,QString strTitle,QString strMessage);
+	void on_ShowMessage(QMessageBox::Icon nIcon, QString strTitle, QString strMessage);
 
-    void OnUpdateProgress(int nStep);
+	void OnUpdateProgress(int nStep);
 
 private:
 	Ui::Sys_ManualMakeCard* ui;

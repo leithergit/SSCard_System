@@ -16,6 +16,7 @@ uc_MakeCard::uc_MakeCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex
 	m_nTimeout = 300;
 	m_LableStep.push_back(ui->label_MakeCard);
 	//m_LableStep.push_back(ui->label_Depanse);
+	m_LableStep.push_back(ui->label_Read);
 	m_LableStep.push_back(ui->label_Write);
 	m_LableStep.push_back(ui->label_Print);
 	m_LableStep.push_back(ui->label_ReturnData);
@@ -127,7 +128,7 @@ void  uc_MakeCard::ShutDown()
 		delete m_pWorkThread;
 		m_pWorkThread = nullptr;
 	}
-	g_pDataCenter->CloseDevice();
+	//g_pDataCenter->CloseDevice();
 }
 
 //int  uc_MakeCard::PremakeCard(QString& strMessage)
@@ -457,9 +458,13 @@ void uc_MakeCard::ThreadWork()
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 			break;
 
-		if (QFailed(g_pDataCenter->WriteCard(strMessage)))
+		if (QFailed(g_pDataCenter->SafeReadCard(strMessage)))
+			break;
+		emit UpdateProgress(MP_ReadCard);
+		if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
 			break;
 		emit UpdateProgress(MP_WriteCard);
+
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
 			break;
 		strInfo = "卡片打印成功";

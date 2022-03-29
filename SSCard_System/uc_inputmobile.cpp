@@ -27,6 +27,27 @@ int uc_InputMobile::ProcessBussiness()
 	SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	pSSCardInfo->strMobile = g_pDataCenter->strMobilePhone;
 	m_strMobile = "";
+	SSCardService* pService = g_pDataCenter->GetSSCardService();
+	if (!pService)
+	{
+		emit ShowMaskWidget("操作失败", "卡管服务不可用!", Fetal, Return_MainPage);
+		return -1;
+	}
+	string strJsonout;
+	if (pService->GetPersonInfoFromStage(strJsonout))
+	{
+		CJsonObject jsonPerson(strJsonout);
+		if (jsonPerson.KeyExist("Mobile"))
+		{
+			string strMobile;
+			jsonPerson.Get("Mobile", strMobile);
+			if (strMobile.size() == 11)
+			{
+				m_strMobile = strMobile.c_str();
+				ui->lineEdit_Mobile->setText(QString(strMobile.c_str()));
+			}
+		}
+	}
 	return 0;
 }
 

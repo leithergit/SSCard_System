@@ -176,6 +176,45 @@ color: #ffffff;
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_Net">
+        <property name="styleSheet">
+         <string notr="true">#label_Net{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
+        </property>
+        <property name="text">
+         <string>网络正常</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_NetWarning">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image: url(:/Image/network-connected.png);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

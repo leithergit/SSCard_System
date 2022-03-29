@@ -140,7 +140,7 @@ enum class Manager_Level
 enum MakeCard_Progress
 {
 	MP_PreMakeCard = 0,
-	//Depense,
+    MP_ReadCard,
 	MP_WriteCard,
 	MP_PrintCard,
 	MP_EnableCard,
@@ -1008,7 +1008,8 @@ public:
 	int  RegisterLost(QString& strMessage);
 	int  PremakeCard(QString& strMessage);
 	int  CommitPersionInfo(QString& strMessage);
-	int	 WriteCard(QString& strMessage);
+	int	 SafeWriteCard(QString& strMessage);
+	int	 SafeReadCard(QString& strMessage);
 	int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
 	int  EnsureData(QString& strMessage);
 	int  ActiveCard(QString& strMessage);

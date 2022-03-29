@@ -55,6 +55,14 @@ public:
 	void On_LoadSystemManager();
 
 	int m_nDateTimer = 0;
+
+	int m_nTimerTestHost = 0;
+	int m_nTimerNetWarning = 0;
+	bool bDisconnect = false;
+	void StartNetWarning();
+	void StopNetWarning();
+	std::thread* pThreadAsync = nullptr;
+
 	virtual void timerEvent(QTimerEvent* event) override;
 	virtual void closeEvent(QCloseEvent* event) override;
 	int LoadConfigure(QString& strError);

@@ -466,7 +466,7 @@ void DeviceManager::fnThreadReadIDCard(QString strPort)
 	bool bSucceed = false;
 	while (bThreadReadIDCardRunning)
 	{
-		if (ReaderIDCard(strPort.toStdString().c_str(), CardInfo) == IDCard_Status::IDCard_Succeed)
+		if (ReaderIDCard(strPort.toStdString().c_str(), &CardInfo) == IDCard_Status::IDCard_Succeed)
 		{
 			bSucceed = true;
 			break;
@@ -488,7 +488,7 @@ void DeviceManager::fnThreadReadIDCard(QString strPort)
 }
 #define    Error_Not_IDCARD         (-1)
 
-int DeviceManager::ReaderIDCard(const char* szPort, IDCardInfo& CardInfo)
+int DeviceManager::ReaderIDCard(const char* szPort, IDCardInfo* pCardInfo)
 {
 	int nResult = IDCard_Status::IDCard_Succeed;
 	do
@@ -505,7 +505,7 @@ int DeviceManager::ReaderIDCard(const char* szPort, IDCardInfo& CardInfo)
 			break;
 		}
 
-		nResult = ::ReadIDCard(CardInfo);
+		nResult = ::ReadIDCard(pCardInfo);
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
 			break;

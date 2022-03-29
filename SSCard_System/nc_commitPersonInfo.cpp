@@ -124,6 +124,7 @@ int nc_commitPersonInfo::ProcessBussiness()
 		pSSCardInfo->strSSQX = Reginfo.strCountry;
 		pSSCardInfo->strCardVender = Reginfo.strCardVendor;
 		pSSCardInfo->strBankCode = Reginfo.strBankCode;
+		pSSCardInfo->strOccupType = ui->comboBox_Career->currentData().toString().toStdString();
 
 		jsonIn.Clear();
 

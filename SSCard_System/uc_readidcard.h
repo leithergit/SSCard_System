@@ -50,7 +50,7 @@ signals:
 	void ShowNationWidget(bool bShow);
 private slots:
 	void OnErrorMessage(QString strErrorMsg);
-	void on_checkBox_WithoutIDCard_stateChanged(int arg1);
+	void On_WithoutIDCard(int arg1);
 	void on_ShowNationWidget(bool bShow);
 private:
 	Ui::ReadIDCard* ui;

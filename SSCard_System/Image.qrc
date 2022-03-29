@@ -21,6 +21,8 @@
         <file>Image/CheckBox_Checked.png</file>
         <file>Image/CheckBox_UnCheck.png</file>
         <file>Image/down_arrow.png</file>
+        <file>Image/network-connected.png</file>
+        <file>Image/network-disconnected.png</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

@@ -363,7 +363,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 		if (g_pDataCenter->nCardStratus == CardStatus::Card_Release ||
 			g_pDataCenter->nCardStratus == CardStatus::Card_Normal)
 		{
-			QString strError("社保卡信息已经确认,正在发送挂失信息!");
+			QString strError = "社保卡信息已经确认,正在发送挂失信息!";
 			gInfo() << strError.toLocal8Bit().data();
 			SSCardService* pService = g_pDataCenter->GetSSCardService();
 			CJsonObject jsonIn;
@@ -389,6 +389,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			}
 			else
 			{
+				strError = "社保卡挂失成功!";
 				gInfo() << strError.toLocal8Bit().data();
 				emit ShowMaskWidget("操作成功", strError, Success, Return_MainPage);
 			}

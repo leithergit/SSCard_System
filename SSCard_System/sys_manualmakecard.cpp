@@ -106,7 +106,7 @@ void Sys_ManualMakeCard::fnThreadReadIDCard(string strPort)
 	bool bSucceed = false;
 	while (bThreadReadIDCardRunning)
 	{
-		if (ReaderIDCard(strPort.c_str(), CardInfo) == IDCard_Status::IDCard_Succeed)
+		if (ReaderIDCard(strPort.c_str(), &CardInfo) == IDCard_Status::IDCard_Succeed)
 		{
 			bSucceed = true;
 			break;
@@ -128,7 +128,7 @@ void Sys_ManualMakeCard::fnThreadReadIDCard(string strPort)
 }
 #define    Error_Not_IDCARD         (-1)
 
-int Sys_ManualMakeCard::ReaderIDCard(const char* szPort, IDCardInfo& CardInfo)
+int Sys_ManualMakeCard::ReaderIDCard(const char* szPort, IDCardInfo* pCardInfo)
 {
 	int nResult = IDCard_Status::IDCard_Succeed;
 	do
@@ -145,7 +145,7 @@ int Sys_ManualMakeCard::ReaderIDCard(const char* szPort, IDCardInfo& CardInfo)
 			break;
 		}
 
-		nResult = ::ReadIDCard(CardInfo);
+		nResult = ::ReadIDCard(pCardInfo);
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
 			break;
@@ -845,13 +845,13 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardInfo_clicked()
 		pSSCardInfo->strSSQX = Reginfo.strCountry;
 		pSSCardInfo->strCardVender = Reginfo.strCardVendor;
 
-        pSSCardInfo->strName = (const char*)pIDCard->szName;
-        pSSCardInfo->strGender = (const char*)pIDCard->szGender;
-        pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
-        pSSCardInfo->strNationCode = (const char*)pIDCard->szNationaltyCode;
-        pSSCardInfo->strBirthday = (const char*)pIDCard->szBirthday;
-        pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
-        pSSCardInfo->strAddress = (const char*)pIDCard->szAddress;
+		pSSCardInfo->strName = (const char*)pIDCard->szName;
+		pSSCardInfo->strGender = (const char*)pIDCard->szGender;
+		pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
+		pSSCardInfo->strNationCode = (const char*)pIDCard->szNationaltyCode;
+		pSSCardInfo->strBirthday = (const char*)pIDCard->szBirthday;
+		pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
+		pSSCardInfo->strAddress = (const char*)pIDCard->szAddress;
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 		SSCardBaseInfoPtr pTempSSCardInfo = make_shared<SSCardBaseInfo>();
@@ -985,20 +985,20 @@ void Sys_ManualMakeCard::on_checkBox_Debug_stateChanged(int arg1)
 void Sys_ManualMakeCard::on_pushButton_PremakeCard_clicked()
 {
 	QString strMessage;
-    if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
-    {
-         if (QFailed(g_pDataCenter->RegisterLost(strMessage)))
-         {
-              QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-              return;
-         }
-    }
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
+	{
+		if (QFailed(g_pDataCenter->RegisterLost(strMessage)))
+		{
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return;
+		}
+	}
 
-    if (QFailed(g_pDataCenter->GetCardStatus(strMessage)))
-    {
-        QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-        return ;
-    }
+	if (QFailed(g_pDataCenter->GetCardStatus(strMessage)))
+	{
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return;
+	}
 
 	if (QFailed(g_pDataCenter->CommitPersionInfo(strMessage)))
 	{
@@ -1026,7 +1026,7 @@ void Sys_ManualMakeCard::ThreadMakeCard()
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 			break;
 
-		if (QFailed(g_pDataCenter->WriteCard(strMessage)))
+		if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
 			break;
 		emit UpdateProgress(MP_WriteCard);
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))

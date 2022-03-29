@@ -18,6 +18,18 @@ enum class BatchTable_Column
 	Col_Progress
 };
 
+int nColumnWidthList[] =
+{
+	80,
+	120,
+	240,
+	60,
+	200,
+	360,
+	150,
+	180,
+	150
+};
 Sys_BatchMakeCard::Sys_BatchMakeCard(QWidget* parent) :
 	QWidget(parent),
 	ui(new Ui::Sys_BatchMakeCard)
@@ -35,20 +47,10 @@ Sys_BatchMakeCard::Sys_BatchMakeCard(QWidget* parent) :
 
 	ComboBoxDelegate* pDelegateServiceType = new ComboBoxDelegate(strServiceType);
 	ui->tableWidget->setItemDelegateForColumn((int)BatchTable_Column::Col_ServiceType, pDelegateServiceType);
-	int nWidthList[] =
-	{
-		80,
-		120,
-		240,
-		60,
-		200,
-		200,
-		150,
-		180,
-		150
-	};
-	for (int i = 0; i < sizeof(nWidthList) / sizeof(int); i++)
-		ui->tableWidget->setColumnWidth(i, nWidthList[i]);
+
+	for (int i = 0; i < sizeof(nColumnWidthList) / sizeof(int); i++)
+		ui->tableWidget->setColumnWidth(i, nColumnWidthList[i]);
+	//ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Career, 360);
 	ui->tableWidget->setRowHeight(0, 60);
 
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -99,7 +101,7 @@ int Sys_BatchMakeCard::ReaderIDCard(IDCardInfo* pIDCard)
 			break;
 		}
 
-		nResult = ReadIDCard(*pIDCard);
+		nResult = ReadIDCard(pIDCard);
 		if (nResult != IDCard_Status::IDCard_Succeed)
 		{
 			break;
@@ -153,6 +155,11 @@ void Sys_BatchMakeCard::ThreadWork()
 
 void Sys_BatchMakeCard::on_pushButton_StartReadIDCard_clicked()
 {
+	if (pButttonGrp->checkedId() == -1)
+	{
+		QMessageBox_CN(QMessageBox::Information, "提示", "请选择批量制卡的业务类型!", QMessageBox::Ok, this);
+		return;
+	}
 	m_bWorkThreadRunning = true;
 	m_pWorkThread = new std::thread(&Sys_BatchMakeCard::ThreadWork, this);
 	Sys_DialogReadIDCard dlg;
@@ -173,7 +180,9 @@ void Sys_BatchMakeCard::on_pushButton_StopReadIDCard_clicked()
 
 void Sys_BatchMakeCard::on_pushButton_ImportList_clicked()
 {
-
+	int nColumnWidth = ui->tableWidget->columnWidth((int)BatchTable_Column::Col_Career);
+	int nColumnWidth2 = ui->tableWidget->columnWidth((int)BatchTable_Column::Col_ServiceType);
+	qDebug() << "BatchTable_Column::Col_Career Width = " << nColumnWidth << "BatchTable_Column::Col_ServiceType Width = " << nColumnWidth2;
 }
 
 
@@ -210,5 +219,6 @@ void Sys_BatchMakeCard::on_AddNewIDCard(IDCardInfo* pIDCard)
 	ui->tableWidget->setItem(nItems - 1, (int)BatchTable_Column::Col_ServiceType, new QTableWidgetItem(nTServiceType == 0 ? "新办卡" : "补换卡"));
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui->tableWidget->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Career, nColumnWidthList[(int)BatchTable_Column::Col_Career]);
 
 }

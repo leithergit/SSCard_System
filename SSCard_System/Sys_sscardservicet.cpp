@@ -678,89 +678,57 @@ void SSCardServiceT::on_pushButton_UnRegisterLost_clicked()
 
 void SSCardServiceT::on_pushButton_ReadBankNum_clicked()
 {
-	int nResult = -1;
 	QString strMessage;
-	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-
 
 	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	char szRCode[32] = { 0 };
-	char szCardBaseRead[1024] = { 0 };
-	int nCardATRLen = 0;
-	QString strInfo;
 
-
-	do
-	{
-		if (QFailed(g_pDataCenter->OpenDevice(strMessage)))
-		{
-			break;
-		}
-		KT_Reader* pSSCardReader = g_pDataCenter->GetSSCardReader();
-		if (!pSSCardReader)
-		{
-			strMessage = "读卡器未就绪!";
-			break;
-		}
-		if (QFailed(g_pDataCenter->MoveCard(strMessage)))
-			break;
-
-		if (QFailed(nResult = pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, (char*)pSSCardInfo->strCardATR.c_str(), nCardATRLen, szRCode)))
-		{
-			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
-			nResult = -4;
-			break;
-		}
-		gInfo() << "CardATR:" << pSSCardInfo->strCardATR;
-		char szBankNum[32] = { 0 };
-		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
-		{
-			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
-			break;
-		}
-
-		pSSCardInfo->strBankNum = szBankNum;
-		gInfo() << "BankNum:" << pSSCardInfo->strBankNum;
-
-		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
-		{
-			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
-			break;
-		}
-		/*
-		发卡地区行政区划代码（卡识别码前6位）、社会保障号码、 卡号、 卡识别码、 姓名、 卡复位信息（仅取历史字节）、 规范版本、 发卡日期、 卡有效期、终端机编号、终端设备号。各数据项之间以 “ | ” 分割，且最后一个数据项以 “ I,, 结尾。
-		639900|l111111198101011110|X00000019|639900D15600000500BF7C7A48FB4966|张三|00814E43238697159900BF7C7A|1.00|20101001
-		区号|社会保障号码(空)|卡号(空)|卡识别码|姓名(空)|卡复位信息(ATR)|Ver|发卡日期|有效期限|
-		411600|||411600D156000005C38275EEFC9B9648||008C544CB386844116018593CA|3.00|20211203|20311202|
-		Field[ 0 ] "371600"
-		Field[ 1 ] ""
-		Field[ 2 ] ""
-		Field[ 3 ] "371600D156000005004B9CF763FBBE5C"
-		Field[ 4 ] ""
-		Field[ 5 ] "0081544C9686843716008F3D97"
-		Field[ 6 ] "3.00"
-		Field[ 7 ] "20220224"
-		Field[ 8 ] "20320224"
-		Field[ 9 ] ""
-		*/
-		QStringList strFieldList = QString(szCardBaseRead).split("|", Qt::KeepEmptyParts);
-		int nIndex = 0;
-		for (auto var : strFieldList)
-		{
-			qDebug() << "Field[" << nIndex << "]" << var;
-			nIndex++;
-		}
-		gInfo() << "CardBaseRead:" << szCardBaseRead;
-
-		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
-		nResult = 0;
-	} while (0);
+    int nResult = g_pDataCenter->ReadCard(pSSCardInfo,strMessage);
 	if (QFailed(nResult))
 	{
 		QMessageBox::information(nullptr, "提示", strMessage);
 	}
 	else
 	{
-		QMessageBox::information(nullptr, "提示", pSSCardInfo->strBankNum.c_str());
+        ui->label_BankNum->setText(pSSCardInfo->strBankNum.c_str());
+        ui->label_ChipNum->setText(pSSCardInfo->strChipNum.c_str());
 	}
 }
+
+void SSCardServiceT::on_pushButton_QueryPersonInfo_clicked()
+{
+    QString strMessage;
+
+    IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+    RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+    QString strInfo;
+    SSCardService* pService = g_pDataCenter->GetSSCardService();
+    string strJsonIn, strJsonOut;
+
+    do
+    {
+        CJsonObject jsonIn;
+
+        jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
+        jsonIn.Add("Name", (char*)pIDCard->szName);
+        jsonIn.Add("City", (char*)Reginfo.strCityCode.c_str());
+
+        strJsonIn = jsonIn.ToString();
+        string strJsonout;
+        string strCommand = "QueryPersonInfo";
+
+        if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+        {
+            break;
+        }
+        CJsonObject jsonOut(strJsonOut);
+        string strCardNum;
+        string strOccupation;
+        jsonOut.Get("CardNum", strCardNum);
+        jsonOut.Get("Occupation", strOccupation);
+        strMessage = QString("社保卡号:%1,职业代码:%2").arg(strCardNum.c_str()).arg(strOccupation.c_str());
+
+        QMessageBox::information(nullptr, "提示", strMessage);
+    } while (0);
+}
+

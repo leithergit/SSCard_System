@@ -99,8 +99,6 @@ void QMainStackPage::ResetAllPages(int nStartPage)
 		qDebug() << "KillTimer:" << m_nTimerID;
 	}
 
-	m_nTimerID = startTimer(1000);
-	qDebug() << "m_nTimerID:" << m_nTimerID;
 	if (m_pStackWidget)
 	{
 		int nPageCount = m_pStackWidget->count();
@@ -109,14 +107,21 @@ void QMainStackPage::ResetAllPages(int nStartPage)
 			QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->widget(i));
 			pCurPage->ShutDown();
 		}
+
+	}
+}
+
+void QMainStackPage::StartBusiness()
+{
+	m_nTimerID = startTimer(1000);
+	qDebug() << "m_nTimerID:" << m_nTimerID;
+	if (m_pStackWidget)
+	{
 		m_pStackWidget->setCurrentIndex(StartPageIndex);
 		QStackPage* pCurPage = dynamic_cast<QStackPage*>(m_pStackWidget->widget(0));
 		pCurPage->ActiveTitle();
-		if (nStartPage)
-		{
-			ShowTimeOut(pCurPage->m_nTimeout);
-			pCurPage->ProcessBussiness();
-		}
+		ShowTimeOut(pCurPage->m_nTimeout);
+		pCurPage->ProcessBussiness();
 		m_nTimeout = pCurPage->m_nTimeout;
 	}
 }

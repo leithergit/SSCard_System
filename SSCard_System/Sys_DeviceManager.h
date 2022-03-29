@@ -18,7 +18,7 @@ public:
 	//int OpenReader(QString strLib, ReaderBrand nReaderType, QString& strMesssage);
 	//int Depense(int nDepenseBox, CardPowerType nPowerOnType, QString& strMessage);
 	//void CloseDevice();
-	int ReaderIDCard(const char* szPort, IDCardInfo& CardInfo);
+	int ReaderIDCard(const char* szPort, IDCardInfo* pCardInfo);
 	void fnThreadReadIDCard(QString strPort);
 	void fnThreadReadPin();
 	IDCardInfo CardInfo;

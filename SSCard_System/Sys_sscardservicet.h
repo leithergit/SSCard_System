@@ -46,6 +46,8 @@ private slots:
 
     void on_pushButton_ReadBankNum_clicked();
 
+    void on_pushButton_QueryPersonInfo_clicked();
+
 private:
 	Ui::Sys_SSCardServiceT* ui;
 };

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1139</width>
+    <width>1398</width>
     <height>710</height>
    </rect>
   </property>
@@ -148,6 +148,25 @@
          </property>
          <property name="text">
           <string>Query CardInfo</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_QueryPersonInfo">
+         <property name="minimumSize">
+          <size>
+           <width>320</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>思源黑体 CN Normal</family>
+           <pointsize>28</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Query PersionInfo</string>
          </property>
         </widget>
        </item>
@@ -381,6 +400,28 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="label_BankNum">
+       <property name="minimumSize">
+        <size>
+         <width>600</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -418,6 +459,25 @@
      </item>
      <item>
       <widget class="QLabel" name="label_Name">
+       <property name="minimumSize">
+        <size>
+         <width>600</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>思源黑体 CN Normal</family>
+         <pointsize>28</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>N/A</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_ChipNum">
        <property name="minimumSize">
         <size>
          <width>600</width>
