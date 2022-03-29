@@ -231,8 +231,10 @@ int IDCardSDK::Authenticate()
 	}
 }
 
-int IDCardSDK::LoadCardInfo(IDCardInfo& IDCard)
+int IDCardSDK::LoadCardInfo(IDCardInfo* pIDCard)
 {
+	if (!pIDCard)
+		return IDCard_Invalid_Parameter;
 	int nResult = CVR_Read_Content();
 	if (nResult != 1)
 	{
@@ -250,39 +252,39 @@ int IDCardSDK::LoadCardInfo(IDCardInfo& IDCard)
 	}
 
 	int nLen;
-	IDCard.Reset();
-	nLen = sizeof(IDCard.szName);
-	GetPeopleName(IDCard.szName, &nLen);
+	pIDCard->Reset();
+	nLen = sizeof(pIDCard->szName);
+	GetPeopleName(pIDCard->szName, &nLen);
 
-	nLen = sizeof(IDCard.szGender);
-	GetPeopleSex(IDCard.szGender, &nLen);
+	nLen = sizeof(pIDCard->szGender);
+	GetPeopleSex(pIDCard->szGender, &nLen);
 
-	nLen = sizeof(IDCard.szNationalty);
-	GetPeopleNation(IDCard.szNationalty, &nLen);
+	nLen = sizeof(pIDCard->szNationalty);
+	GetPeopleNation(pIDCard->szNationalty, &nLen);
 
-	nLen = sizeof(IDCard.szBirthday);
-	GetPeopleBirthday(IDCard.szBirthday, &nLen);
+	nLen = sizeof(pIDCard->szBirthday);
+	GetPeopleBirthday(pIDCard->szBirthday, &nLen);
 
-	nLen = sizeof(IDCard.szBirthday);
-	GetPeopleAddress(IDCard.szAddress, &nLen);
+	nLen = sizeof(pIDCard->szBirthday);
+	GetPeopleAddress(pIDCard->szAddress, &nLen);
 
-	nLen = sizeof(IDCard.szNationalty);
-	GetPeopleIDCode(IDCard.szNationalty, &nLen);
+	nLen = sizeof(pIDCard->szIdentity);
+	GetPeopleIDCode(pIDCard->szIdentity, &nLen);
 
-	nLen = sizeof(IDCard.szIszssueAuthority);
-	GetDepartment(IDCard.szIszssueAuthority, &nLen);
+	nLen = sizeof(pIDCard->szIszssueAuthority);
+	GetDepartment(pIDCard->szIszssueAuthority, &nLen);
 
-	nLen = sizeof(IDCard.szExpirationDate1);
-	GetStartDate(IDCard.szExpirationDate1, &nLen);
+	nLen = sizeof(pIDCard->szExpirationDate1);
+	GetStartDate(pIDCard->szExpirationDate1, &nLen);
 
-	nLen = sizeof(IDCard.szExpirationDate2);
-	GetEndDate(IDCard.szExpirationDate2, &nLen);
+	nLen = sizeof(pIDCard->szExpirationDate2);
+	GetEndDate(pIDCard->szExpirationDate2, &nLen);
 
-	nLen = sizeof(IDCard.szNationaltyCode);
-	GetNationCode(IDCard.szNationaltyCode, &nLen);
+	nLen = sizeof(pIDCard->szNationaltyCode);
+	GetNationCode(pIDCard->szNationaltyCode, &nLen);
 
-	nLen = sizeof(IDCard.szPhoto);
-	GetBmpData(IDCard.szPhoto, (int*)&IDCard.nPhotoSize);
+	nLen = sizeof(pIDCard->szPhoto);
+	GetBmpData(pIDCard->szPhoto, (int*)&pIDCard->nPhotoSize);
 
 	//    unsigned char  szFingerData[2048] = {0};
 	//    GetFPDate(szFingerData, &nLen);

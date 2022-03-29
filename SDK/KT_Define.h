@@ -160,6 +160,9 @@ struct SD_SSCardInfo
 	std::string strContactsName;	//联系人姓名
 	std::string strContactsMobile;	//联系人电话
 	std::string strReason;			//补换原因
+	std::string strGuardianCardType;//监护人证件类型
+	std::string strGuardianCardID;	//监护人证件号
+	std::string strGuardianType;	//监护人关系
 	std::string strPhoto;			//相片
 };
 struct CAInfo 

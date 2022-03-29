@@ -247,16 +247,48 @@ public:
 		{
 			if (bFinised)
 			{
-				if (fs::exists(strJsonFile))
+				if (!fs::exists(strJsonFile))	// 最后一步已经完成,文件是否保存无关紧要
+					return true;
+				try
 				{
-					fs::copy(strJsonFile, strPathFinished);
+					int nIndex = 0;
+					string strBaseFile = strPathFinished;
+					do
+					{
+						if (fs::exists(strBaseFile))
+							strBaseFile = strPathFinished + std::to_string(nIndex++);
+						else
+							break;
+					} while (true);
+					fs::copy(strJsonFile, strBaseFile);
 					fs::remove(strJsonFile);
+				}
+				catch (std::exception& e)
+				{
+					gInfo() << "catch a exception:" << e.what();
 				}
 			}
 			return true;
 		}
 		else
 			return false;
+	}
+
+	virtual int GetPersonInfoFromStage(string& strJsonout) override
+	{
+		CJsonObject MainProgress;
+		if (!LoadProgress(MainProgress))
+		{
+			gError() << "Faled in load progress!";
+			return false;
+		}
+		if (!MainProgress.KeyExist("Person"))
+			return false;
+
+		CJsonObject jsonPerson = MainProgress["Person"];
+		strJsonout = jsonPerson.ToString();
+		gInfo() << " get Person info from progress file!";
+		return true;
 	}
 
 	virtual int GetStageStatus(string strKey, int& nResult, string& strDatagram) override
@@ -357,7 +389,7 @@ public:
 		CJsonObject jsonInit;
 		if (!jsonInit.Parse(strInitJson))
 		{
-			strOutInfo = "Invliad strInitJson,it's a valid json string!";
+			strOutInfo = "卡管服务配置无法识别, 请检查SSCardService.json文件!";
 			gError() << strOutInfo;
 			return -1;
 		}
@@ -750,7 +782,9 @@ public:
 			CJsonObject outJson;
 			UpdatePerson();
 			strKey = "queryCardInfoBySfzhm";
-			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			if (!GetStageStatus(strKey, nResult, strDatagram) ||
+				QFailed(nResult) ||
+				nServiceType == ServiceType::Service_RegisterLost)
 			{
 				if (QFailed(nSSResult = queryCardInfoBySfzhm(CardInfo, strOutInfo)))
 				{
@@ -945,7 +979,7 @@ public:
 			CardInfo.strDealType = "0";	// new card
 			CardInfo.strOperator = strOperator;
 			CardInfo.strCardType = "A";
-			CardInfo.strOccupType = "2000000";
+			//CardInfo.strOccupType = "2000000";
 			jsonIn.Get("CardID", CardInfo.strCardID);
 			jsonIn.Get("Name", CardInfo.strName);
 			jsonIn.Get("BankCode", CardInfo.strBankCode);
@@ -959,6 +993,9 @@ public:
 			jsonIn.Get("Nation", CardInfo.strNation);
 			jsonIn.Get("Address", CardInfo.strAdress);
 			jsonIn.Get("Photo", CardInfo.strPhoto);
+			jsonIn.Get("Occupation", CardInfo.strOccupType);
+			if (CardInfo.strOccupType.empty())
+				CardInfo.strOccupType = "8000000";
 
 			if (strGender == "男")
 				CardInfo.strSex = "1";
@@ -982,12 +1019,6 @@ public:
 				strMessage = "身份证,姓名,城市代码,银行代码,手机,证件有效,生日,性别,民族,住址或照片不能为空!";
 				break;
 			}
-			if (strGender == "男")
-				CardInfo.strSex = "1";
-			else if (strGender == "女")
-				CardInfo.strSex = "2";
-			else
-				CardInfo.strSex = "9";
 
 			/*auto itFind = g_mapNationnaltyCode.find(strNationality);
 			if (itFind != g_mapNationnaltyCode.end())
@@ -1152,7 +1183,7 @@ public:
 			//json.Get("Reason", CardInfo.strReason);
 			//json.Get("Operator", CardInfo.strOperator);
 			//json.Get("OccupType", CardInfo.strOccupType);
-			CardInfo.strOccupType = "2000000";
+			CardInfo.strOccupType = "8000000";
 			json.Get("IssueDate", CardInfo.strReleaseDate);
 			json.Get("ExpireDate", CardInfo.strValidDate);
 			json.Get("Birthday", CardInfo.strBirthday);
@@ -1161,6 +1192,9 @@ public:
 			json.Get("Address", CardInfo.strAdress);
 			json.Get("CardNum", CardInfo.strCardNum);
 			json.Get("Photo", CardInfo.strPhoto);
+			json.Get("Occupation", CardInfo.strOccupType);
+			if (CardInfo.strOccupType.empty())
+				CardInfo.strOccupType = "8000000";
 
 			if (CardInfo.strCardID.empty() ||
 				CardInfo.strName.empty() ||
@@ -1645,7 +1679,7 @@ public:
 					}
 					break;
 				}
-				UpdateStage(strKey, 0, tmpJson.ToFormattedString(), true);
+				UpdateStage(strKey, 0, tmpJson.ToFormattedString(), false);
 			}
 			nErrFlag = 0;
 			nResult = 0;
@@ -1740,7 +1774,7 @@ public:
 					}
 					break;
 				}
-				UpdateStage(strKey, 0, tmpJson.ToFormattedString());
+				UpdateStage(strKey, 0, tmpJson.ToFormattedString(), false);
 			}
 
 			strKey = "saveCardJrzhActive";
@@ -2130,15 +2164,15 @@ public:
 			ds.Get("zylb", CardInfo.strOccupType);		//职业类别
 
 			CJsonObject jsonOut;
-			jsonOut.Add("CardID", CardInfo.strCardID);
+			//jsonOut.Add("CardID", CardInfo.strCardID);			
+			//jsonOut.Add("Name", CardInfo.strName);
+			//jsonOut.Add("Gender", CardInfo.strSex);
+			//jsonOut.Add("Birthday", CardInfo.strBirthday);
+			//jsonOut.Add("Nation", CardInfo.strNation);
+			//jsonOut.Add("Address", CardInfo.strAdress);
+			//jsonOut.Add("Mobile", CardInfo.strMobile);
 			jsonOut.Add("CardNum", CardInfo.strCardNum);
-			jsonOut.Add("Name", CardInfo.strName);
-			jsonOut.Add("Gender", CardInfo.strSex);
-			jsonOut.Add("Birthday", CardInfo.strBirthday);
-			jsonOut.Add("Nation", CardInfo.strNation);
-			jsonOut.Add("Address", CardInfo.strAdress);
-			jsonOut.Add("Mobile", CardInfo.strMobile);
-			jsonOut.Add("OccupType", CardInfo.strOccupType);
+			jsonOut.Add("Occupation", CardInfo.strOccupType);
 			strJsonOut = jsonOut.ToString();
 			nErrFlag = 0;
 			nResult = 0;

@@ -163,5 +163,7 @@ public:
 
 	virtual int SetExtraInterface(const string& strCommand, string& strInput, string& strOutput) = 0;
 
-	virtual int GetCA(string& strJsonIn, string& strJsonou) = 0;
+	virtual int GetCA(string& strJsonIn, string& strJsonout) = 0;
+
+	virtual int GetPersonInfoFromStage(string& strJsonout) = 0;
 };

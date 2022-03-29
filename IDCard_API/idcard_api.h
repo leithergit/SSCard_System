@@ -134,7 +134,7 @@ int IDCARD_API_EXPORT FindIDCard();
 
 //读身份证
 // 返回值描述参见@OpenReader
-int IDCARD_API_EXPORT ReadIDCard(OUT IDCardInfo& CardInfo);
+int IDCARD_API_EXPORT ReadIDCard(OUT IDCardInfo* pCardInfo);
 
 // 取得返回值或错误代码的具体描述信息
 // 返回相信息描述信息的字节长度
