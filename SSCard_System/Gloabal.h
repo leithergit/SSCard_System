@@ -44,6 +44,7 @@
 #include <QBrush>
 #include <QHBoxLayout>
 #include <QDirIterator>
+#include <QtXlsx/QtXlsx>
 #include "DevBase.h"
 
 #include "../utility/Utility.h"
@@ -140,7 +141,7 @@ enum class Manager_Level
 enum MakeCard_Progress
 {
 	MP_PreMakeCard = 0,
-    MP_ReadCard,
+	MP_ReadCard,
 	MP_WriteCard,
 	MP_PrintCard,
 	MP_EnableCard,
@@ -528,6 +529,8 @@ struct ImagePosition
 
 struct CardForm
 {
+	CardForm()
+	{}
 	CardForm(QSettings* pSettings)
 	{
 		if (!pSettings)
@@ -719,6 +722,10 @@ struct SysConfig
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
 		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
+		bSkipWriteCard = pSettings->value("SkipWriteCard", false).toBool();
+		bSkipPrintCard = pSettings->value("SkipPrintCard", false).toBool();
+		bWriteTest = pSettings->value("WriteTest", false).toBool();
+		nNetTimeout = pSettings->value("NetTimeout", 1500).toInt();
 
 		bUpoadlog = pSettings->value("logUpload", false).toBool();;
 		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
@@ -802,6 +809,10 @@ struct SysConfig
 	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
 	bool			bDebug = false;
 	bool			bTestCard = false;
+	bool			bSkipWriteCard = false;
+	bool			bSkipPrintCard = false;
+	bool			bWriteTest = false;
+	int				nNetTimeout = 1500;
 	std::map<string, string> strMapBank;
 };
 
@@ -907,30 +918,34 @@ public:
 	// 			strCardStatus = pSSCardInfo->strCardStatus;
 	// 		return 0;
 	// 	}
-	string         strIDImageFile;
-	string		   strSSCardPhotoFile;
-	string		   strSSCardPhotoBase64File;
-	string         strMobilePhone;
-	string         strSSCardOldPassword;
-	string         strSSCardNewPassword;
-	string		   strCardMakeProgress;
-	CardStatus	   nCardStratus;
-	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
-	string		   strPayCode;
-	string		   strCardVersion;
-	bool		   bDebug;
-	bool		   bTestCard = false;
+	string			strIDImageFile;
+	string			strSSCardPhotoFile;
+	string			strSSCardPhotoBase64File;
+	string			strMobilePhone;
+	string			strSSCardOldPassword;
+	string			strSSCardNewPassword;
+	string			strCardMakeProgress;
+	CardStatus		nCardStratus;
+	ServiceType		nCardServiceType = ServiceType::Service_Unknown;
+	string			strPayCode;
+	string			strCardVersion;
+	bool			bDebug;
+	bool			bSkipWriteCard = false;
+	bool			bSkipPrintCard = false;
+	bool            bWriteTest = false;
+	bool			bTestCard = false;
+	int				nNetTimeout = 1500;
 public:
-	bool m_bDetectStarted = false;
-	bool m_bVideoStarted = false;
-	HANDLE  m_hCamera = nullptr;
-	int m_nWidth = 640;
-	int m_nHeight = 480;
-	int nWndIndex = 0;
+	bool			m_bDetectStarted = false;
+	bool			m_bVideoStarted = false;
+	HANDLE			m_hCamera = nullptr;
+	int				m_nWidth = 640;
+	int				m_nHeight = 480;
+	int				nWndIndex = 0;
 	byte* pImageBuffer = nullptr;
-	int		nBufferSize = 0;
-	string strFullCapture;
-	string strFaceCapture;
+	int				nBufferSize = 0;
+	string			strFullCapture;
+	string			strFaceCapture;
 	//int FaceCamera_EventCallback(int nEventID, int nFrameStatus);
 
 	bool IsVideoStart();
@@ -984,7 +999,11 @@ public:
 
 	int PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
 
+	int PrintExtraText(QString strText, int nAngle, float fxPos, float fyPos, QString strFont, int nFontSize, int nColor);
+
 	int WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
+
+	int WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
 
 	int ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
 
@@ -1009,6 +1028,7 @@ public:
 	int  PremakeCard(QString& strMessage);
 	int  CommitPersionInfo(QString& strMessage);
 	int	 SafeWriteCard(QString& strMessage);
+    int	 SafeWriteCardTest(QString& strMessage);
 	int	 SafeReadCard(QString& strMessage);
 	int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
 	int  EnsureData(QString& strMessage);
@@ -1019,8 +1039,9 @@ private:
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardBaseInfoPtr   pSSCardInfo = nullptr;
 	KT_PrinterLibPtr	m_pPrinterlib = nullptr;
-	KT_ReaderLibPtr	m_pSSCardReaderLib = nullptr;
+	KT_ReaderLibPtr		m_pSSCardReaderLib = nullptr;
 	SSCardServiceLibPtr pSServiceLib = nullptr;
+	vector<TextPosition> vecExtraText;
 
 	KT_Printer* m_pPrinter = nullptr;
 	KT_Reader* m_pSSCardReader = nullptr;

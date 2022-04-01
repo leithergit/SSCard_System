@@ -186,6 +186,9 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			return -1;
 		}
 		bDebug = GetSysConfigure()->bDebug;
+		bSkipWriteCard = GetSysConfigure()->bSkipWriteCard;
+		bSkipPrintCard = GetSysConfigure()->bSkipPrintCard;
+		nNetTimeout = GetSysConfigure()->nNetTimeout;
 		bTestCard = GetSysConfigure()->bTestCard;
 		return 0;
 	}
@@ -694,9 +697,9 @@ int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int
 					strMessage = QString("Printer_Open‘%1’失败,错误代码:%2").arg(szPrinterTypeList[nPrinterType]).arg(szRCode);
 					break;
 				}
-				//m_pPrinter->Printer_ExtraCommand("Ps;y;=;250",szRCode);
-				//m_pPrinter->Printer_ExtraCommand("Ps;m;=;250",szRCode);
-				//m_pPrinter->Printer_ExtraCommand("Ps;c;=;250",szRCode);
+				m_pPrinter->Printer_ExtraCommand("Ps;y;=;250", szRCode);
+				m_pPrinter->Printer_ExtraCommand("Ps;m;=;250", szRCode);
+				m_pPrinter->Printer_ExtraCommand("Ps;c;=;250", szRCode);
 			}
 
 		} while (0);
@@ -1166,6 +1169,21 @@ string DataCenter::MakeCardInfo(SSCardBaseInfoPtr& pSSCardInfo)
 	return strCardInfo;
 }
 
+
+int DataCenter::PrintExtraText(QString strText, int nAngle, float fxPos, float fyPos, QString strFont, int nFontSize, int nColor)
+{
+	TextPosition Text;
+	Text.strText = strText.toStdString();
+	Text.fxPos = fxPos;
+	Text.fyPos = fyPos;
+	Text.nAngle = nAngle;
+	Text.strFontName = strFont.toStdString();
+	Text.nFontSize = nFontSize;
+	Text.nColor = nColor;
+	vecExtraText.push_back(Text);
+	return 0;
+}
+
 int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText)
 {
 	char szBuffer[1024] = { 0 };
@@ -1177,29 +1195,27 @@ int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QStr
 	string strDatagram = "";
 	do
 	{
-		if (!m_pSSCardReader)
+		//if (!m_pSSCardReader)
+		//{
+		//	strMessage = "读卡器未就绪!";
+		//	break;
+		//}
+		if (pSScardSerivce)
 		{
-			strMessage = "读卡器未就绪!";
-			break;
-		}
-		if (!pSScardSerivce)
-		{
-			strMessage = "卡管服务不可用!";
-			break;
-		}
-
-		if (pSScardSerivce->GetStageStatus(strStage, nResult, strDatagram) && nResult == 0)
-		{// 与之前写入成功的卡片的很行卡号进行核对
-			string strLastBankNum;
-			CJsonObject json(strDatagram);
-			json.Get("BankNum", strLastBankNum);
-			if (strLastBankNum == pSSCardInfo->strBankNum)
-			{
-				strMessage = "打印操作已经完成,无须重复操作!";
-				gInfo() << gQStr(strMessage);
-				break;
+			if (pSScardSerivce->GetStageStatus(strStage, nResult, strDatagram) && nResult == 0)
+			{// 与之前写入成功的卡片的很行卡号进行核对
+				string strLastBankNum;
+				CJsonObject json(strDatagram);
+				json.Get("BankNum", strLastBankNum);
+				if (strLastBankNum == pSSCardInfo->strBankNum)
+				{
+					strMessage = "打印操作已经完成,无须重复操作!";
+					gInfo() << gQStr(strMessage);
+					break;
+				}
 			}
 		}
+
 		nResult = -1;
 		nBufferSize = sizeof(szBuffer);
 		ZeroMemory(szBuffer, nBufferSize);
@@ -1209,19 +1225,27 @@ int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QStr
 			break;
 		}
 
-		TextPosition* pFieldPos = &pCardForm->posName;
 		if (bPrintText)
 		{
+			TextPosition* pFieldPos = &pCardForm->posName;
 			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posIDNumber;
 			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strIdentity.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posSSCardID;
 			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posIssueDate;
-			QDate dt = QDate::currentDate();
+			/*QDate dt = QDate::currentDate();
 			char szReleaseDate[32] = { 0 };
 			sprintf_s(szReleaseDate, 32, "%d年%d月", dt.year(), dt.month());
-			m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);*/
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strReleaseDate.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+		}
+
+		if (vecExtraText.size())
+		{
+			for (auto var : vecExtraText)
+				m_pPrinter->Printer_AddText((char*)var.strText.c_str(), var.nAngle, var.fxPos, var.fyPos, (char*)var.strFontName.c_str(), var.nFontSize, 0, var.nColor, szRCode);
+			vecExtraText.clear();
 		}
 
 		ImagePosition& ImgPos = pCardForm->posImage;
@@ -1526,6 +1550,98 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		CJsonObject json;
 		json.Add("BankNum", pSSCardInfo->strBankNum);
 		pSScardSerivce->UpdateStage(strStage, 0, json.ToFormattedString());
+		nResult = 0;
+
+	} while (0);
+	return nResult;
+}
+
+int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
+{
+	int nResult = -1;
+	DeviceConfig& DevConfig = pSysConfig->DevConfig;
+	RegionInfo& Region = pSysConfig->Region;
+	char szRCode[32] = { 0 };
+	//char szCardBaseRead[1024] = { 0 };
+	char szCardBaseWrite[1024] = { 0 };
+	char szExAuthData[1024] = { 0 };
+	char szWHSM1[1024] = { 0 };
+	/*char szWHSM2[1024] = { 0 };*/
+	char szSignatureKey[1024] = { 0 };
+	char szWriteCARes[1024] = { 0 };
+	char szCardATR[1024] = { 0 };
+	int nCardATRLen = 0;
+	QString strInfo;
+	HSMInfo  HsmInfo;
+	string strStage = "WriteCard";
+	string strDatagram;
+	do
+	{
+		if (!m_pSSCardReader)
+		{
+			strMessage = "读卡器未就绪!";
+			break;
+		}
+
+		nResult = -1;
+		if (QFailed(nResult = m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, (char*)szCardATR, nCardATRLen, szRCode)))
+		{
+			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			nResult = -4;
+			break;
+		}
+		pSSCardInfo->strCardATR = szCardATR;
+		gInfo() << "CardATR:" << pSSCardInfo->strCardATR;
+
+		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
+		{
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+		// szCardBaseWrite输出结果为两个随机数
+		// random1|random2
+		gInfo() << "CardBaseRead:" << szCardBaseWrite;
+
+		QStringList strRomdom = QString(szCardBaseWrite).split("|", Qt::KeepEmptyParts);
+
+		//strcpy(HsmInfo.strSystemID, "410700006");
+		strcpy(HsmInfo.strRegionCode, Region.strCityCode.c_str());
+		strcpy(HsmInfo.strCardNum, pSSCardInfo->strCardNum.c_str()); //用最新的卡号	   
+		//strcpy(HsmInfo.strTerminalCode, DevConfig.strTerminalCode.c_str());	// 
+		strcpy(HsmInfo.strCardID, pSSCardInfo->strIdentity.c_str());
+		strcpy(HsmInfo.strBusinessType, "026");	// 写卡为026，读卡为028
+		strcpy(HsmInfo.strIdentifyNum, pSSCardInfo->strCardIdentity.c_str());
+		strcpy(HsmInfo.strName, pSSCardInfo->strName.c_str());
+		strcpy(HsmInfo.strCardATR, pSSCardInfo->strCardATR.c_str());
+		strcpy(HsmInfo.stralgoCode, "03");
+		strcpy(HsmInfo.strKeyAddr, "0094");
+		strcpy(HsmInfo.strRandom1, strRomdom[1].toStdString().c_str());
+		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
+
+		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
+		{
+			strMessage = QString("卡片外部信息认证失败,Result:%1").arg(nResult);
+			break;
+		}
+		int nLen = strlen(szExAuthData);
+		if (nLen)
+			szExAuthData[nLen - 1] = '\0';
+		gInfo() << "szExAuthData = " << szExAuthData;
+		string strCardInfo = MakeCardInfo(pSSCardInfo);
+		gInfo() << "strCardInfo = " << strCardInfo;
+
+		if (QFailed(nResult = iWriteCardBas_HSM_Step1((char*)szExAuthData, (char*)strCardInfo.c_str(), szWHSM1)))
+		{
+			strMessage = QString("iWriteCardBas_HSM_Step1,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szWHSM1);
+			break;
+		}
+		gInfo() << "szWHSM1 = " << szWHSM1;
+
+		if (QFailed(nResult = iReadSignatureKey(DevConfig.nSSCardReaderPowerOnType, szSignatureKey)))
+		{
+			strMessage = QString("iReadSignatureKey,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
 		nResult = 0;
 
 	} while (0);
@@ -2056,6 +2172,10 @@ int  DataCenter::PremakeCard(QString& strMessage)
 		//jsonOut.Get("NationalityCode", pSSCardInfo->strNationCode);
 		jsonOut.Get("Photo", pSSCardInfo->strPhoto);
 		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto.c_str());
+		QDate dt = QDate::currentDate();
+		char szReleaseDate[32] = { 0 };
+		sprintf_s(szReleaseDate, 32, "%d年%d月", dt.year(), dt.month());
+		pSSCardInfo->strReleaseDate = UTF8_GBK(szReleaseDate);
 		nResult = 0;
 	} while (0);
 	return nResult;
@@ -2320,6 +2440,7 @@ int	 DataCenter::SafeReadCard(QString& strMessage)
 	}
 	return nResult;
 }
+
 int	 DataCenter::SafeWriteCard(QString& strMessage)
 {
 	int nResult = -1;
@@ -2352,6 +2473,40 @@ int	 DataCenter::SafeWriteCard(QString& strMessage)
 		nResult = 0;
 	}
 	return nResult;
+}
+
+int	 DataCenter::SafeWriteCardTest(QString& strMessage)
+{
+    int nResult = -1;
+    string strJsonIn, strJsonOut;
+    QString strInfo;
+    int nWriteCardCount = 0;
+
+    while (nWriteCardCount < 3)
+    {
+        strInfo = QString("尝试第%1次写卡!").arg(nWriteCardCount + 1);
+        gInfo() << gQStr(strInfo);
+        nResult = g_pDataCenter->WriteCardTest(pSSCardInfo, strMessage);
+        if (QSucceed(nResult))
+        {
+            break;
+        }
+        else if (nResult == -4)
+        {
+            nWriteCardCount++;
+            strInfo = "写卡上电失败,尝试移动卡片!";
+            gInfo() << gQStr(strInfo);
+            g_pDataCenter->MoveCard(strMessage);
+            continue;
+        }
+        else if (QFailed(nResult))
+        {
+            strMessage = "写卡失败!";
+            break;
+        }
+        nResult = 0;
+    }
+    return nResult;
 }
 
 int  DataCenter::EnsureData(QString& strMessage)

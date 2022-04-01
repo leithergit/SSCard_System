@@ -461,12 +461,20 @@ void uc_MakeCard::ThreadWork()
 		if (QFailed(g_pDataCenter->SafeReadCard(strMessage)))
 			break;
 		emit UpdateProgress(MP_ReadCard);
-		if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
-			break;
+		if (!g_pDataCenter->bSkipWriteCard)
+		{
+			if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
+				break;
+		}
+
 		emit UpdateProgress(MP_WriteCard);
 
-		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
-			break;
+		if (!g_pDataCenter->bSkipPrintCard)
+		{
+			if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+				break;
+		}
+
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
 		emit UpdateProgress(MP_PrintCard);

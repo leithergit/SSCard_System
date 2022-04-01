@@ -1,4 +1,4 @@
-QT       += core gui sql
+QT       += core gui sql xlsx
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -215,3 +215,18 @@ DEPENDPATH += $$PWD/../openssl-1.0.1g/include
 
 INCLUDEPATH += $$PWD/../SDK/IDCard
 DEPENDPATH += $$PWD/../SDK/IDCard
+
+
+DEPENDPATH += $$PWD/../SDK/SSCardDriver
+DEPENDPATH += $$PWD/../SDK/SSCardHSM
+DEPENDPATH += $$PWD/../SDK/SSCardInfo_Henan
+DEPENDPATH += $$PWD/../SDK/libcurl
+DEPENDPATH += $$PWD/../SDK/QREncode
+DEPENDPATH += $$PWD/../SDK/IDCard
+DEPENDPATH += $$PWD/../SDK/glog
+DEPENDPATH += $$PWD/../SDK/PinKeybroad
+DEPENDPATH += $$PWD/../SDK/7Z/lib
+
+
+
+DISTFILES +=

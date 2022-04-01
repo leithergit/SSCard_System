@@ -208,10 +208,11 @@ void uc_InputIDCardInfo::ResetPage()
 	ui->lineEdit_Name->setText("");
 	//ui->lineEdit_Mobile->setText("");
 	ui->lineEdit_CardID->setText("");
+	ui->lineEdit_Address->setText("");
 	ui->comboBox_Nationality->setCurrentIndex(0);
 	ui->radioButton_Male->setChecked(false);
 	ui->radioButton_Female->setChecked(false);
-	ui->pushButton_OK->setEnabled(false);
+	ui->pushButton_OK->setEnabled(true);
 }
 
 int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMessage)
@@ -294,6 +295,7 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	}
 	strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
 	strcpy((char*)pIDCard->szIdentity, strCardID.toLocal8Bit().data());
+	strncpy((char*)pIDCard->szBirthday, (char*)&pIDCard->szIdentity[6], 8);
 	strcpy((char*)pIDCard->szGender, strGender.toLocal8Bit().data());
 	strcpy((char*)pIDCard->szNationalty, strNation.toLocal8Bit().data());
 	strcpy((char*)pIDCard->szNationaltyCode, strNationCode.toStdString().c_str());
@@ -310,22 +312,24 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 	WaitCursor();
 	QString strMessage;
 	RegionInfo Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+	int nResult = -1;
 	do
 	{
-		if (QFailed(GetCardInfo(strMessage)))
+		if (QFailed(nResult = GetCardInfo(strMessage)))
 		{
 			break;
 		}
-		if (QFailed(GetSSCardInfo(strMessage)))
+		if (QFailed(nResult = GetSSCardInfo(strMessage)))
 		{
 			break;
 		}
+		nResult = 0;
 	} while (0);
 	uc_ReadIDCard* pReadIDCard = ((uc_ReadIDCard*)parent());
 	int nOperation = Page_EnsureInformation - Page_ReaderIDCard + Switch_NextPage - 1;
 	MaskStatus nStatus = Success;
 	QString strTips = "操作成功";
-	if (strMessage.size())
+	if (QSucceed(nResult))
 	{
 		if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
 			strMessage = "人员身份信息已经确认,稍后开始制卡!";

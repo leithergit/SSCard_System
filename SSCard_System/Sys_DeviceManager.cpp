@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QAction>
 #include <thread>
+#include <iomanip>
 #include "Gloabal.h"
 #include "DevBase.h"
 #include "Payment.h"
@@ -32,6 +33,9 @@ DeviceManager::DeviceManager(QWidget* parent)
 	ui.lineEdit_PrinterModule->setText(DevConfig.strPrinterModule.c_str());
 
 	ui.lineEdit_SSCardReaderModule->setText(DevConfig.strReaderModule.c_str());
+
+	ui.lineEdit_PrintCount->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
+
 
 	//QMenu* pBtnMenu = new QMenu(this);
 
@@ -824,9 +828,8 @@ void DeviceManager::on_pushButton_MakePhoto_clicked()
 	}
 }
 
-void DeviceManager::on_pushButton_Excute_clicked()
+void DeviceManager::on_pushButton_Excute_clicked(int index)
 {
-	int index = ui.comboBox_PrinterTest->currentIndex();
 	QString strMessage;
 	QString strPrinterLib;
 	PrinterType nPrinterType;
@@ -902,33 +905,143 @@ void DeviceManager::on_pushButton_Excute_clicked()
 		{
 			strDPI = "Resolution=DPI600;";
 		}
-
+		class RestoreCardForm
+		{
+			CardFormPtr pSavedCardForm;
+			CardFormPtr& pCardFormRef;
+		public:
+			RestoreCardForm(CardFormPtr& pCardForm) :pCardFormRef(pCardForm)
+			{
+			}
+			void SaveCardForam(CardFormPtr& pCardForm)
+			{
+				if (pCardForm)
+				{
+					pSavedCardForm = make_shared<CardForm>();
+					pSavedCardForm->nAngle = pCardForm->nAngle;
+					pSavedCardForm->posName = pCardForm->posName;
+					pSavedCardForm->posImage = pCardForm->posImage;
+					pSavedCardForm->posIDNumber = pCardForm->posIDNumber;
+					pSavedCardForm->posSSCardID = pCardForm->posSSCardID;
+					pSavedCardForm->posIssueDate = pCardForm->posIssueDate;
+					pSavedCardForm->strFont = pCardForm->strFont;
+					pSavedCardForm->nFontColor = pCardForm->nFontColor;
+					pSavedCardForm->nFontSize = pCardForm->nFontSize;
+					pSavedCardForm->nAngle = pCardForm->nAngle;
+				}
+			}
+			~RestoreCardForm()
+			{
+				if (!pSavedCardForm)
+					return;
+				if (!pCardFormRef)
+					return;
+				pCardFormRef->nAngle = pSavedCardForm->nAngle;
+				pCardFormRef->posName = pSavedCardForm->posName;
+				pCardFormRef->posImage = pSavedCardForm->posImage;
+				pCardFormRef->posIDNumber = pSavedCardForm->posIDNumber;
+				pCardFormRef->posSSCardID = pSavedCardForm->posSSCardID;
+				pCardFormRef->posIssueDate = pSavedCardForm->posIssueDate;
+				pCardFormRef->strFont = pSavedCardForm->strFont;
+				pCardFormRef->nFontColor = pSavedCardForm->nFontColor;
+				pCardFormRef->nFontSize = pSavedCardForm->nFontSize;
+				pCardFormRef->nAngle = pSavedCardForm->nAngle;
+			}
+		};
 		SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
-		pSSCardInfo->strName = UTF8_GBK("测试用户");
-		pSSCardInfo->strIdentity = "123456789012345678";
-		pSSCardInfo->strCardNum = "PP123456N";
-		pSSCardInfo->strValidDate = "20220101";
-		char szRcode[128] = { 0 };
-		QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
+		RestoreCardForm rcf(g_pDataCenter->GetCardForm());
+		if (ui.checkBox_PrintAll->isChecked())
+		{
+			CardFormPtr& pCardForm = g_pDataCenter->GetCardForm();
+			rcf.SaveCardForam(pCardForm);
+			pSSCardInfo->strName = UTF8_GBK("姓名 测试用户");
+			pSSCardInfo->strIdentity = UTF8_GBK("社会保障号码 123456789012345678");
+			pSSCardInfo->strCardNum = UTF8_GBK("卡号 PP123456N");
+			QDate dt = QDate::currentDate();
+			char szReleaseDate[32] = { 0 };
+			sprintf_s(szReleaseDate, 32, "发卡日期 %d年%d月", dt.year(), dt.month());
+			pSSCardInfo->strReleaseDate = UTF8_GBK(szReleaseDate);
 
-		g_pDataCenter->GetPrinter()->Printer_ExtraCommand(strDPI.c_str(), szRcode);
-		if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))
-		{
-			Wait.RestoreCursor();
-			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
-			return;
+			pCardForm->posName.fxPos = 28;
+			pCardForm->posIDNumber.fxPos = 28;
+			pCardForm->posSSCardID.fxPos = 28;
+			pCardForm->posIssueDate.fxPos = 28;
 		}
-		std::this_thread::sleep_for(chrono::seconds(30));
-		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject(szRCode)))
+		else
 		{
-			strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
-			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
-			return;
+			pSSCardInfo->strName = UTF8_GBK("测试用户");
+			pSSCardInfo->strIdentity = "123456789012345678";
+			pSSCardInfo->strCardNum = "PP123456N";
+			QDate dt = QDate::currentDate();
+			char szReleaseDate[32] = { 0 };
+			sprintf_s(szReleaseDate, 32, "%d年%d月", dt.year(), dt.month());
+			pSSCardInfo->strReleaseDate = UTF8_GBK(szReleaseDate);
 		}
+		int nCount = 1;
+		if (ui.checkBox_MultiPrint->isChecked())
+		{
+			int nMulti = ui.lineEdit_PrintCount->text().toInt();
+			if (nMulti > 1)
+				nCount = nMulti;
+		}
+		for (int i = 0; i < nCount; i++)
+		{
+			if (ui.checkBox_PrintTime->isChecked())
+			{
+				stringstream datetime;
+				auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+				datetime << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
+				g_pDataCenter->PrintExtraText(datetime.str().c_str(), 0, 60, 50, UTF8_GBK("宋体").c_str(), 6, 255);
+			}
+			QString strTagText = ui.lineEdit_Tag->text();
+			if (!strTagText.isEmpty())
+			{
+				g_pDataCenter->PrintExtraText(strTagText, 0, 35, 50, UTF8_GBK("宋体").c_str(), 6, 255);
+			}
+
+			char szRcode[128] = { 0 };
+			QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
+
+			g_pDataCenter->GetPrinter()->Printer_ExtraCommand(strDPI.c_str(), szRcode);
+			if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))
+			{
+				break;
+			}
+			//std::this_thread::sleep_for(chrono::seconds(30));
+			if (QFailed(g_pDataCenter->GetPrinter()->Printer_Retract(1, szRCode)))
+			{
+				strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
+				break;
+			}
+		}
+
 		Wait.RestoreCursor();
 		strMessage = tr("卡片打印成功,请最走卡片!");
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		break;
 	}
 	}
+}
+
+void DeviceManager::on_pushButton_Depense_clicked()
+{
+	on_pushButton_Excute_clicked(0);
+}
+
+
+void DeviceManager::on_pushButton_Eject_clicked()
+{
+	on_pushButton_Excute_clicked(1);
+}
+
+
+void DeviceManager::on_pushButton_Retract_clicked()
+{
+	on_pushButton_Excute_clicked(2);
+}
+
+
+void DeviceManager::on_pushButton_PrintCard_clicked()
+{
+	on_pushButton_Excute_clicked(3);
 }

@@ -74,7 +74,15 @@ private slots:
 
 	void on_pushButton_MakePhoto_clicked();
 
-	void on_pushButton_Excute_clicked();
+    void on_pushButton_Excute_clicked(int nIndex);
+
+    void on_pushButton_Depense_clicked();
+
+    void on_pushButton_Eject_clicked();
+
+    void on_pushButton_Retract_clicked();
+
+    void on_pushButton_PrintCard_clicked();
 
 private:
 	Ui::DeviceManager ui;

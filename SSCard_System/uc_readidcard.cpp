@@ -97,6 +97,7 @@ int uc_ReadIDCard::ProcessBussiness()
 	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
 	ShowReadCardID();
 	disconnect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
+
 	StartDetect();
 	ui->checkBox_WithoutIDCard->setChecked(false);
 	connect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
@@ -274,7 +275,7 @@ void uc_ReadIDCard::ShowInputCardID()
 {
 	ui->label_Swipecard->hide();
 	ui->label_Notify->hide();
-	//ui->checkBox_WithoutIDCard->hide();
+	ui->checkBox_WithoutIDCard->hide();
 	if (!pInputIDCardWidget)
 	{
 		pInputIDCardWidget = new uc_InputIDCardInfo(this);
@@ -311,6 +312,7 @@ void uc_ReadIDCard::RemoveUI()
 {
 
 }
+
 void uc_ReadIDCard::on_ShowNationWidget(bool bShow)
 {
 	if (!pQNationWidget)

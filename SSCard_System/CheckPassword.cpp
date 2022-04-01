@@ -7,6 +7,7 @@ CheckPassword::CheckPassword(QWidget* parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+    this->setWindowTitle("密码校验");
 }
 
 CheckPassword::~CheckPassword()

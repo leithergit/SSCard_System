@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
-    <height>464</height>
+    <width>543</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -141,9 +141,10 @@ border-radius: 24px;</string>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">color: #707070;
+        <string notr="true">#pushButton_Stop{
+color: #707070;
 font:32px &quot;思源黑体 CN Medium&quot;;
-border-radius: 24px;</string>
+}</string>
        </property>
        <property name="text">
         <string>停止读卡</string>

@@ -193,7 +193,7 @@ void __stdcall PrintVariant(wstring strName, VARIANT Value, DWORD_PTR pUserPtr)
 
 		HRESULT hr = SafeArrayAccessData(Value.parray, (void HUGEP**) & pBuf);
 		hr = SafeArrayUnaccessData(Value.parray);
-		high = min(high, MAX_PATH * 2 - 1);
+		high = std::min<LONG>(high, MAX_PATH * 2 - 1);
 		//TCHAR szText[1024] = { 0 };
 		//wprintf(L"%s", szText);
 	}

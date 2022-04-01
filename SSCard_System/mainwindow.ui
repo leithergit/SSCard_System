@@ -176,21 +176,20 @@ color: #ffffff;
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_Net">
-        <property name="styleSheet">
-         <string notr="true">#label_Net{
-font-family: &quot;思源黑体 CN Regular&quot;;
-font-size: 25px;
-font-weight: bold;
-line-height: 49px;
-letter-spacing: 1px;
-color: #ffffff;
-}</string>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="text">
-         <string>网络正常</string>
+        <property name="sizeType">
+         <enum>QSizePolicy::MinimumExpanding</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QLabel" name="label_NetWarning">
@@ -211,6 +210,102 @@ color: #ffffff;
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_Net">
+        <property name="styleSheet">
+         <string notr="true">#label_Net{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
+        </property>
+        <property name="text">
+         <string>网络正常</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_Debug">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+#checkBox_Debug{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: rgb(255, 0, 0);
+}</string>
+        </property>
+        <property name="text">
+         <string>调试</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_SkipWrite">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+#checkBox_SkipWrite{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: rgb(255, 0, 0);
+}</string>
+        </property>
+        <property name="text">
+         <string>跳过写卡</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_SkipPrint">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+#checkBox_SkipPrint{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: rgb(255, 0, 0);
+}</string>
+        </property>
+        <property name="text">
+         <string>跳过打印</string>
         </property>
        </widget>
       </item>

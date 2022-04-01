@@ -52,6 +52,7 @@ private slots:
 	void OnErrorMessage(QString strErrorMsg);
 	void On_WithoutIDCard(int arg1);
 	void on_ShowNationWidget(bool bShow);
+
 private:
 	Ui::ReadIDCard* ui;
 };

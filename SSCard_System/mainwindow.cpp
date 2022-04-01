@@ -168,6 +168,16 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->stackedWidget->addWidget(m_pUpdatePassword);
 	ui->stackedWidget->addWidget(m_pRegiserLost);
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
+
+	ui->checkBox_Debug->setVisible(g_pDataCenter->bDebug);
+	ui->checkBox_Debug->setChecked(g_pDataCenter->bDebug);
+
+	ui->checkBox_SkipWrite->setChecked(g_pDataCenter->bSkipWriteCard);
+	ui->checkBox_SkipWrite->setVisible(g_pDataCenter->bSkipWriteCard);
+
+	ui->checkBox_SkipPrint->setChecked(g_pDataCenter->bSkipPrintCard);
+	ui->checkBox_SkipPrint->setVisible(g_pDataCenter->bSkipPrintCard);
+
 	m_pMainpage->show();
 
 	/*
@@ -192,7 +202,8 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(this, &MainWindow::Shutdown, this, &MainWindow::on_Shutdown);
 	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
 	bThreadUploadlogRunning = true;
-	ThreadUploadlog = std::thread(&MainWindow::fnThreadUploadlog, this);
+	pThreadUploadlog = new std::thread(&MainWindow::fnThreadUploadlog, this);
+
 	m_nTimerTestHost = startTimer(5000);
 }
 
@@ -209,7 +220,7 @@ void MainWindow::On_LoadSystemManager()
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
 {
-	if ((e->x() >= 1880 && e->y() >= 960) &&
+	if ((e->x() >= 1840 && e->y() >= 910) &&
 		(e->x() <= 1920 && e->y() <= 990))
 	{
 		qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
@@ -522,10 +533,10 @@ void MainWindow::on_Shutdown()
 		m_nDateTimer = 0;
 	}
 
-	if (bThreadUploadlogRunning)
+	if (pThreadUploadlog)
 	{
 		bThreadUploadlogRunning = false;
-		ThreadUploadlog.join();
+		pThreadUploadlog->join();
 	}
 	close();
 }
@@ -540,14 +551,13 @@ void MainWindow::timerEvent(QTimerEvent* event)
 	else if (event->timerId() == m_nTimerTestHost)
 	{
 		RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
-		// http://10.0.0.0:8080
 		QString strUrl = region.strEMURL.c_str();
 		QStringList  strField = strUrl.split(':');
 		if (strField.size())
 		{
 			QString strIP = strField[1].mid(2);
 			USHORT  nPort = (USHORT)strField[2].toShort();
-			if (TestHost(strIP.toStdString(), nPort, 500))
+			if (TestHost(strIP.toStdString(), nPort, g_pDataCenter->nNetTimeout))
 			{// 连续成功
 				if (m_nTimerNetWarning)
 				{
@@ -592,7 +602,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 	if (bThreadUploadlogRunning)
 	{
 		bThreadUploadlogRunning = false;
-		ThreadUploadlog.join();
+		pThreadUploadlog->join();
 	}
 }
 

@@ -69,7 +69,7 @@ public:
 	//virtual void paintEvent(QPaintEvent* event) override;
 
 	void fnThreadUploadlog();
-	std::thread ThreadUploadlog;
+	std::thread* pThreadUploadlog = nullptr;
 	bool  bThreadUploadlogRunning = false;
 
 signals:
