@@ -39,19 +39,18 @@ public:
 public slots:
 	void on_pushButton_MainPage_clicked();
 	virtual void on_SwitchNextPage(int nPageOperation);
-	//virtual void On_RetryCurrentPage(QStackPage* pCurrentPage);
 	virtual void on_SwitchPage(int nPage);
-	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
+	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage)
 	{
-		qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nPageOperation;
-		emit ShowMaskWidget(strTitle, strDesc, nStatus, nPageOperation);
+		//qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nOperation;
+		emit ShowMaskWidget(strTitle, strDesc, nStatus, nOperation, nPage);
 	}
 	//void On_RetryCurrentPage(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
 	//{
 	//	emit ShowMaskWidget(strTitle, strDesc, nStatus, nPageOperation);
 	//}
 signals:
-	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation);
+	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
 	void SwitchNextPage(int nOperation);
 	void SwitchPage(int nPage);
 };

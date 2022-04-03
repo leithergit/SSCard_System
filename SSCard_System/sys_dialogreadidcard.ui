@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>543</width>
-    <height>418</height>
+    <width>720</width>
+    <height>430</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>720</width>
+    <height>430</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>720</width>
+    <height>430</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -20,6 +32,9 @@
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -52,6 +67,9 @@
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -141,13 +159,19 @@ border-radius: 24px;</string>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">#pushButton_Stop{
-color: #707070;
-font:32px &quot;思源黑体 CN Medium&quot;;
-}</string>
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 36px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
        </property>
        <property name="text">
-        <string>停止读卡</string>
+        <string>取消</string>
        </property>
       </widget>
      </item>
@@ -165,6 +189,19 @@ font:32px &quot;思源黑体 CN Medium&quot;;
       </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

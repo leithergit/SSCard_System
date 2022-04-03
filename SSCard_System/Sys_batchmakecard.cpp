@@ -63,9 +63,7 @@ Sys_BatchMakeCard::Sys_BatchMakeCard(QWidget* parent) :
 	ui->tableWidget->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
-	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
-	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
+
 	pButttonGrp = new QButtonGroup(this);
 	pButttonGrp->setExclusive(true);
 	pButttonGrp->addButton(ui->radioButton_NewCard, 0);
@@ -91,51 +89,51 @@ Sys_BatchMakeCard::~Sys_BatchMakeCard()
 	delete ui;
 }
 
-int Sys_BatchMakeCard::ReaderIDCard(IDCardInfo* pIDCard)
-{
-	int nResult = IDCard_Status::IDCard_Succeed;
-	bool bDevOpened = false;
-	do
-	{
-		if (m_strDevPort == "AUTO" || !m_strDevPort.size())
-		{
-			gInfo() << "Try to open IDCard Reader auto!" << m_strDevPort;
-			nResult = OpenReader(nullptr);
-		}
-		else
-		{
-			gInfo() << "Try to open IDCard Reader " << m_strDevPort;
-			nResult = OpenReader(m_strDevPort.c_str());
-		}
-
-		if (nResult != IDCard_Status::IDCard_Succeed)
-		{
-			break;
-		}
-		bDevOpened = true;
-		nResult = FindIDCard();
-		if (nResult != IDCard_Status::IDCard_Succeed)
-		{
-			break;
-		}
-
-		nResult = ReadIDCard(pIDCard);
-		if (nResult != IDCard_Status::IDCard_Succeed)
-		{
-			break;
-		}
-		int nNationalityCode = strtol((char*)pIDCard->szNationaltyCode, nullptr, 10);
-		if (nNationalityCode < 10)
-			sprintf_s((char*)pIDCard->szNationaltyCode, sizeof(pIDCard->szNationaltyCode), "%02d", nNationalityCode);
-
-	} while (0);
-	if (bDevOpened)
-	{
-		gInfo() << "Try to close IDCard Reader!";
-		CloseReader();
-	}
-	return nResult;
-}
+//int Sys_BatchMakeCard::ReaderIDCard(IDCardInfo* pIDCard)
+//{
+//	int nResult = IDCard_Status::IDCard_Succeed;
+//	bool bDevOpened = false;
+//	do
+//	{
+//		if (m_strDevPort == "AUTO" || !m_strDevPort.size())
+//		{
+//			gInfo() << "Try to open IDCard Reader auto!" << m_strDevPort;
+//			nResult = OpenReader(nullptr);
+//		}
+//		else
+//		{
+//			gInfo() << "Try to open IDCard Reader " << m_strDevPort;
+//			nResult = OpenReader(m_strDevPort.c_str());
+//		}
+//
+//		if (nResult != IDCard_Status::IDCard_Succeed)
+//		{
+//			break;
+//		}
+//		bDevOpened = true;
+//		nResult = FindIDCard();
+//		if (nResult != IDCard_Status::IDCard_Succeed)
+//		{
+//			break;
+//		}
+//
+//		nResult = ReadIDCard(pIDCard);
+//		if (nResult != IDCard_Status::IDCard_Succeed)
+//		{
+//			break;
+//		}
+//		int nNationalityCode = strtol((char*)pIDCard->szNationaltyCode, nullptr, 10);
+//		if (nNationalityCode < 10)
+//			sprintf_s((char*)pIDCard->szNationaltyCode, sizeof(pIDCard->szNationaltyCode), "%02d", nNationalityCode);
+//
+//	} while (0);
+//	if (bDevOpened)
+//	{
+//		gInfo() << "Try to close IDCard Reader!";
+//		CloseReader();
+//	}
+//	return nResult;
+//}
 
 void Sys_BatchMakeCard::ThreadReadIDCard()
 {
@@ -148,7 +146,7 @@ void Sys_BatchMakeCard::ThreadReadIDCard()
 		if (tDuration.count() >= 1000)
 		{
 			tLast = high_resolution_clock::now();
-			int nResult = ReaderIDCard(pIDCard);
+			int nResult = g_pDataCenter->ReaderIDCard(pIDCard);
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
 				emit AddNewIDCard(pIDCard);
@@ -547,7 +545,7 @@ void Sys_BatchMakeCard::on_pushButton_StartReadIDCard_clicked()
 	}
 	m_bWorkThreadRunning = true;
 	m_pWorkThread = new std::thread(&Sys_BatchMakeCard::ThreadReadIDCard, this);
-	Sys_DialogReadIDCard dlg;
+	Sys_DialogReadIDCard dlg("请刷身份证以添加制卡人信息", this);
 	dlg.exec();
 	m_bWorkThreadRunning = false;
 	m_pWorkThread->join();
@@ -783,12 +781,12 @@ void Sys_BatchMakeCard::on_AddNewIDCard(IDCardInfo* pIDCard)
 	//auto [it, Inserted] = m_MapIDCardInfo.try_emplace(string((char*)pIDCard->szIdentity), pIDCardPtr);
 	//if (!Inserted)
 	//	return;
-	//auto var = find_if(vecMakeCardInfo.begin(), vecMakeCardInfo.end(), [pIDCard](MakeCardInfoPtr pItem)
-	//	{
-	//		return strcmp((char*)pItem->pIDCard->szIdentity, (char*)pIDCard->szIdentity) == 0;
-	//	});
-	//if (var != vecMakeCardInfo.end())
-	//	return;
+	auto var = find_if(vecMakeCardInfo.begin(), vecMakeCardInfo.end(), [pIDCard](MakeCardInfoPtr pItem)
+		{
+			return strcmp((char*)pItem->pIDCard->szIdentity, (char*)pIDCard->szIdentity) == 0;
+		});
+	if (var != vecMakeCardInfo.end())
+		return;
 	int nItems = vecMakeCardInfo.size();
 	vecMakeCardInfo.push_back(make_shared<MakeCardInfo>(pIDCardPtr));
 

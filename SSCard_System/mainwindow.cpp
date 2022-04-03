@@ -291,7 +291,7 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	if (LoadConfigure(strMessage))		// 加载配置时会自动关闭已经打开的打印和读卡器
 	{
 		gError() << strMessage.toLocal8Bit().data();
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
@@ -355,6 +355,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+	g_pDataCenter->ResetIDData();
 	m_pUpdateCard->StartBusiness();
 	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
@@ -484,6 +485,8 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	case Fetal:
 		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Fetal];
 		break;
+	case Nop:
+		break;
 	}
 	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nPageOperation, nTimeout);
 }
@@ -509,6 +512,13 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
 	pCurPage->emit SwitchNextPage(nPageOperation);
+}
+
+void MainWindow::SwitchPage(int nOperation)
+{
+	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
+	if (pCurPage)
+		pCurPage->emit SwitchNextPage(nOperation);
 }
 
 void MainWindow::On_MaskWidgetEnsure(int nPageOperation, int nStatus)

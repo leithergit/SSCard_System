@@ -27,6 +27,8 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <filesystem>
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QPainter>
@@ -81,6 +83,8 @@ using namespace std;
 using namespace chrono;
 using namespace bit7z;
 using namespace neb;
+using namespace std::filesystem;
+namespace fs = std::filesystem;
 //using namespace Kingaotech;
 
 extern const char* szPrinterTypeList[PRINTER_MAX];
@@ -112,26 +116,29 @@ enum MaskStatus
 	Information,
 	Error,
 	Failed,
-	Fetal
+	Fetal,
+	Nop
 };
 
 enum Page_Index
 {
-	Page_ReaderIDCard,				//读取身份证
-	Page_FaceCapture,				//读取社保卡	
-	Page_EnsureInformation,			//信息确认
-	Page_InputMobile,				//输入手机号码
-	Page_Payment,					//支付页面
-	Page_MakeCard,					//制卡页面	
-	Page_ReadSSCard,				//读取社保卡	
-	Page_InputSSCardPWD,			//输入社保卡密码	
-	Page_ChangeSSCardPWD,			//修改社保卡密码	
-	Page_RegisterLost,				//挂失 / 解挂
-	Page_CommitNewInfo,				//提交新办卡信息
-	Page_AdforFinance,				//开通金融页面
-	Page_Succeed					//操作成功
+	Page_ReaderIDCard,				// 读取身份证
+	Page_InputIDCardInfo,			// 输入身份信息
+	Page_FaceCapture,				// 人脸识别
+	Page_EnsureInformation,			// 信息确认
+	Page_InputMobile,				// 输入手机号码
+	Page_Payment,					// 支付页面
+	Page_MakeCard,					// 制卡页面	
+	Page_ReadSSCard,				// 读取社保卡	
+	Page_InputSSCardPWD,			// 输入社保卡密码	
+	Page_ChangeSSCardPWD,			// 修改社保卡密码	
+	Page_RegisterLost,				// 挂失 / 解挂
+	Page_CommitNewInfo,				// 提交新办卡信息
+	Page_AdforFinance,				// 开通金融页面
+	Page_Succeed					// 操作成功
 };
 
+#define  Switch2Page(x)	(x - Page_ReaderIDCard + Switch_NextPage - 1)
 enum class Manager_Level
 {
 	SuperVisor = 0,
@@ -257,6 +264,8 @@ struct DeviceConfig
 		strTerminalCode = pSettings->value("TerminalCode", "").toString().toStdString();
 
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
+		if (strIDCardReaderPort.size())
+			transform(strIDCardReaderPort.begin(), strIDCardReaderPort.end(), strIDCardReaderPort.begin(), ::toupper);
 
 		// 		Info() << "Device Cofnigure:\n";
 		// 		Info() << "\t\Printer:" << strPrinter;
@@ -666,6 +675,8 @@ struct SysConfig
 		pSettings->endGroup();
 	}
 
+	bool  LoadBankCode(string& strError);
+
 	void SaveMaskPageTimeout(QSettings* pSettings)
 	{
 		if (!pSettings)
@@ -744,6 +755,7 @@ struct SysConfig
 			return;
 		pSettings->beginGroup("PageTimeOut");
 		nPageTimeout[Page_ReaderIDCard] = pSettings->value("ReaderIDCard", 30).toUInt();
+		nPageTimeout[Page_InputIDCardInfo] = pSettings->value("InputIDCard", 600).toUInt();
 		nPageTimeout[Page_FaceCapture] = pSettings->value("FaceCapture", 30).toUInt();
 		nPageTimeout[Page_EnsureInformation] = pSettings->value("EnsureInformation", 30).toUInt();
 		nPageTimeout[Page_InputMobile] = pSettings->value("InputMobile", 30).toUInt();
@@ -813,7 +825,7 @@ struct SysConfig
 	bool			bSkipPrintCard = false;
 	bool			bWriteTest = false;
 	int				nNetTimeout = 1500;
-	std::map<string, string> strMapBank;
+	map<string, string> strMapBank;
 };
 
 using SysConfigPtr = shared_ptr<SysConfig>;
@@ -827,6 +839,8 @@ struct NationaltyCode
 	string strCode;
 	string strNationalty;
 };
+
+using ReadIDCard_CallBack = std::function<void(QWidget* pWidget, IDCardInfo* pIDCard)>;
 
 class DataCenter
 {
@@ -863,6 +877,10 @@ public:
 		strPayCode = "";
 		pIDCard.reset();
 		pSSCardInfo.reset();
+		strSSCardPhotoFile = "";
+		strIDImageFile = "";
+		strSSCardPhotoBase64File = "";
+		bGuardian = false;
 	}
 	SSCardBaseInfoPtr& GetSSCardInfo()
 	{
@@ -902,6 +920,7 @@ public:
 		nManagerLevel = nLevel;
 	}
 
+
 	Manager_Level GetManagerLevel()
 	{
 		return nManagerLevel;
@@ -929,6 +948,7 @@ public:
 	ServiceType		nCardServiceType = ServiceType::Service_Unknown;
 	string			strPayCode;
 	string			strCardVersion;
+	bool			bGuardian;	// 启用监护人
 	bool			bDebug;
 	bool			bSkipWriteCard = false;
 	bool			bSkipPrintCard = false;
@@ -946,6 +966,7 @@ public:
 	int				nBufferSize = 0;
 	string			strFullCapture;
 	string			strFaceCapture;
+	map<string, string>	mapBankCode;
 	//int FaceCamera_EventCallback(int nEventID, int nFrameStatus);
 
 	bool IsVideoStart();
@@ -971,6 +992,8 @@ public:
 	bool Snapshot(string strFilePath);
 
 public:
+	int  ReaderIDCard(IDCardInfo* pIDCard);
+
 	int OpenDevice(QString& strMessage);
 
 	int OpenSSCardService(SSCardService** ppService, QString& strMessage);
@@ -1009,6 +1032,8 @@ public:
 
 	int MoveCard(QString& strMessage);
 
+	bool LoadBankCode(QString& strError);
+
 	KT_Reader* GetSSCardReader()
 	{
 		return m_pSSCardReader;
@@ -1028,9 +1053,10 @@ public:
 	int  PremakeCard(QString& strMessage);
 	int  CommitPersionInfo(QString& strMessage);
 	int	 SafeWriteCard(QString& strMessage);
-    int	 SafeWriteCardTest(QString& strMessage);
+	int	 SafeWriteCardTest(QString& strMessage);
 	int	 SafeReadCard(QString& strMessage);
-	int  LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage);
+	int  DownloadPhoto(string& strBase64Photo, QString& strMessage);
+	int  LoadPhoto(string& strPhoto, QString& strMessage);
 	int  EnsureData(QString& strMessage);
 	int  ActiveCard(QString& strMessage);
 private:
@@ -1119,6 +1145,8 @@ void ShowWidgets(QWidget* pUIObj, bool bShow = true);
 char VerifyCardID(const char* pszSrc);
 
 QString CardStatusString(CardStatus nCardStratus);
+// 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
+int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage);
 
 struct _CareerType
 {

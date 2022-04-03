@@ -1,8 +1,8 @@
 {
 	"Person":	{
-		"Name":	"",
-		"Identity":	"",
-		"Gender":	"",
+		"Name":	"Ã«Ôô¶®",
+		"Identity":	"342321198012104521",
+		"Gender":	"ÄÐ",
 		"Birthday":	"",
 		"Nantion":	"",
 		"PaperIssuedate":	"",
@@ -13,9 +13,7 @@
 		"BankCode":	""
 	},
 	"NewCard":	{
-		
 	},
 	"UpdateCard":	{
-		
 	}
 }

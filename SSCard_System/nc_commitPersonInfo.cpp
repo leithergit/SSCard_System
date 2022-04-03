@@ -48,7 +48,9 @@ int nc_commitPersonInfo::ProcessBussiness()
 	int nResult = -1;
 	QString strCardProgress;
 
-	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	if (!pSSCardInfo)
+		pSSCardInfo = make_shared<SSCardBaseInfo>();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 
@@ -127,7 +129,6 @@ int nc_commitPersonInfo::ProcessBussiness()
 		pSSCardInfo->strOccupType = ui->comboBox_Career->currentData().toString().toStdString();
 
 		jsonIn.Clear();
-
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
@@ -162,6 +163,7 @@ int nc_commitPersonInfo::ProcessBussiness()
 			strMessage = QString("社保后台未返回个人照片!");
 			break;
 		}
+
 
 		ui->label_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
 		ui->label_Gender->setText(QString::fromLocal8Bit(pSSCardInfo->strGender.c_str()));

@@ -72,8 +72,10 @@ public:
 	std::thread* pThreadUploadlog = nullptr;
 	bool  bThreadUploadlogRunning = false;
 
+	void SwitchPage(int nOperation);
+
 signals:
-	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
+	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
 	void LoadSystemManager();
 	void Shutdown();
 

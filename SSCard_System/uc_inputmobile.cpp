@@ -208,7 +208,7 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		{
 			QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
 			gInfo() << strInfo.toLocal8Bit().data();
-			emit ShowMaskWidget("操作成功", strInfo, Success, Skip_NextPage);
+			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_Page, Page_MakeCard);
 		}
 		else
 		{

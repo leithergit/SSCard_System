@@ -16,7 +16,7 @@
 #include <QDebug>
 #include <map>
 #include <vector>
-#include<filesystem>
+#include <filesystem>
 using namespace std::filesystem;
 namespace fs = std::filesystem;
 
@@ -204,6 +204,13 @@ public:
 		UpdateJson(jsonPerson, "Address", CardInfo.strAdress);
 		UpdateJson(jsonPerson, "BankCode", CardInfo.strBankCode);
 		UpdateJson(jsonPerson, "City", CardInfo.strCity);
+		int nAge = GetAge(CardInfo.strBirthday);
+		if (nAge >= 0 && nAge < 16)
+		{
+			UpdateJson(jsonPerson, "Guardian", CardInfo.strGuardianName);
+			UpdateJson(jsonPerson, "GuardianShip", CardInfo.strGuardianType);
+			UpdateJson(jsonPerson, "GuardianCardID", CardInfo.strGuardianCardID);
+		}
 
 		UpdateJson(MainProgress, strPerson, jsonPerson);
 
@@ -731,6 +738,34 @@ public:
 		return nResult;
 	}
 
+	int GetAge(string& strBirthday)
+	{
+		if (strBirthday.empty())
+			return -1;
+
+		int nBirthYear, nBirthMonth, nBirthDay;
+		int nCount = sscanf_s(strBirthday.c_str(), "%04d%02d%02d", &nBirthYear, &nBirthMonth, &nBirthDay);
+		if (nCount != 3)
+			return -1;
+
+		time_t tNow = time(nullptr);
+		tm* tmNow = localtime(&tNow);
+		tmNow->tm_year += 1900;
+		tmNow->tm_mon += 1;
+
+		int nAge = tmNow->tm_year - nBirthYear;
+		if (tmNow->tm_mon < nBirthMonth)
+		{
+			nAge--;
+		}
+		else if (tmNow->tm_mon == nBirthMonth)
+		{
+			if (tmNow->tm_mday < nBirthDay)
+				nAge--;
+		}
+		return nAge;
+	}
+
 	// 输入
 	// {
 	// "CardID":"33333333333333",
@@ -994,6 +1029,7 @@ public:
 			jsonIn.Get("Address", CardInfo.strAdress);
 			jsonIn.Get("Photo", CardInfo.strPhoto);
 			jsonIn.Get("Occupation", CardInfo.strOccupType);
+
 			if (CardInfo.strOccupType.empty())
 				CardInfo.strOccupType = "8000000";
 
@@ -1008,18 +1044,46 @@ public:
 				|| CardInfo.strName.empty()
 				|| CardInfo.strCity.empty()
 				|| CardInfo.strMobile.empty()
-				|| CardInfo.strReleaseDate.empty()
-				|| CardInfo.strValidDate.empty()
 				|| CardInfo.strBirthday.empty()
 				|| CardInfo.strAdress.empty()
 				|| CardInfo.strPhoto.empty()
 				|| strGender.empty()
 				|| CardInfo.strNation.empty())
 			{
-				strMessage = "身份证,姓名,城市代码,银行代码,手机,证件有效,生日,性别,民族,住址或照片不能为空!";
+				strMessage = "身份证,姓名,城市代码,银行代码,手机,证件有效期,生日,性别,民族,住址或照片不能为空!";
 				break;
 			}
-
+			int nAge = GetAge(CardInfo.strBirthday);
+			if (nAge < 0)
+			{
+				strMessage = "生日不是一个有效的日期!";
+				break;
+			}
+			bool bByGuardian = false;
+			if (nAge < 16 || jsonIn.KeyExist("ByGuardian"))
+			{
+				bByGuardian = true;
+				jsonIn.Get("Guardian", CardInfo.strGuardianName);
+				jsonIn.Get("GuardianShip", CardInfo.strGuardianType);
+				jsonIn.Get("GuardianCardID", CardInfo.strGuardianCardID);
+				CardInfo.strGuardianCardType = "A";
+				if (CardInfo.strGuardianName.empty() ||
+					CardInfo.strGuardianCardID.empty() ||
+					CardInfo.strGuardianType.empty())
+				{
+					strMessage = "监护人姓名,监护人身份证号码,监护关系不能为空!";
+					break;
+				}
+			}
+			else if (nAge >= 16)
+			{
+				if (CardInfo.strReleaseDate.empty()
+					|| CardInfo.strValidDate.empty())
+				{
+					strMessage = "16周岁及以上人员证件有效期不能为空!";
+					break;
+				}
+			}
 			/*auto itFind = g_mapNationnaltyCode.find(strNationality);
 			if (itFind != g_mapNationnaltyCode.end())
 			{
@@ -1037,7 +1101,15 @@ public:
 			int nSSResult = -1;
 			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				if (QFailed(nSSResult = saveCardSqList(CardInfo, strOutInfo)))
+				if (bByGuardian)
+				{
+					if (QFailed(nSSResult = saveCardSqListByGuardian(CardInfo, strOutInfo)))
+					{
+						strMessage = "Failed in saveCardSqListByGuardian:";
+						strMessage += strOutInfo;
+					}
+				}
+				else if (QFailed(nSSResult = saveCardSqList(CardInfo, strOutInfo)))
 				{
 					strMessage = "Failed in saveCardSqList:";
 					strMessage += strOutInfo;
@@ -1196,25 +1268,51 @@ public:
 			if (CardInfo.strOccupType.empty())
 				CardInfo.strOccupType = "8000000";
 
-			if (CardInfo.strCardID.empty() ||
-				CardInfo.strName.empty() ||
-				CardInfo.strBankCode.empty() ||
-				CardInfo.strCity.empty() ||
-				CardInfo.strMobile.empty() ||
-				CardInfo.strReason.empty() ||
-				//CardInfo.strOperator.empty() ||
-				strGender.empty() ||
-				//CardInfo.strOccupType.empty() ||
-				//CardInfo.strCardType.empty() ||
-				CardInfo.strReleaseDate.empty() ||
-				CardInfo.strValidDate.empty() ||
-				CardInfo.strBirthday.empty() ||
-				CardInfo.strNation.empty() ||
-				CardInfo.strAdress.empty())
+			if (CardInfo.strCardID.empty()
+				|| CardInfo.strName.empty()
+				|| CardInfo.strCity.empty()
+				|| CardInfo.strMobile.empty()
+				|| CardInfo.strBirthday.empty()
+				|| CardInfo.strAdress.empty()
+				|| CardInfo.strPhoto.empty()
+				|| strGender.empty()
+				|| CardInfo.strNation.empty())
 			{
-				strMessage = "身份号码,姓名,银行代码,城市,手机号码,出生日期,性别,民族或住址不能为空!";
+				strMessage = "身份证,姓名,城市代码,银行代码,手机,证件有效期,生日,性别,民族,住址或照片不能为空!";
 				break;
 			}
+			int nAge = GetAge(CardInfo.strBirthday);
+			if (nAge < 0)
+			{
+				strMessage = "生日不是一个有效的日期!";
+				break;
+			}
+			bool bByGuardian = false;
+			if (nAge < 16 || json.KeyExist("ByGuardian"))
+			{
+				bByGuardian = true;
+				json.Get("Guardian", CardInfo.strGuardianName);
+				json.Get("GuardianShip", CardInfo.strGuardianType);
+				json.Get("GuardianCardID", CardInfo.strGuardianCardID);
+				CardInfo.strGuardianCardType = "A";
+				if (CardInfo.strGuardianName.empty() ||
+					CardInfo.strGuardianCardID.empty() ||
+					CardInfo.strGuardianType.empty())
+				{
+					strMessage = "监护人姓名,监护人身份证号码,监护关系不能为空!";
+					break;
+				}
+			}
+			else if (nAge >= 16)
+			{
+				if (CardInfo.strReleaseDate.empty()
+					|| CardInfo.strValidDate.empty())
+				{
+					strMessage = "16周岁及以上人员证件有效期不能为空!";
+					break;
+				}
+			}
+
 			if (strGender == "男")
 				CardInfo.strSex = "1";
 			else if (strGender == "女")
@@ -1239,7 +1337,16 @@ public:
 			CJsonObject tmpJson;
 			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 			{
-				if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
+				if (bByGuardian)
+				{
+					if (QFailed(nSSResult = saveCardBhListByGuardian(CardInfo, strOutInfo)))
+					{
+						strMessage = "Failed in saveCardBhListByGuardian:";
+						strMessage += strOutInfo;
+						break;
+					}
+				}
+				else if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
 				{
 					strMessage = "Failed in saveCardBhList:";
 					strMessage += strOutInfo;

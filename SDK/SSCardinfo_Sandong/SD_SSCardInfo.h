@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <windows.h>
 #include "KT_Define.h"
 
@@ -8,172 +8,174 @@
 EXTERN_C_START
 #endif
 
-//·µ»ØÖµ: 8--Í¨Ñ¶¹ÊÕÏ 9--ÓĞ²ÎÊıÎª¿Õ
+//è¿”å›å€¼: 8--é€šè®¯æ•…éšœ 9--æœ‰å‚æ•°ä¸ºç©º
 
 /**
-* @brief ³õÊ¼»¯¿¨¹ÜĞÅÏ¢
-* @param[in] inJson url(ĞèÒª¼ÓÉÏport)/licenseKey/serviceName
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief åˆå§‹åŒ–å¡ç®¡ä¿¡æ¯
+* @param[in] inJson url(éœ€è¦åŠ ä¸Šport)/licenseKey/serviceName
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int initCardInfo(const char* inJson, std::string& pOutInfo);
 
 /**
-* @brief ÉêÁì¿¨ĞÅÏ¢Ğ£Ñé
-* @param[in] info ĞèÒªcardID,name,city,bankcode
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ç”³é¢†å¡ä¿¡æ¯æ ¡éªŒ
+* @param[in] info éœ€è¦cardID,name,city,bankcode
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int chkCanCardSq(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ±£´æÉêÁìÃûµ¥ĞÅÏ¢
-* @param[in] info ĞèÒªcardID,cardType,name,city,bankcode,mobile,operator,OccupType,releaseDate,validDate,Birthday,sex,nation,address,photo
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ä¿å­˜ç”³é¢†åå•ä¿¡æ¯
+* @param[in] info éœ€è¦cardID,cardType,name,city,bankcode,mobile,operator,OccupType,releaseDate,validDate,Birthday,sex,nation,address,photo
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardSqList(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ±£´æÉêÁìÃûµ¥ĞÅÏ¢(Î´³ÉÄêĞÂ°ì¿¨)
-* @param[in] info ĞèÒªcardID,cardType,name,city,bankcode,mobile,operator,releaseDate,validDate,Birthday,sex,nation,address,GuardianCardType,GuardianCardID,GuardianName,GuardianType,photo
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ä¿å­˜ç”³é¢†åå•ä¿¡æ¯(æœªæˆå¹´æ–°åŠå¡)
+* @param[in] info éœ€è¦cardID,cardType,name,city,bankcode,mobile,operator,releaseDate,validDate,Birthday,sex,nation,address,GuardianCardType,GuardianCardID,GuardianName,GuardianType,photo
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
-DLL_PUBLIC int saveCardSqListWithChild(SD_SSCardInfo& info, std::string& pOutInfo);
+DLL_PUBLIC int saveCardSqListByGuardian(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ²éÑ¯ÉêÁìÃûµ¥ĞÅÏ¢
-* @param[in] info ĞèÒªcity,bankcode,validDate,dealType,releaseDate
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief æŸ¥è¯¢ç”³é¢†åå•ä¿¡æ¯
+* @param[in] info éœ€è¦city,bankcode,validDate,dealType,releaseDate
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int queryCardZksqList(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ¼´Ê±ÖÆ¿¨Ô¤¿ª»§
-* @param[in] info ĞèÒªcardID,cardType,name,bankCode,operator,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief å³æ—¶åˆ¶å¡é¢„å¼€æˆ·
+* @param[in] info éœ€è¦cardID,cardType,name,bankCode,operator,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardOpen(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ÖÆ¿¨Íê³É
-* @param[in] info ĞèÒªcardID,cardType,name,bankCode,operator,city,cardNum,chipNum,MagNum,ATR,identifyNum,cardVersion,chipType
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief åˆ¶å¡å®Œæˆ
+* @param[in] info éœ€è¦cardID,cardType,name,bankCode,operator,city,cardNum,chipNum,MagNum,ATR,identifyNum,cardVersion,chipType
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardCompleted(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief Éç±£¿¨ÆôÓÃ
-* @param[in] info ĞèÒªcardID,cardType,name,cardNum,bankCode,operator,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ç¤¾ä¿å¡å¯ç”¨
+* @param[in] info éœ€è¦cardID,cardType,name,cardNum,bankCode,operator,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardActive(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ±£´æÉç±£¿¨½ğÈÚÕËºÅ¼¤»î¼ÇÂ¼
-* @param[in] info ĞèÒªcardID,cardType,name,magNum,bankCode,operator,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ä¿å­˜ç¤¾ä¿å¡é‡‘èè´¦å·æ¿€æ´»è®°å½•
+* @param[in] info éœ€è¦cardID,cardType,name,magNum,bankCode,operator,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardJrzhActive(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ²éÑ¯Éç±£¿¨ĞÅÏ¢
-* @param[in] info ĞèÒªcardID,cardType,name,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief æŸ¥è¯¢ç¤¾ä¿å¡ä¿¡æ¯
+* @param[in] info éœ€è¦cardID,cardType,name,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int queryCardInfoBySfzhm(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief Éç±£¿¨ÁÙÊ±¹ÒÊ§
-* @param[in] info ĞèÒªcardID,cardType,name,cardNum,Operator,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ç¤¾ä¿å¡ä¸´æ—¶æŒ‚å¤±
+* @param[in] info éœ€è¦cardID,cardType,name,cardNum,Operator,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardLsgs(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ÁÙÊ±¹ÒÊ§½â¹Ò
-* @param[in] info ĞèÒªcardID,cardType,name,cardNum,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ä¸´æ—¶æŒ‚å¤±è§£æŒ‚
+* @param[in] info éœ€è¦cardID,cardType,name,cardNum,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardLsgsjg(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief Éç±£¿¨¹ÒÊ§
-* @param[in] info ĞèÒªcardID,cardType,name,cardNum,city,cardNum,operator,bankcode
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ç¤¾ä¿å¡æŒ‚å¤±
+* @param[in] info éœ€è¦cardID,cardType,name,cardNum,city,cardNum,operator,bankcode
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int saveCardGs(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ²éÑ¯¸öÈËÕÕÆ¬ĞÅÏ¢
-* @param[in] info ĞèÒªcardID,cardType,city,name
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief æŸ¥è¯¢ä¸ªäººç…§ç‰‡ä¿¡æ¯
+* @param[in] info éœ€è¦cardID,cardType,city,name
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int queryPerPhoto(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ĞŞ¸Ä¸öÈË»ù±¾ĞÅÏ¢
-* @param[in] info ĞèÒªcardID,cardType,name(Ç°ÈıÏîÎŞ·¨ĞŞ¸Ä),sex,birthday, nation,address,mobile,operator,city,releaseDate,validDate,cardUnit,postcal,birthplace,PerAddr,RegAttr,Education,Marital,ContactsName,ContactsMobile
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ä¿®æ”¹ä¸ªäººåŸºæœ¬ä¿¡æ¯
+* @param[in] info éœ€è¦cardID,cardType,name(å‰ä¸‰é¡¹æ— æ³•ä¿®æ”¹),sex,birthday, nation,address,mobile,operator,city,releaseDate,validDate,cardUnit,postcal,birthplace,PerAddr,RegAttr,Education,Marital,ContactsName,ContactsMobile
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
 DLL_PUBLIC int modifyPersonInfo(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ²éÑ¯¸öÈË»ù±¾ĞÅÏ¢
-* @param[in] info ĞèÒªcardID,cardType,name,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief æŸ¥è¯¢ä¸ªäººåŸºæœ¬ä¿¡æ¯
+* @param[in] info éœ€è¦cardID,cardType,name,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
-DLL_PUBLIC int queryPersonInfo(SD_SSCardInfo& info,std::string& pOutInfo);
+DLL_PUBLIC int queryPersonInfo(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief Éç±£¿¨²¹»»¿¨Ğ£Ñé
-* @param[in] info ĞèÒªcardID,cardType,name,bankCode,city
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ç¤¾ä¿å¡è¡¥æ¢å¡æ ¡éªŒ
+* @param[in] info éœ€è¦cardID,cardType,name,bankCode,city
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
-DLL_PUBLIC int chkCanCardBh(SD_SSCardInfo& info,std::string& pOutInfo);
+DLL_PUBLIC int chkCanCardBh(SD_SSCardInfo& info, std::string& pOutInfo);
+
+DLL_PUBLIC int saveCardBhListByGuardian(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ±£´æ²¹»»¿¨Ãûµ¥ĞÅÏ¢
-* @param[in] info ĞèÒªcardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief ä¿å­˜è¡¥æ¢å¡åå•ä¿¡æ¯
+* @param[in] info éœ€è¦cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
-DLL_PUBLIC int saveCardBhList(SD_SSCardInfo& info,std::string& pOutInfo);
+DLL_PUBLIC int saveCardBhList(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief ¹ÒÊ§²¹»»¿¨ºËĞÄ½Ó¿Ú
-* @param[in] info ĞèÒªcardID,cardType,name,bankCode,city,cardNum,operator
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief æŒ‚å¤±è¡¥æ¢å¡æ ¸å¿ƒæ¥å£
+* @param[in] info éœ€è¦cardID,cardType,name,bankCode,city,cardNum,operator
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
-DLL_PUBLIC int saveCardBhk(SD_SSCardInfo& info,std::string& pOutInfo);
+DLL_PUBLIC int saveCardBhk(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
-* @brief »ñÈ¡CA
-* @param[in]  name  ĞÕÃû
-* @param[in]  cardID  Éí·İÖ¤ºÅ
-* @param[in]  cardNum  ¿¨ºÅ
-* @param[in]  signatureKey  Ç©Ãû¹«Ô¿
-* @param[in]  SF  Ëã·¨
-* @param[in]  city  ĞĞÕşÇø»®´úÂë
-* @param[out] pOutInfo ·µ»Øjson×Ö·û´®
-* @return 0:³É¹¦ 1:Ê§°Ü
+* @brief è·å–CA
+* @param[in]  name  å§“å
+* @param[in]  cardID  èº«ä»½è¯å·
+* @param[in]  cardNum  å¡å·
+* @param[in]  signatureKey  ç­¾åå…¬é’¥
+* @param[in]  SF  ç®—æ³•
+* @param[in]  city  è¡Œæ”¿åŒºåˆ’ä»£ç 
+* @param[out] pOutInfo è¿”å›jsonå­—ç¬¦ä¸²
+* @return 0:æˆåŠŸ 1:å¤±è´¥
  */
-DLL_PUBLIC int getCA(std::string name, std::string cardID, std::string cardNum, std::string signatureKey, std::string SF, std::string city,std::string& pOutInfo);
+DLL_PUBLIC int getCA(std::string name, std::string cardID, std::string cardNum, std::string signatureKey, std::string SF, std::string city, std::string& pOutInfo);
 
 #ifdef __cplusplus
 EXTERN_C_END

@@ -460,7 +460,7 @@ void DeviceManager::on_pushButton_PrinterTest_clicked()
 		return;
 	}
 	Wait.RestoreCursor();
-	strMessage = tr("卡片打印成功,请最走卡片!");
+	strMessage = tr("卡片打印成功,请取走卡片!");
 	QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 }
 
@@ -1016,7 +1016,7 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 		}
 
 		Wait.RestoreCursor();
-		strMessage = tr("卡片打印成功,请最走卡片!");
+		strMessage = tr("卡片打印成功,请取走卡片!");
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		break;
 	}

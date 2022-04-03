@@ -32,12 +32,7 @@ class Sys_BatchMakeCard : public QWidget
 public:
 	explicit Sys_BatchMakeCard(QWidget* parent = nullptr);
 	~Sys_BatchMakeCard();
-	int     ReaderIDCard(IDCardInfo* pIDCard);
-	void    ThreadReadIDCard();
-	volatile bool    m_bWorkThreadRunning = false;
-	std::thread* m_pWorkThread = nullptr;
-	string  m_strDevPort;
-	ushort  m_nBaudreate = 9600;
+
 	//map<string, IDCardInfoPtr> m_MapIDCardInfo;
 	vector<MakeCardInfoPtr> vecMakeCardInfo;
 	QButtonGroup* pButttonGrp = nullptr;
@@ -45,6 +40,10 @@ public:
 	int		BuildNewCardInfo(QString& strMessage);
 	int		BuildUpdateCardInfo(QString& strMessage);
 	int		ImportNewIDCard(vector<QString>& vecInfo);
+
+	void    ThreadReadIDCard();
+	volatile bool    m_bWorkThreadRunning = false;
+	std::thread* m_pWorkThread = nullptr;
 
 signals:
 	void AddNewIDCard(IDCardInfo* IDCard);

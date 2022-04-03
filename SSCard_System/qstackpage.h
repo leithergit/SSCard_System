@@ -25,7 +25,7 @@ enum PageOperation
 	Return_MainPage,
 	Stay_CurrentPage,
 	Switch_NextPage,
-	Skip_NextPage,
+	Switch_Page,
 	Retry_CurrentPage = 1024
 };
 extern const char* g_szPageOperation[4];
@@ -118,13 +118,12 @@ public slots:
 signals:
 	void InputPin(unsigned char ch);
 	void SwitchNextPage(int nOperation);
-	//	void RetryCurrentPage(QStackPage* pCurrentPage);
 	void SwitchPage(int nPage);
 	void ErrorMessage(QString strMessage);
-	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
+	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
 	void LiveDetectStatusEvent(int nEventID, int nFrameStatus);
-	void   FaceCaptureSucceed();
-	void   FaceCaptureFailed();
+	void FaceCaptureSucceed();
+	void FaceCaptureFailed();
 
 };
 

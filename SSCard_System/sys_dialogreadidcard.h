@@ -12,7 +12,7 @@ class Sys_DialogReadIDCard : public QDialog
     Q_OBJECT
 
 public:
-    explicit Sys_DialogReadIDCard(QWidget *parent = nullptr);
+    explicit Sys_DialogReadIDCard(QString strMessage, QWidget *parent = nullptr);
     ~Sys_DialogReadIDCard();
 
 private slots:

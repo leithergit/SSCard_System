@@ -70,6 +70,9 @@
     <Filter Include="Page">
       <UniqueIdentifier>{50ed85f1-1173-4b2a-858d-d06f3beb3f58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Page\form">
+      <UniqueIdentifier>{a77bbd4a-048c-42a3-95b8-7ac29af630e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp">
@@ -254,9 +257,6 @@
     <ClInclude Include="DevBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Gloabal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\KT_Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -308,6 +308,9 @@
     <ClInclude Include="..\utility\Markup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Gloabal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -333,43 +336,7 @@
     <QtUic Include="OperatorSucceed.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="uc_adforfinance.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="uc_ensureinformation.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="uc_facecapture.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="uc_inputmobile.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="uc_makecard.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="uc_pay.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="uc_readidcard.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="up_Inputpwd.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="up_changepwd.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="up_readsscard.bak.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="up_readsscard.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="showlicense.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="nc_commitpersoninfo.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="updatecard.ui">
@@ -432,14 +399,50 @@
     <QtUic Include="qnationwidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="uc_inputidcardinfo.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Sys_batchmakecard.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="sys_dialogreadidcard.ui">
       <Filter>SystemManager</Filter>
+    </QtUic>
+    <QtUic Include="Sys_batchmakecard.ui">
+      <Filter>SystemManager</Filter>
+    </QtUic>
+    <QtUic Include="nc_commitpersoninfo.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_adforfinance.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_ensureinformation.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_facecapture.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_inputidcardinfo.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_inputmobile.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_makecard.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_pay.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="uc_readidcard.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="up_changepwd.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="up_Inputpwd.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="up_readsscard.bak.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="up_readsscard.ui">
+      <Filter>Page\form</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>

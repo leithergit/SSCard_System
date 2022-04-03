@@ -508,15 +508,19 @@ int  GetImageStorePath(string& strFilePath, int nType)
 			return -1;
 		}
 	}
+	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+	if (!pIDCard)
+		return -1;
 	QString strTempPath;
 	if (nType == 0)
-		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)pIDCard->szIdentity);
 	else if (nType == 1)
 	{
-		if (g_pDataCenter->GetSSCardInfo()->strCardNum.size() == 9)
-			strTempPath = strStorePath + QString("ID_%1_%2.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
+		if (g_pDataCenter->GetSSCardInfo() &&
+			g_pDataCenter->GetSSCardInfo()->strCardNum.size() == 9)
+			strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)pIDCard->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
 		else
-			strTempPath = strStorePath + QString("ID_%1_SSCard.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+			strTempPath = strStorePath + QString("ID_%1_SSCard.jpg").arg((const char*)pIDCard->szIdentity);
 	}
 	else if (nType == 2)		// 原始base64 文本
 	{
@@ -542,7 +546,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
 	string strPhotoPath;
 	GetImageStorePath(strPhotoPath, 1);
-	photo.save(strPhotoPath.c_str(), "bmp");
+	photo.save(strPhotoPath.c_str(), "jpg", 90);
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
 	return 0;
 }

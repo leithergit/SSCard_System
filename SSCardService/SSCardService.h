@@ -90,6 +90,8 @@ struct SSCardBaseInfo
 	std::string strCommunity;		// 所在社区
 	std::string strCompanyName;		// 单位名称
 	std::string strGuardianName;	// 监护人姓名
+	std::string strGuardianIDentity;// 监护人证件
+	std::string strGuardianShip;	// 监护关系，父子：1，父女：2，母子：3，母女：4
 	std::string strPostalCode;		// 邮政编码
 	std::string strEmail;			// 电子邮箱
 	std::string strLocalNum;		// 所在社区或单位,编号

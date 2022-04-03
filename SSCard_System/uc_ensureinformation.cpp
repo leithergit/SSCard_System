@@ -22,13 +22,12 @@ uc_EnsureInformation::~uc_EnsureInformation()
 
 int uc_EnsureInformation::ProcessBussiness()
 {
-	/*if (g_pMaskWindow)
-		g_pMaskWindow->hide();*/
 	QString strMessage;
 	int nResult = -1;
 	QString strCardProgress;
-
-	SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	if (!pSSCardInfo)
+		pSSCardInfo = make_shared<SSCardBaseInfo>();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	g_pDataCenter->nCardStratus = CardStatus::Card_Unknow;
@@ -205,8 +204,8 @@ int uc_EnsureInformation::ProcessBussiness()
 			// 直接跳转到制止页面
 			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
 			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
-			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
-			emit SwitchNextPage(nOperation);
+			//int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
+			emit SwitchPage(Page_MakeCard);
 			strCardStatus2 = "制卡中";
 		}
 
@@ -273,8 +272,7 @@ int uc_EnsureInformation::ProcessBussiness()
 			// 直接跳转到制止页面
 			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
 			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
-			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
-			emit SwitchNextPage(nOperation);
+			emit SwitchPage(Page_MakeCard);
 			strCardStatus2 = "制卡中";
 		}
 		break;

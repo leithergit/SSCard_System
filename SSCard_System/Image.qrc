@@ -23,6 +23,7 @@
         <file>Image/down_arrow.png</file>
         <file>Image/network-connected.png</file>
         <file>Image/network-disconnected.png</file>
+        <file>Image/Camera.png</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

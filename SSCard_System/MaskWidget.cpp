@@ -49,6 +49,8 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "exclamation.png";
 		break;
+	case Nop:
+		break;
 	}
 
 	//   以下代码为下设置全屏遮罩，暂弃用

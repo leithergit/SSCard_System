@@ -3,6 +3,7 @@
 #include "ui_Newcard.h"
 #include "mainwindow.h"
 #include "uc_readidcard.h"
+#include "uc_inputidcardinfo.h"
 #include "uc_facecapture.h"
 #include "uc_inputmobile.h"
 #include "uc_pay.h"
@@ -25,9 +26,11 @@ NewCard::NewCard(QWidget* parent) :
 	try
 	{
 		m_pStackWidget = ui->stackedWidget;
+
 		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Sandong/newcard1.png", Page_ReaderIDCard));				// step 0
+		ui->stackedWidget->addWidget(new uc_InputIDCardInfo(ui->label_step, "Sandong/newcard1.png", Page_InputIDCardInfo));		// step 1
 		ui->stackedWidget->addWidget(new uc_FaceCapture(ui->label_step, "Sandong/newcard2.png", Page_FaceCapture));				// step 1
-		ui->stackedWidget->addWidget(new nc_commitPersonInfo(ui->label_step, "Sandong/newcard3.png", Page_CommitNewInfo));	// step 2
+		ui->stackedWidget->addWidget(new nc_commitPersonInfo(ui->label_step, "Sandong/newcard3.png", Page_CommitNewInfo));		// step 2
 		ui->stackedWidget->addWidget(new uc_InputMobile(ui->label_step, "Sandong/newcard4.png", Page_InputMobile));				// step 3
 		//ui->stackedWidget->addWidget(new uc_Pay(ui->label_step, "updatecard5.png", Page_Payment));							// step 4
 		ui->stackedWidget->addWidget(new uc_MakeCard(ui->label_step, "Sandong/newcard5.png", Page_MakeCard));					// step 5
@@ -38,6 +41,7 @@ NewCard::NewCard(QWidget* parent) :
 			//connect(ui->stackedWidget->widget(i),SIGNAL(SwitchNextPage),this,SLOT(on_SwitchNextPage));
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
 			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+			connect(pPage, &QStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 			//connect(pPage, &QStackPage::RetryCurrentPage, this, &QMainStackPage::On_RetryCurrentPage);
 		}

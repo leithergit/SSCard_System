@@ -154,9 +154,79 @@ vector<_CareerType> vecCareer = {
 						{"5000000","农林牧渔水利生产人员"},
 						{"6000000","生产运输工人"},
 						{"8000000","其他从业人员"} };
+
+
+bool DataCenter::LoadBankCode(QString& strError)
+{
+	try
+	{
+		gInfo() << "Try to load BankCode.json";
+		QString strBankFile = QCoreApplication::applicationDirPath();
+		strBankFile += "/Data/BankCode.json";
+		QFileInfo fi(strBankFile);
+		if (!fi.isFile())
+		{
+			strError = QString("找不到银行代码库文件:%1!").arg(strBankFile);
+			return false;
+		}
+
+		ifstream ifs(strBankFile.toStdString(), ios::in);
+		stringstream ss;
+		ss << ifs.rdbuf();
+		CJsonObject json;
+		auto tNow = chrono::high_resolution_clock::now();
+		if (!json.Parse(ss.str()))
+		{
+			strError = QString("无效的银行代码库:1%").arg(strBankFile);
+			return false;
+		}
+		if (!json.KeyExist("BankList"))
+		{
+			strError = "银行代码库文件被损坏!";
+			return false;
+		}
+		CJsonObject jsonBankList = json["BankList"];
+		if (!jsonBankList.IsArray())
+		{
+			strError = "银行代码库文件被损坏!";
+			return false;
+		}
+		auto tDuration = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - tNow);
+
+		cout << "Parsar duration:" << tDuration.count() << endl;
+		tNow = chrono::high_resolution_clock::now();
+		int nArraySize = jsonBankList.GetArraySize();
+		CJsonObject jsonItem;
+		for (int i = 0; i < nArraySize; i++)
+		{
+			if (!jsonBankList.Get(i, jsonItem))
+				break;
+			string strCode = jsonItem("code");
+			string strName = jsonItem("Name");
+			auto [it, Inserted] = mapBankCode.try_emplace(strCode, strName);
+		}
+
+		tDuration = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - tNow);
+
+		cout << "Parsar duration:" << tDuration.count() << endl;
+		tNow = chrono::high_resolution_clock::now();
+		//for (auto var : mapBankCode)
+		//{
+		//	cout << var.first << "-->" << var.second;
+		//}
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		cout << "exception:" << e.what();
+	}
+	return false;
+}
+
 DataCenter::DataCenter()
 {
 	DVTGKLDCam_Init();
+
 }
 
 DataCenter::~DataCenter()
@@ -464,6 +534,53 @@ QStringList SearchFiles(const QString& dir_path, QDateTime* pStart, QDateTime* p
 	}
 
 	return FileList;
+}
+
+int  DataCenter::ReaderIDCard(IDCardInfo* pIDCard)
+{
+	int nResult = IDCard_Status::IDCard_Succeed;
+	auto strDevPort = GetSysConfigure()->DevConfig.strIDCardReaderPort;
+	bool bDevOpened = false;
+	do
+	{
+		if (strDevPort == "AUTO" || !strDevPort.size())
+		{
+			gInfo() << "Try to open IDCard Reader auto!" << strDevPort;
+			nResult = OpenReader(nullptr);
+		}
+		else
+		{
+			gInfo() << "Try to open IDCard Reader " << strDevPort;
+			nResult = OpenReader(strDevPort.c_str());
+		}
+
+		if (nResult != IDCard_Status::IDCard_Succeed)
+		{
+			break;
+		}
+		bDevOpened = true;
+		nResult = FindIDCard();
+		if (nResult != IDCard_Status::IDCard_Succeed)
+		{
+			break;
+		}
+
+		nResult = ReadIDCard(pIDCard);
+		if (nResult != IDCard_Status::IDCard_Succeed)
+		{
+			break;
+		}
+		int nNationalityCode = strtol((char*)pIDCard->szNationaltyCode, nullptr, 10);
+		if (nNationalityCode < 10)
+			sprintf_s((char*)pIDCard->szNationaltyCode, sizeof(pIDCard->szNationaltyCode), "%02d", nNationalityCode);
+
+	} while (0);
+	if (bDevOpened)
+	{
+		gInfo() << "Try to close IDCard Reader!";
+		CloseReader();
+	}
+	return nResult;
 }
 
 int DataCenter::OpenDevice(QString& strMessage)
@@ -1568,7 +1685,6 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 	char szWHSM1[1024] = { 0 };
 	/*char szWHSM2[1024] = { 0 };*/
 	char szSignatureKey[1024] = { 0 };
-	char szWriteCARes[1024] = { 0 };
 	char szCardATR[1024] = { 0 };
 	int nCardATRLen = 0;
 	QString strInfo;
@@ -1828,6 +1944,10 @@ bool DataCenter::StartVideo(HWND hWnd)
 
 		if (!IsWindow(hWnd))
 			break;
+		nRet = DVTGKLDCam_SetCamFormat(m_hCamera, 0, LD_FMT_MJPG, m_nWidth, m_nHeight);
+		if (nRet != LD_RET_OK)
+			break;
+
 		nRet = DVTGKLDCam_SetCamFormat(m_hCamera, 1, LD_FMT_MJPG, m_nWidth, m_nHeight);
 		if (nRet != LD_RET_OK)
 			break;
@@ -1892,23 +2012,40 @@ bool DataCenter::SaveFaceImage(string strPhotoFile, bool bFull)
 	int nDataLen = 0;
 	bool bSucceed = false;
 	ZeroMemory(pImageBuffer, nBufferSize);
-	if (bFull)
+	//if (bFull)
+	//{
+	try
 	{
-		if (LD_RET_OK == DVTGKLDCam_GetImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nDataLen))
+		if (fs::exists(strPhotoFile))
 		{
-			WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, m_nWidth, m_nHeight);
-			bSucceed = true;
+			fs::remove(strPhotoFile);
 		}
+		int nRes = DVTGKLDCam_Snapshot(m_hCamera, IMG_JPG, pImageBuffer, nBufferSize, &nDataLen);
+		if (nRes != LD_RET_OK)
+			return false;
+		ofstream ofs(strPhotoFile, ios::out | ios::binary);
+		//WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, m_nWidth, m_nHeight);
+		string strBuffer((char*)pImageBuffer, nDataLen);
+		ofs << strBuffer;
+		ofs.flush();
+		bSucceed = true;
 	}
+	catch (std::exception& e)
+	{
+		gInfo() << "保存图片发生异常:" << e.what();
+		bSucceed = false;
+	}
+
+	/*}
 	else
 	{
 		int nFaceWidth = 0, nFaceHeight = 0;
-		if (LD_RET_OK == DVTGKLDCam_GetFaceImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nFaceWidth, &nFaceHeight, &nDataLen))
+		if (LD_RET_OK == DVTGKLDCam_GetFaceImage(m_hCamera, IMG_JPG, pImageBuffer, nBufferSize, &nFaceWidth, &nFaceHeight, &nDataLen))
 		{
 			WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, nFaceWidth, nFaceHeight);
 			bSucceed = true;
 		}
-	}
+	}*/
 	return bSucceed;
 }
 
@@ -2181,75 +2318,79 @@ int  DataCenter::PremakeCard(QString& strMessage)
 	return nResult;
 }
 
-int DataCenter::LoadPhoto(SSCardService* pService, string& strPhoto, QString& strMessage)
+int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage)
+{
+	if (strSSCardPhotoFile.empty())
+	{
+		return DownloadPhoto(strBase64Photo, strMessage);
+	}
+	else
+	{
+		try
+		{
+			ifstream ifs(strSSCardPhotoFile, ios::in | ios::binary);
+			stringstream ss;
+			ss << ifs.rdbuf();
+			// 读取jpg图片并转base64
+			QByteArray ba(ss.str().c_str(), ss.str().size());
+			QByteArray baBase64 = ba.toBase64();
+			strBase64Photo = string(baBase64.data(), baBase64.size());
+			return 0;
+		}
+		catch (std::exception& e)
+		{
+			gInfo() << e.what();
+			return -1;
+		}
+	}
+}
+int DataCenter::DownloadPhoto(string& strBase64Photo, QString& strMessage)
 {
 	if (!pSScardSerivce)
 	{
 		strMessage = "卡管服务不可用!";
 		return -1;
 	}
-	if (strSSCardPhotoFile.empty())
+
+	CJsonObject jsonQuery;
+	jsonQuery.Clear();
+
+	jsonQuery.Add("CardID", pSSCardInfo->strIdentity);
+	jsonQuery.Add("Name", pSSCardInfo->strName);
+	jsonQuery.Add("City", pSSCardInfo->strCity);
+
+	string strJsonQuery = jsonQuery.ToString();
+	string strJsonOut;
+	string strCommand = "QueryPersonPhoto";
+
+	if (QFailed(pSScardSerivce->SetExtraInterface(strCommand, strJsonQuery, strJsonOut)))
 	{
-		CJsonObject jsonQuery;
-		jsonQuery.Clear();
-
-		jsonQuery.Add("CardID", pSSCardInfo->strIdentity);
-		jsonQuery.Add("Name", pSSCardInfo->strName);
-		jsonQuery.Add("City", pSSCardInfo->strCity);
-
-		string strJsonQuery = jsonQuery.ToString();
-		string strJsonOut;
-		string strCommand = "QueryPersonPhoto";
-
-		if (QFailed(pSScardSerivce->SetExtraInterface(strCommand, strJsonQuery, strJsonOut)))
-		{
-			CJsonObject jsonOut(strJsonOut);
-			string strText;
-			int nErrCode = -1;
-			jsonOut.Get("Result", nErrCode);
-			jsonOut.Get("Message", strText);
-			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-			return -1;
-		}
 		CJsonObject jsonOut(strJsonOut);
-		string strPhoto;
-		if (jsonOut.Get("Photo", strPhoto))
-		{
-			SaveSSCardPhoto(strMessage, strPhoto.c_str());
-			if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
-			{
-				strMessage = QString("保存照片数据失败!");
-				return -1;
-			}
-		}
-		else
-		{
-			strMessage = QString("社保后台未返回个人照片!");
-			return 1;
-		}
-		/*strMessage = "提示", "未找到照片数据,请先下载照片";
-		break;*/
-	}
-
-	try
-	{
-		ifstream ifs(g_pDataCenter->strSSCardPhotoBase64File, ios::in | ios::binary);
-		stringstream ss;
-		ss << ifs.rdbuf();
-		// 读取jpg图片并转base64
-		//QByteArray ba(ss.str().c_str(), ss.str().size());
-		//QByteArray baBase64 = ba.toBase64();
-		//jsonIn.Add("Photo", baBase64.data());
-		// 直接使用base64数据
-		strPhoto = ss.str();
-		//jsonIn.Add("Photo", );
-		return 0;
-	}
-	catch (std::exception& e)
-	{
-		gInfo() << e.what();
+		string strText;
+		int nErrCode = -1;
+		jsonOut.Get("Result", nErrCode);
+		jsonOut.Get("Message", strText);
+		strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 		return -1;
 	}
+	CJsonObject jsonOut(strJsonOut);
+
+	if (jsonOut.Get("Photo", strBase64Photo))
+	{
+		SaveSSCardPhoto(strMessage, strBase64Photo.c_str());
+		if (QFailed(SaveSSCardPhotoBase64(strMessage, strBase64Photo.c_str())))
+		{
+			strMessage = QString("保存照片数据失败!");
+			return -1;
+		}
+	}
+	else
+	{
+		strMessage = QString("社保后台未返回个人照片!");
+		return 1;
+	}
+	return 0;
+
 }
 
 int DataCenter::RegisterLost(QString& strMessage)
@@ -2353,10 +2494,17 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		jsonIn.Add("Address", pSSCardInfo->strAddress);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("Occupation", pSSCardInfo->strOccupType);
-		if QFailed(LoadPhoto(pSScardSerivce, pSSCardInfo->strPhoto, strMessage))
+		if (g_pDataCenter->bGuardian)
 		{
-			break;
+			jsonIn.Add("ByGuardian", 1);	// 启用监护人信息
+			jsonIn.Add("Guardian", pSSCardInfo->strGuardianName);
+			jsonIn.Add("GuardianShip", pSSCardInfo->strGuardianShip);
+			jsonIn.Add("GuardianCardID", pSSCardInfo->strGuardianIDentity);
 		}
+
+		if QFailed(LoadPhoto(pSSCardInfo->strPhoto, strMessage))
+			break;
+
 		gInfo() << "JsonIn(without photo) = " << strJsonIn;
 		jsonIn.Add("Photo", pSSCardInfo->strPhoto);
 
@@ -2477,36 +2625,36 @@ int	 DataCenter::SafeWriteCard(QString& strMessage)
 
 int	 DataCenter::SafeWriteCardTest(QString& strMessage)
 {
-    int nResult = -1;
-    string strJsonIn, strJsonOut;
-    QString strInfo;
-    int nWriteCardCount = 0;
+	int nResult = -1;
+	string strJsonIn, strJsonOut;
+	QString strInfo;
+	int nWriteCardCount = 0;
 
-    while (nWriteCardCount < 3)
-    {
-        strInfo = QString("尝试第%1次写卡!").arg(nWriteCardCount + 1);
-        gInfo() << gQStr(strInfo);
-        nResult = g_pDataCenter->WriteCardTest(pSSCardInfo, strMessage);
-        if (QSucceed(nResult))
-        {
-            break;
-        }
-        else if (nResult == -4)
-        {
-            nWriteCardCount++;
-            strInfo = "写卡上电失败,尝试移动卡片!";
-            gInfo() << gQStr(strInfo);
-            g_pDataCenter->MoveCard(strMessage);
-            continue;
-        }
-        else if (QFailed(nResult))
-        {
-            strMessage = "写卡失败!";
-            break;
-        }
-        nResult = 0;
-    }
-    return nResult;
+	while (nWriteCardCount < 3)
+	{
+		strInfo = QString("尝试第%1次写卡!").arg(nWriteCardCount + 1);
+		gInfo() << gQStr(strInfo);
+		nResult = g_pDataCenter->WriteCardTest(pSSCardInfo, strMessage);
+		if (QSucceed(nResult))
+		{
+			break;
+		}
+		else if (nResult == -4)
+		{
+			nWriteCardCount++;
+			strInfo = "写卡上电失败,尝试移动卡片!";
+			gInfo() << gQStr(strInfo);
+			g_pDataCenter->MoveCard(strMessage);
+			continue;
+		}
+		else if (QFailed(nResult))
+		{
+			strMessage = "写卡失败!";
+			break;
+		}
+		nResult = 0;
+	}
+	return nResult;
 }
 
 int  DataCenter::EnsureData(QString& strMessage)
@@ -2587,4 +2735,56 @@ int  DataCenter::ActiveCard(QString& strMessage)
 		nResult = 0;
 	} while (0);
 	return 0;
+}
+
+// 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
+int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage)
+{
+	QWaitCursor Wait;
+	QString strAppPath = QApplication::applicationDirPath();
+	QString strCurrentPath = strAppPath + "/PhotoProcess";
+	QString strProcessPath = strAppPath + "/PhotoProcess/MattingTool.bin";
+
+	try
+	{
+		if (!fs::exists(strProcessPath.toStdString()))
+		{
+			strMessage = "找不到人像处理组件:MattingTool.bin";
+			return -1;
+		}
+
+		QString strPhotoPath2 = strAppPath + "/PhotoProcess/2.jpg";
+
+		if (fs::exists(strPhotoPath2.toStdString()))
+			fs::remove(strPhotoPath2.toStdString());
+
+		wchar_t wszCurrentPath[1024] = { 0 };
+		wcscpy_s(wszCurrentPath, 1024, strCurrentPath.toStdWString().c_str());
+		QProcess tProcess;
+		tProcess.setCreateProcessArgumentsModifier([&](QProcess::CreateProcessArguments* args)
+			{
+				//args->flags |= CREATE_NEW_CONSOLE;
+				args->startupInfo->dwFlags &= ~STARTF_USESTDHANDLES;
+				args->startupInfo->dwFlags |= STARTF_USEFILLATTRIBUTE;
+				args->startupInfo->dwFillAttribute = BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+				args->currentDirectory = wszCurrentPath;
+			});
+		tProcess.start(strProcessPath);
+		tProcess.waitForFinished();
+
+		QFileInfo fi2(strPhotoPath2);
+		if (!fi2.isFile())
+		{
+			strMessage = "人像处理失败!";
+			return -1;
+		}
+		strHeaderPhoto = strPhotoPath2;
+		return 0;
+
+	}
+	catch (std::exception& e)
+	{
+		gInfo() << "发生异常" << e.what();
+	}
+	return -1;
 }

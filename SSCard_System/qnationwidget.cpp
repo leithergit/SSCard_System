@@ -18,5 +18,5 @@ QNationWidget::~QNationWidget()
 void QNationWidget::on_pushButton_Ok_clicked()
 {
 	this->hide();
-	((uc_ReadIDCard*)parent())->emit ShowNationWidget(false);
+	//((uc_ReadIDCard*)parent())->emit ShowNationWidget(false);
 }
