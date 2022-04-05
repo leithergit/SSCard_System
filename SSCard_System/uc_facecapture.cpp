@@ -25,6 +25,7 @@ uc_FaceCapture::~uc_FaceCapture()
 
 void  uc_FaceCapture::ShutDownDevice()
 {
+	gInfo() << __FUNCTION__;
 	QString strError;
 	if (CloseCamera(strError))
 	{
@@ -97,6 +98,7 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 
 int uc_FaceCapture::CloseCamera(QString& strError)
 {
+	gInfo() << __FUNCTION__;
 	int nResult = 0;
 	do
 	{
@@ -109,6 +111,7 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 
 void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
+	gInfo() << __FUNCTION__;
 	QString strError;
 	g_pDataCenter->StopFaceDetect();
 
@@ -118,6 +121,7 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 
 void uc_FaceCapture::OnFaceCaptureFailed()
 {
+	gInfo() << __FUNCTION__;
 	QString strError;
 	g_pDataCenter->StopFaceDetect();
 	gInfo() << "OnFaceCaptureFailed!";
@@ -126,6 +130,7 @@ void uc_FaceCapture::OnFaceCaptureFailed()
 
 int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, bool bFull)
 {
+	gInfo() << __FUNCTION__;
 	if (QFailed(GetFaceCaptureStorePath(strFaceImageFile, bFull)))
 	{
 		gError() << QString("无法访问人脸数据目录!").toLocal8Bit().data();
@@ -140,6 +145,7 @@ int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, b
 
 int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, bool bFull)
 {
+	gInfo() << __FUNCTION__;
 	QString strStorePath = QCoreApplication::applicationDirPath();
 	strStorePath += "/FaceCapture/";
 	strStorePath += QDateTime::currentDateTime().toString("yyyyMMdd/");
@@ -156,15 +162,20 @@ int  uc_FaceCapture::GetFaceCaptureStorePath(QString& strFilePath, bool bFull)
 			return -1;
 		}
 	}
-	if (bFull)
-		strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
-	else
-		strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+	if (g_pDataCenter->GetIDCardInfo())
+	{
+		if (bFull)
+			strFilePath = strStorePath + QString("Full_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+		else
+			strFilePath = strStorePath + QString("Face_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+	}
+
 	return 0;
 }
 
 void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 {
+	gInfo() << __FUNCTION__;
 	QString strInfo = QString("nEventID = %1\tnFrameStatus = %2.\n").arg(eventID, nFrameStatus);
 	gInfo() << strInfo.toLocal8Bit().data();
 	QString strEvent = "";

@@ -80,8 +80,8 @@ signals:
 	void Shutdown();
 
 public slots:
-	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);
-	void On_MaskWidgetTimeout(int nOperation);
+	void On_ShowMaskWidget(QString, QString, int nStatus, int nOperation, int nPage);
+	void On_MaskWidgetTimeout(int nOperation, int nStatus);
 	void On_MaskWidgetEnsure(int nOperation, int nStatus);
 	void on_Shutdown();
 	void OnNewInstance(const QString&);

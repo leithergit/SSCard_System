@@ -25,7 +25,7 @@ enum PageOperation
 	Return_MainPage,
 	Stay_CurrentPage,
 	Switch_NextPage,
-	Switch_Page,
+	Goto_Page,
 	Retry_CurrentPage = 1024
 };
 extern const char* g_szPageOperation[4];
@@ -107,7 +107,7 @@ public slots:
 	// 遮罩层图标状态  0为成功，1为失败，2为警告
 	// 遮罩层滞留时间  单位毫秒
 	// nNextPages   0 为保留当前页，1为切换下一页，2..3否则为需要跳过的页数,直接当前页+nNextPages页
-	virtual void  OnShowMaskWidget(QString strMessage, int nStatus, int nOperation)
+	virtual void  OnShowMaskWidget(QString strMessage, int nStatus, int nOperation, int nPage)
 	{
 		Q_UNUSED(strMessage);
 		Q_UNUSED(nStatus);
@@ -117,8 +117,7 @@ public slots:
 
 signals:
 	void InputPin(unsigned char ch);
-	void SwitchNextPage(int nOperation);
-	void SwitchPage(int nPage);
+	void SwitchPage(int nOperation, int nPage);
 	void ErrorMessage(QString strMessage);
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
 	void LiveDetectStatusEvent(int nEventID, int nFrameStatus);

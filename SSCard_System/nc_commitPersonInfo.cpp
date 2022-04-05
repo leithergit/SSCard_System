@@ -42,6 +42,7 @@ void nc_commitPersonInfo::OnTimeout()
 
 int nc_commitPersonInfo::ProcessBussiness()
 {
+	gInfo() << __FUNCTION__;
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
 	QString strMessage;
@@ -185,9 +186,9 @@ int nc_commitPersonInfo::ProcessBussiness()
 	return nResult;
 }
 
-
 void nc_commitPersonInfo::on_pushButton_OK_clicked()
 {
+	gInfo() << __FUNCTION__;
 	QString strInfo;
 	if (g_pDataCenter->strSSCardPhotoFile.empty())
 	{

@@ -82,6 +82,11 @@ void Sys_BatchMakeCard::on_ShowMessage(QString strMessage)
 void Sys_BatchMakeCard::on_UpdateTableWidget(int nRow, int nCol, QString strMessage)
 {
 	ui->tableWidget->item(nRow, nCol)->setText(strMessage);
+	QString strDateTime = QDateTime::currentDateTime().toString("HH:MM:SS");
+	ui->textEdit->append(strDateTime + " " + strMessage);
+	QTextCursor cursor = ui->textEdit->textCursor();
+	cursor.movePosition(QTextCursor::End);
+	ui->textEdit->setTextCursor(cursor);
 }
 
 Sys_BatchMakeCard::~Sys_BatchMakeCard()
@@ -427,6 +432,7 @@ void Sys_BatchMakeCard::ThreadBatchMakeCard()
 		g_pDataCenter->SetIDCardInfo(var->pIDCard);
 		g_pDataCenter->SetSSCardInfo(var->pSSCardInfo);
 		int nResult = -1;
+		g_pDataCenter->bGuardian = false;
 		do
 		{
 			if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
@@ -488,6 +494,10 @@ void Sys_BatchMakeCard::ThreadBatchMakeCard()
 				if (QFailed(nResult = g_pDataCenter->SafeWriteCard(strMessage)))
 					break;
 			}
+			else
+			{
+				emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_Progress, "根据配置,跳过写卡");
+			}
 
 			emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_Progress, "写卡");
 
@@ -495,6 +505,10 @@ void Sys_BatchMakeCard::ThreadBatchMakeCard()
 			{
 				if (QFailed(nResult = g_pDataCenter->PrintCard(var->pSSCardInfo, "", strMessage)))
 					break;
+			}
+			else
+			{
+				emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_Progress, "根据配置,跳过打印");
 			}
 
 			emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_Progress, "打印");
@@ -545,7 +559,7 @@ void Sys_BatchMakeCard::on_pushButton_StartReadIDCard_clicked()
 	}
 	m_bWorkThreadRunning = true;
 	m_pWorkThread = new std::thread(&Sys_BatchMakeCard::ThreadReadIDCard, this);
-	Sys_DialogReadIDCard dlg("请刷身份证以添加制卡人信息", this);
+	Sys_DialogReadIDCard dlg("请刷身份证以添加制卡人信息", true, this);
 	dlg.exec();
 	m_bWorkThreadRunning = false;
 	m_pWorkThread->join();

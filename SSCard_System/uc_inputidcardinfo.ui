@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1314</width>
+    <width>1327</width>
     <height>827</height>
    </rect>
   </property>
@@ -734,7 +734,7 @@ QRadioButton::indicator::checked {
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <layout class="QHBoxLayout" name="horizontalLayout_Guardian">
            <item>
             <widget class="QLabel" name="label_Guardian">
              <property name="minimumSize">
@@ -777,22 +777,6 @@ QRadioButton::indicator::checked {
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_13">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QLabel" name="label_GuardianMobile">
              <property name="minimumSize">
               <size>
@@ -824,7 +808,7 @@ QRadioButton::indicator::checked {
              </property>
              <property name="maximumSize">
               <size>
-               <width>400</width>
+               <width>500</width>
                <height>60</height>
               </size>
              </property>

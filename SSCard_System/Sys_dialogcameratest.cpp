@@ -52,6 +52,8 @@ void DialogCameraTest::on_pushButton_clicked()
 			string strSSCardPhoto;
 			if (QSucceed(GetImageStorePath(strSSCardPhoto, 1)))
 			{
+				if (fs::exists(strSSCardPhoto))
+					fs::remove(strSSCardPhoto);
 				fs::copy(strPhotoPath2.toStdString(), strSSCardPhoto);
 				g_pDataCenter->strSSCardPhotoFile = strSSCardPhoto;
 			}

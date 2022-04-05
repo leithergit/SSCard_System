@@ -19,12 +19,13 @@ MaskWidget::~MaskWidget()
 	delete ui;
 }
 
-void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPageOpteration, int nTimeout)
+void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage, int nTimeout)
 {
-	gInfo() << gQStr(strTitle) << gQStr(strDesc) << gVal(nStatus) << gVal(nPageOpteration) << gVal(nTimeout);
+	gInfo() << gQStr(strTitle) << gQStr(strDesc) << gVal(nStatus) << gVal(nOperation) << gVal(nTimeout);
 	QString strImage;
 	setWindowOpacity(0.8);
-	m_nPageOpteration = nPageOpteration;
+	this->nOperation = nOperation;
+	this->nPage = nPage;
 	QString strQSS;
 	switch (nStatus)    // 设置相应图标
 	{
@@ -81,7 +82,7 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	show();
 	setFocus();
 
-	if (nPageOpteration != Retry_CurrentPage)
+	if (nOperation != Retry_CurrentPage)
 	{
 		m_nTimeout = nTimeout;
 		m_nTimerID = startTimer(m_nTimerInterval);
@@ -117,7 +118,7 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 			hide();
 			killTimer(m_nTimerID);
 			m_nTimerID = 0;
-			emit MaskTimeout(m_nPageOpteration);
+			emit MaskTimeout(nOperation, nPage);
 		}
 	}
 }
@@ -127,5 +128,5 @@ void MaskWidget::on_pushButton_OK_clicked()
 	hide();
 	killTimer(m_nTimerID);
 	m_nTimerID = 0;
-	emit MaskEnsure(m_nPageOpteration, 0);
+	emit MaskEnsure(nOperation, 0);
 }

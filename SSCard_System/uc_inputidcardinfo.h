@@ -41,6 +41,7 @@ public:
 	void    ThreadWork();
 	void	ShowGuardianWidget(bool bShow);
 	void	ClearGuardianInfo();
+	QSpacerItem* horizontalSpacer_Mobile = nullptr;
 
 signals:
 	void AddNewIDCard(IDCardInfo* IDCard);
@@ -52,8 +53,6 @@ private slots:
 	void on_pushButton_OK_clicked();
 
 	void on_AddNewIDCard(IDCardInfo* pIDCard);
-
-	void on_ShowWidgets(QWidget* pWidget, bool bShow);
 
 	void on_comboBox_Province_currentIndexChanged(int index);
 
@@ -68,6 +67,8 @@ private slots:
 	void on_pushButton_TakePhoto_clicked();
 
 	void on_pushButton_SelectPhoto_clicked();
+
+	void on_checkBox_Agency_clicked();
 
 private:
 	Ui::uc_InputIDCardInfo* ui;

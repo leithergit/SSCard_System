@@ -20,18 +20,17 @@ UpdatePassword::UpdatePassword(QWidget* parent) :
 
 	try
 	{
-
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-		ui->stackedWidget->addWidget(new up_ReadSSCard(ui->label_step, "changepassword1.png", Page_ReadSSCard));
-		ui->stackedWidget->addWidget(new up_InputPWD(ui->label_step, "changepassword2.png", Page_InputSSCardPWD));
-		ui->stackedWidget->addWidget(new up_ChangePWD(ui->label_step, "changepassword3.png", Page_ChangeSSCardPWD));
-		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, "", Page_Succeed));
+		AddPage(new up_ReadSSCard(ui->label_step, "changepassword1.png", Page_ReadSSCard));
+		AddPage(new up_InputPWD(ui->label_step, "changepassword2.png", Page_InputSSCardPWD));
+		AddPage(new up_ChangePWD(ui->label_step, "changepassword3.png", Page_ChangeSSCardPWD));
+		AddPage(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < ui->stackedWidget->count(); i++)
 		{
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
-			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+			//connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
 			connect(pPage, &QStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}

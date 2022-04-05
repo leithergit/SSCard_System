@@ -1227,7 +1227,6 @@ public:
 	int CommitReplaceCardInfo(string& strJsonIn, string& strJsonOut)
 	{
 		CJsonObject json(strJsonIn);
-		int nSSResult = -1;
 		int nResult = -1;
 		int nErrFlag = -1;
 		string strMessage;
@@ -1339,14 +1338,14 @@ public:
 			{
 				if (bByGuardian)
 				{
-					if (QFailed(nSSResult = saveCardBhListByGuardian(CardInfo, strOutInfo)))
+					if (QFailed(saveCardBhListByGuardian(CardInfo, strOutInfo)))
 					{
 						strMessage = "Failed in saveCardBhListByGuardian:";
 						strMessage += strOutInfo;
 						break;
 					}
 				}
-				else if (QFailed(nSSResult = saveCardBhList(CardInfo, strOutInfo)))
+				else if (QFailed(saveCardBhList(CardInfo, strOutInfo)))
 				{
 					strMessage = "Failed in saveCardBhList:";
 					strMessage += strOutInfo;

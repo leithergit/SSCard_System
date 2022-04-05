@@ -139,12 +139,21 @@ void uc_ReadIDCard::ThreadWork()
 			int nResult = g_pDataCenter->ReaderIDCard(m_pIDCard.get());
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
+				g_pDataCenter->SetIDCardInfo(m_pIDCard);
+
+				if (QSucceed(GetImageStorePath(g_pDataCenter->strIDImageFile)))
+				{
+					QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);
+					ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
+				}
+
 				if (nReadIDType == ReadID_UpdateCard)
 					strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
 				else if (nReadIDType == ReadID_RegisterLost)
 					strError = "读取身份证成功,稍后请进行挂失/解挂操作!";
 				gInfo() << gQStr(strError);
-				emit ShowMaskWidget("操作成功", strError, Success, Switch2Page(Page_FaceCapture));
+				g_pDataCenter->SetIDCardInfo(m_pIDCard);
+				emit ShowMaskWidget("操作成功", strError, Success, Goto_Page, Page_FaceCapture);
 				break;
 			}
 			else
@@ -163,6 +172,62 @@ void uc_ReadIDCard::ThreadWork()
 	}
 }
 
+void uc_ReadIDCard::timerEvent(QTimerEvent* event)
+{
+
+}
+
+void uc_ReadIDCard::On_WithoutIDCard(int arg1)
+{
+	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
+	if (pMainWind && pMainWind->pLastStackPage)
+	{
+		g_pDataCenter->bWithoutIDCard = true;
+		pMainWind->pLastStackPage->emit SwitchPage(Switch_NextPage);
+	}
+	//emit ShowMaskWidget("操作成功", "稍后手动输入一些必要的信息", Success, Switch_NextPage);
+	//QWaitCursor Wait;
+	//if (arg1)
+	//{
+	//	ShowInputCardID();
+	//	StopDetect();
+	//}
+	//else
+	//{
+	//	//ui->label_Swipecard->setParent(this);
+	//	//ui->horizontalLayout_2->addWidget(ui->label_Swipecard);
+	//	ShowReadCardID();
+	//	StartDetect();
+	//}
+	//MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
+	//if (pMainWind && pMainWind->pLastStackPage)
+	//{
+	//	pMainWind->pLastStackPage->ResetTimer(arg1 != 0, this);
+	//}
+}
+
+// int  uc_ReadIDCard::GetIDImageStorePath(string& strFilePath)
+// {
+// 	QString strStorePath = QCoreApplication::applicationDirPath();
+// 	strStorePath += "/IDImage/";
+// 	strStorePath += QDateTime::currentDateTime().toString("yyyyMMdd/");
+// 	QFileInfo fi(strStorePath);
+// 	if (!fi.isDir())
+// 	{// 当天目录不存在？则创建目录
+// 		QDir storeDir;
+// 		if (!storeDir.mkpath(strStorePath))
+// 		{
+// 			char szError[1024] = { 0 };
+// 			_strerror_s(szError, 1024, nullptr);
+// 			QString Info = QString("创建身份证照片保存目录'%1'失败:%2").arg(strStorePath, szError);
+// 			gInfo() << Info.toLocal8Bit().data();
+// 			return -1;
+// 		}
+// 	}
+// 	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
+// 	strFilePath = strTempPath.toStdString();
+// 	return 0;
+// }
 //
 //int uc_ReadIDCard::ReaderIDCard()
 //{
@@ -229,35 +294,6 @@ void uc_ReadIDCard::ThreadWork()
 //	}
 //	return nResult;
 //}
-
-void uc_ReadIDCard::timerEvent(QTimerEvent* event)
-{
-
-}
-
-// int  uc_ReadIDCard::GetIDImageStorePath(string& strFilePath)
-// {
-// 	QString strStorePath = QCoreApplication::applicationDirPath();
-// 	strStorePath += "/IDImage/";
-// 	strStorePath += QDateTime::currentDateTime().toString("yyyyMMdd/");
-// 	QFileInfo fi(strStorePath);
-// 	if (!fi.isDir())
-// 	{// 当天目录不存在？则创建目录
-// 		QDir storeDir;
-// 		if (!storeDir.mkpath(strStorePath))
-// 		{
-// 			char szError[1024] = { 0 };
-// 			_strerror_s(szError, 1024, nullptr);
-// 			QString Info = QString("创建身份证照片保存目录'%1'失败:%2").arg(strStorePath, szError);
-// 			gInfo() << Info.toLocal8Bit().data();
-// 			return -1;
-// 		}
-// 	}
-// 	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentify);
-// 	strFilePath = strTempPath.toStdString();
-// 	return 0;
-// }
-
 //void uc_ReadIDCard::ShowReadCardID()
 //{
 //	ui->label_Swipecard->show();
@@ -287,42 +323,10 @@ void uc_ReadIDCard::timerEvent(QTimerEvent* event)
 //	ui->horizontalLayout_2->addWidget(pInputIDCardWidget);
 //	pInputIDCardWidget->show();
 //}
-void uc_ReadIDCard::On_WithoutIDCard(int arg1)
-{
-	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
-	if (pMainWind && pMainWind->pLastStackPage)
-	{
-		pMainWind->pLastStackPage->ResetTimer(arg1 != 0, this);
-
-		pMainWind->pLastStackPage->emit SwitchNextPage(Switch_NextPage);
-
-	}
-	//emit ShowMaskWidget("操作成功", "稍后手动输入一些必要的信息", Success, Switch_NextPage);
-	//QWaitCursor Wait;
-	//if (arg1)
-	//{
-	//	ShowInputCardID();
-	//	StopDetect();
-	//}
-	//else
-	//{
-	//	//ui->label_Swipecard->setParent(this);
-	//	//ui->horizontalLayout_2->addWidget(ui->label_Swipecard);
-	//	ShowReadCardID();
-	//	StartDetect();
-	//}
-	//MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
-	//if (pMainWind && pMainWind->pLastStackPage)
-	//{
-	//	pMainWind->pLastStackPage->ResetTimer(arg1 != 0, this);
-	//}
-}
-
 //void uc_ReadIDCard::RemoveUI()
 //{
 //
 //}
-
 //void uc_ReadIDCard::on_ShowNationWidget(bool bShow)
 //{
 //	if (!pQNationWidget)

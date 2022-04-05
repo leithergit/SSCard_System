@@ -17,9 +17,11 @@ class QMainStackPage : public QWidget
 public:
 	explicit QMainStackPage(QWidget* parent = nullptr);
 	~QMainStackPage();
+	void AddPage(QWidget* pWidget);
 	int     m_nTimerID = 0;
 	int     m_nTimeout = 0;
 	int     m_nCurPageIndex = 0;
+	vector<QStackPage*>vecStackPage;
 	QWidget* m_pMainWindow = nullptr;
 	QStackedWidget* m_pStackWidget = nullptr;
 	virtual void timerEvent(QTimerEvent* event) override;
@@ -38,8 +40,7 @@ public:
 
 public slots:
 	void on_pushButton_MainPage_clicked();
-	virtual void on_SwitchNextPage(int nPageOperation);
-	virtual void on_SwitchPage(int nPage);
+	virtual void on_SwitchPage(int nOperation, int nPage = 0);
 	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage)
 	{
 		//qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nOperation;
@@ -51,8 +52,7 @@ public slots:
 	//}
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
-	void SwitchNextPage(int nOperation);
-	void SwitchPage(int nPage);
+	void SwitchPage(int nOperation, int nPage = 0);
 };
 
 #endif // QMAINSTACKPAGE_H

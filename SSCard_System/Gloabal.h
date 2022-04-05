@@ -849,10 +849,12 @@ public:
 	~DataCenter();
 	IDCardInfoPtr& GetIDCardInfo()
 	{
+		gInfo() << __FUNCTION__;
 		return pIDCard;
 	}
 	void SetIDCardInfo(IDCardInfoPtr& pCardInfo)
 	{
+		gInfo() << __FUNCTION__;
 		pIDCard = pCardInfo;
 	}
 
@@ -869,6 +871,7 @@ public:
 	}
 	void ResetIDData()
 	{
+		gInfo() << __FUNCTION__;
 		strMobilePhone = "";
 		strIDImageFile = "";
 		strSSCardOldPassword = "";
@@ -881,6 +884,7 @@ public:
 		strIDImageFile = "";
 		strSSCardPhotoBase64File = "";
 		bGuardian = false;
+		bWithoutIDCard = false;
 	}
 	SSCardBaseInfoPtr& GetSSCardInfo()
 	{
@@ -954,6 +958,8 @@ public:
 	bool			bSkipPrintCard = false;
 	bool            bWriteTest = false;
 	bool			bTestCard = false;
+	bool			bWithoutIDCard = false;
+	bool			bBatchMode = false;	// 批量制卡模式
 	int				nNetTimeout = 1500;
 public:
 	bool			m_bDetectStarted = false;
@@ -1061,6 +1067,7 @@ public:
 	int  ActiveCard(QString& strMessage);
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
+
 	SysConfigPtr	pSysConfig = nullptr;
 	CardFormPtr		pCardForm = nullptr;						  // 打印版式
 	SSCardBaseInfoPtr   pSSCardInfo = nullptr;

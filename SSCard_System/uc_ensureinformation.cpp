@@ -22,6 +22,7 @@ uc_EnsureInformation::~uc_EnsureInformation()
 
 int uc_EnsureInformation::ProcessBussiness()
 {
+	gInfo() << __FUNCTION__;
 	QString strMessage;
 	int nResult = -1;
 	QString strCardProgress;
@@ -205,7 +206,7 @@ int uc_EnsureInformation::ProcessBussiness()
 			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
 			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
 			//int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
-			emit SwitchPage(Page_MakeCard);
+			emit SwitchPage(Goto_Page, Page_MakeCard);
 			strCardStatus2 = "制卡中";
 		}
 
@@ -272,7 +273,7 @@ int uc_EnsureInformation::ProcessBussiness()
 			// 直接跳转到制止页面
 			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
 			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
-			emit SwitchPage(Page_MakeCard);
+			emit SwitchPage(Goto_Page, Page_MakeCard);
 			strCardStatus2 = "制卡中";
 		}
 		break;
@@ -301,9 +302,9 @@ void uc_EnsureInformation::OnTimeout()
 
 }
 
-
 void uc_EnsureInformation::on_pushButton_OK_clicked()
 {
+	gInfo() << __FUNCTION__;
 	SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
@@ -351,13 +352,15 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
 			}
 			gInfo() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
+			if (g_pDataCenter->bWithoutIDCard)
+				emit ShowMaskWidget("操作成功", strError, Success, Goto_Page, Page_MakeCard);
+			else
+				emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
 			return;
 		}
 	}
 	else
 	{
-
 		if (g_pDataCenter->nCardStratus == CardStatus::Card_Release ||
 			g_pDataCenter->nCardStratus == CardStatus::Card_Normal)
 		{

@@ -260,6 +260,7 @@ MainWindow::~MainWindow()
 
 int MainWindow::LoadConfigure(QString& strError)
 {
+	gInfo() << __FUNCTION__;
 	if (g_pDataCenter)
 	{
 		QString strError;
@@ -323,6 +324,7 @@ void MainWindow::on_pushButton_NewCard_clicked()
 
 void MainWindow::on_pushButton_Updatecard_clicked()
 {
+	gInfo() << __FUNCTION__;
 	QWaitCursor Wait;
 	if (pLastStackPage)
 	{
@@ -441,7 +443,7 @@ void MainWindow::on_pushButton_MainPage_clicked()
 	m_pMainpage->show();
 }
 
-void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
+void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage)
 {
 	QMainStackPage* pCurPageSender = qobject_cast<QMainStackPage*>(sender());
 	//if (m_pMaskWindow)
@@ -457,7 +459,7 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 		QPoint ptLeftTop = pCurPageSender->mapToGlobal(QPoint(0, 0));
 		m_pMaskWindow->move(ptLeftTop);
 	}
-	if (nPageOperation == Return_MainPage)
+	if (nOperation == Return_MainPage)
 	{
 		char szRCode[128] = { 0 };
 		if (g_pDataCenter->GetPrinter())
@@ -488,10 +490,24 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	case Nop:
 		break;
 	}
-	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nPageOperation, nTimeout);
+	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nOperation, (int)nPage, nTimeout);
 }
 
-void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
+void MainWindow::On_MaskWidgetEnsure(int nOperation, int nPage)
+{
+	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
+	if (m_pMaskWindow)
+	{
+		//m_pMaskWindow->hide();
+		disconnect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetEnsure);
+		delete m_pMaskWindow;
+		m_pMaskWindow = nullptr;
+	}
+	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
+	pCurPage->emit SwitchPage(nOperation, nPage);
+}
+
+void MainWindow::On_MaskWidgetTimeout(int nOperation, int nPage)
 {
 	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
 	if (m_pMaskWindow)
@@ -511,29 +527,17 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 	}
 
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
-	pCurPage->emit SwitchNextPage(nPageOperation);
+	pCurPage->emit SwitchPage(nOperation, nPage);
 }
 
 void MainWindow::SwitchPage(int nOperation)
 {
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
 	if (pCurPage)
-		pCurPage->emit SwitchNextPage(nOperation);
+		pCurPage->emit SwitchPage(Switch_NextPage, 0);
 }
 
-void MainWindow::On_MaskWidgetEnsure(int nPageOperation, int nStatus)
-{
-	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
-	if (m_pMaskWindow)
-	{
-		//m_pMaskWindow->hide();
-		disconnect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetEnsure);
-		delete m_pMaskWindow;
-		m_pMaskWindow = nullptr;
-	}
-	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
-	pCurPage->emit SwitchNextPage(nPageOperation);
-}
+
 
 void MainWindow::on_Shutdown()
 {
