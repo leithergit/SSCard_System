@@ -844,22 +844,32 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 	QWaitCursor Wait;
 	if (!g_pDataCenter->GetPrinter())
 	{
-		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		/*KT_Printer* pPrinter = nullptr;
+		pPrinter = g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage);*/
+		//if (!pPrinter)
+		if (QFailed(g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage)))
 		{
 			Wait.RestoreCursor();
 			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 			return;
 		}
 	}
-	else
+	KT_Printer* pPrinter = g_pDataCenter->GetPrinter();
+	if (!pPrinter)
 	{
-		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
-		{
-			Wait.RestoreCursor();
-			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
-			return;
-		}
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), "打印模块加载失败!", QMessageBox::Ok, this);
+		return;
 	}
+	//}
+	//else
+	//{
+	//	if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	//	{
+	//		Wait.RestoreCursor();
+	//		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+	//		return;
+	//	}
+	//}
 	switch (index)
 	{
 	case 0:
@@ -873,7 +883,6 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 		}
 		break;
 	}
-
 	case 1:
 	{
 		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Eject(szRCode)))
@@ -884,7 +893,6 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 		}
 		break;
 	}
-
 	case 2:
 	{
 		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Retract(1, szRCode)))
@@ -895,7 +903,6 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 		}
 		break;
 	}
-
 	case 3:
 	{
 		int nDPI = ui.comboBox_DPI->currentIndex();
@@ -1021,6 +1028,7 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 		break;
 	}
 	}
+
 }
 
 void DeviceManager::on_pushButton_Depense_clicked()

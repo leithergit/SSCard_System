@@ -1007,6 +1007,7 @@ public:
 	int CloseSSCardService(QString& strMessage);
 
 	int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
+	//KT_Printer* OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
 	void CloseDevice();
 
@@ -1046,6 +1047,7 @@ public:
 	}
 	KT_Printer* GetPrinter()
 	{
+		TraceMsgA("%s Printer Address = %p", __FUNCTION__, &m_pPrinter);
 		return m_pPrinter;
 	}
 	SSCardService* GetSSCardService()

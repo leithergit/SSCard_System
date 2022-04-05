@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	google::SetLogFilenameExtension(".log");
 	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
 
-	ifstream ifs("./AppRuning.json");
+	/*ifstream ifs("./AppRuning.json");
 	int nRunCount = 0;
 	QDateTime Now = QDateTime::currentDateTime();
 	if (ifs)
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 	RunJson.Add("StartTime", strRunTime.toStdString());
 	RunJson.Add("Count", nRunCount);
 	ofs << RunJson.ToString();
-	ofs.close();
+	ofs.close();*/
 
 	curl_global_init(CURL_GLOBAL_WIN32);
 	g_pDataCenter = make_shared<DataCenter>();
@@ -161,20 +161,20 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// 	WaitingProgress WaitingUI;
-	// 	WaitingUI.show();
-	// 	a.exec();
-	// 	if (!WaitingUI.bPrinterReady)
-	// 	{
-	// 		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
-	// 		return 0;
-	// 	}
-	// 	if (!CheckLocalLicense(Code_License))
-	// 	{
-	// 		ShowLicense s;
-	// 		s.show();
-	// 		return a.exec();
-	// 	}
+	WaitingProgress WaitingUI;
+	WaitingUI.show();
+	a.exec();
+	if (!WaitingUI.bPrinterReady)
+	{
+		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+		return 0;
+	}
+	if (!CheckLocalLicense(Code_License))
+	{
+		ShowLicense s;
+		s.show();
+		return a.exec();
+	}
 
 	MainWindow w;
 

@@ -101,7 +101,10 @@ int uc_ReadIDCard::ProcessBussiness()
 	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
 	//ShowReadCardID();
 	disconnect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
-
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_RegisterLost)
+		ui->checkBox_WithoutIDCard->hide();
+	else
+		ui->checkBox_WithoutIDCard->show();
 	StartDetect();
 	ui->checkBox_WithoutIDCard->setChecked(false);
 	m_bAgency = false;
@@ -147,13 +150,23 @@ void uc_ReadIDCard::ThreadWork()
 					ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
 				}
 
-				if (nReadIDType == ReadID_UpdateCard)
-					strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
-				else if (nReadIDType == ReadID_RegisterLost)
+				int nNewPage = Page_FaceCapture;
+				strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
+				switch (g_pDataCenter->nCardServiceType)
+				{
+				case ServiceType::Service_NewCard:
+				case ServiceType::Service_ReplaceCard:
+					break;
+				case ServiceType::Service_RegisterLost:
+				default:
+					nNewPage = Page_RegisterLost;
 					strError = "读取身份证成功,稍后请进行挂失/解挂操作!";
+					break;
+				}
+
 				gInfo() << gQStr(strError);
 				g_pDataCenter->SetIDCardInfo(m_pIDCard);
-				emit ShowMaskWidget("操作成功", strError, Success, Goto_Page, Page_FaceCapture);
+				emit ShowMaskWidget("操作成功", strError, Success, Goto_Page, nNewPage);
 				break;
 			}
 			else

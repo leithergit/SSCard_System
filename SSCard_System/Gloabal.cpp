@@ -34,7 +34,7 @@
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriver")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSM")
-#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfo")
+#pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfo")
 #pragma comment(lib, "../SDK/libcurl/libcurl")
 #pragma comment(lib, "../SDK/QREncode/qrencode")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
@@ -772,6 +772,7 @@ int DataCenter::OpenPrinter(QString& strMessage)
 }
 
 int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
+//KT_Printer* DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
 {
 	int nResult = -1;
 	char szRCode[32] = { 0 };
@@ -819,6 +820,7 @@ int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int
 				m_pPrinter->Printer_ExtraCommand("Ps;y;=;250", szRCode);
 				m_pPrinter->Printer_ExtraCommand("Ps;m;=;250", szRCode);
 				m_pPrinter->Printer_ExtraCommand("Ps;c;=;250", szRCode);
+				TraceMsgA("%s Printer Address = %p", __FUNCTION__, &m_pPrinter);
 			}
 
 		} while (0);
@@ -826,12 +828,14 @@ int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int
 			return -1;
 		else
 			return 0;
+		//return m_pPrinter;
 	}
 	catch (std::exception& e)
 	{
 		strMessage = e.what();
 		gError() << gQStr(strMessage);
 		return -1;
+		//return nullptr;
 	}
 }
 
@@ -1342,7 +1346,7 @@ int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QStr
 		nResult = -1;
 		nBufferSize = sizeof(szBuffer);
 		ZeroMemory(szBuffer, nBufferSize);
-		if (QFailed(nResult = m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
+		if (QFailed(m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
 		{
 			strMessage = QString("Printer_InitPrint失败，错误代码:%1!").arg(szRCode);
 			break;

@@ -7,7 +7,7 @@ CheckPassword::CheckPassword(QWidget* parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
-    this->setWindowTitle("密码校验");
+	this->setWindowTitle("密码校验");
 }
 
 CheckPassword::~CheckPassword()
@@ -18,7 +18,7 @@ CheckPassword::~CheckPassword()
 void CheckPassword::on_pushButton_OK_clicked()
 {
 	strPassword = ui.lineEdit_Password->text();
-#ifdef _DEBUG
+	//#ifdef _DEBUG
 	if (strPassword == "1")
 	{
 		g_pDataCenter->SetMannagerLevel(Manager_Level::Manager);
@@ -31,20 +31,20 @@ void CheckPassword::on_pushButton_OK_clicked()
 	}
 	else
 		QDialog::reject();
-#else
-	if (strPassword == "#edcVFR$")
-	{
-		g_pDataCenter->SetMannagerLevel(Manager_Level::Manager);
-		QDialog::accept();
-	}
-	else if (strPassword == "KingaoTech@2021")
-	{
-		g_pDataCenter->SetMannagerLevel(Manager_Level::SuperVisor);
-		QDialog::accept();
-	}
-	else
-		QDialog::reject();
-#endif
+	//#else
+	//	if (strPassword == "#edcVFR$")
+	//	{
+	//		g_pDataCenter->SetMannagerLevel(Manager_Level::Manager);
+	//		QDialog::accept();
+	//	}
+	//	else if (strPassword == "KingaoTech@2021")
+	//	{
+	//		g_pDataCenter->SetMannagerLevel(Manager_Level::SuperVisor);
+	//		QDialog::accept();
+	//	}
+	//	else
+	//		QDialog::reject();
+	//#endif
 }
 
 

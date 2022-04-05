@@ -350,18 +350,21 @@ public:
 					return -1;
 					break;
 				}
-				strJsonFile = "./Data/Progress_" + strIdentity + ".json";
-				strPathFinished = "./Data/Finished/Progress_" + strIdentity + ".json";
-				if (!exists("./Data/Finished"))
-					filesystem::create_directories("./Data/Finished");
-				if (!fs::exists(strJsonFile))
-				{// 生成新的进度控制 文件
-					CJsonObject jsonProgress;
-					CJsonObject jsonPerson("{}");
-					CJsonObject jsonService("{}");
-					jsonProgress.Add("Person", jsonPerson);
-					jsonProgress.Add(strCurService, jsonService);
-					SaveProgress(jsonProgress);
+				if (strCurService.size())
+				{
+					strJsonFile = "./Data/Progress_" + strIdentity + ".json";
+					strPathFinished = "./Data/Finished/Progress_" + strIdentity + ".json";
+					if (!exists("./Data/Finished"))
+						filesystem::create_directories("./Data/Finished");
+					if (!fs::exists(strJsonFile))
+					{// 生成新的进度控制 文件
+						CJsonObject jsonProgress;
+						CJsonObject jsonPerson("{}");
+						CJsonObject jsonService("{}");
+						jsonProgress.Add("Person", jsonPerson);
+						jsonProgress.Add(strCurService, jsonService);
+						SaveProgress(jsonProgress);
+					}
 				}
 
 				//if (exists(strJsonFile))

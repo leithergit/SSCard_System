@@ -2,7 +2,11 @@
 
 #include "SSCardService_Sandong.h"
 #include "pch.h"
+#ifdef _DEBUG
 #pragma comment(lib,"../sdk/sscardinfo_sandong/SD_SSCardInfod.lib")
+#else
+#pragma comment(lib,"../sdk/sscardinfo_sandong/SD_SSCardInfo.lib")
+#endif
 map<string, string>g_mapNationnaltyCode;
 struct NationaltyCode
 {

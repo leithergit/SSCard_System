@@ -346,7 +346,7 @@ void up_ChangePWD::on_pushButton_OK_clicked()
 				emit ShowMaskWidget("操作失败", strMessage, Error, Stay_CurrentPage);
 				return;
 			}
-			emit ShowMaskWidget("操作成功", "密码修改成功,请妥善保管好您的新密码!", Success, Switch_NextPage);
+			emit ShowMaskWidget("操作成功", "密码修改成功,请妥善保管好您的新密码!", Success, Return_MainPage);
 		}
 		else
 		{

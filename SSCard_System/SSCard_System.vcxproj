@@ -71,23 +71,23 @@
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;sql;network;gui;widgets;</QtModules>
+    <QtModules>core;sql;network;gui;widgets;xlsx;</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;qtpropertybrowser;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK/SSCardInfo_Henan;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
-      <DebugInformationFormat>None</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>release\</ObjectFileName>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NDEBUG;QT_NO_DEBUG;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>
@@ -141,11 +141,13 @@
       <QtUicFileName>ui_%(Filename).h</QtUicFileName>
     </QtUic>
     <PostBuildEvent>
-      <Command>@echo copy $(TargetPath) to remote device
-::copy /y $(TargetPath) z:\</Command>
+      <Command>@call updatesdk.bat $(Configuration)
+@echo update $(TargetPath) to remote device...
+copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>@call updatesdk.bat</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -211,7 +213,7 @@
     <PostBuildEvent>
       <Command>@call updatesdk.bat $(Configuration)
 @echo update $(TargetPath) to remote device...
-copy /y $(TargetPath) Z:\SSCardSystem.mvc</Command>
+copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>::@call updatesdk.bat $(Configuration)
