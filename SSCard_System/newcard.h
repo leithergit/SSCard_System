@@ -20,7 +20,6 @@ public:
     virtual void  ShowTimeOut(int nTimeout) override;
 private slots:
 
-
 private:
     Ui::NewCard* ui;
 };

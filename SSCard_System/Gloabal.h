@@ -132,8 +132,9 @@ enum Page_Index
 	Page_ReadSSCard,				// 读取社保卡	
 	Page_InputSSCardPWD,			// 输入社保卡密码	
 	Page_ChangeSSCardPWD,			// 修改社保卡密码	
-	Page_RegisterLost,				// 挂失 / 解挂
+	Page_RegisterLost,				// 挂失/解挂
 	Page_CommitNewInfo,				// 提交新办卡信息
+	Page_QueryInformation,			// 信息查询
 	Page_AdforFinance,				// 开通金融页面
 	Page_Succeed					// 操作成功
 };
@@ -675,8 +676,6 @@ struct SysConfig
 		pSettings->endGroup();
 	}
 
-	bool  LoadBankCode(string& strError);
-
 	void SaveMaskPageTimeout(QSettings* pSettings)
 	{
 		if (!pSettings)
@@ -695,7 +694,7 @@ struct SysConfig
 		if (!pSettings)
 			return;
 		pSettings->beginGroup("Bank");
-		for (auto var : strMapBank)
+		for (auto var : MapBankSupported)
 		{
 			pSettings->setValue(var.first.c_str(), var.second.c_str());
 		}
@@ -766,6 +765,7 @@ struct SysConfig
 		nPageTimeout[Page_InputSSCardPWD] = pSettings->value("InputSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_ChangeSSCardPWD] = pSettings->value("ChangeSSCardPWD", 30).toUInt();
 		nPageTimeout[Page_RegisterLost] = pSettings->value("RegisterLost", 30).toUInt();
+		nPageTimeout[Page_QueryInformation] = pSettings->value("QueryInfo", 30).toUInt();
 		nPageTimeout[Page_AdforFinance] = pSettings->value("AdforFinance", 30).toUInt();
 		nPageTimeout[Page_CommitNewInfo] = pSettings->value("CommitNewInfo", 30).toUInt();
 
@@ -791,13 +791,13 @@ struct SysConfig
 			return;
 		pSettings->beginGroup("Bank");
 		QStringList strKeyList = pSettings->allKeys();
-		strMapBank.clear();
+		MapBankSupported.clear();
 		for (auto var : strKeyList)
 		{
 			QString strValue = pSettings->value(var).toString();
 			qDebug() << strValue.toStdString().c_str() << "=" << var.toStdString().c_str();
 			//strMapBank.insert(pair<string, string>(var.toStdString(), strValue.toStdString()));
-			auto [it, Inserted] = strMapBank.try_emplace(var.toStdString(), strValue.toStdString());
+			auto [it, Inserted] = MapBankSupported.try_emplace(var.toStdString(), strValue.toStdString());
 		}
 		pSettings->endGroup();
 	}
@@ -825,7 +825,7 @@ struct SysConfig
 	bool			bSkipPrintCard = false;
 	bool			bWriteTest = false;
 	int				nNetTimeout = 1500;
-	map<string, string> strMapBank;
+	map<string, string> MapBankSupported;
 };
 
 using SysConfigPtr = shared_ptr<SysConfig>;
@@ -906,8 +906,8 @@ public:
 
 	int GetBankName(string strBankCode, string& strBankName)
 	{
-		auto itFind = pSysConfig->strMapBank.find(strBankCode);
-		if (itFind != pSysConfig->strMapBank.end())
+		auto itFind = pSysConfig->MapBankSupported.find(strBankCode);
+		if (itFind != pSysConfig->MapBankSupported.end())
 		{
 			strBankName = itFind->second;
 			return 0;
@@ -1040,6 +1040,17 @@ public:
 	int MoveCard(QString& strMessage);
 
 	bool LoadBankCode(QString& strError);
+
+	int CheckBankCode(string& strBankName, QString& strMessage)
+	{
+		if (QFailed(GetBankName(GetSysConfigure()->Region.strBankCode, strBankName)))
+		{
+			strMessage = "银行代码配置有误或未配置银行代码!";
+			return 1;
+		}
+
+		return 0;
+	}
 
 	KT_Reader* GetSSCardReader()
 	{

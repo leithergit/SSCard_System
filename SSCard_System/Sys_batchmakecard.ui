@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1379</width>
-    <height>728</height>
+    <width>1570</width>
+    <height>796</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,18 @@ color: 0
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
        </property>
        <property name="text">
         <string>读取证件</string>
@@ -73,6 +85,12 @@ QRadioButton::indicator::unchecked {
 QRadioButton::indicator::checked { 
 	image: url(:/Image/RadioCheck.png);
 }
+QRadioButton{
+font-weight: bold;
+line-height: 28px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;}
 </string>
        </property>
        <property name="text">
@@ -93,7 +111,12 @@ QRadioButton::indicator::unchecked {
 QRadioButton::indicator::checked { 
 	image: url(:/Image/RadioCheck.png);
 }
-</string>
+QRadioButton{
+font-weight: bold;
+line-height: 28px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;}</string>
        </property>
        <property name="text">
         <string>补换</string>
@@ -130,6 +153,18 @@ QRadioButton::indicator::checked {
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
+       </property>
        <property name="text">
         <string>导入名单</string>
        </property>
@@ -148,6 +183,18 @@ QRadioButton::indicator::checked {
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
        </property>
        <property name="text">
         <string>开始制卡</string>
@@ -171,6 +218,18 @@ QRadioButton::indicator::checked {
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
+       </property>
        <property name="text">
         <string>停止制卡</string>
        </property>
@@ -190,13 +249,25 @@ QRadioButton::indicator::checked {
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
+       </property>
        <property name="text">
         <string>导出名单</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -208,10 +279,48 @@ QRadioButton::indicator::checked {
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_MainPage">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{image: url(:/Image/Homepage.png);
+image-position: left;
+padding-left: 2px;
+text-align: right;
+padding-right: 2px;
+font-size: 12px;
+color: rgb(0, 0, 0);}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
     <widget class="QTableWidget" name="tableWidget">
+     <property name="styleSheet">
+      <string notr="true">font-weight: bold;
+line-height: 28px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
+     </property>
      <attribute name="horizontalHeaderVisible">
       <bool>true</bool>
      </attribute>

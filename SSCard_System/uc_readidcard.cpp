@@ -151,22 +151,23 @@ void uc_ReadIDCard::ThreadWork()
 				}
 
 				int nNewPage = Page_FaceCapture;
+				int nOperation = Goto_Page;
 				strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
 				switch (g_pDataCenter->nCardServiceType)
 				{
 				case ServiceType::Service_NewCard:
 				case ServiceType::Service_ReplaceCard:
 					break;
-				case ServiceType::Service_RegisterLost:
 				default:
-					nNewPage = Page_RegisterLost;
+					nOperation = Switch_NextPage;
+					nNewPage = 0;
 					strError = "读取身份证成功,稍后请进行挂失/解挂操作!";
 					break;
 				}
 
 				gInfo() << gQStr(strError);
 				g_pDataCenter->SetIDCardInfo(m_pIDCard);
-				emit ShowMaskWidget("操作成功", strError, Success, Goto_Page, nNewPage);
+				emit ShowMaskWidget("操作成功", strError, Success, nOperation, nNewPage);
 				break;
 			}
 			else

@@ -1053,6 +1053,38 @@ int DataCenter::TestCard(QString& strMessage)
 				strMessage = "卡片数据交互失败,请更换卡片或重新进卡!";
 				break;
 			}
+
+			char szBankNum[64] = { 0 };
+			if (QFailed(iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
+			{
+				strMessage = QString("读卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+				break;
+			}
+			gInfo() << "BankNum:" << szBankNum;
+			string strMatchBankName;
+			for (auto var : mapBankCode)
+			{
+				const char* pDest = strstr((const char*)szBankNum, var.first.c_str());
+				if ((pDest - szBankNum) == 0)
+				{
+					strMatchBankName = var.second;
+					break;
+				}
+			}
+			gInfo() << "Card BankNum" << szBankNum << "\tMatched BankName:" << UTF8_GBK(strMatchBankName.c_str());
+			if (strMatchBankName.size())
+			{
+				string strCurrentBank;
+				CheckBankCode(strCurrentBank, strMessage);
+				gInfo() << "Current Bank:" << UTF8_GBK(strCurrentBank.c_str());
+				if (strCurrentBank.find(strMatchBankName) == string::npos &&
+					strMatchBankName.find(strCurrentBank) == string::npos)
+				{
+					strMessage = QString("当前社保卡(%1)与网点银行(%2)不匹配,请检查设置!").arg(strMatchBankName.c_str()).arg(strCurrentBank.c_str());
+					break;
+				}
+			}
+
 			bSucceed = true;
 			break;
 		}

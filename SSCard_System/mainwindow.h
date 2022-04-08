@@ -8,6 +8,8 @@
 #include "updatecard.h"
 #include "updatepassword.h"
 #include "registerlost.h"
+#include "Sys_batchmakecard.h"
+#include "queryinfo.h"
 #include "MaskWidget.h"
 #include "newcard.h"
 #include <chrono>
@@ -34,8 +36,10 @@ public:
 	NewCard* m_pNewCard = nullptr;
 	UpdateCard* m_pUpdateCard = nullptr;
 	UpdatePassword* m_pUpdatePassword = nullptr;
+	Sys_BatchMakeCard* m_pBatchMakeCard = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
 	MaskWidget* m_pMaskWindow = nullptr;
+	QueryInfo* m_pQueryInfo = nullptr;
 	QMainStackPage* pLastStackPage = nullptr;
 	high_resolution_clock::time_point	m_tLastPress = high_resolution_clock::now();
 	int		m_nContinuePressCount = 0;
@@ -51,6 +55,10 @@ public:
 	void on_pushButton_RegisterLost_clicked();
 
 	void on_pushButton_MainPage_clicked();
+
+	void on_pushButton_QueryInfo_clicked();
+
+	void on_pushButton_BatchMake_clicked();
 
 	void On_LoadSystemManager();
 

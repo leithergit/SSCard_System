@@ -6,6 +6,7 @@
 
 #include "Payment.h"
 #include "sys_dialogreadidcard.h"
+#include "mainwindow.h"
 
 enum class BatchTable_Column
 {
@@ -822,4 +823,10 @@ void Sys_BatchMakeCard::on_AddNewIDCard(IDCardInfo* pIDCard)
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Career, nColumnWidthList[(int)BatchTable_Column::Col_Career]);
 	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Mobile, nColumnWidthList[(int)BatchTable_Column::Col_Mobile]);
+}
+
+void Sys_BatchMakeCard::on_pushButton_MainPage_clicked()
+{
+	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
+	pMainWind->on_pushButton_MainPage_clicked();
 }

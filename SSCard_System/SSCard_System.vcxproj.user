@@ -17,9 +17,9 @@
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2022-04-05T12:39:11.0132688Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-04-06T09:12:25.2427127Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2022-04-01T13:18:33.8642022Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-04-06T09:12:22.6584979Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

@@ -68,6 +68,8 @@ private slots:
 
 	//void on_ComboxoDeledateModelIndexChanged(int iRow, int iColumn, int nIndex);
 
+    void on_pushButton_MainPage_clicked();
+
 private:
 	Ui::Sys_BatchMakeCard* ui;
 };

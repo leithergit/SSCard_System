@@ -7,7 +7,7 @@ OtherOptions::OtherOptions(QWidget* parent) :
 	ui(new Ui::OtherOptions)
 {
 	ui->setupUi(this);
-	auto& pBankMap = g_pDataCenter->GetSysConfigure()->strMapBank;
+	auto& pBankMap = g_pDataCenter->GetSysConfigure()->MapBankSupported;
 	int nRows = 0;
 	for (auto var : pBankMap)
 	{

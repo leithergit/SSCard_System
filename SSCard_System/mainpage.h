@@ -35,6 +35,10 @@ private slots:
 
     void on_pushButton_NewCard_clicked();
 
+    void on_pushButton_QueryInfo_clicked();
+
+    void on_pushButton_BatchMake_clicked();
+
 private:
 	Ui::MainPage* ui;
 };

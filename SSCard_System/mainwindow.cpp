@@ -159,6 +159,8 @@ MainWindow::MainWindow(QWidget* parent)
 	m_pUpdateCard = new UpdateCard(this);
 	m_pUpdatePassword = new UpdatePassword(this);
 	m_pRegiserLost = new RegisterLost(this);
+	m_pBatchMakeCard = new Sys_BatchMakeCard(this);
+	m_pQueryInfo = new QueryInfo(this);
 	//m_pMaskWindow = new MaskWidget(this);
 
 	//m_pOperatorFailed = new OperatorFailed();
@@ -167,6 +169,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->stackedWidget->addWidget(m_pUpdateCard);
 	ui->stackedWidget->addWidget(m_pUpdatePassword);
 	ui->stackedWidget->addWidget(m_pRegiserLost);
+	ui->stackedWidget->addWidget(m_pBatchMakeCard);
+	ui->stackedWidget->addWidget(m_pQueryInfo);
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
 
 	ui->checkBox_Debug->setVisible(g_pDataCenter->bDebug);
@@ -199,12 +203,20 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
+	connect(m_pQueryInfo, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(this, &MainWindow::Shutdown, this, &MainWindow::on_Shutdown);
 	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
 	bThreadUploadlogRunning = true;
 	pThreadUploadlog = new std::thread(&MainWindow::fnThreadUploadlog, this);
 
 	m_nTimerTestHost = startTimer(5000);
+	QString strMessage;
+	string strBankName;
+	if (QFailed(g_pDataCenter->CheckBankCode(strBankName, strMessage)))
+	{
+		strMessage = "银行代码配置有误或未配置银行代码!";
+		QMessageBox_CN(QMessageBox::Critical, "严重错误", strMessage, QMessageBox::Ok, this);
+	}
 }
 
 void MainWindow::On_LoadSystemManager()
@@ -283,6 +295,12 @@ int MainWindow::LoadConfigure(QString& strError)
 void MainWindow::on_pushButton_NewCard_clicked()
 {
 	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -324,8 +342,14 @@ void MainWindow::on_pushButton_NewCard_clicked()
 
 void MainWindow::on_pushButton_Updatecard_clicked()
 {
-	gInfo() << __FUNCTION__;
 	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
+
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -537,8 +561,6 @@ void MainWindow::SwitchPage(int nOperation)
 		pCurPage->emit SwitchPage(Switch_NextPage, 0);
 }
 
-
-
 void MainWindow::on_Shutdown()
 {
 	if (m_nDateTimer)
@@ -606,6 +628,7 @@ void MainWindow::timerEvent(QTimerEvent* event)
 		ui->label_NetWarning->setStyleSheet(strQSS);
 	}
 }
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
 	if (m_nDateTimer)
@@ -634,4 +657,44 @@ void MainWindow::OnNewInstance(const QString& strMessage)
 {
 	showNormal();
 	activateWindow();
+}
+
+void MainWindow::on_pushButton_QueryInfo_clicked()
+{
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		if (pLastStackPage->m_nTimerID)
+		{
+			killTimer(pLastStackPage->m_nTimerID);
+			pLastStackPage->m_nTimerID = 0;
+		}
+		pLastStackPage = nullptr;
+	}
+
+	m_pQueryInfo->ResetAllPages();
+	g_pDataCenter->nCardServiceType = ServiceType::Service_RegisterLost;
+	m_pQueryInfo->StartBusiness();
+	ui->stackedWidget->setCurrentWidget(m_pQueryInfo);
+
+	m_pQueryInfo->show();
+	pLastStackPage = m_pRegiserLost;
+}
+
+void MainWindow::on_pushButton_BatchMake_clicked()
+{
+	// 回到主页时需清空所有身份数据
+	if (pLastStackPage)
+	{
+		pLastStackPage->ResetAllPages(0);
+		if (pLastStackPage->m_nTimerID)
+		{
+			killTimer(pLastStackPage->m_nTimerID);
+			pLastStackPage->m_nTimerID = 0;
+		}
+		pLastStackPage = nullptr;
+	}
+	g_pDataCenter->ResetIDData();
+	ui->stackedWidget->setCurrentWidget(m_pBatchMakeCard);
+	m_pBatchMakeCard->show();
 }

@@ -2327,7 +2327,7 @@ public:
 				CardInfo.strName.empty() ||
 				CardInfo.strCity.empty())
 			{
-				strMessage = "身份证,姓名,城市代码!";
+				strMessage = "身份证,姓名,城市代码不能为空!";
 				break;
 			}
 			if (QFailed(queryPerPhoto(CardInfo, strJsonOut)))

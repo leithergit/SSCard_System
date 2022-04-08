@@ -236,7 +236,8 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
     <ClCompile Include="Payment.cpp" />
     <ClCompile Include="QCheckComboBox.cpp" />
     <ClCompile Include="qclickablelineedit.cpp" />
-    <ClCompile Include="qnationwidget.cpp" />
+    <ClCompile Include="qi_information.cpp" />
+    <ClCompile Include="queryinfo.cpp" />
     <ClCompile Include="showlicense.cpp" />
     <ClCompile Include="Sys_batchmakecard.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
@@ -295,10 +296,11 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
     <QtMoc Include="waitingprogress.h" />
     <QtMoc Include="uc_inputidcardinfo.h" />
     <QtMoc Include="qclickablelineedit.h" />
-    <QtMoc Include="qnationwidget.h" />
     <QtMoc Include="Sys_batchmakecard.h" />
     <QtMoc Include="QCheckComboBox.h" />
     <QtMoc Include="sys_dialogreadidcard.h" />
+    <QtMoc Include="queryinfo.h" />
+    <QtMoc Include="qi_information.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -404,7 +406,8 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
-    <QtUic Include="qnationwidget.ui" />
+    <QtUic Include="qi_information.ui" />
+    <QtUic Include="queryinfo.ui" />
     <QtUic Include="showlicense.ui" />
     <QtUic Include="Sys_batchmakecard.ui" />
     <QtUic Include="Sys_DeviceManager.ui">

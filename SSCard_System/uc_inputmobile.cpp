@@ -21,7 +21,7 @@ uc_InputMobile::~uc_InputMobile()
 
 int uc_InputMobile::ProcessBussiness()
 {
-	ui->lineEdit_Mobile->setText("");
+	ui->lineEdit_Mobile->clear();
 	//ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();

@@ -1003,7 +1003,7 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 			QString strTagText = ui.lineEdit_Tag->text();
 			if (!strTagText.isEmpty())
 			{
-				g_pDataCenter->PrintExtraText(strTagText, 0, 35, 50, UTF8_GBK("宋体").c_str(), 6, 255);
+				g_pDataCenter->PrintExtraText(strTagText, 0, 25, 50, UTF8_GBK("宋体").c_str(), 6, 255);
 			}
 
 			char szRcode[128] = { 0 };

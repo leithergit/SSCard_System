@@ -33,12 +33,16 @@ MainPage::MainPage(QWidget* parent) :
 	QString strUpdateCard = QString(strButtonStyle).arg("UpdateCard");
 	QString strRegisterLost = QString(strButtonStyle).arg("RegisterLost");
 	QString strChangePassword = QString(strButtonStyle).arg("ChangePassword");
+	QString strQueryInfo = QString(strButtonStyle).arg("QueryInfo");
+	QString strBatchMakeCard = QString(strButtonStyle).arg("BatchMode");
 
 	ui->pushButton_NewCard->setStyleSheet(strNewCard);
 	//ui->pushButton_NewCard->hide();
 	ui->pushButton_Updatecard->setStyleSheet(strUpdateCard);
 	ui->pushButton_RegisterLost->setStyleSheet(strRegisterLost);
 	ui->pushButton_ChangePWD->setStyleSheet(strChangePassword);
+	ui->pushButton_BatchMake->setStyleSheet(strBatchMakeCard);
+	ui->pushButton_QueryInfo->setStyleSheet(strQueryInfo);
 
 	if (LoadServiceDescription())
 	{
@@ -80,6 +84,20 @@ void MainPage::on_pushButton_RegisterLost_clicked()
 {
 	((MainWindow*)m_pMainWindow)->on_pushButton_RegisterLost_clicked();
 }
+
+void MainPage::on_pushButton_QueryInfo_clicked()
+{
+	void on_pushButton_MainPage_clicked();
+
+	((MainWindow*)m_pMainWindow)->on_pushButton_QueryInfo_clicked();
+}
+
+
+void MainPage::on_pushButton_BatchMake_clicked()
+{
+	((MainWindow*)m_pMainWindow)->on_pushButton_BatchMake_clicked();
+}
+
 
 bool MainPage::LoadServiceDescription()
 {

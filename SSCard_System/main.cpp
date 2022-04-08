@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <QSharedMemory>
+#include <QSplashScreen>
 #include "DevBase.h"
 
 #include "Gloabal.h"
@@ -42,9 +43,16 @@ static void SetupExceptionHandler()
 	BT_InstallSehFilter();
 }
 
+const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
+HANDLE g_hAppMutex = nullptr;
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
+
+	if (OpenMutexW(MUTEX_ALL_ACCESS, FALSE, g_pUniqueID))
+		return 0;
+	g_hAppMutex = CreateMutexW(nullptr, TRUE, g_pUniqueID);
+	shared_ptr<void> FreeMutex(g_hAppMutex, CloseHandle);
 	//qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

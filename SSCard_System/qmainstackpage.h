@@ -43,7 +43,7 @@ public slots:
 	virtual void on_SwitchPage(int nOperation, int nPage = 0);
 	void On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage)
 	{
-		//qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nOperation;
+		qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nOperation;
 		emit ShowMaskWidget(strTitle, strDesc, nStatus, nOperation, nPage);
 	}
 	//void On_RetryCurrentPage(QString strTitle, QString strDesc, int nStatus, int nPageOperation)

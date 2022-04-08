@@ -50,10 +50,12 @@ SOURCES += \
     nc_commitpersoninfo.cpp \
     newcard.cpp \
     qclickablelineedit.cpp \
+    qi_information.cpp \
     qmainstackpage.cpp \
     qnationwidget.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
+    queryinfo.cpp \
     registerlost.cpp \
     showlicense.cpp \
     sys_dialogreadidcard.cpp \
@@ -104,10 +106,12 @@ HEADERS += \
     nc_commitpersoninfo.h \
     newcard.h \
     qclickablelineedit.h \
+    qi_information.h \
     qmainstackpage.h \
     qnationwidget.h \
     qpinkeybroad.h \
     qstackpage.h \
+    queryinfo.h \
     registerlost.h \
     showlicense.h \
     sys_dialogreadidcard.h \
@@ -151,7 +155,9 @@ FORMS += \
     mainpage.ui \
     mainwindow.ui \
     nc_commitpersoninfo.ui \
+    qi_information.ui \
     qnationwidget.ui \
+    queryinfo.ui \
     registerlost.ui \
     showlicense.ui \
     sys_dialogreadidcard.ui \

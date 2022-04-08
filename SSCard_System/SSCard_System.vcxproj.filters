@@ -225,14 +225,8 @@
     <ClCompile Include="qclickablelineedit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="qnationwidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="waitingprogress.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_batchmakecard.cpp">
-      <Filter>SystemManager</Filter>
     </ClCompile>
     <ClCompile Include="ComboDelegate.cpp">
       <Filter>Source Files</Filter>
@@ -242,6 +236,15 @@
     </ClCompile>
     <ClCompile Include="sys_dialogreadidcard.cpp">
       <Filter>SystemManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_batchmakecard.cpp">
+      <Filter>MainPage</Filter>
+    </ClCompile>
+    <ClCompile Include="queryinfo.cpp">
+      <Filter>MainPage</Filter>
+    </ClCompile>
+    <ClCompile Include="qi_information.cpp">
+      <Filter>Page</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -396,13 +399,7 @@
     <QtUic Include="waitingprogress.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="qnationwidget.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="sys_dialogreadidcard.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_batchmakecard.ui">
       <Filter>SystemManager</Filter>
     </QtUic>
     <QtUic Include="nc_commitpersoninfo.ui">
@@ -442,6 +439,15 @@
       <Filter>Page\form</Filter>
     </QtUic>
     <QtUic Include="up_readsscard.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_batchmakecard.ui">
+      <Filter>MainPage</Filter>
+    </QtUic>
+    <QtUic Include="queryinfo.ui">
+      <Filter>MainPage</Filter>
+    </QtUic>
+    <QtUic Include="qi_information.ui">
       <Filter>Page\form</Filter>
     </QtUic>
   </ItemGroup>
@@ -691,14 +697,8 @@
     <QtMoc Include="qclickablelineedit.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="qnationwidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="waitingprogress.h">
       <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_batchmakecard.h">
-      <Filter>SystemManager</Filter>
     </QtMoc>
     <QtMoc Include="ComboDelegate.h">
       <Filter>Header Files</Filter>
@@ -708,6 +708,15 @@
     </QtMoc>
     <QtMoc Include="sys_dialogreadidcard.h">
       <Filter>SystemManager</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_batchmakecard.h">
+      <Filter>MainPage</Filter>
+    </QtMoc>
+    <QtMoc Include="queryinfo.h">
+      <Filter>MainPage</Filter>
+    </QtMoc>
+    <QtMoc Include="qi_information.h">
+      <Filter>Page</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
