@@ -495,6 +495,22 @@ color: rgb(0, 0, 0);</string>
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_Start_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>OpenPort</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_Stop">
        <property name="enabled">
         <bool>false</bool>

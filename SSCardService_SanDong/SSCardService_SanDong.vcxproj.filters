@@ -50,6 +50,9 @@
     <ClCompile Include="..\utility\json\CJsonObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\utility\Utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SSCardService_Sandong.def">

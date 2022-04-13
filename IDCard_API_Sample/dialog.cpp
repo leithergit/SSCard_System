@@ -24,6 +24,12 @@ Dialog::~Dialog()
 }
 #define    Error_Not_IDCARD         (-1)
 
+
+void Dialog::ReadIDCard()
+{
+
+}
+
 void Dialog::timerEvent(QTimerEvent *event)
 {
     int nResult = OpenReader(nullptr);
@@ -102,5 +108,11 @@ void Dialog::on_pushButton_Stop_clicked()
     m_nTimerID = -1;
     ui->pushButton_Start->setEnabled(true);
     ui->pushButton_Stop->setEnabled(false);
+}
+
+
+void Dialog::on_pushButton_Start_2_clicked()
+{
+
 }
 

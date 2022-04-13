@@ -43,11 +43,13 @@ static void SetupExceptionHandler()
 	BT_InstallSehFilter();
 }
 
+#define WSA_VERSION MAKEWORD(2,2)
 const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
+
 
 	if (OpenMutexW(MUTEX_ALL_ACCESS, FALSE, g_pUniqueID))
 		return 0;
@@ -109,7 +111,18 @@ int main(int argc, char* argv[])
 	google::SetLogFilenameExtension(".log");
 	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
 
-	/*ifstream ifs("./AppRuning.json");
+	WSADATA		WSAData = { 0 };
+	if (WSAStartup(WSA_VERSION, &WSAData))
+	{
+		if (LOBYTE(WSAData.wVersion) != LOBYTE(WSA_VERSION) ||
+			HIBYTE(WSAData.wVersion) != HIBYTE(WSA_VERSION))
+		{
+			WSACleanup();
+			gInfo() << "Failed in initialize winsock 2.0!";
+		}
+	}
+
+	ifstream ifs("./AppRuning.json");
 	int nRunCount = 0;
 	QDateTime Now = QDateTime::currentDateTime();
 	if (ifs)
@@ -124,14 +137,22 @@ int main(int argc, char* argv[])
 			RunJson.Get("StartTime", strStartTime);
 			RunJson.Get("Count", nRunCount);
 			QDateTime lastStartTime = QDateTime::fromString(strStartTime.c_str(), "yyyy-MM-dd hh:mm:ss");
-
-			int nDiffSecond = lastStartTime.secsTo(Now);
-			if (nDiffSecond <= 1)
+			if (lastStartTime.isValid())
 			{
-				if (nRunCount >= 3)
-					return 0;
-				else
-					nRunCount++;
+				int nDiffSecond = lastStartTime.secsTo(Now);
+				if (nDiffSecond < 0)
+					nRunCount = 1;
+				else if (nDiffSecond <= 1)
+				{
+					if (nRunCount >= 3)
+						return 0;
+					else
+						nRunCount++;
+				}
+			}
+			else
+			{
+				nRunCount = 1;
 			}
 		}
 	}
@@ -142,9 +163,8 @@ int main(int argc, char* argv[])
 	RunJson.Add("StartTime", strRunTime.toStdString());
 	RunJson.Add("Count", nRunCount);
 	ofs << RunJson.ToString();
-	ofs.close();*/
+	ofs.close();
 
-	curl_global_init(CURL_GLOBAL_WIN32);
 	g_pDataCenter = make_shared<DataCenter>();
 	if (!g_pDataCenter)
 	{
@@ -169,20 +189,26 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	WaitingProgress WaitingUI;
-	WaitingUI.show();
-	a.exec();
-	if (!WaitingUI.bPrinterReady)
+	if (!g_pDataCenter->InitializeDB(strError))
 	{
-		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
-		return 0;
+		gError() << gQStr(strError);
+		return -1;
 	}
-	if (!CheckLocalLicense(Code_License))
-	{
-		ShowLicense s;
-		s.show();
-		return a.exec();
-	}
+
+	//WaitingProgress WaitingUI;
+	//WaitingUI.show();
+	//a.exec();
+	//if (!WaitingUI.bPrinterReady)
+	//{
+	//	QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+	//	return 0;
+	//}
+	//if (!CheckLocalLicense(Code_License))
+	//{
+	//	ShowLicense s;
+	//	s.show();
+	//	return a.exec();
+	//}
 
 	MainWindow w;
 

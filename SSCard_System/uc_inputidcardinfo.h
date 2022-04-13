@@ -32,15 +32,18 @@ public:
 	IDCardInfoPtr pIDCard = nullptr;
 	SSCardBaseInfoPtr pSSCardInfo = nullptr;
 	QButtonGroup* pButtonGrp = nullptr;
-	QSqlDatabase SQLiteDB;
+	//QSqlDatabase SQLiteDB;
 	Sys_DialogReadIDCard* pDialogReadIDCard = nullptr;
 	bool    InitializeDB(QString& strMessage);
+	//bool    OpenDB(QSqlDatabase& DB, QString& strMessage);
 	bool    bInitialized = false;
 	void	StartDetect();
 	void	StopDetect();
 	void    ThreadWork();
 	void	ShowGuardianWidget(bool bShow);
 	void	ClearGuardianInfo();
+	bool	LoadPersonInfo();
+	void	SavePersonInfo();
 	QSpacerItem* horizontalSpacer_Mobile = nullptr;
 
 signals:

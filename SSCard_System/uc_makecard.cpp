@@ -485,6 +485,8 @@ void uc_MakeCard::ThreadWork()
 		if (QFailed(g_pDataCenter->ActiveCard(strMessage)))
 			break;
 		emit UpdateProgress(MP_EnableCard);
+
+		g_pDataCenter->RemoveTempPersonInfo();
 		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 
 		nResult = 0;

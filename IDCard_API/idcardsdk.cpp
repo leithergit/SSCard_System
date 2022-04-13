@@ -78,12 +78,14 @@ int IDCardSDK::OpenUSB(int nPort)
 
 	if (nPort != -1)
 	{
+		TraceMsgA("%s %d Try to CVR_InitComm,nPort = %d!", __FUNCTION__, __LINE__, nPort);
 		m_nStatus = CVR_InitComm(nPort);
 	}
 	else
 	{
 		if (m_nPort != -1)
 		{
+			TraceMsgA("%s %d Try to CVR_InitComm,nPort = %d!", __FUNCTION__, __LINE__, nPort);
 			m_nStatus = CVR_InitComm(m_nPort);
 		}
 		else
@@ -128,18 +130,21 @@ int IDCardSDK::OpenSerialport(int nPort)
 
 	if (nPort != -1)
 	{
+		TraceMsgA("%s %d Try to CVR_InitComm,nPort = %d!", __FUNCTION__, __LINE__, nPort);
 		m_nStatus = CVR_InitComm(nPort);
 	}
 	else
 	{
 		if (m_nPort != -1)
 		{
+			TraceMsgA("%s %d Try to CVR_InitComm,nPort = %d!", __FUNCTION__, __LINE__, nPort);
 			m_nStatus = CVR_InitComm(nPort);
 		}
 		else
 		{
 			for (int nIndex = ComPort1; nIndex < ComPort16; nIndex++)
 			{
+				TraceMsgA("%s %d Try to CVR_InitComm,nPort = %d!", __FUNCTION__, __LINE__, nPort);
 				m_nStatus = CVR_InitComm(nIndex);
 				if (m_nStatus == 1)
 				{
@@ -194,6 +199,7 @@ int IDCardSDK::CloseDev()
 		__try
 		{
 			m_nStatus = 0;
+			TraceMsgA("%s %d Try to CVR_CloseComm!", __FUNCTION__, __LINE__);
 			CVR_CloseComm();
 
 		}

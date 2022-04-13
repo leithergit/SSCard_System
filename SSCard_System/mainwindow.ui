@@ -226,7 +226,7 @@ color: #ffffff;
 }</string>
         </property>
         <property name="text">
-         <string>网络正常</string>
+         <string>网络良好</string>
         </property>
        </widget>
       </item>

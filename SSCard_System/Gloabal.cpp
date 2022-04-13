@@ -575,7 +575,7 @@ int  DataCenter::ReaderIDCard(IDCardInfo* pIDCard)
 			sprintf_s((char*)pIDCard->szNationaltyCode, sizeof(pIDCard->szNationaltyCode), "%02d", nNationalityCode);
 
 	} while (0);
-	if (bDevOpened)
+	//if (bDevOpened)
 	{
 		gInfo() << "Try to close IDCard Reader!";
 		CloseReader();
@@ -1328,7 +1328,6 @@ string DataCenter::MakeCardInfo(SSCardBaseInfoPtr& pSSCardInfo)
 	return strCardInfo;
 }
 
-
 int DataCenter::PrintExtraText(QString strText, int nAngle, float fxPos, float fyPos, QString strFont, int nFontSize, int nColor)
 {
 	TextPosition Text;
@@ -1381,7 +1380,7 @@ int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QStr
 		if (QFailed(m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
 		{
 			strMessage = QString("Printer_InitPrint失败，错误代码:%1!").arg(szRCode);
-			break;
+			//break;
 		}
 
 		if (bPrintText)
@@ -1393,10 +1392,13 @@ int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QStr
 			pFieldPos = &pCardForm->posSSCardID;
 			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 			pFieldPos = &pCardForm->posIssueDate;
-			/*QDate dt = QDate::currentDate();
-			char szReleaseDate[32] = { 0 };
-			sprintf_s(szReleaseDate, 32, "%d年%d月", dt.year(), dt.month());
-			m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);*/
+
+			stringstream date;
+			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			// date = "2022-01-26 09:51:00"
+			// date << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
+			date << std::put_time(std::localtime(&tNow), "%Y年%m月");
+			pSSCardInfo->strReleaseDate = UTF8_GBK(date.str().c_str());
 			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strReleaseDate.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
 		}
 
@@ -1936,6 +1938,7 @@ bool DataCenter::IsVideoStart()
 {
 	return m_bVideoStarted;
 }
+
 bool DataCenter::OpenCamera()
 {
 	int nRet = -1;
@@ -2214,7 +2217,6 @@ bool GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, W
 	return bResult;
 }
 
-
 void EnableWidgets(QWidget* pUIObj, bool bEnable)
 {
 	if (!pUIObj)
@@ -2239,7 +2241,6 @@ void EnableWidgets(QWidget* pUIObj, bool bEnable)
 	pUIObj->setEnabled(true);
 }
 
-
 void ShowWidgets(QWidget* pUIObj, bool bShow)
 {
 	if (!pUIObj)
@@ -2260,7 +2261,6 @@ void ShowWidgets(QWidget* pUIObj, bool bShow)
 		return;
 	}
 }
-
 
 char VerifyCardID(const char* pszSrc)
 {
@@ -2311,7 +2311,6 @@ QString CardStatusString(CardStatus nCardStratus)
 	}
 }
 
-
 int  DataCenter::PremakeCard(QString& strMessage)
 {
 	int nResult = -1;
@@ -2351,10 +2350,13 @@ int  DataCenter::PremakeCard(QString& strMessage)
 		//jsonOut.Get("NationalityCode", pSSCardInfo->strNationCode);
 		jsonOut.Get("Photo", pSSCardInfo->strPhoto);
 		SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto.c_str());
-		QDate dt = QDate::currentDate();
-		char szReleaseDate[32] = { 0 };
-		sprintf_s(szReleaseDate, 32, "%d年%d月", dt.year(), dt.month());
-		pSSCardInfo->strReleaseDate = UTF8_GBK(szReleaseDate);
+
+		stringstream date;
+		auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		// date = "2022-01-26 09:51:00"
+		// date << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
+		date << std::put_time(std::localtime(&tNow), "%Y%m%d");
+		pSSCardInfo->strReleaseDate = date.str();
 		nResult = 0;
 	} while (0);
 	return nResult;
@@ -2386,6 +2388,7 @@ int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage)
 		}
 	}
 }
+
 int DataCenter::DownloadPhoto(string& strBase64Photo, QString& strMessage)
 {
 	if (!pSScardSerivce)
@@ -2779,6 +2782,19 @@ int  DataCenter::ActiveCard(QString& strMessage)
 	return 0;
 }
 
+void DataCenter::RemoveTempPersonInfo()
+{
+	try
+	{
+		string strAppPath = QApplication::applicationDirPath().toLocal8Bit().data();
+		strAppPath += "/data/TempPerson.json";
+		if (!fs::exists(strAppPath))
+			fs::remove(strAppPath);
+	}
+	catch (std::exception& e)
+	{
+	}
+}
 // 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
 int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage)
 {
@@ -2829,4 +2845,24 @@ int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage)
 		gInfo() << "发生异常" << e.what();
 	}
 	return -1;
+}
+
+bool  DataCenter::InitializeDB(QString& strMessage)
+{
+	SQLiteDB = QSqlDatabase::addDatabase("QSQLITE");
+	//设置数据库
+	SQLiteDB.setDatabaseName("./Data/ChinaRegion.db");
+	QFileInfo fi("./Data/ChinaRegion.db");
+
+	if (!fi.isFile())
+	{
+		strMessage = QString("找不到文件:'%1'").arg(fi.absoluteFilePath());
+		return false;
+	}
+	if (!SQLiteDB.open())
+	{
+		strMessage = "打开地址数据库失败,请检查地址数据库!";
+		return false;
+	}
+	return true;
 }

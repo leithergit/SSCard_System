@@ -105,6 +105,13 @@ int uc_EnsureInformation::ProcessBussiness()
 
 	pSSCardInfo->strName = (const char*)pIDCard->szName;
 	pSSCardInfo->strGender = (const char*)pIDCard->szGender;
+	string strGender = GBK_UTF8((const char*)pIDCard->szGender);
+	if (strGender == "男")
+		pSSCardInfo->strGenderCode = "1";
+	else if (strGender == "女")
+		pSSCardInfo->strGenderCode = "2";
+	else
+		pSSCardInfo->strGenderCode = "9";
 	pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
 	pSSCardInfo->strNationCode = (const char*)pIDCard->szNationaltyCode;
 	pSSCardInfo->strBirthday = (const char*)pIDCard->szBirthday;

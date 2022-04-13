@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2007, Google Inc.
+﻿// Copyright (c) 1999, 2007, Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@
 #ifndef BASE_VLOG_IS_ON_H_
 #define BASE_VLOG_IS_ON_H_
 
-#include "glog/log_severity.h"
+#include "log_severity.h"
 
 // Annoying stuff for windows -- makes sure clients can import these functions
 #ifndef GOOGLE_GLOG_DLL_DECL
@@ -101,15 +101,15 @@
 //       (If no --vmodule pattern applied to them
 //       the value of FLAGS_v will continue to control them.)
 extern GOOGLE_GLOG_DLL_DECL int SetVLOGLevel(const char* module_pattern,
-                                             int log_level);
+	int log_level);
 
 // Various declarations needed for VLOG_IS_ON above: =========================
 
 struct SiteFlag {
-  google::int32* level;
-  const char* base_name;
-  size_t base_len;
-  SiteFlag* next;
+	google::int32* level;
+	const char* base_name;
+	size_t base_len;
+	SiteFlag* next;
 };
 
 // Helper routine which determines the logging info for a particalur VLOG site.
@@ -121,9 +121,9 @@ struct SiteFlag {
 // We will return the return value for VLOG_IS_ON
 // and if possible set *site_flag appropriately.
 extern GOOGLE_GLOG_DLL_DECL bool InitVLOG3__(
-    google::SiteFlag* site_flag,
-    google::int32* site_default,
-    const char* fname,
-    google::int32 verbose_level);
+	google::SiteFlag* site_flag,
+	google::int32* site_default,
+	const char* fname,
+	google::int32 verbose_level);
 
 #endif  // BASE_VLOG_IS_ON_H_

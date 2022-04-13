@@ -16,6 +16,7 @@ public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
 
+    void ReadIDCard();
 
     void timerEvent(QTimerEvent *event);
 
@@ -28,6 +29,8 @@ private slots:
     void on_pushButton_Start_clicked();
 
     void on_pushButton_Stop_clicked();
+
+    void on_pushButton_Start_2_clicked();
 
 private:
     Ui::Dialog *ui;

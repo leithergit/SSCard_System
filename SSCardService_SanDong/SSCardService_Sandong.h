@@ -60,6 +60,7 @@ public:
 		strOperator = "金乔炜煜移动制卡机";
 	}
 
+
 	bool LoadProgress(CJsonObject& json)
 	{
 		try
@@ -1293,8 +1294,26 @@ public:
 			if (nAge < 16 || json.KeyExist("ByGuardian"))
 			{
 				bByGuardian = true;
+				string strGuardianShip;
 				json.Get("Guardian", CardInfo.strGuardianName);
-				json.Get("GuardianShip", CardInfo.strGuardianType);
+				json.Get("GuardianShip", strGuardianShip);
+
+				char szGuardianShip[64] = { 0 };
+				ANSI2UTF8(strGuardianShip.c_str(), szGuardianShip, 64);
+				if (strcmp(szGuardianShip, "父子"))
+					CardInfo.strGuardianType = "1";
+				else if (strcmp(szGuardianShip, "父女"))
+					CardInfo.strGuardianType = "2";
+				else if (strcmp(szGuardianShip, "母子"))
+					CardInfo.strGuardianType = "3";
+				else if (strcmp(szGuardianShip, "母女"))
+					CardInfo.strGuardianType = "4";
+				else
+				{
+					strMessage = "监护关系有误,只能是父子,父女,母子,母女中的一种!";
+					break;
+				}
+
 				json.Get("GuardianCardID", CardInfo.strGuardianCardID);
 				CardInfo.strGuardianCardType = "A";
 				if (CardInfo.strGuardianName.empty() ||

@@ -12,6 +12,8 @@
 #include <iostream>
 #include <errno.h>
 #include <fstream>
+#include <sstream>
+#include <ctime>
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <string>
 #include <QObject>
@@ -46,6 +48,7 @@
 #include <QBrush>
 #include <QHBoxLayout>
 #include <QDirIterator>
+#include <QSqlDatabase>
 #include <QtXlsx/QtXlsx>
 #include "DevBase.h"
 
@@ -257,12 +260,17 @@ struct DeviceConfig
 		else if (strSSCardPowerOnType == "Contactless")
 			nDesktopSSCardReaderPowerOnType = READER_UNCONTACT;
 		else
-		{
 			nDesktopSSCardReaderPowerOnType = READER_CONTACT;		// 默认为接触式
-		}
+
 		strDesktopSSCardReaderPort = pSettings->value("DesktopSSCardReaderPort", "USB").toString().toStdString();
 
 		strTerminalCode = pSettings->value("TerminalCode", "").toString().toStdString();
+
+		QString strPrinterCommand;
+		strPrinterCommand = pSettings->value("PrinterCommmand", "").toString();
+		QStringList cmdList = strPrinterCommand.split("|");
+		for (auto var : cmdList)
+			vecPrinterCommand.push_back(var.toStdString());
 
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
 		if (strIDCardReaderPort.size())
@@ -368,6 +376,7 @@ struct DeviceConfig
 		pSettings->setValue("DesktopSSCardReaderPort", strDesktopSSCardReaderPort.c_str());
 		pSettings->setValue("TerminalCode", strTerminalCode.c_str());
 		pSettings->setValue("IDCardReaderPort", strIDCardReaderPort.c_str());
+
 		// 打印机驱动模块名称，如KT_Printer.dll
 		// 		Info() << "Device Cofnigure:\n";
 		// 		Info() << "\t\Printer:" << strPrinter;
@@ -404,8 +413,9 @@ struct DeviceConfig
 	string		strPinBroadBaudrate;				   // 9600
 
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
-
 	string		strTerminalCode;					   // 终端唯一识别码
+
+	vector<string> vecPrinterCommand;					// 打印机必须的一些初始化指令
 public:
 
 private:
@@ -952,6 +962,7 @@ public:
 	ServiceType		nCardServiceType = ServiceType::Service_Unknown;
 	string			strPayCode;
 	string			strCardVersion;
+	QSqlDatabase	SQLiteDB;
 	bool			bGuardian;	// 启用监护人
 	bool			bDebug;
 	bool			bSkipWriteCard = false;
@@ -996,6 +1007,8 @@ public:
 	bool SwitchVideoWnd(HWND hWnd);
 
 	bool Snapshot(string strFilePath);
+
+	bool InitializeDB(QString& strMessage);
 
 public:
 	int  ReaderIDCard(IDCardInfo* pIDCard);
@@ -1078,6 +1091,7 @@ public:
 	int  LoadPhoto(string& strPhoto, QString& strMessage);
 	int  EnsureData(QString& strMessage);
 	int  ActiveCard(QString& strMessage);
+	void RemoveTempPersonInfo();
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 
@@ -1099,6 +1113,7 @@ private:
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
 extern vector<NationaltyCode> g_vecNationCode;
+
 bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage);
 
 struct HttpBuffer

@@ -333,8 +333,8 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-	m_pNewCard->StartBusiness();
 	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
+	m_pNewCard->StartBusiness();
 	ui->stackedWidget->setCurrentWidget(m_pNewCard);
 	m_pNewCard->show();
 	pLastStackPage = m_pNewCard;
@@ -382,8 +382,9 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		return;
 	}
 	g_pDataCenter->ResetIDData();
-	m_pUpdateCard->StartBusiness();
+
 	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;
+	m_pUpdateCard->StartBusiness();
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 	m_pUpdateCard->show();
 	pLastStackPage = m_pUpdateCard;
@@ -414,6 +415,13 @@ void MainWindow::on_pushButton_ChangePWD_clicked()
 
 void MainWindow::on_pushButton_RegisterLost_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -661,6 +669,13 @@ void MainWindow::OnNewInstance(const QString& strMessage)
 
 void MainWindow::on_pushButton_QueryInfo_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -683,6 +698,13 @@ void MainWindow::on_pushButton_QueryInfo_clicked()
 
 void MainWindow::on_pushButton_BatchMake_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	// 回到主页时需清空所有身份数据
 	if (pLastStackPage)
 	{

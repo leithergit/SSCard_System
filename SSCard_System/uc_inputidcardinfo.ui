@@ -662,54 +662,16 @@ QRadioButton::indicator::checked {
             </spacer>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_Town">
-             <property name="minimumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBox_Street">
-             <property name="minimumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QLineEdit" name="lineEdit_Address">
              <property name="minimumSize">
               <size>
-               <width>400</width>
+               <width>800</width>
                <height>40</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>400</width>
+               <width>6555</width>
                <height>60</height>
               </size>
              </property>

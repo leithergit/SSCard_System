@@ -186,6 +186,7 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
   <ItemGroup>
     <ClCompile Include="..\utility\json\cJSON.c" />
     <ClCompile Include="..\utility\json\CJsonObject.cpp" />
+    <ClCompile Include="..\utility\Utility.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
   </ItemGroup>

@@ -906,7 +906,7 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 	case 3:
 	{
 		int nDPI = ui.comboBox_DPI->currentIndex();
-
+		int nResult = -1;
 		string strDPI = "Resolution=DPI300;";
 		if (nDPI == 1)
 		{
@@ -1003,7 +1003,7 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 			QString strTagText = ui.lineEdit_Tag->text();
 			if (!strTagText.isEmpty())
 			{
-				g_pDataCenter->PrintExtraText(strTagText, 0, 25, 50, UTF8_GBK("宋体").c_str(), 6, 255);
+				g_pDataCenter->PrintExtraText(strTagText, 0, 5, 50, UTF8_GBK("宋体").c_str(), 6, 255);
 			}
 
 			char szRcode[128] = { 0 };
@@ -1020,10 +1020,12 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 				strMessage = QString("Printer_Eject失败，错误代码:%1!").arg(szRCode);
 				break;
 			}
+			nResult = 0;
 		}
 
 		Wait.RestoreCursor();
-		strMessage = tr("卡片打印成功,请取走卡片!");
+		if (QSucceed(nResult))
+			strMessage = tr("卡片打印成功,请取走卡片!");
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		break;
 	}
