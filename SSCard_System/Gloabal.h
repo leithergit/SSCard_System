@@ -1024,6 +1024,8 @@ public:
 
 	void CloseDevice();
 
+	void CloseSSCardReader();
+
 	int OpenPrinter(QString& strMessage);
 
 	int OpenSSCardReader(QString& strMessage);
@@ -1041,6 +1043,7 @@ public:
 	string MakeCardInfo(SSCardBaseInfoPtr& pSSCardInfo);
 
 	int PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
+	int PrintTestCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText = true);
 
 	int PrintExtraText(QString strText, int nAngle, float fxPos, float fyPos, QString strFont, int nFontSize, int nColor);
 
@@ -1120,7 +1123,7 @@ struct HttpBuffer
 {
 	unsigned int nDataLength;
 	unsigned int nBufferSize;
-	FILE* fp;;
+	FILE* fp;
 	byte* pBuffer;
 	HttpBuffer(int nBufferSize = 8 * 1024, char* szFileName = nullptr)
 	{

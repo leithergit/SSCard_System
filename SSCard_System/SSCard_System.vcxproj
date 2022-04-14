@@ -292,7 +292,6 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
     <QtMoc Include="sys_manualmakecard.h" />
     <QtMoc Include="clickablelabel.h" />
     <QtMoc Include="ComboDelegate.h" />
-    <ClInclude Include="MakCard.h" />
     <QtMoc Include="waitingprogress.h" />
     <QtMoc Include="uc_inputidcardinfo.h" />
     <QtMoc Include="qclickablelineedit.h" />

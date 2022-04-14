@@ -10,7 +10,6 @@
 #include "Utility.h"
 #include "CJsonObject.hpp"
 #include "Markup.h"
-#include <QtCore/qglobal.h>
 #include <QSettings>
 #include <QFileInfo>
 #include <QDebug>

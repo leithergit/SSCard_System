@@ -850,7 +850,12 @@ void DataCenter::CloseDevice()
 	}
 
 	m_pPrinterlib = nullptr;
+	CloseSSCardReader();
+}
 
+void DataCenter::CloseSSCardReader()
+{
+	char szRCode[32] = { 0 };
 	if (m_pSSCardReader)
 	{
 		m_pSSCardReader->Reader_Exit(szRCode);
@@ -1434,6 +1439,62 @@ int DataCenter::PrintCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QStr
 	return nResult;
 }
 
+int DataCenter::PrintTestCard(SSCardBaseInfoPtr& pSSCardInfo, QString strPhoto, QString& strMessage, bool bPrintText)
+{
+	char szBuffer[1024] = { 0 };
+	int nBufferSize = sizeof(szBuffer);
+	int nResult = -1;
+	char szRCode[32] = { 0 };
+	CardFormPtr& pCardForm = GetCardForm();
+	do
+	{
+
+		nResult = -1;
+		nBufferSize = sizeof(szBuffer);
+		ZeroMemory(szBuffer, nBufferSize);
+		if (QFailed(m_pPrinter->Printer_InitPrint(nullptr, szRCode)))
+		{
+			strMessage = QString("Printer_InitPrint失败，错误代码:%1!").arg(szRCode);
+			//break;
+		}
+
+		if (bPrintText)
+		{
+			TextPosition* pFieldPos = &pCardForm->posName;
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strName.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			pFieldPos = &pCardForm->posIDNumber;
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strIdentity.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			pFieldPos = &pCardForm->posSSCardID;
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strCardNum.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+			pFieldPos = &pCardForm->posIssueDate;
+			m_pPrinter->Printer_AddText((char*)pSSCardInfo->strReleaseDate.c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode);
+		}
+
+		if (vecExtraText.size())
+		{
+			for (auto var : vecExtraText)
+				m_pPrinter->Printer_AddText((char*)var.strText.c_str(), var.nAngle, var.fxPos, var.fyPos, (char*)var.strFontName.c_str(), var.nFontSize, 0, var.nColor, szRCode);
+			vecExtraText.clear();
+		}
+
+		ImagePosition& ImgPos = pCardForm->posImage;
+		if (!strPhoto.size())
+			m_pPrinter->Printer_AddImage((char*)strSSCardPhotoFile.c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
+		else
+			m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode);
+
+		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
+		{
+			strMessage = QString("Printer_StartPrint失败，错误代码:%1!").arg(szRCode);
+			break;
+		}
+
+		nResult = 0;
+
+	} while (0);
+	return nResult;
+}
+
 int DataCenter::MoveCard(QString& strMessage)
 {
 	//	int nRetry = 0;
@@ -1443,6 +1504,13 @@ int DataCenter::MoveCard(QString& strMessage)
 	else if (pSysConfig->DevConfig.nSSCardReaderPowerOnType == CardPowerType::READER_CONTACT)
 		nPowerOnPos = 2;
 	char szRCode[1024] = { 0 };
+
+	CloseSSCardReader();
+	if (QFailed(OpenSSCardReader(strMessage)))
+	{
+		gInfo() << gQStr(strMessage);
+		return -1;
+	}
 
 	// 移动到打印位
 	if (m_pPrinter->Printer_Dispense(pSysConfig->DevConfig.nDepenseBox - 1, 4, szRCode))
@@ -1459,7 +1527,6 @@ int DataCenter::MoveCard(QString& strMessage)
 		return -1;
 	}
 	return 0;
-
 }
 
 int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
@@ -1619,7 +1686,8 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
-			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			strMessage = QString("写取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			nResult = -4;
 			break;
 		}
 		// szCardBaseWrite输出结果为两个随机数
@@ -1657,6 +1725,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		if (QFailed(nResult = iWriteCardBas_HSM_Step1((char*)szExAuthData, (char*)strCardInfo.c_str(), szWHSM1)))
 		{
 			strMessage = QString("iWriteCardBas_HSM_Step1,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szWHSM1);
+			nResult = -4;
 			break;
 		}
 		gInfo() << "szWHSM1 = " << szWHSM1;
@@ -1664,6 +1733,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		if (QFailed(nResult = iReadSignatureKey(DevConfig.nSSCardReaderPowerOnType, szSignatureKey)))
 		{
 			strMessage = QString("iReadSignatureKey,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			nResult = -4;
 			break;
 		}
 		gInfo() << "szSignatureKey = " << szSignatureKey;
@@ -1701,12 +1771,30 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			break;
 		}
 
-		// 		QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
-		if (QFailed(nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, (char*)strQMZS.c_str(), (char*)strJMZS.c_str(), (char*)strJMMY.c_str(), (char*)strGLYPIN.c_str(), (char*)strZKMY.c_str(), szWriteCARes)))
+		int nWriteCardCount = 0;
+		nResult = -1;
+		while (nWriteCardCount < 3)
 		{
-			strMessage = QString("写CA信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
-			break;
+			strInfo = QString("尝试第%1次CA!").arg(nWriteCardCount + 1);
+			gInfo() << gQStr(strInfo);
+			//QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
+			nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, (char*)strQMZS.c_str(), (char*)strJMZS.c_str(), (char*)strJMMY.c_str(), (char*)strGLYPIN.c_str(), (char*)strZKMY.c_str(), szWriteCARes);
+			if (QSucceed(nResult))
+			{
+				break;
+			}
+			else
+			{
+				strMessage = QString("写CA信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+				gInfo() << gQStr(strMessage);
+				nWriteCardCount++;
+				strInfo = "写卡上电失败,尝试移动卡片!";
+				gInfo() << gQStr(strInfo);
+				g_pDataCenter->MoveCard(strMessage);
+				continue;
+			}
 		}
+
 		gInfo() << "szWriteCA Out = " << szWriteCARes;
 		CJsonObject json;
 		json.Add("BankNum", pSSCardInfo->strBankNum);

@@ -550,7 +550,12 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 		strGender.isEmpty() ||
 		strAddress.isEmpty())
 	{
-		strMessage = "姓名、手机、民族、性别、身份证号码,住址等信息不能为空!";
+		strMessage = "姓名、民族、性别、身份证号码,住址等信息不能为空!";
+		return -1;
+	}
+	if (strName.contains(" "))
+	{
+		strMessage = "姓名中不能含有空格!";
 		return -1;
 	}
 	char nX = VerifyCardID(strCardID.toStdString().c_str());

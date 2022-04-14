@@ -132,6 +132,7 @@ void logManager::on_pushButton_Export_clicked()
 	Bit7zLibrary lib7z{ str7ZLib.toStdWString() };
 	BitCompressor compressor{ lib7z, BitFormat::Zip };
 	compressor.compress(vecFiles, strFileName.toStdWString());
+
 }
 
 void logManager::on_pushButton_Del_clicked()

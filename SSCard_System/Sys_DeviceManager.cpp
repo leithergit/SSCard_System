@@ -328,11 +328,17 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 		}
 		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
 		{
-			strMessage = QString("iReadCardBas失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+            strMessage = QString("Reader_PowerOn,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
+        SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+        if (QFailed(g_pDataCenter->ReadCard(pSSCardInfo, strMessage)))
+        {
+            strMessage = QString("读卡信息失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+            break;
+        }
 		bSucceed = true;
-		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
+        strMessage = QString("读卡测试成功\n卡芯片号:%1\n银行卡号:%2\n稍后请取出卡片").arg(pSSCardInfo->strChipNum.c_str()).arg(pSSCardInfo->strBankNum.c_str());
 	} while (0);
 	if (!bSucceed)
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -998,19 +1004,19 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 				stringstream datetime;
 				auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 				datetime << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
-				g_pDataCenter->PrintExtraText(datetime.str().c_str(), 0, 60, 50, UTF8_GBK("宋体").c_str(), 6, 255);
+				g_pDataCenter->PrintExtraText(datetime.str().c_str(), 0, 60, 40, UTF8_GBK("宋体").c_str(), 6, 255);
 			}
 			QString strTagText = ui.lineEdit_Tag->text();
 			if (!strTagText.isEmpty())
 			{
-				g_pDataCenter->PrintExtraText(strTagText, 0, 5, 50, UTF8_GBK("宋体").c_str(), 6, 255);
+				g_pDataCenter->PrintExtraText(strTagText, 0, 5, 40, UTF8_GBK("宋体").c_str(), 6, 255);
 			}
 
 			char szRcode[128] = { 0 };
 			QString strPhoto = QCoreApplication::applicationDirPath() + "/Image/SamplePhoto.bmp";
 
 			g_pDataCenter->GetPrinter()->Printer_ExtraCommand(strDPI.c_str(), szRcode);
-			if (g_pDataCenter->PrintCard(pSSCardInfo, strPhoto, strMessage))
+			if (g_pDataCenter->PrintTestCard(pSSCardInfo, strPhoto, strMessage))
 			{
 				break;
 			}

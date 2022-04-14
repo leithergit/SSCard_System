@@ -224,6 +224,14 @@ void MainWindow::On_LoadSystemManager()
 	CheckPassword checkpwd;
 	if (checkpwd.exec() == QDialog::Accepted)
 	{
+		QWaitCursor Wait;
+		if (pThreadAsync)
+		{
+			pThreadAsync->join();
+			delete pThreadAsync;
+			pThreadAsync = nullptr;
+		}
+		Wait.RestoreCursor();
 		SystemManager d(this);
 		d.setGeometry(g_pCurScreen->geometry());
 		d.exec();
@@ -603,21 +611,26 @@ void MainWindow::timerEvent(QTimerEvent* event)
 			USHORT  nPort = (USHORT)strField[2].toShort();
 			if (TestHost(strIP.toStdString(), nPort, g_pDataCenter->nNetTimeout))
 			{// 连续成功
+				m_nNetworkFailedCount = 0;
 				if (m_nTimerNetWarning)
 				{
 					killTimer(m_nTimerNetWarning);
 					m_nTimerNetWarning = 0;
 					bDisconnect = false;
-					ui->label_Net->setText("网络通畅");
+					ui->label_Net->setText("网络良好");
 					ui->label_NetWarning->setStyleSheet("border-image:url(:/Image/network-connected.png);");
 				}
 			}
 			else
 			{// 连接失败
-				m_nTimerNetWarning = startTimer(400);
-				bDisconnect = true;
-				ui->label_Net->setText("网络异常");
-				ui->label_NetWarning->setStyleSheet("border-image:url(:/Image/network-disconnected.png);");
+				m_nNetworkFailedCount++;
+				if (m_nNetworkFailedCount >= 3)
+				{
+					m_nTimerNetWarning = startTimer(400);
+					bDisconnect = true;
+					ui->label_Net->setText("网络异常");
+					ui->label_NetWarning->setStyleSheet("border-image:url(:/Image/network-disconnected.png);");
+				}
 			}
 		}
 	}

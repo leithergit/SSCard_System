@@ -65,6 +65,7 @@ public:
 	int m_nDateTimer = 0;
 
 	int m_nTimerTestHost = 0;
+	int m_nNetworkFailedCount = 0;
 	int m_nTimerNetWarning = 0;
 	bool bDisconnect = false;
 	void StartNetWarning();

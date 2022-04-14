@@ -305,9 +305,6 @@
     <ClInclude Include="..\utility\json\CJsonObject.hpp">
       <Filter>json</Filter>
     </ClInclude>
-    <ClInclude Include="MakCard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\utility\Markup.h">
       <Filter>Header Files</Filter>
     </ClInclude>

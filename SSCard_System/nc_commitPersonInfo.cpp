@@ -101,7 +101,8 @@ int nc_commitPersonInfo::ProcessBussiness()
 			jsonOut.Get("Message", strText);
 			jsonOut.Get("errcode", strErrcode);
 			nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-			if (nErrCode == 3)	// 已经申请过,则继续制卡
+			QString qstrText = QString::fromLocal8Bit(strText.c_str());
+			if ((nErrCode == 3) || (nErrCode == 4 && qstrText.contains("放号")))	// 已经申请过,则继续制卡
 			{
 				strMessage = QString::fromLocal8Bit(strText.c_str());
 				emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
@@ -164,7 +165,6 @@ int nc_commitPersonInfo::ProcessBussiness()
 			strMessage = QString("社保后台未返回个人照片!");
 			break;
 		}
-
 
 		ui->label_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
 		ui->label_Gender->setText(QString::fromLocal8Bit(pSSCardInfo->strGender.c_str()));
