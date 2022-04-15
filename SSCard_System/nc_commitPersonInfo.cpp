@@ -192,7 +192,6 @@ void nc_commitPersonInfo::on_pushButton_OK_clicked()
 	QString strInfo;
 	if (g_pDataCenter->strSSCardPhotoFile.empty())
 	{
-
 		gInfo() << gQStr(strInfo);
 		emit ShowMaskWidget("操作失败", "未找到照片数据,需要照片才能进行新办卡业务", Fetal, Return_MainPage);
 		return;

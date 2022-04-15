@@ -132,7 +132,7 @@ void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
 void uc_ReadIDCard::ThreadWork()
 {
 	auto tLast = high_resolution_clock::now();
-	QString strError;
+	QString strMessage;
 	while (m_bWorkThreadRunning)
 	{
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
@@ -152,31 +152,54 @@ void uc_ReadIDCard::ThreadWork()
 
 				int nNewPage = Page_FaceCapture;
 				int nOperation = Goto_Page;
-				strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
-				switch (g_pDataCenter->nCardServiceType)
+
+				QString strProgressFile = QString("%1/data/Progress_%2.json").arg(QCoreApplication::applicationDirPath()).arg((char*)m_pIDCard->szIdentity);
+				if (fs::exists(strProgressFile.toStdString()))
 				{
-				case ServiceType::Service_NewCard:
-				case ServiceType::Service_ReplaceCard:
-					break;
-				default:
-					nOperation = Switch_NextPage;
-					nNewPage = 0;
-					strError = "读取身份证成功,稍后请进行挂失/解挂操作!";
-					break;
+					strMessage = "读取身份证成功,业务流程已开始!";
+					switch (g_pDataCenter->nCardServiceType)
+					{
+					case ServiceType::Service_NewCard:
+						nNewPage = Page_CommitNewInfo;
+						break;
+					case ServiceType::Service_ReplaceCard:
+						nNewPage = Page_EnsureInformation;
+						break;
+					default:
+						nOperation = Switch_NextPage;
+						nNewPage = 0;
+						strMessage = "读取身份证成功,稍后请进行挂失/解挂操作!";
+						break;
+					}
+				}
+				else
+				{
+					strMessage = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
+					switch (g_pDataCenter->nCardServiceType)
+					{
+					case ServiceType::Service_NewCard:
+					case ServiceType::Service_ReplaceCard:
+						break;
+					default:
+						nOperation = Switch_NextPage;
+						nNewPage = 0;
+						strMessage = "读取身份证成功,稍后请进行挂失/解挂操作!";
+						break;
+					}
 				}
 
-				gInfo() << gQStr(strError);
+				gInfo() << gQStr(strMessage);
 				g_pDataCenter->SetIDCardInfo(m_pIDCard);
-				emit ShowMaskWidget("操作成功", strError, Success, nOperation, nNewPage);
+				emit ShowMaskWidget("操作成功", strMessage, Success, nOperation, nNewPage);
 				break;
 			}
 			else
 			{
 				char szText[256] = { 0 };
 				GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
-				strError = QString("读取身份证失败:%1").arg(szText);
-				gInfo() << gQStr(strError);
-				emit ErrorMessage(strError);
+				strMessage = QString("读取身份证失败:%1").arg(szText);
+				gInfo() << gQStr(strMessage);
+				emit ErrorMessage(strMessage);
 			}
 		}
 		else
