@@ -69,6 +69,7 @@
 #include "../SDK/FaceCapture/DVTGKLDCamSDK.h"
 #include "../SSCardService/SSCardService.h"
 #include "../utility/json/CJsonObject.hpp"
+#include "../Update/Update.h"
 
 //宏定义
 #define __STR2__(x) #x
@@ -741,6 +742,7 @@ struct SysConfig
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
+		bEnableUpdate = pSettings->value("EnableUpdate", false).toBool();
 		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
 		bSkipWriteCard = pSettings->value("SkipWriteCard", false).toBool();
 		bSkipPrintCard = pSettings->value("SkipPrintCard", false).toBool();
@@ -833,6 +835,7 @@ struct SysConfig
 	bool			bTestCard = false;
 	bool			bSkipWriteCard = false;
 	bool			bSkipPrintCard = false;
+	bool			bEnableUpdate = false;
 	bool			bWriteTest = false;
 	int				nNetTimeout = 1500;
 	map<string, string> MapBankSupported;
@@ -965,6 +968,7 @@ public:
 	QSqlDatabase	SQLiteDB;
 	bool			bGuardian;	// 启用监护人
 	bool			bDebug;
+	bool			bEnableUpdate = false;
 	bool			bSkipWriteCard = false;
 	bool			bSkipPrintCard = false;
 	bool            bWriteTest = false;
@@ -1116,44 +1120,6 @@ private:
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
 extern vector<NationaltyCode> g_vecNationCode;
-
-bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage);
-
-struct HttpBuffer
-{
-	unsigned int nDataLength;
-	unsigned int nBufferSize;
-	FILE* fp;
-	byte* pBuffer;
-	HttpBuffer(int nBufferSize = 8 * 1024, char* szFileName = nullptr)
-	{
-		ZeroMemory(this, sizeof(HttpBuffer));
-		pBuffer = new (std::nothrow) byte[nBufferSize];
-		if (pBuffer)
-		{
-			ZeroMemory(pBuffer, nBufferSize);
-			this->nBufferSize = nBufferSize;
-		}
-
-		if (szFileName)
-			fp = fopen(szFileName, "wb");
-	}
-	~HttpBuffer()
-	{
-		if (fp)
-		{
-			fflush(fp);
-			fclose(fp);
-			fp = nullptr;
-		}
-
-		if (pBuffer)
-		{
-			delete[]pBuffer;
-			pBuffer = nullptr;
-		}
-	}
-};
 
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
 

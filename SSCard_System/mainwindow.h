@@ -81,6 +81,10 @@ public:
 	std::thread* pThreadUploadlog = nullptr;
 	bool  bThreadUploadlogRunning = false;
 
+	void ThreadUpdateLauncher();
+	std::thread* pThreadUpdateLauncher = nullptr;
+	bool bThreadUpdateLauncherRunning = false;
+
 	void SwitchPage(int nOperation);
 
 signals:

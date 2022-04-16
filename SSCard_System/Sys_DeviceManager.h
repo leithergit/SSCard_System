@@ -84,6 +84,8 @@ private slots:
 
     void on_pushButton_PrintCard_clicked();
 
+    void on_pushButton_WriteTest_clicked();
+
 private:
 	Ui::DeviceManager ui;
 	//KT_PrinterLibPtr	m_pPrinterlib = nullptr;

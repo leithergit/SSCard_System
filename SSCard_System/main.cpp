@@ -9,7 +9,6 @@
 #include <QSharedMemory>
 #include <QSplashScreen>
 #include "DevBase.h"
-
 #include "Gloabal.h"
 #include "license.h"
 #include "showlicense.h"
@@ -49,8 +48,7 @@ HANDLE g_hAppMutex = nullptr;
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
-
-
+	CurlInitializer curlInit;
 	if (OpenMutexW(MUTEX_ALL_ACCESS, FALSE, g_pUniqueID))
 		return 0;
 	g_hAppMutex = CreateMutexW(nullptr, TRUE, g_pUniqueID);

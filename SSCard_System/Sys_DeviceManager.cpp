@@ -1061,3 +1061,95 @@ void DeviceManager::on_pushButton_PrintCard_clicked()
 {
 	on_pushButton_Excute_clicked(3);
 }
+
+void DeviceManager::on_pushButton_WriteTest_clicked()
+{
+    QString strMessage;
+    QString strPrinterLib;
+    PrinterType nPrinterType;
+    int nDepenseBox;
+    QString strDPI;
+#pragma warning(disable:4700)
+    if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+    {
+        QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
+        return;
+    }
+
+    CardPowerType nPowerType;
+    ReaderBrand nSSCardReaderType;
+    QString strSSCardReaderType;
+    QString strReaderLib;
+
+    if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
+    {
+        QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
+        return;
+    }
+
+    int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
+    if (nRes == QMessageBox::Cancel)
+        return;
+    char szRCode[128] = { 0 };
+    bool bSucceed = false;
+    RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+    do
+    {
+        QWaitCursor Wait;
+        if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+            break;
+
+        if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
+            break;
+
+        if (g_pDataCenter->Depense(nDepenseBox, nPowerType, strMessage))
+            break;
+
+        char szCardATR[1024] = { 0 };
+        char szRCode[1024] = { 0 };
+        int nCardATRLen = 0;
+        string strCardATR;
+        QString strPowerType = ui.comboBox_PoweronType->currentText();
+
+        if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+        {
+            strMessage = QString("DriverInit失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+            break;
+        }
+
+        if (QFailed(g_pDataCenter->MoveCard(strMessage)))
+        {
+            break;
+        }
+        if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
+        {
+            strMessage = QString("Reader_PowerOn,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+            break;
+        }
+        SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
+        g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+       pSSCardInfo->strReleaseDate = "20220415";
+       pSSCardInfo->strValidDate = "";
+       pSSCardInfo->strCardNum = "M83358680";
+       pSSCardInfo->strIdentity = "372325197303034840";
+       QString strName = "王瑞燕";
+       pSSCardInfo->strName = strName.toLocal8Bit().data();
+       pSSCardInfo->strGenderCode = "2";
+       pSSCardInfo->strNationCode = "01";
+       pSSCardInfo->strBirthday = "19730303";
+
+        if (QFailed(g_pDataCenter->SafeWriteCardTest(strMessage)))
+        {
+            strMessage = QString("写卡信息失败\n上电类型:%1\n%2").arg(strPowerType).arg(strMessage);
+            break;
+        }
+
+    } while (0);
+    if (!bSucceed)
+        QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+    else
+        QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+    g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+}
+

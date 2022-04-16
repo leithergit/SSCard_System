@@ -120,7 +120,7 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& 
 	gInfo() << "Payment request url = " << strUrl.c_str();
 
 	string strRespond, strMessage1;
-	if (SendHttpRequest(strUrl, strRespond, strMessage1))
+	if (SendHttpRequest("GET", strUrl, strRespond, strMessage1))
 	{
 		gInfo() << strRespond;
 		QString strRes = strRespond.c_str();
@@ -181,7 +181,7 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 	gInfo() << "PayResult request url = " << strUrl.c_str();
 
 	string strRespond, strMessage1;
-	if (SendHttpRequest(strUrl, strRespond, strMessage1))
+	if (SendHttpRequest("GET", strUrl, strRespond, strMessage1))
 	{
 		gInfo() << strRespond;
 		QString strRes = strRespond.c_str();

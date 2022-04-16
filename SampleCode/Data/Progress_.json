@@ -1,0 +1,87 @@
+{
+	"Person":	{
+		"Name":	"",
+		"Identity":	"",
+		"Gender":	"",
+		"Birthday":	"",
+		"Nantion":	"",
+		"PaperIssuedate":	"",
+		"PaperExpiredate":	"",
+		"Address":	"",
+		"City":	"",
+		"Mobile":	"",
+		"BankCode":	""
+	},
+	"NewCard":	{
+		"chkCanCardSq":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardSqList":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"queryCardZksqList":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardOpen":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardCompleted":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardActive":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardJrzhActive":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"CardNum":	"",
+		"ServiceDate":	""
+	},
+	"UpdateCard":	{
+		"saveCardGs":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"chkCanCardBh":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"queryCardInfoBySfzhm":	{
+			"Code":	0,
+			"datagram":	"{\n\t\"errflag\":\t\"0\",\n\t\"errtext\":\t\"\",\n\t\"errcode\":\t\"0\",\n\t\"ds\":\t{\n\t\t\"jszkbz\":\t\"1\",\n\t\t\"kctzh\":\t\"\",\n\t\t\"kfwm\":\t\"\",\n\t\t\"kgfbb\":\t\"\",\n\t\t\"kh\":\t\"M83179754\",\n\t\t\"khhhh\":\t\"\",\n\t\t\"kid\":\t\"184220303123770016\",\n\t\t\"kplx\":\t\"50\",\n\t\t\"ksbm\":\t\"\",\n\t\t\"kxpzh\":\t\"\",\n\t\t\"kzt\":\t\"0\",\n\t\t\"kztmc\":\t\"放号\",\n\t\t\"oldkid\":\t\"\",\n\t\t\"ryid\":\t\"122011110012520017\",\n\t\t\"shbzhm\":\t\"420684199411088510\",\n\t\t\"sjhm\":\t\"15555522255\",\n\t\t\"stpch\":\t\"\",\n\t\t\"xb\":\t\"1\",\n\t\t\"xm\":\t\"测试卡\",\n\t\t\"xplx\":\t\"\",\n\t\t\"yhbh\":\t\"95599\",\n\t\t\"yhmc\":\t\"农业银行\",\n\t\t\"yxrq\":\t\"\",\n\t\t\"zklx\":\t\"1\",\n\t\t\"zkrq\":\t\"\"\n\t}\n}"
+		},
+		"saveCardBhList":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"queryCardZksqList":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardOpen":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardCompleted":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardActive":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"saveCardJrzhActive":	{
+			"code":	-1,
+			"datagram":	""
+		},
+		"CardNum":	"",
+		"ServiceDate":	""
+	}
+}

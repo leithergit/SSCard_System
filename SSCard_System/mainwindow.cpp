@@ -209,6 +209,12 @@ MainWindow::MainWindow(QWidget* parent)
 	bThreadUploadlogRunning = true;
 	pThreadUploadlog = new std::thread(&MainWindow::fnThreadUploadlog, this);
 
+	if (g_pDataCenter->bEnableUpdate)
+	{
+		bThreadUpdateLauncherRunning = true;
+		pThreadUpdateLauncher = new std::thread(&MainWindow::ThreadUpdateLauncher, this);
+	}
+
 	m_nTimerTestHost = startTimer(5000);
 	QString strMessage;
 	string strBankName;
@@ -589,6 +595,15 @@ void MainWindow::on_Shutdown()
 	{
 		bThreadUploadlogRunning = false;
 		pThreadUploadlog->join();
+		delete pThreadUploadlog;
+		pThreadUploadlog = nullptr;
+	}
+	if (pThreadUpdateLauncher)
+	{
+		bThreadUpdateLauncherRunning = false;
+		pThreadUpdateLauncher->join();
+		delete pThreadUpdateLauncher;
+		pThreadUpdateLauncher = nullptr;
 	}
 	close();
 }
@@ -674,6 +689,39 @@ void MainWindow::fnThreadUploadlog()
 	}
 }
 
+void MainWindow::ThreadUpdateLauncher()
+{
+	auto tStart = chrono::high_resolution_clock::now();
+	while (bThreadUpdateLauncherRunning)
+	{
+		auto duration = duration_cast<chrono::seconds>(chrono::high_resolution_clock::now() - tStart);
+		if (duration.count() > 15)
+		{
+			string strMessage, strLocalVersion, strNewVersion, strFilePath;
+			bool bSucceed = false;
+			do
+			{
+				if (QFailed(LoadUpgradeInfo(strMessage)))
+					break;
+
+				if (QFailed(GetLocalVersion("Launcher.exe", strLocalVersion, strMessage)))
+					break;
+
+				if (QFailed(CheckNewVersion(UpdateType::Launcher, strLocalVersion, strNewVersion, strMessage)))
+					break;
+
+				if (QFailed(DownloadNewVerion(UpdateType::Launcher, strNewVersion, strFilePath, strMessage)))
+					break;
+
+				BackupOldVersion(UpdateType::Launcher, strFilePath);
+				if (QFailed(InstallNewVersion(strFilePath, strMessage)))
+					break;
+			} while (0);
+			tStart = chrono::high_resolution_clock::now();
+		}
+		this_thread::sleep_for(chrono::milliseconds(100));
+	}
+}
 void MainWindow::OnNewInstance(const QString& strMessage)
 {
 	showNormal();

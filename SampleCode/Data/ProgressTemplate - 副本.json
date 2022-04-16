@@ -1,0 +1,40 @@
+{
+	"ServiceType":	-1,
+	"Person":	{
+		"Name":	"",
+		"Identity":	"",
+		"Gender":	"",
+		"Birthday":	"",
+		"Nantion":	"",
+		"Identity_Issued":	"",
+		"Identity_Expired":	"",
+		"City":	"",
+		"Mobile":	"",
+		"Bank":	"",
+		"NewCardNum":	"",
+		"OldCardNum":	"",
+		"ServiceDate":	""
+	},
+	"NewCardProgress":	{
+		"queryPersonInfo":	-1,
+		"chkCanCardSq":	-1,
+		"saveCardSqList":	-1,
+		"queryCardZksqList":	-1,
+		"saveCardOpen":	-1,
+		"saveCardCompleted":	-1,
+		"saveCardActive":	-1,
+		"saveCardJrzhActive":	-1
+	},
+	"UpdateCardProgress":	{
+		"queryPersonInfo":	-1,
+		"saveCardGs":	-1,
+		"chkCanCardBh":	-1,
+		"queryCardInfoBySfzhm":	-1,
+		"saveCardBhList":	-1,
+		"queryCardZksqList":	-1,
+		"saveCardOpen":	-1,
+		"saveCardCompleted":	-1,
+		"saveCardActive":	-1,
+		"saveCardJrzhActive":	-1
+	}
+}

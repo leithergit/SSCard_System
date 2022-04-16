@@ -121,6 +121,13 @@ int nc_commitPersonInfo::ProcessBussiness()
 		pSSCardInfo->strBirthday = (const char*)pIDCard->szBirthday;
 		pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
 		pSSCardInfo->strAddress = (const char*)pIDCard->szAddress;
+		string strGender = GBK_UTF8((const char*)pIDCard->szGender);
+		if (strGender == "男")
+			pSSCardInfo->strGenderCode = "1";
+		else if (strGender == "女")
+			pSSCardInfo->strGenderCode = "2";
+		else
+			pSSCardInfo->strGenderCode = "9";
 
 		pSSCardInfo->strOrganID = Reginfo.strAgency;
 		pSSCardInfo->strBankCode = Reginfo.strBankCode;

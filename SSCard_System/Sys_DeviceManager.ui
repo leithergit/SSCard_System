@@ -906,6 +906,19 @@ color: 0
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_WriteTest">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>55</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>写卡测试</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>
