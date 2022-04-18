@@ -45,8 +45,10 @@ public:
 public slots:
 	void	OnUpdateProgress(int nStep);
 	void	on_pushButton_OK_clicked();
+	void	on_EnableButtonOK(bool bEnable);
 signals:
 	void	UpdateProgress(int nStep);
+	void	EnableButtonOK(bool bEnable);
 
 private:
 	Ui::MakeCard* ui;

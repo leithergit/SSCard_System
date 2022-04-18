@@ -91,13 +91,13 @@ color: 0
                <widget class="QPushButton" name="pushButton_BrowsePrinterModule">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>50</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>50</height>
                  </size>
                 </property>
@@ -650,13 +650,13 @@ color: 0
              <widget class="QPushButton" name="pushButton_BrowseReaderModule">
               <property name="minimumSize">
                <size>
-                <width>120</width>
+                <width>80</width>
                 <height>55</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>120</width>
+                <width>80</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -974,13 +974,13 @@ color: 0
              <widget class="QPushButton" name="pushButton_BrowseDesktopReaderModule">
               <property name="minimumSize">
                <size>
-                <width>120</width>
+                <width>80</width>
                 <height>55</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>120</width>
+                <width>80</width>
                 <height>16777215</height>
                </size>
               </property>

@@ -1442,7 +1442,7 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			strMessage = "读卡器未就绪!";
 			break;
 		}
-
+		gInfo() << "Try to Reader_PowerOn";
 		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
@@ -1452,6 +1452,7 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		gInfo() << "CardATR:" << szCardATR;
 		pSSCardInfo->strCardATR = szCardATR;
 		char szBankNum[64] = { 0 };
+		gInfo() << "Try to iReadBankNumber";
 		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
 		{
 			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
@@ -1459,7 +1460,7 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		}
 		gInfo() << "BankNum:" << szBankNum;
 		pSSCardInfo->strBankNum = szBankNum;
-
+		gInfo() << "Try to iReadCardBas";
 		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
 		{
 			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
@@ -1479,44 +1480,98 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			nIndex++;
 		}
 		gInfo() << "CardBaseRead:" << szCardBaseRead;
+		char szRespond[1024] = { 0 };
+		char szMacKey[4096] = { 0 };
+		gInfo() << "Try to iReadCardBas_HSM_Step1";
+		if (QFailed(nResult = iReadCardBas_HSM_Step1(szMacKey)))
+		{
+			strMessage = QString("iReadCardBas_HSM_Step1失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
 
-		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
-		strCardVersion = strFieldList[6].toStdString();
+		strFieldList = QString(szMacKey).split("|", Qt::KeepEmptyParts);
+		for (auto var : strFieldList)
+		{
+			qDebug() << "Field[" << nIndex << "]" << var;
+			nIndex++;
+		}
 
 		HSMInfo hsmInfo;
+		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
+		strcpy(hsmInfo.strCardATR, pSSCardInfo->strCardATR.c_str());
+
 		string strCardRegion = strFieldList[0].toStdString();
 		strcpy(hsmInfo.strRegionCode, strCardRegion.c_str());
-		strcpy(hsmInfo.strCardATR, pSSCardInfo->strCardATR.c_str());
 		strcpy(hsmInfo.stralgoCode, "03");
 		strcpy(hsmInfo.strKeyAddr, "RKMFEF0C_370000");
 		strcpy(hsmInfo.strIdentifyNum, pSSCardInfo->strCardIdentity.c_str());
-		char szRespond[1024] = { 0 };
-		int ret = 0;
-		if (QFailed(ret = iGetMedicalNum_Step1(szRespond)) || strFieldList.size() == 0)
+		strcpy(hsmInfo.strRandom1, strFieldList[4].toStdString().c_str());
+		strcpy(hsmInfo.strRandom2, strFieldList[5].toStdString().c_str());
+		strcpy(hsmInfo.strRandom3, strFieldList[6].toStdString().c_str());
+		strcpy(hsmInfo.strRandom4, strFieldList[7].toStdString().c_str());
+
+		char szKey[256] = { 0 };
+		gInfo() << "Try to InnerAuth";
+		if (QFailed(nResult = InnerAuth(hsmInfo, szKey)))
 		{
-			strMessage = QString("读取医保信息失败,iGetMedicalNum_Step1,resCode:%1").arg(ret);
+			strMessage = QString("读取医保信息失败,cardExternalAuth,resCode:%1").arg(nResult);
+			break;
+		}
+
+		strFieldList = QString(szKey).split("|", Qt::KeepEmptyParts);
+		char szStep2Out[256] = { 0 };
+		gInfo() << "Try to iReadCardBas_HSM_Step2";
+		if (QFailed(nResult = iReadCardBas_HSM_Step2((char*)strFieldList[1].toStdString().c_str(), szStep2Out)))
+		{
+			strMessage = QString("读取卡信息失败,iReadCardBas_HSM_Step2,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+
+		//if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+		//{
+		//	strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+		//	nResult = -4;
+		//	break;
+		//}
+
+		gInfo() << "Try to iReadCardBas";
+		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
+		{
+			strMessage = QString("第二次读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+
+			break;
+		}
+
+		gInfo() << "Try to iGetMedicalNum_Step1";
+		if (QFailed(nResult = iGetMedicalNum_Step1(szRespond)) || strFieldList.size() == 0)
+		{
+			strMessage = QString("读取医保信息失败,iGetMedicalNum_Step1,resCode:%1").arg(nResult);
 			break;
 		}
 		strFieldList = QString(szRespond).split("|", Qt::KeepEmptyParts);
 		strcpy(hsmInfo.strRandom1, strFieldList[0].toStdString().c_str());
 		strcpy(hsmInfo.strRandom2, strFieldList[1].toStdString().c_str());
-		char szKey[128] = { 0 };
-		if (QFailed(ret = cardExternalAuth(hsmInfo, szKey)))
+
+		gInfo() << "Try to cardExternalAuth";
+		if (QFailed(nResult = cardExternalAuth(hsmInfo, szKey)))
 		{
-			strMessage = QString("读取医保信息失败,cardExternalAuth,resCode:%1").arg(ret);
+			strMessage = QString("读取医保信息失败,cardExternalAuth,resCode:%1").arg(nResult);
 			break;
 		}
 
 		ZeroMemory(szRespond, 1024);
-		if (QFailed(ret = iGetMedicalNum_Step2(szKey, szRespond)))
+		gInfo() << "Try to iGetMedicalNum_Step2";
+		if (QFailed(nResult = iGetMedicalNum_Step2(szKey, szRespond)))
 		{
-			strMessage = QString("读取医保信息失败,iGetMedicalNum_Step2,resCode:%1").arg(ret);
+			strMessage = QString("读取医保信息失败,iGetMedicalNum_Step2,resCode:%1").arg(nResult);
 			break;
 		}
+
 		pSSCardInfo->strChipNum = szRespond;
 		nResult = 0;
-
 	} while (0);
+	if (QFailed(nResult))
+		gError() << gQStr(strMessage);
 	return nResult;
 }
 
@@ -1565,6 +1620,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			}
 		}
 		nResult = -1;
+		gInfo() << "Try to Reader_PowerOn";
 		if (QFailed(nResult = m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, (char*)szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
@@ -1573,7 +1629,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		}
 		pSSCardInfo->strCardATR = szCardATR;
 		gInfo() << "CardATR:" << pSSCardInfo->strCardATR;
-
+		gInfo() << "Try to iWriteCardBas";
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
 			strMessage = QString("写取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
@@ -1599,7 +1655,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		strcpy(HsmInfo.strKeyAddr, "0094");
 		strcpy(HsmInfo.strRandom1, strRomdom[1].toStdString().c_str());
 		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
-
+		gInfo() << "Try to cardExternalAuth";
 		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
 		{
 			strMessage = QString("卡版外部信息认证失败,Result:%1").arg(nResult);
@@ -1611,7 +1667,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		gInfo() << "szExAuthData = " << szExAuthData;
 		string strCardInfo = MakeCardInfo(pSSCardInfo);
 		gInfo() << "strCardInfo = " << strCardInfo;
-
+		gInfo() << "Try to iWriteCardBas_HSM_Step1";
 		if (QFailed(nResult = iWriteCardBas_HSM_Step1((char*)szExAuthData, (char*)strCardInfo.c_str(), szWHSM1)))
 		{
 			strMessage = QString("iWriteCardBas_HSM_Step1,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szWHSM1);
@@ -1619,7 +1675,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			break;
 		}
 		gInfo() << "szWHSM1 = " << szWHSM1;
-
+		gInfo() << "Try to iReadSignatureKey";
 		if (QFailed(nResult = iReadSignatureKey(DevConfig.nSSCardReaderPowerOnType, szSignatureKey)))
 		{
 			strMessage = QString("iReadSignatureKey,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
@@ -1640,6 +1696,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		jsonIn.Add("SignatureKey", strPublicKey);
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
+		gInfo() << "Try to GetCA";
 		if (QFailed(nResult = pSScardSerivce->GetCA(strJsonIn, strJsonOut)))
 		{
 			CJsonObject jsonOut(strJsonOut);
@@ -1668,6 +1725,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			strInfo = QString("尝试第%1次CA!").arg(nWriteCardCount + 1);
 			gInfo() << gQStr(strInfo);
 			//QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
+			gInfo() << "Try to iWriteCA";
 			nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, (char*)strQMZS.c_str(), (char*)strJMZS.c_str(), (char*)strJMMY.c_str(), (char*)strGLYPIN.c_str(), (char*)strZKMY.c_str(), szWriteCARes);
 			if (QSucceed(nResult))
 			{
@@ -1699,16 +1757,17 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 	return nResult;
 }
 
-int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
+int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage, QWidget* pParent)
 {
 	int nResult = -1;
 	DeviceConfig& DevConfig = pSysConfig->DevConfig;
 	RegionInfo& Region = pSysConfig->Region;
 	char szRCode[32] = { 0 };
-	//char szCardBaseRead[1024] = { 0 };
+	char szCardBaseRead[1024] = { 0 };
 	char szCardBaseWrite[1024] = { 0 };
 	char szExAuthData[1024] = { 0 };
 	char szWHSM1[1024] = { 0 };
+	char szWriteCARes[1024] = { 0 };
 	/*char szWHSM2[1024] = { 0 };*/
 	char szSignatureKey[1024] = { 0 };
 	char szCardATR[1024] = { 0 };
@@ -1726,6 +1785,7 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		}
 
 		nResult = -1;
+		gInfo() << "Try to Power_on";
 		if (QFailed(nResult = m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, (char*)szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
@@ -1735,6 +1795,25 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		pSSCardInfo->strCardATR = szCardATR;
 		gInfo() << "CardATR:" << pSSCardInfo->strCardATR;
 
+		gInfo() << "Try to iReadCardBas";
+		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
+		{
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			break;
+		}
+		int nIndex = 0;
+		QStringList strFieldList = QString(szCardBaseRead).split("|", Qt::KeepEmptyParts);
+		for (auto var : strFieldList)
+		{
+			qDebug() << "Field[" << nIndex << "]" << var;
+			nIndex++;
+		}
+
+		HSMInfo hsmInfo;
+		pSSCardInfo->strCardIdentity = strFieldList[3].toStdString();
+		strcpy(hsmInfo.strCardATR, pSSCardInfo->strCardATR.c_str());
+		strCardVersion = strFieldList[6].toStdString();
+		gInfo() << "Try to iWriteCardBas";
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
 			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
@@ -1745,7 +1824,6 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		gInfo() << "CardBaseRead:" << szCardBaseWrite;
 
 		QStringList strRomdom = QString(szCardBaseWrite).split("|", Qt::KeepEmptyParts);
-
 		//strcpy(HsmInfo.strSystemID, "410700006");
 		strcpy(HsmInfo.strRegionCode, Region.strCityCode.c_str());
 		strcpy(HsmInfo.strCardNum, pSSCardInfo->strCardNum.c_str()); //用最新的卡号	   
@@ -1760,9 +1838,15 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		strcpy(HsmInfo.strRandom1, strRomdom[1].toStdString().c_str());
 		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
 
+		gInfo() << "Try to cardExternalAuth";
 		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
 		{
 			strMessage = QString("卡片外部信息认证失败,Result:%1").arg(nResult);
+			break;
+		}
+		if (strstr(szExAuthData, "HSM_SERVER_ERROR"))
+		{
+			strMessage = "加密服务器错误:HSM_SERVER_ERROR";
 			break;
 		}
 		int nLen = strlen(szExAuthData);
@@ -1772,6 +1856,7 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		string strCardInfo = MakeCardInfo(pSSCardInfo);
 		gInfo() << "strCardInfo = " << strCardInfo;
 
+		gInfo() << "Try to iWriteCardBas_HSM_Step1";
 		if (QFailed(nResult = iWriteCardBas_HSM_Step1((char*)szExAuthData, (char*)strCardInfo.c_str(), szWHSM1)))
 		{
 			strMessage = QString("iWriteCardBas_HSM_Step1,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szWHSM1);
@@ -1779,11 +1864,60 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		}
 		gInfo() << "szWHSM1 = " << szWHSM1;
 
+		gInfo() << "Try to iReadSignatureKey";
 		if (QFailed(nResult = iReadSignatureKey(DevConfig.nSSCardReaderPowerOnType, szSignatureKey)))
 		{
 			strMessage = QString("iReadSignatureKey,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
 			break;
 		}
+
+		gInfo() << "szSignatureKey = " << szSignatureKey;
+		string strPublicKey = szSignatureKey;
+		string strAlgorithm = "03";
+
+		CJsonObject jsonIn;
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+		jsonIn.Add("Name", pSSCardInfo->strName);
+		jsonIn.Add("City", pSSCardInfo->strCity);
+		jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+		jsonIn.Add("SignatureKey", strPublicKey);
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
+		gInfo() << "Try to GetCA";
+		if (QFailed(nResult = pSScardSerivce->GetCA(strJsonIn, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strErrText;
+			jsonOut.Get("Message", strErrText);
+			strMessage = QString("GetCA失败:%1,PowerOnType:%2").arg(QString::fromLocal8Bit(strErrText.c_str())).arg((int)DevConfig.nSSCardReaderPowerOnType);
+			break;
+		}
+		CJsonObject jsonOut(strJsonOut);
+		string strQMZS, strJMZS, strJMMY, strGLYPIN, strZKMY;
+		jsonOut.Get("JMZS", strJMZS);
+		jsonOut.Get("QMZS", strQMZS);
+		jsonOut.Get("JMMY", strJMMY);
+		jsonOut.Get("GLYPIN", strGLYPIN);
+		jsonOut.Get("ZKMY", strZKMY);
+		if (strJMZS.empty() || strQMZS.empty() || strJMMY.empty() || strGLYPIN.empty())
+		{
+			strMessage = QString("签名证书,加密证书,加密密钥或管理密码中有一项或多项为空!");
+			break;
+		}
+
+		gInfo() << gQStr(strInfo);
+		//QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
+		gInfo() << "Try to iWriteCA";
+		nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, (char*)strQMZS.c_str(), (char*)strJMZS.c_str(), (char*)strJMMY.c_str(), (char*)strGLYPIN.c_str(), (char*)strZKMY.c_str(), szWriteCARes);
+		if (QSucceed(nResult))
+			break;
+		else
+		{
+			strMessage = QString("写CA失败:%1,PowerOnType:%2,nResult:%3").arg(szWriteCARes).arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+			gInfo() << gQStr(strMessage);
+			break;
+		}
+
 		nResult = 0;
 
 	} while (0);
@@ -2663,20 +2797,17 @@ int	 DataCenter::SafeWriteCardTest(QString& strMessage)
 		gInfo() << gQStr(strInfo);
 		nResult = g_pDataCenter->WriteCardTest(pSSCardInfo, strMessage);
 		if (QSucceed(nResult))
-		{
 			break;
-		}
 		else if (nResult == -4)
 		{
 			nWriteCardCount++;
-			strInfo = "写卡上电失败,尝试移动卡片!";
+			strInfo = "写卡失败,尝试移动卡片!";
 			gInfo() << gQStr(strInfo);
 			g_pDataCenter->MoveCard(strMessage);
 			continue;
 		}
 		else if (QFailed(nResult))
 		{
-			strMessage = "写卡失败!";
 			break;
 		}
 		nResult = 0;

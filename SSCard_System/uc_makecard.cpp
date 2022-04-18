@@ -23,6 +23,7 @@ uc_MakeCard::uc_MakeCard(QLabel* pTitle, QString strStepImage, Page_Index nIndex
 	m_LableStep.push_back(ui->label_Reject);
 
 	connect(this, &uc_MakeCard::UpdateProgress, this, &uc_MakeCard::OnUpdateProgress, Qt::BlockingQueuedConnection);
+	connect(this, &uc_MakeCard::EnableButtonOK, this, &uc_MakeCard::on_EnableButtonOK, Qt::BlockingQueuedConnection);
 }
 
 uc_MakeCard::~uc_MakeCard()
@@ -74,6 +75,7 @@ int uc_MakeCard::ProcessBussiness()
 	m_nSocketRetryCount = g_pDataCenter->GetSysConfigure()->PaymentConfig.nSocketRetryCount;
 	int nResult = -1;
 	QString strMessage;
+	ui->pushButton_OK->setText("确定");
 
 	if (!g_pDataCenter->GetPrinter())
 	{
@@ -494,7 +496,8 @@ void uc_MakeCard::ThreadWork()
 
 	if (QFailed(nResult))
 	{
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Stay_CurrentPage);
+		emit EnableButtonOK(true);
 		return;
 	}
 	else
@@ -507,16 +510,31 @@ void uc_MakeCard::ThreadWork()
 
 void uc_MakeCard::on_pushButton_OK_clicked()
 {
+	if (m_pWorkThread)
+	{
+		if (m_pWorkThread->joinable())
+			m_pWorkThread->join();
+		delete m_pWorkThread;
+		m_pWorkThread = nullptr;
+	}
+
+	m_bWorkThreadRunning = true;
+	m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
 	if (!m_pWorkThread)
 	{
-		m_bWorkThreadRunning = true;
-		m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
-		if (!m_pWorkThread)
-		{
-			QString strError = QString("内存不足,创建制卡线程失败!");
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-		}
-		ui->pushButton_OK->setEnabled(false);
+		QString strError = QString("内存不足,创建制卡线程失败!");
+		gError() << strError.toLocal8Bit().data();
+		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 	}
+	ui->pushButton_OK->setEnabled(false);
+
+}
+
+void uc_MakeCard::on_EnableButtonOK(bool bEnable)
+{
+	for (auto var : m_LableStep)
+		var->setStyleSheet(QString::fromUtf8("image: url(:/Image/todo.png);"));
+	ui->label_MakeCard->setStyleSheet(QString::fromUtf8("image: url(:/Image/Status_Finish.png);"));
+	ui->pushButton_OK->setEnabled(bEnable);
+	ui->pushButton_OK->setText("重试");
 }

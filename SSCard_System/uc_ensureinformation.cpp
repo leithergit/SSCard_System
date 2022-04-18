@@ -357,6 +357,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 				strError = "查询卡状态失败!";
 				gError() << gQStr(strError);
 				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+				return;
 			}
 			gInfo() << strError.toLocal8Bit().data();
 			if (g_pDataCenter->bWithoutIDCard)

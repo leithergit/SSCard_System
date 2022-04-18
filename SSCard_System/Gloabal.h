@@ -1053,7 +1053,7 @@ public:
 
 	int WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
 
-	int WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
+	int WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage, QWidget* pParent = nullptr);
 
 	int ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage);
 
