@@ -68,8 +68,7 @@ public:
 	int m_nNetworkFailedCount = 0;
 	int m_nTimerNetWarning = 0;
 	bool bDisconnect = false;
-	void StartNetWarning();
-	void StopNetWarning();
+
 	std::thread* pThreadAsync = nullptr;
 
 	virtual void timerEvent(QTimerEvent* event) override;

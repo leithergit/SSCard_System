@@ -1472,6 +1472,7 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		区号|社会保障号码(空)|卡号(空)|卡识别码|姓名(空)|卡复位信息(ATR)|Ver|发卡日期|有效期限|
 		411600|||411600D156000005C38275EEFC9B9648||008C544CB386844116018593CA|3.00|20211203|20311202|
 		*/
+		gInfo() << "CardBase = " << szCardBaseRead;
 		QStringList strFieldList = QString(szCardBaseRead).split("|", Qt::KeepEmptyParts);
 		int nIndex = 0;
 		for (auto var : strFieldList)
@@ -1479,6 +1480,7 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			qDebug() << "Field[" << nIndex << "]" << var;
 			nIndex++;
 		}
+		pSSCardInfo->strCardVersion = strFieldList[6].toStdString();
 		gInfo() << "CardBaseRead:" << szCardBaseRead;
 		char szRespond[1024] = { 0 };
 		char szMacKey[4096] = { 0 };
@@ -1566,8 +1568,11 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 			strMessage = QString("读取医保信息失败,iGetMedicalNum_Step2,resCode:%1").arg(nResult);
 			break;
 		}
-
-		pSSCardInfo->strChipNum = szRespond;
+		gInfo() << "MedicalNum = " << szRespond;
+		if (szRespond[0] < '0' || szRespond[0] > '9')
+			pSSCardInfo->strChipNum = (char*)&szRespond[1];
+		else
+			pSSCardInfo->strChipNum = szRespond;
 		nResult = 0;
 	} while (0);
 	if (QFailed(nResult))
@@ -2837,7 +2842,7 @@ int  DataCenter::EnsureData(QString& strMessage)
 		jsonIn.Add("CardIdentity", pSSCardInfo->strCardIdentity);
 		jsonIn.Add("ChipNum", pSSCardInfo->strChipNum);
 		jsonIn.Add("MagNum", pSSCardInfo->strBankNum);
-		jsonIn.Add("CardVersion", g_pDataCenter->strCardVersion);
+		jsonIn.Add("CardVersion", pSSCardInfo->strCardVersion);
 		jsonIn.Add("ChipType", "32");
 
 		strJsonIn = jsonIn.ToString();
@@ -2848,7 +2853,7 @@ int  DataCenter::EnsureData(QString& strMessage)
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
 			jsonOut.Get("Message", strErrText);
-			strMessage = strErrText.c_str();
+			strMessage = QString::fromLocal8Bit(strErrText.c_str());
 			break;
 		}
 		gInfo() << "JsonOut = " << strJsonOut;
@@ -2886,7 +2891,7 @@ int  DataCenter::ActiveCard(QString& strMessage)
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
 			jsonOut.Get("Message", strErrText);
-			strMessage = strErrText.c_str();
+			strMessage = QString::fromLocal8Bit(strErrText.c_str());
 			break;
 		}
 		gInfo() << "JsonOut = " << strJsonOut;

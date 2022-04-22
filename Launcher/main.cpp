@@ -86,22 +86,37 @@ int main(int argc, char* argv[])
 	bool bSucceed = false;
 	do
 	{
+		bSucceed = false;
 		if (QFailed(LoadUpgradeInfo(strMessage)))
 			break;
 
 		if (QFailed(GetLocalVersion("SSCard_System.exe", strLocalVersion, strMessage)))
+		{
+			gError() << "Failed in GetLocalVersion:" << strMessage;
 			break;
-
+		}
+		gInfo() << "SSCard_System.exe" << " Local Version" << strLocalVersion;
 		if (QFailed(CheckNewVersion(UpdateType::MainProcess, strLocalVersion, strNewVersion, strMessage)))
+		{
+			gError() << "Failed in CheckNewVersion" << strMessage;
 			break;
-
+		}
+		gInfo() << "SSCard_System.exe" << " Remote Version" << strNewVersion;
 		if (QFailed(DownloadNewVerion(UpdateType::MainProcess, strNewVersion, strFilePath, strMessage)))
+		{
+			gError() << "Failed in DownloadNewVerion" << strMessage;
 			break;
-
+		}
+		gInfo() << "Try to BackupOldVersion";
 		BackupOldVersion(UpdateType::MainProcess, strFilePath);
 		if (QFailed(InstallNewVersion(strFilePath, strMessage)))
+		{
+			gError() << "Failed in InstallNewVersion" << strMessage;
 			break;
-	} while (0);
+		}
+
+		bSucceed = true;
+	} while (true);
 	if (!bSucceed)
 		gInfo() << strMessage;
 

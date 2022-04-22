@@ -14,7 +14,8 @@ Sys_DialogReadIDCard::Sys_DialogReadIDCard(QString strMessage, bool bBatchMode, 
 	movie->setScaledSize(sz);
 	movie->start();
 	ui->label_Notify->setText(strMessage);
-	setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+	setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+	setWindowModality(Qt::WindowModal);
 	this->setStyleSheet(QString::fromUtf8("#Sys_DialogReadIDCard{border-image: url(:/Image/Bkgrnd.png);}"));
 	if (!bBatchMode)
 	{

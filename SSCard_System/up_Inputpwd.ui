@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,6,2,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2,1,0">
    <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
@@ -26,33 +26,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_Swipecard">
-     <property name="minimumSize">
-      <size>
-       <width>600</width>
-       <height>200</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 25 24pt &quot;Microsoft YaHei UI&quot;;
-border-image: url(:/Image/card3.jpg);
-color: rgb(0, 0, 0);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -76,6 +49,12 @@ color: rgb(0, 0, 0);</string>
          <property name="minimumSize">
           <size>
            <width>0</width>
+           <height>72</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
            <height>72</height>
           </size>
          </property>
@@ -109,7 +88,7 @@ color: rgb(0, 0, 0);</string>
           <font>
            <family>Microsoft YaHei UI</family>
            <pointsize>48</pointsize>
-           <weight>3</weight>
+           <weight>50</weight>
            <italic>false</italic>
            <bold>false</bold>
           </font>
@@ -118,8 +97,7 @@ color: rgb(0, 0, 0);</string>
           <enum>Qt::NoContextMenu</enum>
          </property>
          <property name="styleSheet">
-          <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
-color: rgb(0, 0, 0);</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>123456</string>
@@ -185,7 +163,7 @@ color: rgb(0, 0, 0);</string>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: 25 48pt &quot;Microsoft YaHei UI&quot;;
+        <string notr="true">font:48pt &quot;思源黑体 CN Medium&quot;;
 color: rgb(0, 0, 0);
 background-color: rgb(0, 85, 255);</string>
        </property>

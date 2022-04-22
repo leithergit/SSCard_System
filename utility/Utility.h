@@ -506,3 +506,25 @@ BOOL IsCancelDialogMessage(MSG* pMsg);
 bool EnumSerialPortW(WCHAR* szBuffer, WORD nBufferSize, WORD& nPortCount);
 bool EnumSerialPortW(HWND hComboBox, WORD& nPortCount);
 bool EnumSerialPortA(HWND hComboBox, WORD& nPortCount);
+
+#pragma once
+
+class SystemTool {
+public:
+	static SystemTool& Instance();
+	bool OpenScreenKeyboard();
+
+private:
+	SystemTool() = default;
+	~SystemTool() = default;
+	// \brief 打开系统内置osk应用键盘
+	bool OpenOSK();
+	// \brief 打开系统触摸键盘
+	bool OpenTabTip();
+	// \brief win10判断触摸键盘是否已显示
+	bool IsWin10KeyboardVisable();
+	// \brief win7判断触摸键盘是否已显示
+	bool IsWin7KeyboardVisable();
+	// \brief 判断系统版本是否大于或等于win10 10.0.14393.0
+	bool IsNewVersion();
+};

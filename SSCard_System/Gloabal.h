@@ -166,6 +166,7 @@ enum MakeCard_Progress
 #define Str(x)       #x
 #define gVal(p)      #p<<" = "<<p <<"\t"
 #define gQStr(p)	 #p<<" = "<<p.toLocal8Bit().data()<<"\t"
+#define GBKString(x) QString(x).toLocal8Bit().data()
 
 int WINAPI LDCam_EventCallback(int event_id, PVOID context, int iFrameStatus);
 int WINAPI LDCam_NIR_FrameCallback(PVOID context, PUCHAR pFrameData, int nFrameLen);

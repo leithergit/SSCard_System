@@ -1062,7 +1062,6 @@ void DeviceManager::on_pushButton_Excute_clicked(int index)
 		break;
 	}
 	}
-
 }
 
 void DeviceManager::on_pushButton_Depense_clicked()

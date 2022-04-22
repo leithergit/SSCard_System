@@ -42,12 +42,12 @@ void uc_MakeCard::OnUpdateProgress(int nStep)
 void uc_MakeCard::ShowSSCardInfo()
 {
 	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	if (g_pDataCenter->bDebug)
-	{
-		string strJsonFile = "./Debug/Carddata_" + pSSCardInfo->strIdentity + ".json";
-		if (QFailed(LoadJsonCardData(pSSCardInfo, strJsonFile)))
-			return;
-	}
+	//if (g_pDataCenter->bDebug)
+	//{
+	//	string strJsonFile = "./Debug/Carddata_" + pSSCardInfo->strIdentity + ".json";
+	//	if (QFailed(LoadJsonCardData(pSSCardInfo, strJsonFile)))
+	//		return;
+	//}
 
 	ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
 	ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
@@ -86,6 +86,7 @@ int uc_MakeCard::ProcessBussiness()
 			return nResult;
 		}
 	}
+
 	if (!g_pDataCenter->GetSSCardReader())
 	{
 		if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
@@ -95,7 +96,6 @@ int uc_MakeCard::ProcessBussiness()
 			return nResult;
 		}
 	}
-	//m_pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 
 	if (QFailed(g_pDataCenter->CommitPersionInfo(strMessage)))
 	{

@@ -11,8 +11,8 @@ up_ChangePWD::up_ChangePWD(QLabel* pTitle, QString strStepImage, Page_Index nInd
 	ui(new Ui::up_ChangePWD)
 {
 	ui->setupUi(this);
-	ui->lineEdit_Password1->installEventFilter(this);
-	ui->lineEdit_Password2->installEventFilter(this);
+	//ui->lineEdit_Password1->installEventFilter(this);
+	//ui->lineEdit_Password2->installEventFilter(this);
 	m_pLineEdit[0] = ui->lineEdit_Password1;
 	m_pLineEdit[1] = ui->lineEdit_Password2;
 	connect(this, &QStackPage::InputPin, this, &up_ChangePWD::OnInputPin);
@@ -65,71 +65,6 @@ int  up_ChangePWD::CheckPassword(QString& strError)
 		return 0;
 	}
 }
-
-//int up_ChangePWD::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
-//{
-//	int nResult = -1;
-//	try
-//	{
-//		m_pReaderLib = nullptr;
-//		do
-//		{
-//			if (!m_pReaderLib)
-//			{
-//				char szRCode[32] = { 0 };
-//				QString strAppPath = QCoreApplication::applicationDirPath();
-//				QString strReaderMudule = strAppPath + "/" + strLib.toStdString().c_str();
-//
-//				m_pReaderLib = make_shared<KTModule<KT_Reader>>(strReaderMudule.toStdString());
-//				if (!m_pReaderLib)
-//				{
-//					strMessage = strMessage = QString("内存不足，加载‘%1’实例失败!").arg(strReaderMudule);
-//					break;
-//				}
-//				m_pSSCardReader = m_pReaderLib->Instance();
-//				if (!m_pSSCardReader)
-//				{
-//					strMessage = QString("创建‘%1’实例失败!").arg(strReaderMudule);
-//					break;
-//				}
-//				if (QFailed(nResult = m_pSSCardReader->Reader_Create(nReaderType, szRCode)))
-//				{
-//					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
-//					break;
-//				}
-//				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
-//				{
-//					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
-//					break;
-//				}
-//			}
-//
-//		} while (0);
-//		if (QFailed(nResult))
-//			return -1;
-//		else
-//			return 0;
-//	}
-//	catch (std::exception& e)
-//	{
-//		strMessage = e.what();
-//		gError() << gQStr(strMessage);
-//		return -1;
-//	}
-//	return 0;
-//}
-
-//void up_ChangePWD::CloseSSCardReader()
-//{
-//	char szRCode[32] = { 0 };
-//
-//	if (m_pSSCardReader)
-//	{
-//		m_pSSCardReader->Reader_Exit(szRCode);
-//		m_pSSCardReader = nullptr;
-//	}
-//	m_pReaderLib = nullptr;
-//}
 
 int  up_ChangePWD::ChangePassword(QString& strMessage)
 {
@@ -206,7 +141,7 @@ int up_ChangePWD::ProcessBussiness()
 		return -1;
 	}
 
-	m_pLineEdit[0]->setFocus();
+
 	m_bWorkThreadRunning = true;
 	m_pWorkThread = new std::thread(&up_ChangePWD::ThreadWork, this);
 	if (!m_pWorkThread)
@@ -216,6 +151,7 @@ int up_ChangePWD::ProcessBussiness()
 		emit ShowMaskWidget("严重错误", strMessage, Fetal, Return_MainPage);
 		return -1;
 	}
+	m_pLineEdit[0]->setFocus();
 	return 0;
 }
 

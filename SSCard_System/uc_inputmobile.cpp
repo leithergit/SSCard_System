@@ -25,7 +25,7 @@ int uc_InputMobile::ProcessBussiness()
 	//ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	SSCardBaseInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	pSSCardInfo->strMobile = g_pDataCenter->strMobilePhone;
+	//pSSCardInfo->strMobile = g_pDataCenter->strMobilePhone;
 	m_strMobile = "";
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
 	if (!pService)
@@ -43,6 +43,7 @@ int uc_InputMobile::ProcessBussiness()
 			jsonPerson.Get("Mobile", strMobile);
 			if (strMobile.size() == 11)
 			{
+				gInfo() << GBKString("使用已有手机号码:") << strMobile;
 				m_strMobile = strMobile.c_str();
 				ui->lineEdit_Mobile->setText(QString(strMobile.c_str()));
 			}

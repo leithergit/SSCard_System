@@ -40,6 +40,7 @@ public:
 	int		BuildNewCardInfo(QString& strMessage);
 	int		BuildUpdateCardInfo(QString& strMessage);
 	int		ImportNewIDCard(vector<QString>& vecInfo);
+	void	Reset();
 
 	void    ThreadReadIDCard();
 	volatile bool    m_bWorkThreadRunning = false;
@@ -68,7 +69,7 @@ private slots:
 
 	//void on_ComboxoDeledateModelIndexChanged(int iRow, int iColumn, int nIndex);
 
-    void on_pushButton_MainPage_clicked();
+	void on_pushButton_MainPage_clicked();
 
 private:
 	Ui::Sys_BatchMakeCard* ui;

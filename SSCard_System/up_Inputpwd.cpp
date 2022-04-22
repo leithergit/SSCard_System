@@ -89,6 +89,7 @@ int up_InputPWD::ProcessBussiness()
 		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 		return -1;
 	}
+	ui->lineEdit_OldPassword->setFocus();
 	return 0;
 }
 

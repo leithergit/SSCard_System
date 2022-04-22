@@ -43,6 +43,16 @@ int qi_Information::ProcessBussiness()
 	g_pDataCenter->nCardStratus = CardStatus::Card_Unknow;
 	do
 	{
+		if (g_pDataCenter->bDebug)
+		{
+			string strMobile;
+			if (QFailed(LoadTestIDData(pIDCard, pSSCardInfo)))
+			{
+				//pSSCardInfo->strMobile = strMobile.c_str();
+				strMessage = "测试用户数据不存在!";
+				break;
+			}
+		}
 		SSCardService* pService = nullptr;
 
 		if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
@@ -105,7 +115,6 @@ int qi_Information::ProcessBussiness()
 		if (jsonOut.Get("Photo", strPhoto))
 		{
 			SaveSSCardPhoto(strMessage, strPhoto.c_str());
-
 		}
 		else
 		{
@@ -113,13 +122,12 @@ int qi_Information::ProcessBussiness()
 			break;
 		}
 
-
 		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
 		ui->label_Photo->setStyleSheet(strStyle);
 
 		g_pDataCenter->nCardStratus = (CardStatus)nCardStatus;
 		pSSCardInfo->strCardNum = strSSCardNum;
-		pSSCardInfo->strBankCode = Reginfo.strBankCode;
+		pSSCardInfo->strBankCode = strBankCode;
 		pSSCardInfo->strOrganID = Reginfo.strAgency;
 		pSSCardInfo->strTransType = "5";
 		pSSCardInfo->strCity = Reginfo.strCityCode;

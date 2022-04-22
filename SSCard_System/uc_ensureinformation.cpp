@@ -62,6 +62,29 @@ int uc_EnsureInformation::ProcessBussiness()
 		jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
+		if (m_nPageIndex == Page_EnsureInformation)
+			if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))
+			{
+				CJsonObject jsonOut(strJsonOut);
+				string strText, strErrcode;
+				int nErrCode = -1;
+				//jsonOut.Get("Result", nErrCode);
+				jsonOut.Get("Message", strText);
+				jsonOut.Get("errcode", strErrcode);
+				nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
+				QString qstrText = QString::fromLocal8Bit(strText.c_str());
+				if ((nErrCode == 3) || (nErrCode == 4 && qstrText.contains("放号")))	// 已经申请过,则继续制卡
+				{
+					strMessage = QString::fromLocal8Bit(strText.c_str());
+					emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
+				}
+				else
+				{
+					strMessage = QString("查询制卡状态失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+					break;
+				}
+			}
+
 		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
 		{
 			CJsonObject jsonOut(strJsonOut);

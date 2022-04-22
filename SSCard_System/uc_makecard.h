@@ -49,7 +49,6 @@ public slots:
 signals:
 	void	UpdateProgress(int nStep);
 	void	EnableButtonOK(bool bEnable);
-
 private:
 	Ui::MakeCard* ui;
 	QVector<QLabel*> m_LableStep;

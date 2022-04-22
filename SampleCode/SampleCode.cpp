@@ -212,6 +212,10 @@ void TestUpateJson()
 	}
 }
 #include <format>
+#include <windows.h>
+#include <gdiplus.h>
+#include <stdio.h>
+using namespace Gdiplus;
 
 void testMove_InitVec()
 {
@@ -368,6 +372,17 @@ void GetAge()
 
 int main()
 {
+
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+	Image* image = new Image(L"FakePhoto.jpg");
+	CLSID encoderClsID;
+
+
+	GdiplusShutdown(gdiplusToken);
+
 	string strBirthday = "19761216";
 	int nYear, nMonth, nDay;
 	int nCount = sscanf_s(strBirthday.c_str(), "%04d%02d%02d", &nYear, &nMonth, &nDay);

@@ -224,10 +224,30 @@ MainWindow::MainWindow(QWidget* parent)
 		QMessageBox_CN(QMessageBox::Critical, "严重错误", strMessage, QMessageBox::Ok, this);
 	}
 }
+#include <initguid.h>
+#include <Objbase.h>
+//#pragma hdrstop
+//// 4ce576fa-83dc-4F88-951c-9d0782b4e376
+//DEFINE_GUID(CLSID_UIHostNoLaunch,
+//	0x4CE576FA, 0x83DC, 0x4f88, 0x95, 0x1C, 0x9D, 0x07, 0x82, 0xB4, 0xE3, 0x76);
+//
+//// 37c994e7_432b_4834_a2f7_dce1f13b834b
+//DEFINE_GUID(IID_ITipInvocation,
+//	0x37c994e7, 0x432b, 0x4834, 0xa2, 0xf7, 0xdc, 0xe1, 0xf1, 0x3b, 0x83, 0x4b);
+//
+//struct ITipInvocation : IUnknown
+//{
+//	virtual HRESULT STDMETHODCALLTYPE Toggle(HWND wnd) = 0;
+//};
+
+#include <shcore.h>
+#include <ShlObj_core.h>
 
 void MainWindow::On_LoadSystemManager()
 {
 	CheckPassword checkpwd;
+	SystemTool& sysTool = SystemTool::Instance();
+	sysTool.OpenScreenKeyboard();
 	if (checkpwd.exec() == QDialog::Accepted)
 	{
 		QWaitCursor Wait;
@@ -242,6 +262,55 @@ void MainWindow::On_LoadSystemManager()
 		d.setGeometry(g_pCurScreen->geometry());
 		d.exec();
 	}
+	//ITipInvocation* tip;
+	//CoInitialize(0);
+	//HRESULT hr = CoCreateInstance(CLSID_UIHostNoLaunch, 0, CLSCTX_INPROC_HANDLER | CLSCTX_LOCAL_SERVER, IID_ITipInvocation, (void**)&tip);
+	//tip->Toggle(GetDesktopWindow());
+	//tip->Release();
+	//IFrameworkInputPane* inputPane = NULL;
+	//RECT prcInputPaneScreenLocation = { 0,0,0,0 };
+	//HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	//if (SUCCEEDED(hr))
+	//{
+	//	hr = CoCreateInstance(CLSID_FrameworkInputPane, NULL, CLSCTX_INPROC_SERVER, IID_IFrameworkInputPane, (LPVOID*)&inputPane);
+	//	if (SUCCEEDED(hr))
+	//	{
+	//		hr = inputPane->Location(&prcInputPaneScreenLocation);
+	//		if (!SUCCEEDED(hr))
+	//		{
+
+//			}
+//		}
+//		inputPane->Release();
+//	}
+//
+}
+
+
+//*******************************************************************
+//
+// RETURNS KEYBOARD RECTANGLE OR EMPTY ONE IF KEYBOARD IS NOT VISIBLE
+//
+//*******************************************************************
+RECT __stdcall  GetKeyboardRect()
+{
+	IFrameworkInputPane* inputPane = NULL;
+	RECT prcInputPaneScreenLocation = { 0,0,0,0 };
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	if (SUCCEEDED(hr))
+	{
+		hr = CoCreateInstance(CLSID_FrameworkInputPane, NULL, CLSCTX_INPROC_SERVER, IID_IFrameworkInputPane, (LPVOID*)&inputPane);
+		if (SUCCEEDED(hr))
+		{
+			hr = inputPane->Location(&prcInputPaneScreenLocation);
+			if (!SUCCEEDED(hr))
+			{
+			}
+			inputPane->Release();
+		}
+	}
+	CoUninitialize();
+	return prcInputPaneScreenLocation;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
@@ -698,30 +767,43 @@ void MainWindow::ThreadUpdateLauncher()
 		if (duration.count() > 15)
 		{
 			string strMessage, strLocalVersion, strNewVersion, strFilePath;
-			bool bSucceed = false;
 			do
 			{
 				if (QFailed(LoadUpgradeInfo(strMessage)))
 					break;
 
 				if (QFailed(GetLocalVersion("Launcher.exe", strLocalVersion, strMessage)))
+				{
+					gError() << "Failed in GetLocalVersion:" << strMessage;
 					break;
-
+				}
+				gInfo() << "Launcher.exe" << " Local Version" << strLocalVersion;
 				if (QFailed(CheckNewVersion(UpdateType::Launcher, strLocalVersion, strNewVersion, strMessage)))
+				{
+					gError() << "Failed in CheckNewVersion" << strMessage;
 					break;
-
+				}
+				gInfo() << "Launcher.exe" << " Remote Version" << strNewVersion;
 				if (QFailed(DownloadNewVerion(UpdateType::Launcher, strNewVersion, strFilePath, strMessage)))
+				{
+					gError() << "Failed in DownloadNewVerion" << strMessage;
 					break;
-
+				}
+				gInfo() << "Try to BackupOldVersion";
 				BackupOldVersion(UpdateType::Launcher, strFilePath);
 				if (QFailed(InstallNewVersion(strFilePath, strMessage)))
+				{
+					gError() << "Failed in InstallNewVersion" << strMessage;
 					break;
-			} while (0);
+				}
+
+			} while (true);
 			tStart = chrono::high_resolution_clock::now();
 		}
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 }
+
 void MainWindow::OnNewInstance(const QString& strMessage)
 {
 	showNormal();
@@ -779,5 +861,6 @@ void MainWindow::on_pushButton_BatchMake_clicked()
 	}
 	g_pDataCenter->ResetIDData();
 	ui->stackedWidget->setCurrentWidget(m_pBatchMakeCard);
+	m_pBatchMakeCard->Reset();
 	m_pBatchMakeCard->show();
 }

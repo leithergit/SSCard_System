@@ -25,6 +25,10 @@
 #include "../SDK/7Z/include/bitexception.hpp"
 #include "../SDK/7Z/include/bitcompressor.hpp"
 
+#include "../SDK/libcurl/curl.h"
+#include "../SDK/glog/logging.h"
+#include "../Update/Update.h"
+
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
@@ -53,7 +57,6 @@ string strUpdateServer;
 #pragma comment(lib, "../SDK/libcurl/libcurl")
 #endif
 #pragma comment(lib, "version")
-
 
 CurlInitializer::CurlInitializer()
 {
@@ -145,12 +148,12 @@ int RunProcess(string strPath, string strWorkDir)
 	return 0;
 }
 
-
 HttpBuffer::HttpBuffer(const char* szFileName)
 {
 	if (szFileName)
 		fp = fopen(szFileName, "wb");
 }
+
 HttpBuffer::~HttpBuffer()
 {
 	if (fp)
@@ -214,11 +217,18 @@ int SendHttpRequest(string strMothod, string szUrl, string& strRespond, string& 
 
 		nCurResult = curl_easy_perform(pCurl);
 		if (nCurResult != CURLE_OK)
+		{
+			gError() << "curl_easy_perform failed:" << nCurResult;
 			break;
+		}
 
 		nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &nHttpCode);
+
 		if (nCurResult != CURLE_OK)
+		{
+			gError() << "curl_easy_getinfo failed:" << nCurResult;
 			break;
+		}
 
 		if (retcode == 401)
 		{
@@ -373,7 +383,7 @@ int LoadUpgradeInfo(string& strMessage)
 {
 	QString strAppPath = QCoreApplication::applicationDirPath();
 
-	QString strConfigure = strAppPath + "/Configure.ini";
+	QString strConfigure = strAppPath + "/update.ini";
 	QFileInfo fi(strConfigure);
 	if (!fi.isFile())
 	{
@@ -381,13 +391,14 @@ int LoadUpgradeInfo(string& strMessage)
 		return 1;
 	}
 	QSettings setting(strConfigure, QSettings::IniFormat);
-	setting.beginGroup("Region");
-	strUpdateCode = setting.value("UpgradeCode", "").toString().toStdString();
-	strUpdateServer = setting.value("UpgradeServer", "").toString().toStdString();
+	setting.beginGroup("Update");
+	strUpdateCode = setting.value("RegionCode", "").toString().toStdString();
+	strUpdateServer = setting.value("Server", "").toString().toStdString();
 	gInfo() << "UpgradeCode = " << strUpdateCode;
 	gInfo() << "UpgradeServer = " << strUpdateServer;
 	if (strUpdateCode.empty())
 	{
+		gError() << "RegionCode is empty!";
 		strMessage = "系统升级区域代码为空!";
 		return 1;
 	}
@@ -401,6 +412,7 @@ int  CheckNewVersion(UpdateType nType, string& strLocalVersion, string& strNewVe
 
 	string strRespond;
 	string strErrmsg;
+	gInfo() << "Try to Query Version";
 	if (QFailed(SendHttpRequest("GET", strUrl.toStdString(), strRespond, strErrmsg)))
 	{
 		strMessage = strErrmsg.c_str();
@@ -468,10 +480,12 @@ int DownloadNewVerion(UpdateType nType, string& strNewVersion, string& strFilePa
 	QFileInfo fi2(strFilePath.c_str());
 	if (fi.isFile())
 		QFile::remove(strFilePath.c_str());
-
+	gInfo() << "Try to download " << strUrl.toStdString();
 	if (QFailed(Download(strUrl.toStdString(), strFilePath, strMessage)))
+	{
+		gInfo() << "Failed in download " << strUrl.toStdString() << "! Reason:" << strMessage;
 		return 1;
-
+	}
 	return 0;
 }
 /*
@@ -529,6 +543,7 @@ void BackupOldVersion(UpdateType nType, string strFileZipPath)
 			gError() << "Failed in GetLocalVersion.";
 			return;
 		}
+		gInfo() << strProcess << " Version:" << strLocalVersion;
 		QString strBackupPath = strAppPath + "/Backup";
 
 		QString strBackupVersionPath = strBackupPath + "/" + "Patch" + strLocalVersion.c_str();
