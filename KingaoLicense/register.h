@@ -17,6 +17,8 @@ public:
 	~Register();
 	QString strLicenseFile;
 
+	bool ImportLicene(QString& strMachineCode, QString& strLicense, QString& strMessage);
+
 private slots:
 	void on_ButtonRegister_clicked();
 

@@ -55,6 +55,11 @@ public:
 	void On_LoadSystemManager();
 
 	int m_nDateTimer = 0;
+	int m_nTimerTestHost = 0;
+	int m_nNetworkFailedCount = 0;
+	int m_nTimerNetWarning = 0;
+	bool bDisconnect = false;
+	std::thread* pThreadAsync = nullptr;
 	virtual void timerEvent(QTimerEvent* event) override;
 	virtual void closeEvent(QCloseEvent* event) override;
 	int LoadConfigure(QString& strError);
@@ -63,6 +68,10 @@ public:
 	void fnThreadUploadlog();
 	std::thread ThreadUploadlog;
 	bool  bThreadUploadlogRunning = false;
+
+	void ThreadUpdateLauncher();
+	std::thread* pThreadUpdateLauncher = nullptr;
+	bool bThreadUpdateLauncherRunning = false;
 
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);

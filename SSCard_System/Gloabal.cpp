@@ -8,7 +8,10 @@
 #include <QTextCodec>
 #include "Gloabal.h"
 #include "Payment.h"
+#include "aestools.h"
+#include "../update/Update.h"
 #include "qstackpage.h"
+#include "idcard_api.h"
 
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -28,6 +31,7 @@
 #pragma comment(lib, "../SDK/glog/glogd")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z_d.lib")
+#pragma comment(lib, "../Update/Debug/update")
 #else
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printer")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
@@ -40,6 +44,7 @@
 #pragma comment(lib, "../SDK/glog/glog")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z.lib")
+#pragma comment(lib, "../Update/release/update")
 #endif
 
 const char* szPrinterTypeList[PRINTER_MAX] =
@@ -81,6 +86,7 @@ QWaitCursor::~QWaitCursor()
 
 extern DataCenterPtr g_pDataCenter;
 QScreen* g_pCurScreen = nullptr;
+const char* szAesKey = "581386C9F1514F6B92170BF457D8B065";
 DataCenter::DataCenter()
 {
 	DVTGKLDCam_Init();
@@ -112,7 +118,9 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			return -1;
 		}
 		bDebug = GetSysConfigure()->bDebug;
+		nSkipPayTime = GetSysConfigure()->nSkipPayTime;
 		bTestCard = GetSysConfigure()->bTestCard;
+		nNetTimeout = GetSysConfigure()->nNetTimeout;
 		return 0;
 	}
 
@@ -155,120 +163,6 @@ int DataCenter::LoadCardForm(QString& strError)
 		return -1;
 	}
 }
-
-int HttpRecv(void* buffer, size_t sz, size_t nmemb, void* ResInfo)
-{
-	HttpBuffer* pRespond = (HttpBuffer*)ResInfo;
-	if (!pRespond->pBuffer)
-		return sz * nmemb;
-	if (!pRespond || !pRespond->pBuffer || !pRespond->nBufferSize)
-		return sz * nmemb;
-	if ((pRespond->nDataLength + sz * nmemb) < pRespond->nBufferSize)
-	{
-		memcpy(&pRespond->pBuffer[pRespond->nDataLength], buffer, sz * nmemb);
-		pRespond->nDataLength += sz * nmemb;
-	}
-
-	if (pRespond->fp)
-	{
-		fwrite(buffer, sz * nmemb, 1, pRespond->fp);
-	}
-	return sz * nmemb;  //返回接受数据的多少
-}
-
-bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage)
-{
-	CURLcode nCurResult;
-	long retcode = 0;
-	CURL* pCurl = nullptr;
-	bool bSucceed = false;
-	int nHttpCode = 200;
-	HttpBuffer hb;
-	do
-	{
-		pCurl = curl_easy_init();
-		if (pCurl == NULL)
-			break;
-		nCurResult = curl_easy_setopt(pCurl, CURLOPT_CUSTOMREQUEST, "GET");
-		curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5L);			//请求超时时长
-		curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT, 5L);	//连接超时时长 
-		curl_easy_setopt(pCurl, CURLOPT_FOLLOWLOCATION, 1L);	//允许重定向
-		curl_easy_setopt(pCurl, CURLOPT_HEADER, 1L);			//若启用，会将头文件的信息作为数据流输出
-		curl_easy_setopt(pCurl, CURLOPT_TCP_NODELAY, 0L);
-		curl_easy_setopt(pCurl, CURLOPT_TCP_FASTOPEN, 1L);
-
-		HttpBuffer* pHttpBuffer = (HttpBuffer*)&hb;
-		if (pHttpBuffer->pBuffer && pHttpBuffer->nBufferSize)
-		{
-			curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, HttpRecv);
-			curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, pHttpBuffer);
-		}
-
-		curl_easy_setopt(pCurl, CURLOPT_NOSIGNAL, 1L); //关闭中断信号响应
-		curl_easy_setopt(pCurl, CURLOPT_VERBOSE, 1L); //启用时会汇报所有的信息
-		nCurResult = curl_easy_setopt(pCurl, CURLOPT_URL, szUrl.c_str());
-
-		curl_slist* pList = NULL;
-		pList = curl_slist_append(pList, "Accept-Encoding:gzip, deflate, sdch");
-		pList = curl_slist_append(pList, "Accept-Language:zh-CN,zh;q=0.8");
-		curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, pList);
-
-		nCurResult = curl_easy_perform(pCurl);
-		if (nCurResult != CURLE_OK)
-			break;
-
-		nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &nHttpCode);
-		if (nCurResult != CURLE_OK)
-			break;
-
-		if (retcode == 401)
-		{
-			long nAuthorize;
-			nCurResult = curl_easy_getinfo(pCurl, CURLINFO_HTTPAUTH_AVAIL, &nAuthorize);
-
-			if (nCurResult != CURLE_OK)
-				break;
-
-			if (!nAuthorize)
-				break;
-			if (nAuthorize & CURLAUTH_DIGEST)
-				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-			else if (nAuthorize & CURLAUTH_BASIC)
-				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-			else if (nAuthorize & CURLAUTH_NEGOTIATE)
-				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_NEGOTIATE);
-			else if (nAuthorize & CURLAUTH_NTLM)
-				nCurResult = curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_NTLM);
-			if (nCurResult != CURLE_OK)
-				break;
-
-			nCurResult = curl_easy_perform(pCurl);
-			if (nCurResult != CURLE_OK)
-				break;
-		}
-
-	} while (0);
-
-	if (nCurResult != CURLE_OK)
-	{
-		strMessage = curl_easy_strerror(nCurResult);
-	}
-	else
-	{
-		strRespond = string((const char*)hb.pBuffer, hb.nDataLength);
-		nCurResult = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &nHttpCode);
-		if (nHttpCode == 200)
-			bSucceed = true;
-	}
-
-	if (pCurl)
-	{
-		curl_easy_cleanup(pCurl);
-		pCurl = nullptr;
-	}
-	return bSucceed;
-}
-
 
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent)
 {
@@ -388,6 +282,53 @@ QStringList SearchFiles(const QString& dir_path, QDateTime* pStart, QDateTime* p
 	}
 
 	return FileList;
+}
+
+int  DataCenter::ReaderIDCard(IDCardInfo* pIDCard)
+{
+	int nResult = IDCard_Status::IDCard_Succeed;
+	auto strDevPort = GetSysConfigure()->DevConfig.strIDCardReaderPort;
+	bool bDevOpened = false;
+	do
+	{
+		if (strDevPort == "AUTO" || !strDevPort.size())
+		{
+			gInfo() << "Try to open IDCard Reader auto!" << strDevPort;
+			nResult = OpenReader(nullptr);
+		}
+		else
+		{
+			gInfo() << "Try to open IDCard Reader " << strDevPort;
+			nResult = OpenReader(strDevPort.c_str());
+		}
+
+		if (nResult != IDCard_Status::IDCard_Succeed)
+		{
+			break;
+		}
+		bDevOpened = true;
+		nResult = FindIDCard();
+		if (nResult != IDCard_Status::IDCard_Succeed)
+		{
+			break;
+		}
+
+		nResult = ReadIDCard(*pIDCard);
+		if (nResult != IDCard_Status::IDCard_Succeed)
+		{
+			break;
+		}
+		int nNationalityCode = strtol((char*)pIDCard->szNationaltyCode, nullptr, 10);
+		if (nNationalityCode < 10)
+			sprintf_s((char*)pIDCard->szNationaltyCode, sizeof(pIDCard->szNationaltyCode), "%02d", nNationalityCode);
+
+	} while (0);
+	//if (bDevOpened)
+	{
+		gInfo() << "Try to close IDCard Reader!";
+		CloseReader();
+	}
+	return nResult;
 }
 
 int DataCenter::OpenDevice(QString& strMessage)
@@ -545,7 +486,6 @@ int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int
 void DataCenter::CloseDevice()
 {
 	char szRCode[32] = { 0 };
-
 	if (m_pPrinter)
 	{
 		m_pPrinter->Printer_Close(szRCode);
@@ -1188,6 +1128,40 @@ int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 	return nResult;
 }
 
+
+int	 DataCenter::SafeWriteCard(QString& strMessage)
+{
+	int nResult = -1;
+	string strJsonIn, strJsonOut;
+	QString strInfo;
+	int nWriteCardCount = 0;
+
+	while (nWriteCardCount < 3)
+	{
+		strInfo = QString("尝试第%1次写卡!").arg(nWriteCardCount + 1);
+		gInfo() << gQStr(strInfo);
+		nResult = g_pDataCenter->WriteCard(pSSCardInfo, strMessage);
+		if (QSucceed(nResult))
+		{
+			break;
+		}
+		else if (nResult == -4)
+		{
+			nWriteCardCount++;
+			strInfo = "写卡上电失败,尝试移动卡片!";
+			gInfo() << gQStr(strInfo);
+			g_pDataCenter->MoveCard(strMessage);
+			continue;
+		}
+		else if (QFailed(nResult))
+		{
+			break;
+		}
+		nResult = 0;
+	}
+	return nResult;
+}
+
 int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 {
 	if (!m_pSSCardReader)
@@ -1222,11 +1196,6 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 			break;
 		}
 
-		//if (QFailed(MoveCard(strMessage)))
-		//{
-		//	gInfo() << gQStr(strMessage);
-		//	break;
-		//}
 		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
 		{
 			strMessage = QString("IC卡上电失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
@@ -1243,11 +1212,6 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		}
 		gInfo() << "BankNum:" << szBankNum;
 		strcpy(pSSCardInfo->strBankNum, szBankNum);
-		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
-		//{
-		//	gInfo() << gQStr(strMessage);
-		//	break;
-		//}
 
 		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
 		{
@@ -1315,22 +1279,14 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		gInfo() << "szExAuthData = " << szExAuthData;
 		string strCardInfo = MakeCardInfo(szCardATR, pSSCardInfo);
 		gInfo() << "strCardInfo = " << strCardInfo;
-		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
-		//{
-		//	gInfo() << gQStr(strMessage);
-		//	break;
-		//}
+
 		if (QFailed(nResult = iWriteCardBas_HSM_Step1((char*)szExAuthData, (char*)strCardInfo.c_str(), szWHSM1)))
 		{
 			strMessage = QString("iWriteCardBas_HSM_Step1,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szWHSM1);
 			break;
 		}
 		gInfo() << "szWHSM1 = " << szWHSM1;
-		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
-		//{
-		//	gInfo() << gQStr(strMessage);
-		//	break;
-		//}
+
 		if (QFailed(nResult = iReadSignatureKey(DevConfig.nSSCardReaderPowerOnType, szSignatureKey)))
 		{
 			strMessage = QString("iReadSignatureKey,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
@@ -1349,12 +1305,6 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		{
 			break;
 		}
-
-		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
-		//{
-		//	gInfo() << gQStr(strMessage);
-		//	break;
-		//}
 
 		// 		QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
 		if (QFailed(nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, caInfo.QMZS, caInfo.JMZS, caInfo.JMMY, caInfo.GLYPIN, caInfo.ZKMY, szWriteCARes)))
@@ -1720,4 +1670,46 @@ bool GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, W
 		bResult = true;
 	} while (0);
 	return bResult;
+}
+
+bool DataCenter::LoadAdminConfigure()
+{
+	QString strDocPath = qApp->applicationDirPath() + "/Data/Adminster.json";
+	QFile jsfile(strDocPath);
+	if (!jsfile.open(QIODevice::ReadOnly))
+		return false;
+
+	QByteArray byData = jsfile.readAll();
+	if (byData.isEmpty())
+		return false;
+
+	AesTools AesDecrypt((unsigned char*)szAesKey, 16);
+	unsigned char* pBuffer = new unsigned char[byData.size() + 1];
+	shared_ptr<unsigned char> pBufferFree(pBuffer);
+	int nDataLen = AesDecrypt.Decrypt((unsigned char*)byData.data(), byData.size(), pBuffer);
+	qDebug() << (char*)pBuffer;
+	QByteArray baJson((char*)pBuffer, nDataLen);
+	QJsonParseError jsErr;
+	QJsonDocument jsdoc = QJsonDocument::fromJson(baJson, &jsErr);
+	if (jsdoc.isNull())
+	{
+		qDebug() << jsErr.errorString();
+		return false;
+	}
+	vecAdminister.clear();
+	QJsonArray jsArray = jsdoc.array();
+	int nItems = 0;
+	for (auto var : jsArray)
+	{
+		auto jsObj = var.toObject();
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+		QString strName = jsObj.value("Name").toString();
+		QString strID = jsObj.value("ID").toString();
+		QString strGender = jsObj.value("Gender").toString();
+		strcpy((char*)pIDCard->szName, strName.toLocal8Bit());
+		strcpy((char*)pIDCard->szIdentity, strID.toLocal8Bit());
+		strcpy((char*)pIDCard->szGender, strGender.toLocal8Bit());
+		vecAdminister.push_back(pIDCard);
+	}
+	return true;
 }

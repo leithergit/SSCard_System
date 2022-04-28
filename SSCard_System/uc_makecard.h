@@ -21,12 +21,23 @@ namespace Ui {
 
 enum MakeCard_Progress
 {
+	MP_Unknow = -1,
 	MP_PreMakeCard = 0,
 	//Depense,
 	MP_WriteCard,
 	MP_PrintCard,
 	MP_EnableCard,
 	MP_RejectCard
+};
+
+enum Step_Index
+{
+	Step_Mark = 0,
+	Step_PreMake,
+	Step_WriteCard,
+	Step_PrintCard,
+	Step_ReturnData,
+	Step_EnableCard
 };
 
 class uc_MakeCard : public QStackPage
@@ -38,19 +49,12 @@ public:
 	~uc_MakeCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
-	//int OpenDevice(QString& strMessage);
-	//int OpenPrinter(QString& strMesssage);
-	//int OpenSSCardReader(QString& strMesssage);
-	//void CloseDevice();
-	//int TestPrinter(QString& strMessage);
-	//int Depense(QString& strMessage);
-	//string MakeCardInfo(string strATR, SSCardInfoPtr& pSSCardInfo);
-	//int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
-	//int PrintCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 	int PrecessCardInMaking(QString& strMessage);
 	int PrepareMakeCard(QString& strMessage);
 	void ShowSSCardInfo();
 	void ThreadWork();
+	bool	 StepStatus[16] = { 0 };
+	int		nCurrentStep = 0;
 	virtual void ShutDown() override;
 	int     m_nSocketRetryInterval = 500;            // 支付结构查询时间间隔单 毫秒
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
@@ -58,10 +62,11 @@ public:
 
 public slots:
 	void	OnUpdateProgress(int nStep);
+	void	on_pushButton_OK_clicked();
+	void	on_EnableButtonOK(bool bEnable);
 signals:
 	void	UpdateProgress(int nStep);
-private slots:
-    void on_pushButton_OK_clicked();
+	void	EnableButtonOK(bool bEnable);
 
 private:
 	Ui::MakeCard* ui;

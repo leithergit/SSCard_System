@@ -159,6 +159,115 @@ color: #ffffff;}</string>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
+       <widget class="QLabel" name="label_Version">
+        <property name="styleSheet">
+         <string notr="true">#label_Version{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
+        </property>
+        <property name="text">
+         <string>当前版本:1.0.0.1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_NetWarning">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image: url(:/Image/network-connected.png);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_Net">
+        <property name="styleSheet">
+         <string notr="true">#label_Net{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
+        </property>
+        <property name="text">
+         <string>网络良好</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>25</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_Debug">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+#checkBox_Debug{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: rgb(255, 0, 0);
+}</string>
+        </property>
+        <property name="text">
+         <string>调试</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

@@ -67,7 +67,7 @@
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;widgets;</QtModules>
+    <QtModules>core;network;gui;axcontainer;widgets;</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
@@ -212,8 +212,12 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
     <ClCompile Include="..\utility\json\cJSON.c" />
     <ClCompile Include="..\utility\json\CJsonObject.cpp" />
+    <ClCompile Include="administer.cpp" />
+    <ClCompile Include="aes.cpp" />
+    <ClCompile Include="aestools.cpp" />
     <ClCompile Include="CheckPassword.cpp" />
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
@@ -221,13 +225,12 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
-    <ClCompile Include="QtSingleton\qtlocalpeer.cpp" />
-    <ClCompile Include="QtSingleton\qtsingleapplication.cpp" />
     <ClCompile Include="showlicense.cpp" />
     <ClCompile Include="Sys_DeviceManager.cpp" />
     <ClCompile Include="Sys_cardmanger.cpp" />
     <ClCompile Include="Sys_dialogcameratest.cpp" />
     <ClCompile Include="Sys_dialogidcardinfo.cpp" />
+    <ClCompile Include="sys_dialogreadidcard.cpp" />
     <ClCompile Include="Sys_logmanager.cpp" />
     <ClCompile Include="sys_manualmakecard.cpp" />
     <ClCompile Include="Sys_otheroptions.cpp" />
@@ -248,6 +251,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="uc_adforfinance.cpp" />
     <ClCompile Include="uc_ensureinformation.cpp" />
     <ClCompile Include="uc_facecapture.cpp" />
+    <ClCompile Include="uc_facecapture_ocx.cpp" />
     <ClCompile Include="uc_inputmobile.cpp" />
     <ClCompile Include="uc_makecard.cpp" />
     <ClCompile Include="uc_pay.cpp" />
@@ -261,16 +265,20 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\SDK\dvtldcamocx\dvtldcamocxlib.h" />
     <ClInclude Include="..\utility\AutoLock.h" />
     <QtMoc Include="showlicense.h" />
     <QtMoc Include="newcard.h" />
     <ClInclude Include="..\utility\json\cJSON.h" />
     <ClInclude Include="..\utility\json\CJsonObject.hpp" />
-    <QtMoc Include="QtSingleton\qtlocalpeer.h" />
-    <QtMoc Include="QtSingleton\qtsingleapplication.h" />
+    <QtMoc Include="administer.h" />
+    <ClInclude Include="aes.h" />
+    <ClInclude Include="aestools.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="sys_manualmakecard.h" />
     <QtMoc Include="waitingprogress.h" />
+    <QtMoc Include="uc_facecapture_ocx.h" />
+    <QtMoc Include="sys_dialogreadidcard.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -367,6 +375,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <None Include="SSCardSystem_zh_CN.ts" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="administer.ui" />
     <QtUic Include="CheckPassword.ui">
     </QtUic>
     <QtUic Include="MaskWidget.ui">
@@ -383,6 +392,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="Sys_dialogidcardinfo.ui">
     </QtUic>
+    <QtUic Include="sys_dialogreadidcard.ui" />
     <QtUic Include="Sys_logmanager.ui">
     </QtUic>
     <QtUic Include="sys_manualmakecard.ui" />
@@ -407,6 +417,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="uc_facecapture.ui">
     </QtUic>
+    <QtUic Include="uc_facecapture_ocx.ui" />
     <QtUic Include="uc_inputmobile.ui">
     </QtUic>
     <QtUic Include="uc_makecard.ui">

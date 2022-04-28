@@ -18,6 +18,10 @@
         <file>Image/exclamation.png</file>
         <file>Image/failed.png</file>
         <file>Image/Success.png</file>
+        <file>Image/network-connected.png</file>
+        <file>Image/network-disconnected.png</file>
+        <file>Image/RadioCheck.png</file>
+        <file>Image/RadioUnChecked.png</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

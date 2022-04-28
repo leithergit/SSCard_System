@@ -37,6 +37,7 @@ SOURCES += \
     Sys_regionconfigure.cpp \
     SystemManager.cpp \
     WMIQuery.cpp \
+    administer.cpp \
     imageviewlabel.cpp \
     license.cpp \
     main.cpp \
@@ -50,6 +51,7 @@ SOURCES += \
     qwidgetreadidcard.cpp \
     registerlost.cpp \
     showlicense.cpp \
+    sys_dialogreadidcard.cpp \
     sys_manualmakecard.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
@@ -86,6 +88,7 @@ HEADERS += \
     Sys_regionconfigure.h \
     SystemManager.h \
     WMIQuery.h \
+    administer.h \
     imageviewlabel.h \
     license.h \
     mainpage.h \
@@ -172,6 +175,7 @@ HEADERS += \
     qwidgetreadidcard.h \
     registerlost.h \
     showlicense.h \
+    sys_dialogreadidcard.h \
     sys_manualmakecard.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
@@ -206,11 +210,13 @@ FORMS += \
     Sys_qwidgetreadidcard.ui \
     Sys_regionconfigure.ui \
     SystemManager.ui \
+    administer.ui \
     license.ui \
     mainpage.ui \
     mainwindow.ui \
     registerlost.ui \
     showlicense.ui \
+    sys_dialogreadidcard.ui \
     sys_manualmakecard.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \

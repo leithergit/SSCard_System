@@ -58,14 +58,11 @@
     <Filter Include="SSCardService">
       <UniqueIdentifier>{f059f0b0-1b47-42ae-ad3d-63359f81c3e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{f146918b-b784-4282-ad84-2904008ef1b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="json">
       <UniqueIdentifier>{fb4a6581-74aa-4db0-8779-fd671b47cede}</UniqueIdentifier>
     </Filter>
-    <Filter Include="qtsingleton">
-      <UniqueIdentifier>{9557cd4f-5f36-4cf0-b432-f8197e0921a6}</UniqueIdentifier>
+    <Filter Include="Page">
+      <UniqueIdentifier>{f146918b-b784-4282-ad84-2904008ef1b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -154,43 +151,43 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="uc_ensureinformation.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="uc_adforfinance.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="uc_facecapture.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="uc_inputmobile.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="uc_makecard.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="uc_pay.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="uc_readidcard.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="up_changepwd.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="up_Inputpwd.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="up_readsscard.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="updatecard.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="updatepassword.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="registerlost.cpp">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </ClCompile>
     <ClCompile Include="..\utility\json\cJSON.c">
       <Filter>json</Filter>
@@ -201,13 +198,25 @@
     <ClCompile Include="sys_manualmakecard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QtSingleton\qtlocalpeer.cpp">
-      <Filter>qtsingleton</Filter>
+    <ClCompile Include="uc_facecapture_ocx.cpp">
+      <Filter>Page</Filter>
     </ClCompile>
-    <ClCompile Include="QtSingleton\qtsingleapplication.cpp">
-      <Filter>qtsingleton</Filter>
+    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp">
+      <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="waitingprogress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="administer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sys_dialogreadidcard.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aes.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aestools.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -302,7 +311,16 @@
     <ClInclude Include="..\utility\json\CJsonObject.hpp">
       <Filter>json</Filter>
     </ClInclude>
+    <ClInclude Include="..\SDK\dvtldcamocx\dvtldcamocxlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aes.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aestools.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -417,6 +435,15 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="waitingprogress.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="administer.ui">
+      <Filter>Source Files</Filter>
+    </QtUic>
+    <QtUic Include="sys_dialogreadidcard.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="uc_facecapture_ocx.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -577,54 +604,57 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="uc_adforfinance.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_ensureinformation.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_facecapture.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_inputmobile.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_makecard.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_pay.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_readidcard.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="up_changepwd.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="up_Inputpwd.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="up_readsscard.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="updatecard.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="updatepassword.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="registerlost.h">
-      <Filter>UI</Filter>
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="sys_manualmakecard.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="QtSingleton\qtlocalpeer.h">
-      <Filter>qtsingleton</Filter>
-    </QtMoc>
-    <QtMoc Include="QtSingleton\qtsingleapplication.h">
-      <Filter>qtsingleton</Filter>
+    <QtMoc Include="uc_facecapture_ocx.h">
+      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="waitingprogress.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="administer.h">
+      <Filter>Source Files</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_dialogreadidcard.h">
       <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>

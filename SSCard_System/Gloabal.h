@@ -131,12 +131,19 @@ enum class Manager_Level
 	Manager = 1,
 };
 
+enum class CameraDriver
+{
+	Driver_OCX = 0,
+	Driver_DLL = 1
+};
+
 #define gInfo()      LOG(INFO)
 #define gError()     LOG(ERROR)
 #define gWarning()   LOG(WARNING)
 #define Str(x)       #x
 #define gVal(p)      #p<<" = "<<p <<"\t"
 #define gQStr(p)	 #p<<" = "<<p.toLocal8Bit().data()<<"\t"
+#define GBKStr(x)	 QString(x).toLocal8Bit().data()
 struct DeviceConfig
 {
 	DeviceConfig(QSettings* pSettings)
@@ -234,6 +241,7 @@ struct DeviceConfig
 		strTerminalCode = pSettings->value("TerminalCode", "").toString().toStdString();
 
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
+		nCameraDrv = (CameraDriver)pSettings->value("CameraDriver", 1).toInt();
 
 		// 		Info() << "Device Cofnigure:\n";
 		// 		Info() << "\t\Printer:" << strPrinter;
@@ -371,13 +379,9 @@ struct DeviceConfig
 	string		strPinBroadBaudrate;				   // 9600
 
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
-
-	string		strTerminalCode;					   // 终端唯一识别码
+	string		strTerminalCode;					   // 终端唯一识别码	
+	CameraDriver nCameraDrv = CameraDriver::Driver_DLL;
 public:
-
-private:
-
-
 };
 
 struct RegionInfo
@@ -674,6 +678,7 @@ struct SysConfig
 		pSettings->setValue("logServerPort", nLogServerPort);            // 日志服务器端口
 		pSettings->setValue("logSavePeroid", nLogSavePeroid);            // 日志保存天数
 		pSettings->setValue("EnableDebug", bDebug);
+		pSettings->setValue("SkipPay", bDebug);
 		pSettings->endGroup();
 	}
 
@@ -688,7 +693,9 @@ struct SysConfig
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
+		nSkipPayTime = pSettings->value("SkipPayTime", 0).toInt();
 		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
+		nNetTimeout = pSettings->value("NetTimeout", 1500).toInt();
 
 		bUpoadlog = pSettings->value("logUpload", false).toBool();;
 		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
@@ -768,7 +775,9 @@ struct SysConfig
 	int             nLogSavePeroid = 30;                // 日志保存天数
 	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
 	bool			bDebug = false;
+	bool			nSkipPayTime = false;
 	bool			bTestCard = false;
+	int				nNetTimeout = 1500;
 	std::map<string, string> strMapBank;
 };
 
@@ -892,7 +901,9 @@ public:
 	string		   strCardMakeProgress;
 	string		   strPayCode;
 	bool		   bDebug;
+	int			   nSkipPayTime = 0;
 	bool		   bTestCard = false;
+	int				nNetTimeout = 1500;
 public:
 	bool m_bDetectStarted = false;
 	bool m_bVideoStarted = false;
@@ -928,7 +939,9 @@ public:
 
 	bool Snapshot(string strFilePath);
 public:
-	int OpenDevice(QString& strMessage);
+	int  ReaderIDCard(IDCardInfo* pIDCard);
+
+	int  OpenDevice(QString& strMessage);
 
 	int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
@@ -954,9 +967,22 @@ public:
 
 	int WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 
+	int	SafeWriteCard(QString& strMessage);
+
 	int ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 
 	int MoveCard(QString& strMessage);
+
+	int CheckBankCode(string& strBankName, QString& strMessage)
+	{
+		if (QFailed(GetBankName(GetSysConfigure()->Region.strBankCode, strBankName)))
+		{
+			strMessage = "银行代码配置有误或未配置银行代码!";
+			return 1;
+		}
+
+		return 0;
+	}
 
 	KT_Reader* GetSSCardReader()
 	{
@@ -965,6 +991,27 @@ public:
 	KT_Printer* GetPrinter()
 	{
 		return m_pPrinter;
+	}
+	bool LoadAdminConfigure();
+
+	vector<IDCardInfoPtr>& GetAdminConfigure()
+	{
+		return vecAdminister;
+	}
+	bool IsAdmin(char* szIdentify)
+	{
+		if (!vecAdminister.size())
+			return false;
+
+		auto var = find_if(vecAdminister.begin(), vecAdminister.end(), [szIdentify](IDCardInfoPtr pItem)
+			{
+				return strcmp((char*)pItem->szIdentity, szIdentify) == 0;
+			});
+
+		if (var != vecAdminister.end())
+			return true;
+		else
+			return false;
 	}
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
@@ -975,48 +1022,12 @@ private:
 	KT_ReaderLibPtr	m_pSSCardReaderLib = nullptr;
 	KT_Printer* m_pPrinter = nullptr;
 	KT_Reader* m_pSSCardReader = nullptr;
+	vector<IDCardInfoPtr> vecAdminister;
 	Manager_Level	nManagerLevel = Manager_Level::Manager;
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
-bool SendHttpRequest(string szUrl, string& strRespond, string& strMessage);
-
-struct HttpBuffer
-{
-	unsigned int nDataLength;
-	unsigned int nBufferSize;
-	FILE* fp;;
-	byte* pBuffer;
-	HttpBuffer(int nBufferSize = 8 * 1024, char* szFileName = nullptr)
-	{
-		ZeroMemory(this, sizeof(HttpBuffer));
-		pBuffer = new (std::nothrow) byte[nBufferSize];
-		if (pBuffer)
-		{
-			ZeroMemory(pBuffer, nBufferSize);
-			this->nBufferSize = nBufferSize;
-		}
-
-		if (szFileName)
-			fp = fopen(szFileName, "wb");
-	}
-	~HttpBuffer()
-	{
-		if (fp)
-		{
-			fflush(fp);
-			fclose(fp);
-			fp = nullptr;
-		}
-
-		if (pBuffer)
-		{
-			delete[]pBuffer;
-			pBuffer = nullptr;
-		}
-	}
-};
 
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
 
@@ -1036,5 +1047,7 @@ void SetTableWidgetItemChecked(QTableWidget* pTableWidget, int nRow, int nCol, Q
 
 QStringList SearchFiles(const QString& dir_path, QDateTime* pStart = nullptr, QDateTime* pStop = nullptr);
 #define WaitCursor()  QWaitCursor qWait;
+
+extern const char* szAesKey;
 
 #endif // GLOABAL_H

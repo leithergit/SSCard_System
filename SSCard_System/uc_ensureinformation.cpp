@@ -93,10 +93,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 
 		strcpy((char*)pSSCardInfo->strBankCode, pTempSSCardInfo->strBankCode);
-
 		ui->label_Hello->setText(QString("您好，%1").arg(QString::fromLocal8Bit(pSSCardInfo->strName)));
 		ui->label_SSCard->setText(QString("社保卡号:%1").arg(pSSCardInfo->strCardNum));
-
 		string strBankName;
 		if (QFailed(g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName)))
 		{
@@ -186,9 +184,14 @@ int	 uc_EnsureInformation::QuerySSCardStatus(QString& strMessage, SSCardInfoPtr&
 	// 这里需要旧卡号
 	if (QFailed(nResult = queryCardStatus(*pSSCardInfo, reinterpret_cast<char*>(szStatus))))
 	{
-		QString strInfo = QString("queryCardStatus失败:%1,CardID = %2\tName = %3\t").arg(nResult).arg(reinterpret_cast<char*>(pSSCardInfo->strCardID)).arg(reinterpret_cast<char*>(pSSCardInfo->strName));
-		gError() << gQStr(strInfo);
-		strMessage = QString("查询卡状态失败!");
+		FailureMessage("查询卡状态", pSSCardInfo, szStatus, strMessage);
+		/*if (strcmp((const char*)szStatus, "08") == 0)
+		{
+			strMessage = QString("查询卡状态失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\t卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+		}
+		else
+			strMessage = QString("查询卡状态失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);*/
+		gError() << gQStr(strMessage);
 		return -1;
 	}
 
@@ -198,6 +201,7 @@ int	 uc_EnsureInformation::QuerySSCardStatus(QString& strMessage, SSCardInfoPtr&
 	}
 	else
 	{
+
 		QString strStatus = QString::fromLocal8Bit((char*)szStatus);
 		strcpy(pSSCardInfo->strCardStatus, (char*)strStatus.toStdString().c_str());
 	}
@@ -211,9 +215,13 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCa
 	char szStatus[1024] = { 0 };
 	if (QFailed(nResult = queryPersonInfo(*pSSCardInfo, szStatus)))
 	{
-		QString strInfo = QString("queryPersonInfo失败:%1,CardID = %2\tName = %3\t").arg(nResult).arg((char*)pSSCardInfo->strCardID).arg((char*)pSSCardInfo->strName);
-		gError() << gQStr(strInfo);
-		strMessage = QString("查询社保卡信息失败!");
+		FailureMessage("查询人员信息", pSSCardInfo, szStatus, strMessage);
+		/*if (strcmp(szStatus, "08") == 0)
+			strMessage = QString("失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\1卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+		else
+			strMessage = QString("查询人员信息失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardNum);*/
+
+		gError() << gQStr(strMessage);
 		return -1;
 	}
 	char szDigit[16] = { 0 }, szText[1024] = { 0 };
@@ -229,16 +237,19 @@ int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCa
 		return -1;
 }
 
-
 int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
 	char szStatus[1024] = { 0 };
 	int nResult = 0;
 	if (QFailed(nResult = reportLostCard(*pSSCardInfo, szStatus)))
 	{
-		QString strInfo = QString("reportLostCard失败:%1,Name = %2\tCardID = %3").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
-		gError() << gQStr(strInfo);
-		strMessage = QString("挂失失败!");
+		FailureMessage("挂失失败", pSSCardInfo, szStatus, strMessage);
+		nStatus = strtol(szStatus, nullptr, 0);
+		/*if (strcmp(szStatus, "08") == 0)
+			strMessage = QString("挂失失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\1卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+		else
+			strMessage = QString("挂失失败:失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardNum);*/
+		gError() << gQStr(strMessage);
 		return -1;
 	}
 
@@ -263,9 +274,11 @@ int uc_EnsureInformation::UnRegisterLost(QString& strMessage, int& nStatus, SSCa
 	int nResult = 0;
 	if (QFailed(nResult = cancelLostCard(*pSSCardInfo, szStatus)))
 	{
-		QString strInfo = QString("cancelLostCard失败:%1,Name = %2\tCardID = %3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
-		gError() << gQStr(strInfo);
-		strMessage = QString("解除挂失败!");
+		FailureMessage("解除挂失", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
+		//QString strInfo = QString("cancelLostCard失败:%1,Name = %2\tCardID = %3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardID);
+		//gError() << gQStr(strInfo);
+
 		return -1;
 	}
 
@@ -295,7 +308,32 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 		if (QFailed(RegisterLost(strError, nStatus, pSSCardInfo)))
 		{
 			gError() << gQStr(strError);
-			emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
+			// 即使失败，也作二次确认，防止后台系统抽风，成功也返回错误
+			bool bSucceed = false;
+			QString strMessage;
+			do
+			{
+				if (nStatus == 8)	// 网络错误，直接返回
+					break;
+
+				if (QFailed(QuerySSCardStatus(strMessage, pSSCardInfo)))
+				{
+					strError += "二次确认卡状态时再次失败!";
+					gError() << gQStr(strError);
+					break;
+				}
+				QString strCardStatus = pSSCardInfo->strCardStatus;
+				if (strCardStatus == "正式挂失")
+				{
+					strError = "社保卡挂失成功,稍后请输入常用手机号码!";
+					gInfo() << gQStr(strError);
+					bSucceed = true;
+					emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
+				}
+
+			} while (0);
+			if (!bSucceed)
+				emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
 			return;
 		}
 		else

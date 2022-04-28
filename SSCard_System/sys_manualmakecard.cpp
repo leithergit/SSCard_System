@@ -481,7 +481,6 @@ void Sys_ManualMakeCard::PrintPhoto()
 	int nResult = -1;
 	QString strMessage;
 
-	int nStatus = 0;
 	QString strInfo;
 	SSCardInfoPtr pSSCardInfo;
 	char szRCode[128] = { 0 };
@@ -531,6 +530,7 @@ void Sys_ManualMakeCard::PrintPhoto()
 	else
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), "打印成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
+
 void Sys_ManualMakeCard::EnableCard()
 {
 	int nResult = -1;

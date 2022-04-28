@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QSettings>
 #include <QMessageBox>
+#include <QDebug>
 #include "../utility/Utility.h"
 
 extern "C"
@@ -201,7 +202,7 @@ void Register::on_ButtonExport_clicked()
 	License.endGroup();
 }
 
-void Register::on_ButtonImportMachineCode_clicked()
+bool Register::ImportLicene(QString& strMachineCode, QString& strLicense, QString& strMessage)
 {
 	QString selectedFilter;
 	strLicenseFile = QFileDialog::getOpenFileName(this,
@@ -212,31 +213,59 @@ void Register::on_ButtonImportMachineCode_clicked()
 
 	if (strLicenseFile.isEmpty())
 	{
-		return;
+		return false;
 	}
 
 	QSettings License(strLicenseFile, QSettings::IniFormat);
 	License.beginGroup("License");
-	QString strMachineCode = License.value("MachineCode", "").toString();
+	strMachineCode = License.value("MachineCode", "").toString();
 	if (strMachineCode.size() != 64)
 	{
-		QMessageBox::information(nullptr, "提示", "授权文件的机器码无效,必须为64字节的16进制字符串", QMessageBox::Ok);
+		strMessage = "所选文件中没有机器码或机器码无效!";
+		return false;
+	}
+	strLicense = License.value("RegisterCode", "").toString();
+	qDebug() << "MachineCode = " << strMachineCode;
+	qDebug() << "License = " << strLicense;
+	License.endGroup();
+	return true;
+}
+
+void Register::on_ButtonImportMachineCode_clicked()
+{
+	QString strMachineCode;
+	QString strLicense;
+	QString strMessage;
+	if (!ImportLicene(strMachineCode, strLicense, strMessage))
+	{
+		QMessageBox::information(nullptr, "提示", strMessage, QMessageBox::Ok);
 		return;
 	}
 	ui->lineEdit_HardwareCode->setText(strMachineCode);
-	License.endGroup();
 }
 
 void Register::on_ButtonCheckLicense_clicked()
 {
+	QString strHardwareCode;
+	QString strLicenseCode;
+	QString strMessage;
+	if (!ImportLicene(strHardwareCode, strLicenseCode, strMessage))
+	{
+		QMessageBox::information(nullptr, "提示", strMessage, QMessageBox::Ok);
+		return;
+	}
+	if (strLicenseCode.size() != 256)
+	{
+		QMessageBox::information(nullptr, "提示", "选定的文件中没有授权信息或授权信息无效！", QMessageBox::Ok);
+		return;
+	}
+	ui->lineEdit_HardwareCode->setText(strHardwareCode);
+	ui->textEdit_Registercode->setText(strLicenseCode);
 	char szHardwareCodeText[128] = { 0 };
-	QString strHardwareCode = ui->lineEdit_HardwareCode->text();
 	strcpy_s(szHardwareCodeText, 128, strHardwareCode.toStdString().c_str());
 
 	unsigned char szHardCodeBinary[128] = { 0 };
 	AscString2HexA(strHardwareCode.toStdString().c_str(), strHardwareCode.size(), szHardCodeBinary, 128, '\0');
-
-	QString strLicenseCode = ui->textEdit_Registercode->toPlainText();
 
 	char szLicenseCodeA[512];
 	strcpy(szLicenseCodeA, strLicenseCode.toStdString().c_str());

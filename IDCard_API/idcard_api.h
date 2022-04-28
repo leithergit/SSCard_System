@@ -103,7 +103,7 @@ struct IDCardInfo
 	unsigned char     szNationCode[20];       // 民族代码
 	unsigned char     szBirthday[24];         // 出生
 	unsigned char     szAddress[80];          // 户籍
-	unsigned char     szIdentify[36];         // 身份证号
+	unsigned char     szIdentity[36];         // 身份证号
 	unsigned char     szIszssueAuthority[32]; // 发证机关
 	unsigned char     szExpirationDate1[16];  // 有效期起始日
 	unsigned char     szExpirationDate2[16];  // 有效期结束日

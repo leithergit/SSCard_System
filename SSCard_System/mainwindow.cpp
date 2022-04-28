@@ -6,10 +6,115 @@
 #include <QMessageBox>
 #include <QPaintEngine>
 #include <QPainter>
+#include "../update/Update.h"
 #include "SystemManager.h"
 #include "qmainstackpage.h"
 #include "CheckPassword.h"
 MaskWidget* g_pMaskWindow = nullptr;
+
+
+int TestHost(string strIP, USHORT nPort, int nNetTimeout)
+{
+	bool bConnected = true;
+	SOCKET s = INVALID_SOCKET;
+	do
+	{
+		s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (s == INVALID_SOCKET)
+		{
+			bConnected = false;
+			break;
+		}
+
+		//设置socket 选项
+		//1.允许优雅关闭socket
+		linger sLinger;
+		sLinger.l_onoff = 1;	//(在closesocket()调用,但是还有数据没发送完毕的时候容许逗留)
+		// 如果m_sLinger.l_onoff = 0;则功能和2.)作用相同;
+		sLinger.l_linger = 2;//(容许逗留的时间为5秒)
+		if (setsockopt(s, SOL_SOCKET, SO_LINGER, (const char*)&sLinger, sizeof(linger)) == SOCKET_ERROR)
+		{
+			bConnected = false;
+			break;
+		}
+
+		//2.设置收发超时时限
+		//int nNetTimeout = 500;//500毫秒
+		//发送时限
+		if (setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, (char*)&nNetTimeout, sizeof(int)) == SOCKET_ERROR)
+		{
+			bConnected = false;
+			break;
+		}
+
+		//接收时限
+		if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char*)&nNetTimeout, sizeof(int)) == SOCKET_ERROR)
+		{
+			bConnected = false;
+			break;
+		}
+
+		//3.设置数据收发的缓冲区
+		//在send()的时候,返回的是实际发送出去的字节(同步)或发送到socket缓冲区的字节
+		//(异步);系统默认的状态发送和接收一次为8688字节(约为8.5K)；在实际的过程中发送数据
+		//和接收数据量比较大,可以设置socket缓冲区,而避免了send(),recv()不断的循环收发：
+		//接收缓冲区
+		int nRecvBuf = 1024;//设置为1024 byte
+		if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (const char*)&nRecvBuf, sizeof(int)) == SOCKET_ERROR)
+		{
+			bConnected = false;
+			break;
+		}
+
+		// 设置为非阻塞模式
+		unsigned long nBlockMode = 1;
+		if (ioctlsocket(s, FIONBIO, (unsigned long*)&nBlockMode) == SOCKET_ERROR)
+		{
+			bConnected = false;
+			break;
+		}
+
+		sockaddr_in ServerAddr;
+		ServerAddr.sin_family = AF_INET;
+		ServerAddr.sin_port = htons(nPort);
+		ServerAddr.sin_addr.S_un.S_addr = inet_addr(strIP.c_str());
+		//InetPton(AF_INET, strIP.c_str(), &ServerAddr.sin_addr);
+		if (connect(s, (sockaddr*)&ServerAddr, sizeof(ServerAddr)) == SOCKET_ERROR &&
+			GetLastError() != WSAEWOULDBLOCK)
+		{  //连接失败
+			bConnected = false;
+			break;
+		}
+		struct timeval timeout;
+		fd_set FDConnect;
+
+		FD_ZERO(&FDConnect);
+		FD_SET(s, &FDConnect);
+		timeout.tv_sec = nNetTimeout / 1000;
+		timeout.tv_usec = (nNetTimeout % 1000) * 1000;	//连接超时200 ms,tv_usec的时间单位是微秒
+		int nRes = select(0, 0, &FDConnect, 0, &timeout);
+		if (!nRes ||
+			SOCKET_ERROR == nRes)
+		{
+			bConnected = false;
+			break;
+		}
+		// 重新设置为阻塞模式
+		nBlockMode = 0;
+		if (ioctlsocket(s, FIONBIO, (unsigned long*)&nBlockMode) == SOCKET_ERROR)
+		{
+			bConnected = false;
+			break;
+		}
+	} while (0);
+	if (bConnected)
+	{
+		closesocket(s);
+		return true;
+	}
+	else
+		return false;
+}
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -76,13 +181,39 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
 	bThreadUploadlogRunning = true;
 	ThreadUploadlog = std::thread(&MainWindow::fnThreadUploadlog, this);
+
+	m_nTimerTestHost = startTimer(5000);
+	QString strMessage;
+	string strBankName;
+	if (QFailed(g_pDataCenter->CheckBankCode(strBankName, strMessage)))
+	{
+		strMessage = "银行代码配置有误或未配置银行代码!";
+		QMessageBox_CN(QMessageBox::Critical, "严重错误", strMessage, QMessageBox::Ok, this);
+	}
+
+	QString strAppPath = QApplication::applicationFilePath();
+	short nMajorVer = 0, nMinorVer = 0, nBuildNum = 0, nRevsion = 0;
+	if (GetModuleVersion(QApplication::applicationFilePath().toStdString(), nMajorVer, nMinorVer, nBuildNum, nRevsion))
+	{
+		QString strVersion = QString("当前版本:%1.%2.%3.%4").arg(nMajorVer).arg(nMinorVer).arg(nBuildNum).arg(nRevsion);
+		ui->label_Version->setText(strVersion);
+	}
 }
 
 void MainWindow::On_LoadSystemManager()
 {
+	SystemTool& sysTool = SystemTool::Instance();
+	sysTool.OpenScreenKeyboard();
 	CheckPassword checkpwd;
 	if (checkpwd.exec() == QDialog::Accepted)
 	{
+		QWaitCursor Wait;
+		if (pThreadAsync)
+		{
+			pThreadAsync->join();
+			delete pThreadAsync;
+			pThreadAsync = nullptr;
+		}
 		SystemManager d(this);
 		d.setGeometry(g_pCurScreen->geometry());
 		d.exec();
@@ -133,6 +264,7 @@ int MainWindow::LoadConfigure(QString& strError)
 {
 	if (g_pDataCenter)
 	{
+		g_pDataCenter->LoadAdminConfigure();
 		QString strError;
 		int nRes = 0;
 		nRes = g_pDataCenter->LoadSysConfigure(strError);
@@ -152,6 +284,13 @@ int MainWindow::LoadConfigure(QString& strError)
 
 void MainWindow::on_pushButton_NewCard_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -188,6 +327,14 @@ void MainWindow::on_pushButton_NewCard_clicked()
 
 void MainWindow::on_pushButton_Updatecard_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
+
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -202,6 +349,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	}
 
 	QString strMessage;
+	m_pUpdateCard->ResetAllPages();
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
@@ -221,15 +369,21 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		return;
 	}
 
-
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
-	m_pUpdateCard->ResetAllPages();
+
 	m_pUpdateCard->show();
 	pLastStackPage = m_pUpdateCard;
 }
 
 void MainWindow::on_pushButton_ChangePWD_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -251,6 +405,13 @@ void MainWindow::on_pushButton_ChangePWD_clicked()
 
 void MainWindow::on_pushButton_RegisterLost_clicked()
 {
+	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -273,6 +434,19 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 void MainWindow::on_pushButton_MainPage_clicked()
 {
 	gInfo() << "Return mainPage!";
+
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+	}
+	pThreadAsync = new std::thread([]() {
+		char szRCode[128] = { 0 };
+		if (g_pDataCenter->GetPrinter())
+			g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+		g_pDataCenter->CloseDevice();
+		});
+
 	// 回到主页时需清空所有身份数据
 	if (pLastStackPage)
 	{
@@ -306,6 +480,12 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 		m_pMaskWindow->move(ptLeftTop);
 	}
 
+	if (nPageOperation == Return_MainPage)
+	{
+		char szRCode[128] = { 0 };
+		if (g_pDataCenter->GetPrinter())
+			g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+	}
 	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 	connect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetTimeout);
 
@@ -395,6 +575,54 @@ void MainWindow::timerEvent(QTimerEvent* event)
 		QDateTime   tNow = QDateTime::currentDateTime();
 		ui->label_DateTime->setText(tNow.toString("yyyy-MM-dd HH:mm:ss"));
 	}
+	else if (event->timerId() == m_nTimerTestHost)
+	{
+		RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
+		QString strUrl = region.strEMURL.c_str();
+		QStringList  strField = strUrl.split(':');
+		if (strField.size())
+		{
+			QString strIP = strField[1].mid(2);
+			USHORT  nPort = (USHORT)strField[2].toShort();
+			if (TestHost(strIP.toStdString(), nPort, g_pDataCenter->nNetTimeout))
+			{// 连续成功
+				m_nNetworkFailedCount = 0;
+				if (m_nTimerNetWarning)
+				{
+					killTimer(m_nTimerNetWarning);
+					m_nTimerNetWarning = 0;
+					bDisconnect = false;
+					ui->label_Net->setText("网络良好");
+					ui->label_NetWarning->setStyleSheet("border-image:url(:/Image/network-connected.png);");
+				}
+			}
+			else
+			{// 连接失败
+				m_nNetworkFailedCount++;
+				if (m_nNetworkFailedCount >= 3)
+				{
+					m_nTimerNetWarning = startTimer(400);
+					bDisconnect = true;
+					ui->label_Net->setText("网络异常");
+					ui->label_NetWarning->setStyleSheet("border-image:url(:/Image/network-disconnected.png);");
+				}
+			}
+		}
+	}
+	else if (event->timerId() == m_nTimerNetWarning)
+	{
+		QString strQSS = "border-image:url(:/Image/network-disconnected.png);";
+		if (bDisconnect)
+		{
+			bDisconnect = false;
+		}
+		else
+		{
+			strQSS = "";
+			bDisconnect = true;
+		}
+		ui->label_NetWarning->setStyleSheet(strQSS);
+	}
 }
 void MainWindow::closeEvent(QCloseEvent* event)
 {
@@ -416,6 +644,52 @@ void MainWindow::fnThreadUploadlog()
 	while (bThreadUploadlogRunning)
 	{
 #pragma Warning("日志上传功能尚未完成!")
+		this_thread::sleep_for(chrono::milliseconds(100));
+	}
+}
+
+void MainWindow::ThreadUpdateLauncher()
+{
+	auto tStart = chrono::high_resolution_clock::now();
+	while (bThreadUpdateLauncherRunning)
+	{
+		auto duration = duration_cast<chrono::seconds>(chrono::high_resolution_clock::now() - tStart);
+		if (duration.count() > 15)
+		{
+			string strMessage, strLocalVersion, strNewVersion, strFilePath;
+			do
+			{
+				if (QFailed(LoadUpgradeInfo(strMessage)))
+					break;
+
+				if (QFailed(GetLocalVersion("Launcher.exe", strLocalVersion, strMessage)))
+				{
+					gError() << "Failed in GetLocalVersion:" << strMessage;
+					break;
+				}
+				gInfo() << "Launcher.exe" << " Local Version" << strLocalVersion;
+				if (QFailed(CheckNewVersion(UpdateType::Launcher, strLocalVersion, strNewVersion, strMessage)))
+				{
+					gError() << "Failed in CheckNewVersion" << strMessage;
+					break;
+				}
+				gInfo() << "Launcher.exe" << " Remote Version" << strNewVersion;
+				if (QFailed(DownloadNewVerion(UpdateType::Launcher, strNewVersion, strFilePath, strMessage)))
+				{
+					gError() << "Failed in DownloadNewVerion" << strMessage;
+					break;
+				}
+				gInfo() << "Try to BackupOldVersion";
+				BackupOldVersion(UpdateType::Launcher, strFilePath);
+				if (QFailed(InstallNewVersion(strFilePath, strMessage)))
+				{
+					gError() << "Failed in InstallNewVersion" << strMessage;
+					break;
+				}
+
+			} while (true);
+			tStart = chrono::high_resolution_clock::now();
+		}
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 }

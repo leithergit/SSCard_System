@@ -19,6 +19,7 @@ uc_Pay::uc_Pay(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget*
 	ui(new Ui::Pay)
 {
 	ui->setupUi(this);
+	connect(this, &uc_Pay::SkipPay, this, &uc_Pay::On_SkipPay, Qt::QueuedConnection);
 }
 
 uc_Pay::~uc_Pay()
@@ -42,7 +43,7 @@ int uc_Pay::ProcessBussiness()
 	// 获取二维码，并生成图像
 	QImage QRImage;
 	QString strTitle;
-
+	bSkipPay = false;
 	if (QFailed(QueryPayment(strMessage, m_nPayStatus)))
 	{
 		gError() << gQStr(strMessage);
@@ -92,6 +93,14 @@ int uc_Pay::ProcessBussiness()
 	}
 	}
 
+	if (g_pDataCenter->GetAdminConfigure().size())
+	{
+		if (!m_pWorkThread)
+		{
+			bThreadReadIDCard = true;
+			pThreadReadIDCard = new std::thread(&uc_Pay::ThreadReadIDCard, this);
+		}
+	}
 	if (!m_pWorkThread)
 	{
 		m_bWorkThreadRunning = true;
@@ -150,6 +159,57 @@ bool Delay(bool& bFlag, int nDelay, int nStep = 100)
 	return bFlag;
 }
 
+void uc_Pay::On_SkipPay()
+{
+	bThreadReadIDCard = false;
+	bSkipPay = true;
+	if (pThreadReadIDCard && pThreadReadIDCard->joinable())
+	{
+		pThreadReadIDCard->join();
+		delete pThreadReadIDCard;
+		pThreadReadIDCard = nullptr;
+	}
+	ShutDown();
+	QString strMessage = "跳过费用支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
+	emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
+}
+
+void uc_Pay::ThreadReadIDCard()
+{
+	auto tLast = high_resolution_clock::now();
+	QString strError;
+	IDCardInfo* pIDCard = new IDCardInfo();
+	while (bThreadReadIDCard)
+	{
+		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
+		if (tDuration.count() >= 1000)
+		{
+			tLast = high_resolution_clock::now();
+			int nResult = g_pDataCenter->ReaderIDCard(pIDCard);
+			if (nResult == IDCard_Status::IDCard_Succeed)
+			{
+				if (!g_pDataCenter->IsAdmin((char*)pIDCard->szIdentity))
+					continue;
+				gInfo() << GBKStr("管理员:") << pIDCard->szName << " 刷卡身份跳过付费!";
+				emit SkipPay();
+				break;
+			}
+			else
+			{
+				char szText[256] = { 0 };
+				GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
+				strError = QString("读取身份证失败:%1").arg(szText);
+			}
+		}
+		else
+		{
+			this_thread::sleep_for(chrono::milliseconds(200));
+		}
+	}
+	if (pIDCard)
+		delete pIDCard;
+}
+
 void uc_Pay::ThreadWork()
 {
 	auto tLast = high_resolution_clock::now();
@@ -157,8 +217,8 @@ void uc_Pay::ThreadWork()
 	QString strMessage;
 	QString strPayUrl;
 	SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-	//int nDelay = pSysConfig->nPageTimeout[Page_Payment];
-	/*if (g_pDataCenter->bDebug)
+	/*int nDelay = 60; //pSysConfig->nPageTimeout[Page_Payment];
+	if (g_pDataCenter->bDebug)
 		nDelay = 20000;*/
 	auto tStart = high_resolution_clock::now();
 
@@ -173,13 +233,14 @@ void uc_Pay::ThreadWork()
 				break;
 			continue;
 		}
-		//		if (g_pDataCenter->bDebug)
-		//		{
-		//#pragma Warning("未支付也将流程继续进行，即作演示用!")
-		//			auto tDelay = duration_cast<milliseconds>(high_resolution_clock::now() - tStart);
-		//			if (tDelay.count() >= nDelay)
-		//				nPayResult = PayResult::PaySucceed;
-		//		}
+
+		if (g_pDataCenter->nSkipPayTime)
+		{
+#pragma Warning("未支付也将流程继续进行，即作演示用!")
+			auto tDelay = duration_cast<seconds>(high_resolution_clock::now() - tStart);
+			if (tDelay.count() >= g_pDataCenter->nSkipPayTime)
+				nPayResult = PayResult::PaySucceed;
+		}
 
 		if (nPayResult == PayResult::PaySucceed)
 			break;
@@ -188,6 +249,9 @@ void uc_Pay::ThreadWork()
 			break;
 	}
 
+	if (bSkipPay)
+		return;
+
 	if (QFailed(nResult))
 	{
 		emit ShowMaskWidget("操作失败", strMessage, Failed, Return_MainPage);
@@ -195,8 +259,22 @@ void uc_Pay::ThreadWork()
 	}
 	if (nPayResult == PayResult::PaySucceed)
 	{
-		strMessage = "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
-		emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
+		int nStatus = -1;
+		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+		if (QFailed(nResult))
+		{
+			emit ShowMaskWidget("操作失败", strMessage, Success, Return_MainPage);
+		}
+		else if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = QString("缴费登记失败:%1!").arg(nStatus);
+			emit ShowMaskWidget("操作成功", strMessage, Success, Return_MainPage);
+		}
+		else
+		{
+			strMessage = "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
+			emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
+		}
 	}
 	else
 	{

@@ -8,6 +8,7 @@ char* g_szPhotoBuffer = new char[PhotoBufferSize];
 
 #include "./SDK/QREncode/qrencode.h"
 #include "Gloabal.h"
+#include "../update/Update.h"
 
 
 bool TestDigit(char ch)
@@ -78,7 +79,8 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 	int nResult = queryPayment(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "查询付费状态失败";
+		FailureMessage("查询付费状态", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
 		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
 		gInfo() << gQStr(strInfo);
 		return -1;
@@ -153,48 +155,53 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& 
 	gInfo() << "Payment request url = " << strUrl.c_str();
 
 	string strRespond, strMessage1;
-	if (SendHttpRequest(strUrl, strRespond, strMessage1))
+	int nRetry = 0;
+	do
 	{
-		gInfo() << strRespond;
-		QString strRes = strRespond.c_str();
-		QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
-		QJsonParseError jsonParseError;
-		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes[5].toLatin1(), &jsonParseError));
-		if (QJsonParseError::NoError != jsonParseError.error)
+		if (SendHttpRequest("GET", strUrl, strRespond, strMessage1) == 0)
 		{
-			strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
-			gInfo() << gQStr(strMessage);
-			return -1;
+			gInfo() << strRespond;
+			QString strRes = strRespond.c_str();
+			//QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
+			QJsonParseError jsonParseError;
+			QJsonDocument jsonDocument(QJsonDocument::fromJson(strRes.toLatin1(), &jsonParseError));
+			if (QJsonParseError::NoError != jsonParseError.error)
+			{
+				strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
+				gInfo() << gQStr(strMessage);
+				return -1;
+			}
+			QJsonObject rootObject = jsonDocument.object();
+			if (!rootObject.keys().contains("msg") ||
+				!rootObject.keys().contains("code") ||
+				!rootObject.keys().contains("payCode"))
+			{
+				gInfo() << "There is no  No target value in the payment respond!";
+				return -1;
+			}
+			QJsonValue jsCode = rootObject.value("code");
+			QJsonValue jsMsg = rootObject.value("msg");
+			QJsonValue jsPayCode = rootObject.value("payCode");
+			int nCode = jsCode.toInt();
+			if (nCode != 0)
+			{
+				strMessage = QString("查询结果,code = %1").arg(nCode);
+				gInfo() << gQStr(strMessage);
+				return -1;
+			}
+			strPayCode = jsPayCode.toString();
+			strPaymentUrl = jsMsg.toString();
+			gInfo() << gQStr(strPaymentUrl);
+			return 0;
 		}
-		QJsonObject rootObject = jsonDocument.object();
-		if (!rootObject.keys().contains("msg") ||
-			!rootObject.keys().contains("code") ||
-			!rootObject.keys().contains("payCode"))
+		else
 		{
-			gInfo() << "There is no  No target value in the payment respond!";
-			return -1;
+			strMessage = strMessage1.c_str();
+			gError() << gQStr(strMessage);
+			nRetry++;
 		}
-		QJsonValue jsCode = rootObject.value("code");
-		QJsonValue jsMsg = rootObject.value("msg");
-		QJsonValue jsPayCode = rootObject.value("payCode");
-		int nCode = jsCode.toInt();
-		if (nCode != 0)
-		{
-			strMessage = QString("查询结果,code = %1").arg(nCode);
-			gInfo() << gQStr(strMessage);
-			return -1;
-		}
-		strPayCode = jsPayCode.toString();
-		strPaymentUrl = jsMsg.toString();
-		gInfo() << gQStr(strPaymentUrl);
-		return 0;
-	}
-	else
-	{
-		strMessage = strMessage1.c_str();
-		gError() << gQStr(strMessage);
-		return -1;
-	}
+	} while (nRetry < 3);
+	return -1;
 }
 
 // 查询支付结果
@@ -214,7 +221,7 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 	gInfo() << "PayResult request url = " << strUrl.c_str();
 
 	string strRespond, strMessage1;
-	if (SendHttpRequest(strUrl, strRespond, strMessage1))
+	if (SendHttpRequest("GET", strUrl, strRespond, strMessage1))
 	{
 		gInfo() << strRespond;
 		QString strRes = strRespond.c_str();
@@ -253,7 +260,9 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 	int nResult = applyCardReplacement(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "申请补换卡失败";
+		FailureMessage("申请补换卡", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
+		//strMessage = "申请补换卡失败";
 		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
 		gInfo() << gQStr(strInfo);
 		return -1;
@@ -312,7 +321,8 @@ int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCa
 	int nResult = registerPayment(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "交费登记失败";
+		FailureMessage("交费登记", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
 		QString strInfo = QString("registerPayment Failed:%1.").arg(nResult);
 		gInfo() << gQStr(strInfo);
 		return -1;
@@ -365,9 +375,8 @@ int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 	int nResult = markCard(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "即制卡标注失败";
-		QString strInfo = QString("markCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		FailureMessage("即制卡标注", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
 		return -1;
 	}
 	gInfo() << "markCard:" << szStatus;
@@ -390,9 +399,8 @@ int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 	int nResult = cancelMarkCard(*pSSCardInfo, (char*)szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "即制卡撤销标注失败";
-		QString strInfo = QString("cancelMarkCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		FailureMessage("即制卡撤销标注", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
 		return -1;
 	}
 	gInfo() << "cancelMarkCard:" << szStatus;
@@ -597,9 +605,17 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 		int nResult = getCardData(*pSSCardInfo, szStatus, bSkipPreStep);
 		if (QFailed(nResult))
 		{
-			strMessage = QString::fromLocal8Bit(szStatus);
-			QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
-			gInfo() << gQStr(strInfo);
+			if (strcmp(szStatus, "08") == 0)
+			{
+				FailureMessage("即制卡撤销标注", pSSCardInfo, szStatus, strMessage);
+				gError() << gQStr(strMessage);
+			}
+			else
+			{
+				strMessage = QString::fromLocal8Bit(szStatus);
+				QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
+				gInfo() << gQStr(strInfo);
+			}
 			return -1;
 		}
 		char szDigit[16] = { 0 }, szText[1024] = { 0 };
@@ -618,7 +634,6 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 		}
 		else
 			return -1;
-
 	}
 	//#ifdef _DEBUG
 	//	if (ffile.isFile())
@@ -779,9 +794,11 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 	char szStatus[1024] = { 0 };
 	if (QFailed(nResult = queryCardProgress(*pSSCardInfo, szStatus)))
 	{
-		strMessage = "获取制卡进度信息失败!";
-		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		FailureMessage("查询制卡进度", pSSCardInfo, szStatus, strMessage);
+
+		//strMessage = "获取制卡进度信息失败!";
+		//QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
+		gInfo() << gQStr(strMessage);
 		return nResult;
 	}
 	gInfo() << "queryCardProgress:" << szStatus;

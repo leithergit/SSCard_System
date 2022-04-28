@@ -382,35 +382,6 @@ bool IsValidIPAddressW(LPCWSTR szAddress);
 bool IsValidSmsAddressA(CHAR* szSms);
 bool IsValidSmsAddressW(WCHAR* szSms);
 
-
-
-/************************************************************************/
-/* add by Brezze.Wang                                                   */
-/************************************************************************/
-
-/*************************************************************************
-	macro
-*************************************************************************/
-#define UNICODE_TO_ANSI(lpUnicode, lpAnsi, nRet)\
-{\
-	UnicodeStrToMultiByteStr(CP_ACP, lpUnicode, lpAnsi, nRet);\
-}
-
-#define UNICODE_TO_UTF8(lpUnicode, lpUTF8, nRet)\
-{\
-	UnicodeStrToMultiByteStr(CP_UTF8, lpUnicode, lpUTF8, nRet);\
-}
-
-#define ANSI_TO_UNICODE(lpAnsi, lpUnicode, nRet)\
-{\
-	MultiByteStrToUnicodeStr(CP_ACP, lpAnsi, lpUnicode, nRet);\
-}
-
-#define UTF8_TO_UNICODE(lpUTF8, lpUnicode, nRet)\
-{\
-	MultiByteStrToUnicodeStr(CP_UTF8, lpUTF8, lpUnicode, nRet);\
-}
-
 #ifdef MYSQL_CHARACTER_UTF8
 #	define MYSQL_CHARACTER_TO_CPLUSPLUS UTF8_TO_UNICODE
 #	define CPLUSPLUS_CHARACTER_TO_MYSQL UNICODE_TO_UTF8
@@ -419,56 +390,7 @@ bool IsValidSmsAddressW(WCHAR* szSms);
 #	define CPLUSPLUS_CHARACTER_TO_MYSQL UNICODE_TO_ANSI
 #endif
 
-/*************************************************************************
-	function name
-		UnicodeStrToMultiByteStr
 
-	description
-		change unicode string to multi-unsigned char string
-
-	parameters
-		nCodePage
-			[in] CP_ACP		ANSI
-				 CP_UTF8	UTF8
-		lpUniStr
-			[in] Pointer to the wide character string to convert.
-
-		lppMultiByteStr
-			[out] Pointer pointer to a buffer that receives the converted
-				  string.
-
-	return value
-		Returns the number of bytes written to the buffer pointed to by
-		lpMultiByteStr if successful. The number includes the unsigned char for
-		the terminating null character.
-*************************************************************************/
-INT_PTR UnicodeStrToMultiByteStr(UINT_PTR nCodePage, LPCWSTR lpUniStr, LPSTR* lppMultiByteStr);
-INT_PTR UnicodeStrToMultiByteStr(UINT_PTR nCodePage, LPCWSTR lpUniStr, LPSTR lpMultiByteStr, UINT_PTR nMultiByteLen);
-
-/*************************************************************************
-	function name
-		MultiByteStrToUnicodeStr
-
-	description
-		change multi-unsigned char string to unicode string
-
-	parameters
-		nCodePage
-			[in] CP_ACP		ANSI
-				 CP_UTF8	UTF8
-		lpMultiByteStr
-			[in] Pointer to the character string to convert.
-
-		lppMultiByteStr
-			[out] Pointer pointer to a buffer that receives the converted
-				  string.
-
-	return value
-		Returns the number of WCHAR values written to the buffer
-		indicated by lpWideCharStr if successful.
-*************************************************************************/
-INT_PTR MultiByteStrToUnicodeStr(UINT_PTR nCodePage, LPCSTR lpMultiByteStr, LPWSTR* lppUniStr);
-INT_PTR MultiByteStrToUnicodeStr(UINT_PTR nCodePage, LPCSTR lpMultiByteStr, LPWSTR lpUniStr, UINT_PTR nUniStrLen);
 
 // #define _UTF8(UnicodeText,nLength)		(UTF8StringW(UnicodeText,nLength).get())
 // #define _AnsiString(UnicodeText,nLength)	(W2AString(UnicodeText,nLength).get())
@@ -506,3 +428,25 @@ BOOL IsCancelDialogMessage(MSG* pMsg);
 bool EnumSerialPortW(WCHAR* szBuffer, WORD nBufferSize, WORD& nPortCount);
 bool EnumSerialPortW(HWND hComboBox, WORD& nPortCount);
 bool EnumSerialPortA(HWND hComboBox, WORD& nPortCount);
+
+#pragma once
+
+class SystemTool {
+public:
+	static SystemTool& Instance();
+	bool OpenScreenKeyboard();
+
+private:
+	SystemTool() = default;
+	~SystemTool() = default;
+	// \brief 打开系统内置osk应用键盘
+	bool OpenOSK();
+	// \brief 打开系统触摸键盘
+	bool OpenTabTip();
+	// \brief win10判断触摸键盘是否已显示
+	bool IsWin10KeyboardVisable();
+	// \brief win7判断触摸键盘是否已显示
+	bool IsWin7KeyboardVisable();
+	// \brief 判断系统版本是否大于或等于win10 10.0.14393.0
+	bool IsNewVersion();
+};

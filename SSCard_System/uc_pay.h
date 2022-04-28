@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "qstackpage.h"
 #include "Payment.h"
+#include <thread>
 
 namespace Ui {
 	class Pay;
@@ -34,6 +35,10 @@ public:
 	int     m_nSocketRetryCount = 5;                    // 网络失败重试次数
 	int     m_nSocketFailedCount = 0;
 	int     m_nPayStatus = Pay_Not;
+	bool	bThreadReadIDCard = false;
+	bool	bSkipPay = false;
+	std::thread* pThreadReadIDCard = nullptr;
+	void ThreadReadIDCard();
 	virtual void ShutDown() override
 	{
 		gInfo() << __FUNCTION__;
@@ -45,6 +50,10 @@ public:
 			m_pWorkThread = nullptr;
 		}
 	}
+public slots:
+	void On_SkipPay();
+signals:
+	void SkipPay();
 private:
 	Ui::Pay* ui;
 };

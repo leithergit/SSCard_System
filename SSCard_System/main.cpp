@@ -6,11 +6,10 @@
 #include <QScreen>
 #include <fstream>
 #include <QSharedMemory>
+#include <QMutex>
 #include "qtsingleapplication.h"
 #include "waitingprogress.h"
-
 #include "DevBase.h"
-
 #include "Gloabal.h"
 #include "license.h"
 #include "showlicense.h"
@@ -43,18 +42,22 @@ static void SetupExceptionHandler()
 
 }
 
-//const char* g_pUniqueID = "2F026B66-2CCA-40AB-AD72-435B5AC2E625";
-
+const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
+HANDLE g_hAppMutex = nullptr;
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
-
+	QMutex t;
+	if (OpenMutexW(MUTEX_ALL_ACCESS, FALSE, g_pUniqueID))
+		return 0;
+	g_hAppMutex = CreateMutexW(nullptr, TRUE, g_pUniqueID);
+	shared_ptr<void> FreeMutex(g_hAppMutex, CloseHandle);
 	//qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	//QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-	//QApplication a(argc, argv);
-	QtSingleApplication a(argc, argv);
+	QApplication a(argc, argv);
+	//QtSingleApplication a(argc, argv);
 	//if (a.sendMessage("Wake up!"))
 	//	return 0;
 	//QApplication a(argc, argv);
@@ -78,7 +81,6 @@ int main(int argc, char* argv[])
 //    nPos += strPath.size();
 //    string strlogPath = strFilePath.substr(nPos,strFilePath.size() - nPos);
 //    qDebug()<< strlogPath.c_str();
-
 	// 日志目录必须存在才会生成日志
 	//FLAGS_log_dir = "./log/";                             // 使用该设定时，默认情况下，不同级别日志使用不同的文件名
 	QString strLogPath = QCoreApplication::applicationDirPath();
@@ -204,18 +206,17 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	if (!CheckLocalLicense(Code_License))
-	{
-		ShowLicense s;
-		s.show();
-		return a.exec();
-	}
+	//if (!CheckLocalLicense(Code_License))
+	//{
+	//	ShowLicense s;
+	//	s.show();
+	//	return a.exec();
+	//}
 
 	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;
-	a.setActivationWindow(&w);
-
-	QObject::connect(&a, &QtSingleApplication::messageReceived, &w, &MainWindow::OnNewInstance);
+	//a.setActivationWindow(&w);
+	//QObject::connect(&a, &QtSingleApplication::messageReceived, &w, &MainWindow::OnNewInstance);
 
 	auto listScreens = QApplication::screens();
 	g_pCurScreen = listScreens.at(0);
