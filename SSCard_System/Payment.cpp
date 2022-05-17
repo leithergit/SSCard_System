@@ -6,7 +6,7 @@
 #define PhotoBufferSize		256*1024
 char* g_szPhotoBuffer = new char[PhotoBufferSize];
 
-#include "./SDK/QREncode/qrencode.h"
+#include "QREncode/qrencode.h"
 #include "Gloabal.h"
 #include "../update/Update.h"
 
@@ -118,7 +118,6 @@ void	GBKStringtoUrlString(const char* szGBKString, string& strUrlString)
 		strUrlString += szHex;
 	}
 }
-
 
 int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& strMessage)
 {
@@ -254,6 +253,32 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 		return -1;
 	}
 }
+
+// nStatus = 0,成功，否则失败
+int  ApplyNewCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+{
+	char szStatus[1024] = { 0 };
+	int nResult = applyNewCard(*pSSCardInfo, (char*)szStatus);
+	if (QFailed(nResult))
+	{
+		FailureMessage("申请新制卡", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+	gInfo() << "applyNewCard:" << szStatus;
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
+	{
+		nStatus = strtolong(szDigit, 10);
+		return 0;
+	}
+	else
+		return -1;
+}
+
 int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
 	char szStatus[1024] = { 0 };
@@ -262,9 +287,6 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 	{
 		FailureMessage("申请补换卡", pSSCardInfo, szStatus, strMessage);
 		gError() << gQStr(strMessage);
-		//strMessage = "申请补换卡失败";
-		QString strInfo = QString("queryPayment Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
 		return -1;
 	}
 	gInfo() << "applyCardReplacement:" << szStatus;
@@ -280,6 +302,7 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 	else
 		return -1;
 }
+
 // 目前在河南无权限 
 int     CancelCardReplacement(QString& strMessage, int& nStatus)
 {
@@ -417,10 +440,33 @@ int     CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		return -1;
 }
 
+void SaveCardDataField(const char* szField, char* szValue, QString strINIFile)
+{
+	QSettings CardIni(strINIFile, QSettings::IniFormat);
+	CardIni.beginGroup("CardData");
+	CardIni.setValue(szField, szValue);
+	CardIni.endGroup();
+}
+
+int GetCardDataField(const char* szField, char* szValue, QString strINIFile)
+{
+	QFileInfo fi(strINIFile);
+	if (!fi.isFile())
+		return -1;
+
+	QSettings CardIni(strINIFile, QSettings::IniFormat);
+	CardIni.beginGroup("CardData");
+	strcpy(szValue, CardIni.value(szField).toString().toStdString().c_str());
+	CardIni.setValue(szField, szValue);
+	CardIni.endGroup();
+	if (strlen(szValue) == 0)
+		return -1;
+	return 0;
+}
+
 int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 #define AddCardFiled(x,s)	x.setValue(#s,pSSCardInfoOut->s);
-
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
 	CardIni.beginGroup("CardData");
 	AddCardFiled(CardIni, strOrganID);
@@ -595,45 +641,108 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
 			strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
 			pSSCardInfo->strPhoto = pSSCardTemp->strPhoto;
-			SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+			if (strlen(pSSCardInfo->strPhoto))
+			{
+				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+			}
+
 			bLoaded = true;
 		}
 	}
 	if (!bLoaded)
 	{
 		char szStatus[1014] = { 0 };
-		int nResult = getCardData(*pSSCardInfo, szStatus, bSkipPreStep);
-		if (QFailed(nResult))
+		int nResult = -1;
+		string strFnName = "";
+		do
 		{
-			if (strcmp(szStatus, "08") == 0)
+			strFnName = "即制卡人数";
+			if (QFailed(nResult = getJZKRS(*pSSCardInfo, szStatus)))
+				break;
+
+			strFnName = "即制卡人员";
+			if (QFailed(nResult = getJZKRY(*pSSCardInfo, szStatus)))
+				break;
+
+			strFnName = "获取批次号";
+			if (!GetCardDataField("strPCH", pSSCardInfo->strPCH, strAppPath))
 			{
-				FailureMessage("即制卡撤销标注", pSSCardInfo, szStatus, strMessage);
-				gError() << gQStr(strMessage);
+				if (QFailed(nResult = getHQPCH(*pSSCardInfo, szStatus)))
+					break;
+				SaveCardDataField("strPCH", pSSCardInfo->strPCH, strAppPath);
 			}
 			else
 			{
-				strMessage = QString::fromLocal8Bit(szStatus);
-				QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
-				gInfo() << gQStr(strInfo);
+				gInfo() << GBKStr(strFnName.c_str()) << GBKStr("使用已有批次号:") << pSSCardInfo->strPCH;
+				nResult = 0;
 			}
-			return -1;
-		}
-		char szDigit[16] = { 0 }, szText[1024] = { 0 };
-		SplitString(szStatus, szDigit, szText);
-		if (strlen(szText))
-			strMessage = QString::fromLocal8Bit(szText);
-		if (strlen(szDigit))
-		{
-			nStatus = strtolong(szDigit, 10);
-			if (nStatus == 0)
+
+			strFnName = "即制卡批次";
+			if (!GetCardDataField("strCardNum", pSSCardInfo->strCardNum, strAppPath))
 			{
-				SaveCardData(pSSCardInfo, strAppPath);
-				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+				if (QFailed(nResult = getJZKPC(*pSSCardInfo, szStatus)))
+				{
+					strMessage = QString::fromLocal8Bit(szStatus);
+					if (!strMessage.contains("已经有批次号"))
+						break;
+				}
+				SaveCardDataField("strCardNum", pSSCardInfo->strCardNum, strAppPath);
 			}
-			return 0;
+			else
+			{
+				gInfo() << GBKStr(strFnName.c_str()) << GBKStr("使用已有新卡号:") << pSSCardInfo->strCardNum;
+				nResult = 0;
+			}
+
+			strFnName = "获取制卡数据";
+			if (!GetCardDataField("strPhoto", pSSCardInfo->strPhoto, strAppPath))
+			{
+				nResult = getCardData(*pSSCardInfo, szStatus);
+				if (QFailed(nResult))
+				{
+					if (strcmp(szStatus, "08") == 0)
+					{
+						FailureMessage(strFnName.c_str(), pSSCardInfo, szStatus, strMessage);
+						gError() << gQStr(strMessage);
+					}
+					else
+					{
+						strMessage = QString::fromLocal8Bit(szStatus);
+						QString strInfo = QString("getCardData Failed:%1.").arg(nResult);
+						gInfo() << gQStr(strInfo);
+					}
+					return -1;
+				}
+				char szDigit[16] = { 0 }, szText[1024] = { 0 };
+				SplitString(szStatus, szDigit, szText);
+				if (strlen(szText))
+					strMessage = QString::fromLocal8Bit(szText);
+				if (strlen(szDigit))
+				{
+					nStatus = strtolong(szDigit, 10);
+					if (nStatus == 0)
+					{
+						SaveCardData(pSSCardInfo, strAppPath);
+						SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+					}
+					return 0;
+				}
+				else
+					break;
+			}
+			else
+			{
+				gInfo() << GBKStr(strFnName.c_str()) << GBKStr("使用已有照片数据.");
+				nResult = 0;
+			}
+		} while (0);
+		if (nResult == 8)
+		{
+			FailureMessage(strFnName.c_str(), pSSCardInfo, szStatus, strMessage);
 		}
 		else
-			return -1;
+			strMessage = QString::fromLocal8Bit(szStatus);
+		return nResult;
 	}
 	//#ifdef _DEBUG
 	//	if (ffile.isFile())
@@ -705,12 +814,11 @@ int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		strcpy(pSSCardInfo->strFailType, QString("制卡").toLocal8Bit().toStdString().c_str());
 	}
 
-	int nResult = returnCardData(*pSSCardInfo, szStatus, bFailed);
+	int nResult = returnCardData(*pSSCardInfo, szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "制卡回盘失败";
-		QString strInfo = QString("returnCardData Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		FailureMessage("数据回盘", pSSCardInfo, szStatus, strMessage);
+		gInfo() << gQStr(strMessage);
 		return -1;
 	}
 	gInfo() << "returnCardData:" << szStatus;
@@ -733,9 +841,8 @@ int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo
 	int nResult = enableCard(*pSSCardInfo, szStatus);
 	if (QFailed(nResult))
 	{
-		strMessage = "领卡启用失败";
-		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		FailureMessage("领卡启用", pSSCardInfo, szStatus, strMessage);
+		gInfo() << gQStr(strMessage);
 		return -1;
 	}
 	char szDigit[16] = { 0 }, szText[1024] = { 0 };
@@ -768,9 +875,8 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 		caInfo,
 		szStatus)))
 	{
-		strMessage = "获取CA信息失败";
-		QString strInfo = QString("enableCard Failed:%1.").arg(nResult);
-		gInfo() << gQStr(strInfo);
+		FailureMessage("获取CA信息", pSSCardInfo, szStatus, strMessage);
+		gInfo() << gQStr(strMessage);
 		return nResult;
 	}
 	gInfo() << "getCA:" << szStatus;
@@ -867,5 +973,47 @@ int LoadTestData(string& strName, string& strCardID, string& strMobile)
 	strMobile = CardTest.value("Mobile").toString();
 
 	CardTest.endGroup();*/
+	return 0;
+}
+
+
+int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo)
+{
+	if (g_pDataCenter->bDebug)
+	{
+		QString strAppPath = QCoreApplication::applicationDirPath();
+		strAppPath += "/Debug/PersonData.ini";
+		QFileInfo fi(strAppPath);
+		if (!fi.isFile())
+			return -1;
+		if (!pIDCard)
+			return -1;
+
+		QSettings PersonSetting(strAppPath, QSettings::IniFormat);
+		PersonSetting.beginGroup("Person");
+		strcpy((char*)pIDCard->szName, UTF8_GBK(PersonSetting.value("Name").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szIdentity, UTF8_GBK(PersonSetting.value("CardID").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szNationalty, UTF8_GBK(PersonSetting.value("Nationalty").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szNationaltyCode, UTF8_GBK(PersonSetting.value("NationaltyCode").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szGender, UTF8_GBK(PersonSetting.value("Gender").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szBirthday, UTF8_GBK(PersonSetting.value("Birthday").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szExpirationDate1, UTF8_GBK(PersonSetting.value("Issuedate").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szExpirationDate2, UTF8_GBK(PersonSetting.value("ExpireDate").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pIDCard->szAddress, UTF8_GBK(PersonSetting.value("Address").toString().toStdString().c_str()).c_str());
+		strcpy((char*)pSSCardInfo->strName, (char*)pIDCard->szName);
+		strcpy((char*)pSSCardInfo->strCardID, (char*)pIDCard->szIdentity);
+		strcpy((char*)pSSCardInfo->strSex, (char*)pIDCard->szGender);
+		strcpy((char*)pSSCardInfo->strBirthday, (char*)pIDCard->szBirthday);
+		strcpy((char*)pSSCardInfo->strAdress, (char*)pIDCard->szAddress);
+		strcpy((char*)pSSCardInfo->strCardATR, PersonSetting.value("CardATR").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strIdentifyNum, PersonSetting.value("CardIdentityNum").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strBankNum, PersonSetting.value("BankNum").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strCardNum, PersonSetting.value("CardNum").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strMobile, PersonSetting.value("Mobile").toString().toStdString().c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, PersonSetting.value("BankCode").toString().toStdString().c_str());
+
+		PersonSetting.endGroup();
+
+	}
 	return 0;
 }

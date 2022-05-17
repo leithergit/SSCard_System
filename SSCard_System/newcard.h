@@ -8,21 +8,20 @@
 #include "QStackedWidget"
 
 namespace Ui {
-    class NewCard;
+	class NewCard;
 }
 class NewCard : public QMainStackPage
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    NewCard(QWidget* parent = nullptr);
-    ~NewCard();
-    virtual void OnTimerEvent() override;
-    virtual void  SetTimeOut(int nTimeout) override;
+	NewCard(QWidget* parent = nullptr);
+	~NewCard();
+	virtual void  OnTimerEvent() override;
+	virtual void  ShowTimeOut(int nTimeout) override;
 private slots:
 
-
 private:
-    Ui::NewCard* ui;
+	Ui::NewCard* ui;
 };
 
 #endif // NEWCARD_H

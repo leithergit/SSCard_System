@@ -22,6 +22,7 @@
         <file>Image/network-disconnected.png</file>
         <file>Image/RadioCheck.png</file>
         <file>Image/RadioUnChecked.png</file>
+        <file>Image/down_arrow.png</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

@@ -174,13 +174,14 @@ MainWindow::MainWindow(QWidget* parent)
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
+	connect(m_pNewCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdateCard, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pUpdatePassword, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(m_pRegiserLost, &QMainStackPage::ShowMaskWidget, this, &MainWindow::On_ShowMaskWidget);
 	connect(this, &MainWindow::Shutdown, this, &MainWindow::on_Shutdown);
 	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
-	bThreadUploadlogRunning = true;
-	ThreadUploadlog = std::thread(&MainWindow::fnThreadUploadlog, this);
+	// 	bThreadUploadlogRunning = true;
+	// 	ThreadUploadlog = std::thread(&MainWindow::fnThreadUploadlog, this);
 
 	m_nTimerTestHost = startTimer(5000);
 	QString strMessage;
@@ -305,24 +306,31 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	}
 
 	QString strMessage;
+	m_pNewCard->ResetAllPages();
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
 	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
+	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	{
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return;
+	}
+	g_pDataCenter->ResetIDData();
+	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
+	m_pNewCard->StartBusiness();
 	ui->stackedWidget->setCurrentWidget(m_pNewCard);
-	m_pNewCard->ResetAllPages();
 	m_pNewCard->show();
 	pLastStackPage = m_pNewCard;
-
 }
 
 void MainWindow::on_pushButton_Updatecard_clicked()
@@ -368,7 +376,9 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
-
+	g_pDataCenter->ResetIDData();
+	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;
+	m_pUpdateCard->StartBusiness();
 	ui->stackedWidget->setCurrentWidget(m_pUpdateCard);
 
 	m_pUpdateCard->show();
@@ -397,8 +407,10 @@ void MainWindow::on_pushButton_ChangePWD_clicked()
 		return;
 	}
 
-	ui->stackedWidget->setCurrentWidget(m_pUpdatePassword);
 	m_pUpdatePassword->ResetAllPages();
+	m_pUpdatePassword->StartBusiness();
+	ui->stackedWidget->setCurrentWidget(m_pUpdatePassword);
+
 	m_pUpdatePassword->show();
 	pLastStackPage = m_pUpdatePassword;
 }
@@ -425,8 +437,11 @@ void MainWindow::on_pushButton_RegisterLost_clicked()
 		return;
 	}
 
-	ui->stackedWidget->setCurrentWidget(m_pRegiserLost);
 	m_pRegiserLost->ResetAllPages();
+	g_pDataCenter->nCardServiceType = ServiceType::Service_RegisterLost;
+	m_pRegiserLost->StartBusiness();
+	ui->stackedWidget->setCurrentWidget(m_pRegiserLost);
+
 	m_pRegiserLost->show();
 	pLastStackPage = m_pRegiserLost;
 }
@@ -463,13 +478,9 @@ void MainWindow::on_pushButton_MainPage_clicked()
 	m_pMainpage->show();
 }
 
-void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
+void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage)
 {
 	QMainStackPage* pCurPageSender = qobject_cast<QMainStackPage*>(sender());
-	//if (m_pMaskWindow)
-	//{
-	//	delete m_pMaskWindow;
-	//}
 
 	m_pMaskWindow = new MaskWidget(this);
 	g_pMaskWindow = m_pMaskWindow;
@@ -479,13 +490,13 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 		QPoint ptLeftTop = pCurPageSender->mapToGlobal(QPoint(0, 0));
 		m_pMaskWindow->move(ptLeftTop);
 	}
-
-	if (nPageOperation == Return_MainPage)
+	if (nOperation == Return_MainPage)
 	{
 		char szRCode[128] = { 0 };
 		if (g_pDataCenter->GetPrinter())
 			g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 	}
+
 	connect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 	connect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetTimeout);
 
@@ -507,11 +518,26 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	case Fetal:
 		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Fetal];
 		break;
+	case Nop:
+		break;
 	}
-	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nPageOperation, nTimeout);
+	m_pMaskWindow->Popup(strTitle, strDesc, (int)nStatus, (int)nOperation, (int)nPage, nTimeout);
 }
 
-void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
+void MainWindow::On_MaskWidgetEnsure(int nOperation, int nPage)
+{
+	if (m_pMaskWindow)
+	{
+		//m_pMaskWindow->hide();
+		disconnect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetEnsure);
+		delete m_pMaskWindow;
+		m_pMaskWindow = nullptr;
+	}
+	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
+	pCurPage->emit SwitchPage(nOperation, nPage);
+}
+
+void MainWindow::On_MaskWidgetTimeout(int nOperation, int nPage)
 {
 	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
 	if (m_pMaskWindow)
@@ -519,6 +545,7 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 		//m_pMaskWindow->hide();
 		disconnect(m_pMaskWindow, &MaskWidget::MaskTimeout, this, &MainWindow::On_MaskWidgetTimeout);
 		delete m_pMaskWindow;
+		m_pMaskWindow = nullptr;
 	}
 	if (pLastStackPage)
 	{
@@ -530,20 +557,14 @@ void MainWindow::On_MaskWidgetTimeout(int nPageOperation)
 	}
 
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
-	pCurPage->emit SwitchNextPage(nPageOperation);
+	pCurPage->emit SwitchPage(nOperation, nPage);
 }
 
-void MainWindow::On_MaskWidgetEnsure(int nPageOperation, int nStatus)
+void MainWindow::SwitchPage(int nOperation)
 {
-	//gInfo() << __FUNCTION__ << " Operation = " << g_szPageOperation[nPageOperation];
-	if (m_pMaskWindow)
-	{
-		//m_pMaskWindow->hide();
-		disconnect(m_pMaskWindow, &MaskWidget::MaskEnsure, this, &MainWindow::On_MaskWidgetEnsure);
-		delete m_pMaskWindow;
-	}
 	QMainStackPage* pCurPage = (QMainStackPage*)ui->stackedWidget->currentWidget();
-	pCurPage->emit SwitchNextPage(nPageOperation);
+	if (pCurPage)
+		pCurPage->emit SwitchPage(Switch_NextPage, 0);
 }
 
 void MainWindow::on_Shutdown()
@@ -554,18 +575,14 @@ void MainWindow::on_Shutdown()
 		m_nDateTimer = 0;
 	}
 
-	if (bThreadUploadlogRunning)
+	if (pThreadUpdateLauncher)
 	{
-		bThreadUploadlogRunning = false;
-		ThreadUploadlog.join();
+		bThreadUpdateLauncherRunning = false;
+		pThreadUpdateLauncher->join();
+		delete pThreadUpdateLauncher;
+		pThreadUpdateLauncher = nullptr;
 	}
 	close();
-}
-
-void MainWindow::OnNewInstance(const QString& strMessage)
-{
-	showNormal();
-	activateWindow();
 }
 
 void MainWindow::timerEvent(QTimerEvent* event)
@@ -631,22 +648,17 @@ void MainWindow::closeEvent(QCloseEvent* event)
 		killTimer(m_nDateTimer);
 		m_nDateTimer = 0;
 	}
-	if (bThreadUploadlogRunning)
-	{
-		bThreadUploadlogRunning = false;
-		ThreadUploadlog.join();
-	}
 }
 
-void MainWindow::fnThreadUploadlog()
-{
-	auto tStart = chrono::high_resolution_clock::now();
-	while (bThreadUploadlogRunning)
-	{
-#pragma Warning("日志上传功能尚未完成!")
-		this_thread::sleep_for(chrono::milliseconds(100));
-	}
-}
+// void MainWindow::fnThreadUploadlog()
+// {
+// 	auto tStart = chrono::high_resolution_clock::now();
+// 	while (bThreadUploadlogRunning)
+// 	{
+// #pragma Warning("日志上传功能尚未完成!")
+// 		this_thread::sleep_for(chrono::milliseconds(100));
+// 	}
+// }
 
 void MainWindow::ThreadUpdateLauncher()
 {

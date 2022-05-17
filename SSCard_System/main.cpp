@@ -7,7 +7,6 @@
 #include <fstream>
 #include <QSharedMemory>
 #include <QMutex>
-#include "qtsingleapplication.h"
 #include "waitingprogress.h"
 #include "DevBase.h"
 #include "Gloabal.h"
@@ -55,34 +54,28 @@ int main(int argc, char* argv[])
 	//qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-	//QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 	QApplication a(argc, argv);
-	//QtSingleApplication a(argc, argv);
-	//if (a.sendMessage("Wake up!"))
-	//	return 0;
-	//QApplication a(argc, argv);
-	//google::InitGoogleLogging(argv[0]);
-	//font.setStyleStrategy(QFont::PreferAntialias);
-//    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
-//    qDebug()<<"fi.absoluteDir()="<<fi.absoluteDir();
-//    qDebug()<<"fi.absoluteFilePath()="<<fi.absoluteFilePath();
-//    qDebug()<<"fi.baseName()="<<fi.baseName();
-//    qDebug()<<"fi.bundleName()="<<fi.bundleName();
-//    qDebug()<<"fi.canonicalPath()="<<fi.canonicalPath();
-//    qDebug()<<"fi.canonicalFilePath()="<<fi.canonicalFilePath();
-//    qDebug()<<"fi.completeBaseName()="<<fi.completeBaseName();
-//    qDebug()<<"fi.completeSuffix()="<<fi.completeSuffix();
-//    qDebug()<<"fi.fileName()="<<fi.fileName();
-//    qDebug()<<"fi.filePath()="<<fi.filePath();
-//    qDebug()<<"fi.path()="<<fi.path();
-//    string strFilePath = "D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log";
-//    string strPath = "D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log";
-//    int nPos = strFilePath.find(strPath);
-//    nPos += strPath.size();
-//    string strlogPath = strFilePath.substr(nPos,strFilePath.size() - nPos);
-//    qDebug()<< strlogPath.c_str();
-	// 日志目录必须存在才会生成日志
-	//FLAGS_log_dir = "./log/";                             // 使用该设定时，默认情况下，不同级别日志使用不同的文件名
+
+	//    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
+	//    qDebug()<<"fi.absoluteDir()="<<fi.absoluteDir();
+	//    qDebug()<<"fi.absoluteFilePath()="<<fi.absoluteFilePath();
+	//    qDebug()<<"fi.baseName()="<<fi.baseName();
+	//    qDebug()<<"fi.bundleName()="<<fi.bundleName();
+	//    qDebug()<<"fi.canonicalPath()="<<fi.canonicalPath();
+	//    qDebug()<<"fi.canonicalFilePath()="<<fi.canonicalFilePath();
+	//    qDebug()<<"fi.completeBaseName()="<<fi.completeBaseName();
+	//    qDebug()<<"fi.completeSuffix()="<<fi.completeSuffix();
+	//    qDebug()<<"fi.fileName()="<<fi.fileName();
+	//    qDebug()<<"fi.filePath()="<<fi.filePath();
+	//    qDebug()<<"fi.path()="<<fi.path();
+	//    string strFilePath = "D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log";
+	//    string strPath = "D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log";
+	//    int nPos = strFilePath.find(strPath);
+	//    nPos += strPath.size();
+	//    string strlogPath = strFilePath.substr(nPos,strFilePath.size() - nPos);
+	//    qDebug()<< strlogPath.c_str();
+		// 日志目录必须存在才会生成日志
+		//FLAGS_log_dir = "./log/";                             // 使用该设定时，默认情况下，不同级别日志使用不同的文件名
 	QString strLogPath = QCoreApplication::applicationDirPath();
 	QDir::setCurrent(strLogPath);
 	qDebug() << QDir::currentPath();

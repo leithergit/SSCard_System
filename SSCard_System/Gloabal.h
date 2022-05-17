@@ -11,6 +11,8 @@
 #include <chrono>
 #include <iostream>
 #include <errno.h>
+#include <fstream>
+#include <filesystem>
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <string>
 #include <QObject>
@@ -43,23 +45,27 @@
 #include <QBrush>
 #include <QHBoxLayout>
 #include <QDirIterator>
+#include <QProcess>
 #include "DevBase.h"
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
 #include "../utility/AutoLock.h"
-#include "../SDK/KT_Printer/KT_Printer.h"
-#include "../SDK/KT_Reader/KT_Reader.h"
-#include "../SDK/SSCardDriver/SSCardDriver.h"
-#include "../SDK/SSCardHSM/KT_SSCardHSM.h"
-#include "../SDK/SSCardInfo/KT_SSCardInfo.h"
-#include "../SDK/IDCard/idcard_api.h"
-#include "../SDK/PinKeybroad/XZ_F31_API.h"
-#include "../SDK/libcurl/curl.h"
-#include "../SDK/7Z/include/bitarchiveinfo.hpp"
-#include "../SDK/7Z/include/bitcompressor.hpp"
-#include "../SDK/7Z/include/bitexception.hpp"
-#include "../SDK/FaceCapture/DVTGKLDCamSDK.h"
+#include "KT_Printer/KT_Printer.h"
+#include "KT_Reader/KT_Reader.h"
+#include "SSCardDriver/SSCardDriver.h"
+#include "SSCardHSM/KT_SSCardHSM.h"
+#include "SSCardInfo_Henan/KT_SSCardInfo.h"
+#include "IDCard/idcard_api.h"
+#include "PinKeybroad/XZ_F31_API.h"
+#include "libcurl/curl.h"
+#include "7Z/include/bitarchiveinfo.hpp"
+#include "7Z/include/bitcompressor.hpp"
+#include "7Z/include/bitexception.hpp"
+#include "FaceCapture/DVTGKLDCamSDK.h"
+#include "../utility/json/CJsonObject.hpp"
+#include "../Update/Update.h"
+#include "../SSCardService/SSCardService.h"
 
 //宏定义
 #define __STR2__(x) #x
@@ -76,6 +82,9 @@
 using namespace std;
 using namespace chrono;
 using namespace bit7z;
+using namespace neb;
+using namespace std::filesystem;
+namespace fs = std::filesystem;
 //using namespace Kingaotech;
 
 extern const char* szPrinterTypeList[PRINTER_MAX];
@@ -106,23 +115,27 @@ enum MaskStatus
 	Information,
 	Error,
 	Failed,
-	Fetal
+	Fetal,
+	Nop
 };
 
 enum Page_Index
 {
-	Page_ReaderIDCard,				//读取身份证
-	Page_FaceCapture,				//读取社保卡	
-	Page_EnsureInformation,			//信息确认
-	Page_InputMobile,				//输入手机号码
-	Page_Payment,					//支付页面
-	Page_MakeCard,					//制卡页面	
-	Page_ReadSSCard,				//读取社保卡	
-	Page_InputSSCardPWD,			//输入社保卡密码	
-	Page_ChangeSSCardPWD,			//修改社保卡密码	
-	Page_RegisterLost,				//挂失 / 解挂
-	Page_AdforFinance,				//开通金融页面
-	Page_Succeed					//操作成功
+	Page_ReaderIDCard,				// 读取身份证
+	Page_InputIDCardInfo,			// 输入身份信息
+	Page_FaceCapture,				// 人脸识别
+	Page_EnsureInformation,			// 信息确认
+	Page_InputMobile,				// 输入手机号码
+	Page_Payment,					// 支付页面
+	Page_MakeCard,					// 制卡页面	
+	Page_ReadSSCard,				// 读取社保卡	
+	Page_InputSSCardPWD,			// 输入社保卡密码	
+	Page_ChangeSSCardPWD,			// 修改社保卡密码	
+	Page_RegisterLost,				// 挂失/解挂
+	Page_CommitNewInfo,				// 提交新办卡信息
+	Page_QueryInformation,			// 信息查询
+	Page_AdforFinance,				// 开通金融页面
+	Page_Succeed					// 操作成功
 };
 
 enum class Manager_Level
@@ -714,6 +727,7 @@ struct SysConfig
 			return;
 		pSettings->beginGroup("PageTimeOut");
 		nPageTimeout[Page_ReaderIDCard] = pSettings->value("ReaderIDCard", 30).toUInt();
+		nPageTimeout[Page_InputIDCardInfo] = pSettings->value("InputIDCard", 600).toUInt();
 		nPageTimeout[Page_FaceCapture] = pSettings->value("FaceCapture", 30).toUInt();
 		nPageTimeout[Page_EnsureInformation] = pSettings->value("EnsureInformation", 30).toUInt();
 		nPageTimeout[Page_InputMobile] = pSettings->value("InputMobile", 30).toUInt();
@@ -802,6 +816,13 @@ using SSCardInfoPtr = shared_ptr<SSCardInfo>;
 
 using IDCardInfoPtr = shared_ptr<IDCardInfo>;
 
+struct NationaltyCode
+{
+	string strCode;
+	string strNationalty;
+};
+
+
 class DataCenter
 {
 public:
@@ -836,6 +857,7 @@ public:
 		strSSCardNewPassword = "";
 		strCardMakeProgress = "";
 		strPayCode = "";
+		bWithoutIDCard = false;
 		pIDCard.reset();
 		pSSCardInfo.reset();
 	}
@@ -900,10 +922,13 @@ public:
 	string         strSSCardNewPassword;
 	string		   strCardMakeProgress;
 	string		   strPayCode;
+	string		   strCardVersion = "3.0";
 	bool		   bDebug;
 	int			   nSkipPayTime = 0;
 	bool		   bTestCard = false;
-	int				nNetTimeout = 1500;
+	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
+	bool		   bWithoutIDCard = false;
+	int			   nNetTimeout = 1500;
 public:
 	bool m_bDetectStarted = false;
 	bool m_bVideoStarted = false;
@@ -927,13 +952,13 @@ public:
 
 	void CloseCamera();
 
-	bool StartDetect(void* pContext, int nDetectMilliSeconds = 2000, int nTimeoutMilliSeconds = 15000);
+	bool StartFaceDetect(void* pContext, int nDetectMilliSeconds = 2000, int nTimeoutMilliSeconds = 15000);
 
 	bool SaveFaceImage(string strPhotoFile, bool bFull = true);
 
 	bool FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, float& dfSimilarity);
 
-	void StopDetect();
+	void StopFaceDetect();
 
 	bool SwitchVideoWnd(HWND hWnd);
 
@@ -992,6 +1017,11 @@ public:
 	{
 		return m_pPrinter;
 	}
+
+	int  ReadSSCardInfo(SSCardInfoPtr& pSSCardInfo, int& nStatus, QString& strMessage);
+
+	int	 QuerySSCardStatus(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
+
 	bool LoadAdminConfigure();
 
 	vector<IDCardInfoPtr>& GetAdminConfigure()
@@ -1042,6 +1072,10 @@ public:
 	~QWaitCursor();
 };
 
+char VerifyCardID(const char* pszSrc);
+
+// 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
+int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage);
 
 void SetTableWidgetItemChecked(QTableWidget* pTableWidget, int nRow, int nCol, QButtonGroup* pButtonGrp, int nItemID, bool bChecked = false);
 
@@ -1049,5 +1083,6 @@ QStringList SearchFiles(const QString& dir_path, QDateTime* pStart = nullptr, QD
 #define WaitCursor()  QWaitCursor qWait;
 
 extern const char* szAesKey;
+extern vector<NationaltyCode> g_vecNationCode;
 
 #endif // GLOABAL_H

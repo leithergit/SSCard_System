@@ -10,7 +10,7 @@ MaskWidget::MaskWidget(QWidget* parent) :
 	ui(new Ui::MaskWidget)
 {
 	ui->setupUi(this);
-	//ui->pushButton_OK->hide();
+	ui->pushButton_OK->hide();
 	hide();
 }
 
@@ -19,12 +19,13 @@ MaskWidget::~MaskWidget()
 	delete ui;
 }
 
-void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPageOpteration, int nTimeout)
+void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage, int nTimeout)
 {
-	gInfo() << gQStr(strTitle) << gQStr(strDesc) << gVal(nStatus) << gVal(nPageOpteration) << gVal(nTimeout);
+	gInfo() << gQStr(strTitle) << gQStr(strDesc) << gVal(nStatus) << gVal(nOperation) << gVal(nTimeout);
 	QString strImage;
 	setWindowOpacity(0.8);
-	m_nPageOpteration = nPageOpteration;
+	this->nOperation = nOperation;
+	this->nPage = nPage;
 	QString strQSS;
 	switch (nStatus)    // 设置相应图标
 	{
@@ -48,6 +49,8 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	case Fetal:
 		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "exclamation.png";
+		break;
+	case Nop:
 		break;
 	}
 
@@ -78,15 +81,13 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowActive));
 	show();
 	setFocus();
-	//ui->pushButton_OK->show();
 
-	if (nPageOpteration != Retry_CurrentPage)
+	if (nOperation != Retry_CurrentPage)
 	{
 		m_nTimeout = nTimeout;
 		m_nTimerID = startTimer(m_nTimerInterval);
 
 	}
-
 	if (m_nTimeout <= 5000)
 	{
 		ui->pushButton_OK->hide();
@@ -102,7 +103,6 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nPage
 	ui->label_Title->setText(strTitle);
 	ui->label_Title->setStyleSheet(strQSS);
 	ui->label_Desc->setText(strDesc);
-
 }
 
 void MaskWidget::timerEvent(QTimerEvent* event)
@@ -117,7 +117,7 @@ void MaskWidget::timerEvent(QTimerEvent* event)
 			hide();
 			killTimer(m_nTimerID);
 			m_nTimerID = 0;
-			emit MaskTimeout(m_nPageOpteration);
+			emit MaskTimeout(nOperation, nPage);
 		}
 	}
 }
@@ -127,5 +127,5 @@ void MaskWidget::on_pushButton_OK_clicked()
 	hide();
 	killTimer(m_nTimerID);
 	m_nTimerID = 0;
-	emit MaskEnsure(m_nPageOpteration, 0);
+	emit MaskEnsure(nOperation, 0);
 }

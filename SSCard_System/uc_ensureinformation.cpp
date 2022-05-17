@@ -69,7 +69,7 @@ int uc_EnsureInformation::ProcessBussiness()
 		if (g_pDataCenter->strCardMakeProgress == "制卡中")
 		{
 			// 可以获取新的社保卡一些数据
-			if (QFailed(nResult = (ReadSSCardInfo(strMessage, nStatus, pSSCardInfo))))
+			if (QFailed(nResult = g_pDataCenter->ReadSSCardInfo(pSSCardInfo, nStatus, strMessage)))
 				break;
 			if (nStatus != 0 && nStatus != 1)
 				break;
@@ -78,13 +78,13 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 
 		// 可取旧社保卡号
-		if (QFailed(ReadSSCardInfo(strMessage, nStatus, pSSCardInfo)))
+		if (QFailed(nResult = g_pDataCenter->ReadSSCardInfo(pSSCardInfo, nStatus, strMessage)))
 			break;
 
 		if (nStatus != 0 && nStatus != 1)
 			break;
 
-		if (QFailed(QuerySSCardStatus(strMessage, pSSCardInfo)))
+		if (QFailed(nResult = g_pDataCenter->QuerySSCardStatus(pSSCardInfo, strMessage)))
 			break;
 
 		if (nStatus != 0)
@@ -129,12 +129,9 @@ int uc_EnsureInformation::ProcessBussiness()
 		{
 			QString strInfo = QString("制卡进度:制卡中,直接跳至制卡页面!");
 			gInfo() << gQStr(strInfo);
-			// 直接跳转到制止页面
-			// nNewPage = nCurIndex + nPageOperation -Switch_NextPage + 1;
-			// nPageOperation = nNewPage - nCurIndex + Switch_NextPage - 1;
-			int nOperation = Page_MakeCard - Page_EnsureInformation + Switch_NextPage - 1;
+			// 直接跳转到制止页面						
 			//emit SwitchNextPage(nOperation);
-			emit ShowMaskWidget("操作成功", "制卡信息已确认,现将转入制卡页面!", Success, nOperation);
+			emit ShowMaskWidget("操作成功", "制卡信息已确认,现将转入制卡页面!", Success, Goto_Page, Page_MakeCard);
 		}
 		break;
 	}
@@ -177,65 +174,65 @@ void uc_EnsureInformation::OnTimeout()
 // 	return 0;
 // }
 
-int	 uc_EnsureInformation::QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo)
-{
-	int nResult = 0;
-	char* szStatus[1024] = { 0 };
-	// 这里需要旧卡号
-	if (QFailed(nResult = queryCardStatus(*pSSCardInfo, reinterpret_cast<char*>(szStatus))))
-	{
-		FailureMessage("查询卡状态", pSSCardInfo, szStatus, strMessage);
-		/*if (strcmp((const char*)szStatus, "08") == 0)
-		{
-			strMessage = QString("查询卡状态失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\t卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
-		}
-		else
-			strMessage = QString("查询卡状态失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);*/
-		gError() << gQStr(strMessage);
-		return -1;
-	}
+//int	 uc_EnsureInformation::QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo)
+//{
+//	int nResult = 0;
+//	char* szStatus[1024] = { 0 };
+//	// 这里需要旧卡号
+//	if (QFailed(nResult = queryCardStatus(*pSSCardInfo, reinterpret_cast<char*>(szStatus))))
+//	{
+//		FailureMessage("查询卡状态", pSSCardInfo, szStatus, strMessage);
+//		/*if (strcmp((const char*)szStatus, "08") == 0)
+//		{
+//			strMessage = QString("查询卡状态失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\t卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+//		}
+//		else
+//			strMessage = QString("查询卡状态失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);*/
+//		gError() << gQStr(strMessage);
+//		return -1;
+//	}
+//
+//	if (strcmp(_strupr((char*)szStatus), "OK") == 0)
+//	{
+//		strcpy(pSSCardInfo->strCardStatus, "正常");
+//	}
+//	else
+//	{
+//
+//		QString strStatus = QString::fromLocal8Bit((char*)szStatus);
+//		strcpy(pSSCardInfo->strCardStatus, (char*)strStatus.toStdString().c_str());
+//	}
+//
+//	return 0;
+//}
 
-	if (strcmp(_strupr((char*)szStatus), "OK") == 0)
-	{
-		strcpy(pSSCardInfo->strCardStatus, "正常");
-	}
-	else
-	{
-
-		QString strStatus = QString::fromLocal8Bit((char*)szStatus);
-		strcpy(pSSCardInfo->strCardStatus, (char*)strStatus.toStdString().c_str());
-	}
-
-	return 0;
-}
-
-int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
-{
-	int nResult = 0;
-	char szStatus[1024] = { 0 };
-	if (QFailed(nResult = queryPersonInfo(*pSSCardInfo, szStatus)))
-	{
-		FailureMessage("查询人员信息", pSSCardInfo, szStatus, strMessage);
-		/*if (strcmp(szStatus, "08") == 0)
-			strMessage = QString("失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\1卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
-		else
-			strMessage = QString("查询人员信息失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardNum);*/
-
-		gError() << gQStr(strMessage);
-		return -1;
-	}
-	char szDigit[16] = { 0 }, szText[1024] = { 0 };
-	SplitString(szStatus, szDigit, szText);
-	if (strlen(szText))
-		strMessage = QString::fromLocal8Bit(szText);
-	if (strlen(szDigit))
-	{
-		nStatus = strtolong(szDigit, 10);
-		return 0;
-	}
-	else
-		return -1;
-}
+//int uc_EnsureInformation::ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+//{
+//	int nResult = 0;
+//	char szStatus[1024] = { 0 };
+//	if (QFailed(nResult = queryPersonInfo(*pSSCardInfo, szStatus)))
+//	{
+//		FailureMessage("查询人员信息", pSSCardInfo, szStatus, strMessage);
+//		/*if (strcmp(szStatus, "08") == 0)
+//			strMessage = QString("失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\1卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+//		else
+//			strMessage = QString("查询人员信息失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardNum);*/
+//
+//		gError() << gQStr(strMessage);
+//		return -1;
+//	}
+//	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+//	SplitString(szStatus, szDigit, szText);
+//	if (strlen(szText))
+//		strMessage = QString::fromLocal8Bit(szText);
+//	if (strlen(szDigit))
+//	{
+//		nStatus = strtolong(szDigit, 10);
+//		return 0;
+//	}
+//	else
+//		return -1;
+//}
 
 int  uc_EnsureInformation::RegisterLost(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
@@ -316,7 +313,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 				if (nStatus == 8)	// 网络错误，直接返回
 					break;
 
-				if (QFailed(QuerySSCardStatus(strMessage, pSSCardInfo)))
+				if (QFailed(g_pDataCenter->QuerySSCardStatus(pSSCardInfo, strMessage)))
 				{
 					strError += "二次确认卡状态时再次失败!";
 					gError() << gQStr(strError);
@@ -347,7 +344,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			else
 			{
 				QString strMessage;
-				if (QFailed(QuerySSCardStatus(strMessage, pSSCardInfo)))
+				if (QFailed(g_pDataCenter->QuerySSCardStatus(pSSCardInfo, strMessage)))
 				{
 					strMessage = "挂失时社保中心返回错误代码:【";
 					strMessage += std::to_string(nStatus).c_str();

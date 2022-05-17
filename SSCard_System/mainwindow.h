@@ -65,25 +65,26 @@ public:
 	int LoadConfigure(QString& strError);
 	//virtual void paintEvent(QPaintEvent* event) override;
 
-	void fnThreadUploadlog();
-	std::thread ThreadUploadlog;
-	bool  bThreadUploadlogRunning = false;
+// 	void fnThreadUploadlog();
+// 	std::thread ThreadUploadlog;
+// 	bool  bThreadUploadlogRunning = false;
 
 	void ThreadUpdateLauncher();
 	std::thread* pThreadUpdateLauncher = nullptr;
 	bool bThreadUpdateLauncherRunning = false;
 
+	void SwitchPage(int nOperation);
+
 signals:
-	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation);
+	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
 	void LoadSystemManager();
 	void Shutdown();
 
 public slots:
-	void On_ShowMaskWidget(QString, QString, int nStatus, int nPageOperation);
-	void On_MaskWidgetTimeout(int nOperation);
+	void On_ShowMaskWidget(QString, QString, int nStatus, int nOperation, int nPage);
+	void On_MaskWidgetTimeout(int nOperation, int nStatus);
 	void On_MaskWidgetEnsure(int nOperation, int nStatus);
 	void on_Shutdown();
-	void OnNewInstance(const QString&);
 
 private:
 	Ui::MainWindow* ui;

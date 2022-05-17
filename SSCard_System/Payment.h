@@ -10,22 +10,11 @@
 #define Failed_QREnocode        3         // 生成支付二维码失败
 
 
-enum class PayResult
-{
-	Pay_Unsupport = -1,
-	WaitforPay = 0,
-	WairforConfirm,
-	PaySucceed,
-	PayFailed,
-	InvalidOrder,
-	OrderCanceled
-};
-
 #define FailureMessage(strFuncName,pSSCardInfo,strStatus,strMessage) {\
 if (strcmp((const char*)strStatus, "08") == 0)\
-	strMessage = QString("%1失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%2\t卡号:%3\t").arg(strFuncName).arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);\
+	strMessage = QString("%1失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%2\t卡号:%3\t").arg(strFuncName).arg(QString::fromLocal8Bit(pSSCardInfo->strName)).arg(pSSCardInfo->strCardNum);\
 else\
-	strMessage = QString("%1失败:\n姓名:%2\t卡号:%3\t").arg(strFuncName).arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum); }\
+	strMessage = QString("%1失败:\n姓名:%2\t卡号:%3\t").arg(strFuncName).arg(QString::fromLocal8Bit(pSSCardInfo->strName)).arg(pSSCardInfo->strCardNum); }\
 
 void  SplitString(const char* szStr, char* szDigit, char* szText);
 
@@ -43,6 +32,9 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 
 // nStatus = 0,成功，1 已缴费
 int  ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
+
+// nStatus = 0,成功，否则失败
+int  ApplyNewCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
 // nStatus = 0,成功，否则失败
 int  ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
@@ -78,5 +70,7 @@ int LoadTestData(string& strName, string& strCardID, string& strMobile);
 int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile);
 
 int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64);
+
+int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo);
 
 #endif // PAYMENT_H

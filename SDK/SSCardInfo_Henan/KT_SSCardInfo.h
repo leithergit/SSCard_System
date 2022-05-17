@@ -1,4 +1,4 @@
-ï»¿#ifndef KT_SSCARDINFO_H
+#ifndef KT_SSCARDINFO_H
 #define KT_SSCARDINFO_H
 #include <windows.h>
 #include "KT_Define.h"
@@ -9,138 +9,165 @@
 EXTERN_C_START
 #endif
 
-//pOutInfoè¿”å›: 07--æœªçŸ¥çœä»½ 08--é€šè®¯æ•…éšœ 09--æœ‰å‚æ•°ä¸ºç©º
+//pOutInfo·µ»Ø: 07--Î´ÖªÊ¡·İ 08--Í¨Ñ¶¹ÊÕÏ 09--ÓĞ²ÎÊıÎª¿Õ
 
 /**
- * @brief åˆå§‹åŒ–åŠ¨æ€åº“æ¥å£
- * @param[in]  inJson jsonæ ¼å¼å­—ç¬¦ä¸²éœ€è¦keyå€¼:province/user/pwd/city		æšä¸¾ä¼ å¯¹åº”æ•´å‹å€¼
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å¤±è´¥
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ³õÊ¼»¯¶¯Ì¬¿â½Ó¿Ú
+ * @param[in]  inJson json¸ñÊ½×Ö·û´®ĞèÒªkeyÖµ:province/user/pwd/city		Ã¶¾Ù´«¶ÔÓ¦ÕûĞÍÖµ
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01Ê§°Ü
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
-	DLL_PUBLIC int initCardInfo(const char* inJson, char* pOutInfo);
+DLL_PUBLIC int initCardInfo(const char* inJson, char* pOutInfo);
 
 /**
- * @brief æŸ¥è¯¢äººå‘˜æ•°æ®
- * @param[in/out] info	éœ€è¦name/cardID,è¿”å›çš„ä¸ªäººä¿¡æ¯,æ—§ç¤¾ä¿å¡å·ç­‰
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å¤±è´¥
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ²éÑ¯ÈËÔ±Êı¾İ
+ * @param[in/out] info	ĞèÒªname/cardID,·µ»ØµÄ¸öÈËĞÅÏ¢,¾ÉÉç±£¿¨ºÅµÈ
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01Ê§°Ü
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
-DLL_PUBLIC int queryPersonInfo(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int queryPersonInfo(SSCardInfo& info,char *pOutInfo);
 /**
- * @brief åˆ¶å¡è¿›åº¦æŸ¥è¯¢
- * @param[in/out] info	éœ€è¦name/cardID,è¿”å›çš„ä¸ªäººä¿¡æ¯,åˆ¶å¡è¿›åº¦ç­‰
-* @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å¤±è´¥
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ÖÆ¿¨½ø¶È²éÑ¯
+ * @param[in/out] info	ĞèÒªname/cardID,·µ»ØµÄ¸öÈËĞÅÏ¢,ÖÆ¿¨½ø¶ÈµÈ
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01Ê§°Ü
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int queryCardProgress(SSCardInfo& info, char* pOutInfo);
 /**
- * @brief å¡çŠ¶æ€æŸ¥è¯¢ï¼ˆå¡é‰´æƒï¼‰
- * @param[in] info	éœ€è¦name/cardID/cardNum(æ—§å¡å·)
-* @param[out] pOutInfo	è¿”å›:OKå¡çŠ¶æ€æ­£å¸¸,å…¶ä»–ä¸­æ–‡æè¿°
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ¿¨×´Ì¬²éÑ¯£¨¿¨¼øÈ¨£©
+ * @param[in] info	ĞèÒªname/cardID/cardNum(¾É¿¨ºÅ)
+* @param[out] pOutInfo	·µ»Ø:OK¿¨×´Ì¬Õı³£,ÆäËûÖĞÎÄÃèÊö
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
-DLL_PUBLIC int queryCardStatus(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int queryCardStatus(SSCardInfo& info, char *pOutInfo);
 /**
- * @brief æ­£å¼æŒ‚å¤±
- * @param[in] info	éœ€è¦name/cardID/cardNum(æ—§å¡å·)
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å·²æŒ‚å¤±
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ÕıÊ½¹ÒÊ§
+ * @param[in] info	ĞèÒªname/cardID/cardNum(¾É¿¨ºÅ)
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01ÒÑ¹ÒÊ§
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
-DLL_PUBLIC int reportLostCard(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int reportLostCard(SSCardInfo& info, char *pOutInfo);
 /**
- * @brief è§£é™¤æŒ‚å¤±
- * @param[in] info	éœ€è¦name/cardID/cardNum(æ—§å¡å·)
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å·²æŒ‚å¤±
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ½â³ı¹ÒÊ§
+ * @param[in] info	ĞèÒªname/cardID/cardNum(¾É¿¨ºÅ)
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01ÒÑ¹ÒÊ§
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int cancelLostCard(SSCardInfo& info, char* pOutInfo);
 /**
- * @brief æŸ¥è¯¢äº¤è´¹ç™»è®°çŠ¶æ€
- * @param[in] info	éœ€è¦name/cardID
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,å…¶ä»–å¤±è´¥
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ²éÑ¯½»·ÑµÇ¼Ç×´Ì¬
+ * @param[in] info	ĞèÒªname/cardID
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,ÆäËûÊ§°Ü
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int queryPayment(SSCardInfo& info, char* pOutInfo);
 /**
- * @brief æ³¨å†Œäº¤è´¹ç™»è®°
- * @param[in] info	éœ€è¦name/cardID
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å·²äº¤è´¹
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ×¢²á½»·ÑµÇ¼Ç
+ * @param[in] info	ĞèÒªname/cardID
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01ÒÑ½»·Ñ
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int registerPayment(SSCardInfo& info, char* pOutInfo);
 /**
- * @brief æ’¤é”€ç¼´è´¹ç™»è®°
- * @param[in] info	ä¼ å…¥çš„äººå‘˜ä¿¡æ¯
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ³·Ïú½É·ÑµÇ¼Ç
+ * @param[in] info	´«ÈëµÄÈËÔ±ĞÅÏ¢
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int cancelPayment(SSCardInfo& info, char* pOutInfo);
 
 /**
- * @brief æ–°åŠå¡
- * @param[in] info	éœ€è¦personType/name/cardID/CardNum/OrganID(ç»åŠæœºæ„)/BankCode/Mobile/validDate/sex/nation/birthday/address/postalCode/photo(base64å­—ç¬¦ä¸²)
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ĞÂ°ì¿¨
+ * @param[in] info	ĞèÒªpersonType/name/cardID/CardNum/OrganID(¾­°ì»ú¹¹)/BankCode/Mobile/validDate/sex/nation/birthday/address/postalCode/photo(base64×Ö·û´®)
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int applyNewCard(SSCardInfo& info, char* pOutInfo);
 
 /**
- * @brief ç”³è¯·è¡¥æ¢å¡
- * @param[in] info	éœ€è¦name/cardID/CardNum/OrganID(ç»åŠæœºæ„)/BankCode/Mobile
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ÉêÇë²¹»»¿¨
+ * @param[in] info	ĞèÒªname/cardID/CardNum/OrganID(¾­°ì»ú¹¹)/BankCode/Mobile
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
-DLL_PUBLIC int applyCardReplacement(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int applyCardReplacement(SSCardInfo& info, char *pOutInfo );
 /**
- * @brief æ’¤é”€ç”³è¯·è¡¥æ¢å¡
- * @param[in] info	éœ€è¦name/cardID
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ³·ÏúÉêÇë²¹»»¿¨
+ * @param[in] info	ĞèÒªname/cardID
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int cancelCardReplacement(SSCardInfo& info, char* pOutInfo);
 /**
- * @brief å³åˆ¶å¡æ ‡æ³¨
- * @param[in] info	éœ€è¦name/cardID
- * @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å·²æ ‡æ³¨
- * @return 0æˆåŠŸ,é0å¤±è´¥
+ * @brief ¼´ÖÆ¿¨±ê×¢
+ * @param[in] info	ĞèÒªname/cardID
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01ÒÑ±ê×¢
+ * @return 0³É¹¦,·Ç0Ê§°Ü
  */
 DLL_PUBLIC int markCard(SSCardInfo& info, char* pOutInfo);
-/**
-* @brief æ’¤é”€æ ‡æ³¨
-* @param[in] info	éœ€è¦name/cardID
-* @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ,01å·²ç»æ˜¯æœªæ ‡æ³¨
-* @return 0æˆåŠŸ,é0å¤±è´¥
-*/
+ /**
+ * @brief ³·Ïú±ê×¢
+ * @param[in] info	ĞèÒªname/cardID
+ * @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦,01ÒÑ¾­ÊÇÎ´±ê×¢
+ * @return 0³É¹¦,·Ç0Ê§°Ü
+ */
 DLL_PUBLIC int cancelMarkCard(SSCardInfo& info, char* pOutInfo);
 /**
-* @brief è·å–åˆ¶å¡æ•°æ®
-* @param[in] info	éœ€è¦name/cardID/TransType(ç”³è¯·ç±»å‹)/SSQX(æ‰€å±ç¤¾åŒº)/BankCode/Card(å¡å•†)
-*					ä¼ å‡ºcardNum(æ–°å¡å·)/PCH(æ‰¹æ¬¡å·)/sex/nation/birthday/releasedate/validdate/photo
-* @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
-* @return 0æˆåŠŸ,é0å¤±è´¥
+* @brief »ñÈ¡ÖÆ¿¨ÈËÊı--1
+* @param[in] info	ĞèÒªcardID/TransType(ÉêÇëÀàĞÍ)
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
+*/
+DLL_PUBLIC int getJZKRS(SSCardInfo& info, char* pOutInfo);
+/**
+* @brief »ñÈ¡¼´ÖÆ¿¨ÈËÔ±--2
+* @param[in] info	ĞèÒªcardID/TransType(ÉêÇëÀàĞÍ)
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
+*/
+DLL_PUBLIC int getJZKRY(SSCardInfo& info, char* pOutInfo);
+/**
+* @brief »ñÈ¡Åú´ÎºÅ--3
+* @param[in] info	ĞèÒªSSQX(ËùÊôÇøÏØ)
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
+*/
+DLL_PUBLIC int getHQPCH(SSCardInfo& info, char* pOutInfo);
+/**
+* @brief »ñÈ¡¼´ÖÆ¿¨Åú´Î--4
+* @param[in] info	ĞèÒªcardID/TransType(ÉêÇëÀàĞÍ)/card(¿¨ÉÌ)
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü 
+*/
+DLL_PUBLIC int getJZKPC(SSCardInfo& info, char* pOutInfo);
+/**
+* @brief »ñÈ¡ÖÆ¿¨Êı¾İ--5
+* @param[in] info	ĞèÒªBankCode,´«³öcardNum(ĞÂ¿¨ºÅ)/sex/nation/birthday/releaseDate/validDate/photo
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
 */
 DLL_PUBLIC int getCardData(SSCardInfo& info, char* pOutInfo);
 /**
-* @brief åˆ¶å¡å›ç›˜
-* @param[in] info	ä¼ å…¥çš„äººå‘˜ä¿¡æ¯
-* @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
-* @return 0æˆåŠŸ,é0å¤±è´¥
+* @brief ÖÆ¿¨»ØÅÌ
+* @param[in] info	´«ÈëµÄÈËÔ±ĞÅÏ¢,ÖÆ¿¨³É¹¦:CardNum,CardID,Name,ReleaseDate,ValidDate,IdentifyNum,CardATR, BankNum,PCH   ÖÆ¿¨Ê§°Ü:CardNum,CardID,Name,PCH
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
 */
-DLL_PUBLIC int returnCardData(SSCardInfo& info, char* pOutInfo);
+DLL_PUBLIC int returnCardData(SSCardInfo& info, char* pOutInfo,bool bFailed = false);
 /**
-* @brief é¢†å¡å¯ç”¨
-* @param[in] info	ä¼ å…¥çš„äººå‘˜ä¿¡æ¯
-* @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
-* @return 0æˆåŠŸ,é0å¤±è´¥
+* @brief Áì¿¨ÆôÓÃ
+* @param[in] info	´«ÈëµÄÈËÔ±ĞÅÏ¢
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
 */
 DLL_PUBLIC int enableCard(SSCardInfo& info, char* pOutInfo);
 /**
-* @brief è·å–CA
-* @param[in] info	ä¼ å…¥çš„äººå‘˜ä¿¡æ¯
-* @param[out] pOutInfo	è¿”å›ç»“æœ,00æˆåŠŸ
-* @return 0æˆåŠŸ,é0å¤±è´¥
+* @brief »ñÈ¡CA
+* @param[in] info	´«ÈëµÄÈËÔ±ĞÅÏ¢
+* @param[out] pOutInfo	·µ»Ø½á¹û,00³É¹¦
+* @return 0³É¹¦,·Ç0Ê§°Ü
 */
-DLL_PUBLIC int getCA(const char* user, const char* pwd, const char* city, const char* cardID, const char* cardNum, const char* QMGY, const char* name, const char* SF, CAInfo& info, char* pOutInfo);
+DLL_PUBLIC int getCA(const char* user, const char* pwd, const char* city, const char* cardID, const char* cardNum, const char* QMGY, const char* name, const char* SF, CAInfo &info, char* pOutInfo);
 
 #ifdef __cplusplus
 EXTERN_C_END

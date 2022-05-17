@@ -20,12 +20,15 @@ public:
 	QImage  ImageDetected;
 	int    OpenCamara(QString& strError);
 	int    CloseCamera(QString& strError);
+	QString strHeaderPhoto;
 
 private slots:
 	void on_pushButton_clicked();
 	void OnLiveDetectStatusEvent(int nEventID, int nFrameStatus);
 	//void   OnFaceCaptureSucceed();
 	//void   OnFaceCaptureFailed();
+	void on_pushButton_TakePhoto_clicked();
+
 private:
 	Ui::DialogCameraTest* ui;
 };

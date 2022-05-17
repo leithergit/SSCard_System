@@ -24,7 +24,7 @@
 #pragma comment(lib, "../SDK/KT_Reader/KT_Readerd")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
-#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfod")
+#pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfod")
 #pragma comment(lib, "../SDK/libcurl/libcurld")
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
@@ -87,6 +87,67 @@ QWaitCursor::~QWaitCursor()
 extern DataCenterPtr g_pDataCenter;
 QScreen* g_pCurScreen = nullptr;
 const char* szAesKey = "581386C9F1514F6B92170BF457D8B065";
+vector<NationaltyCode> g_vecNationCode = {
+			{"01", "汉族"},
+			{ "02","蒙古族" },
+			{ "03","回族" },
+			{ "04","藏族" },
+			{ "05","维吾尔族" },
+			{ "06","苗族" },
+			{ "07","彝族" },
+			{ "08","壮族" },
+			{ "09","布依族" },
+			{ "10","朝鲜族" },
+			{ "11","满族" },
+			{ "12","侗族" },
+			{ "13","瑶族" },
+			{ "14","白族" },
+			{ "15","土家族" },
+			{ "16","哈尼族" },
+			{ "17","哈萨克族" },
+			{ "18","傣族" },
+			{ "19","黎族" },
+			{ "20","傈傈族" },
+			{ "21","佤族" },
+			{ "22","畲族" },
+			{ "23","高山族" },
+			{ "24","拉祜族" },
+			{ "25","水族" },
+			{ "26","东乡族" },
+			{ "27","纳西族" },
+			{ "28","景颇族" },
+			{ "29","柯尔克孜族" },
+			{ "30","土族" },
+			{ "31","达翰尔族" },
+			{ "32","仫佬族" },
+			{ "33","羌族" },
+			{ "34","布朗族" },
+			{ "35","撒拉族" },
+			{ "36","毛南族" },
+			{ "37","仡佬族" },
+			{ "38","锡伯族" },
+			{ "39","阿昌族" },
+			{ "40","普米族" },
+			{ "41","塔吉克族" },
+			{ "42","怒族" },
+			{ "43","乌孜别克族" },
+			{ "44","俄罗斯族" },
+			{ "45","鄂温克族" },
+			{ "46","德昂族" },
+			{ "47","保安族" },
+			{ "48","裕固族" },
+			{ "49","京族" },
+			{ "50","塔塔尔族" },
+			{ "51","独龙族" },
+			{ "52","鄂伦春族" },
+			{ "53","赫哲族" },
+			{ "54","门巴族" },
+			{ "55","珞巴族" },
+			{ "56","基诺族" },
+			{ "57","穿青人" },
+			{ "90","外籍人士" },
+			{ "99","其他" }
+};
 DataCenter::DataCenter()
 {
 	DVTGKLDCam_Init();
@@ -637,7 +698,6 @@ int DataCenter::TestCard(QString& strMessage)
 			strMessage = QString("进卡箱无卡,请放入卡片后重试!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
 			break;
 		}
-
 
 		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
 		{
@@ -1500,7 +1560,7 @@ void DataCenter::CloseCamera()
 {
 	if (m_hCamera)
 	{
-		StopDetect();
+		StopFaceDetect();
 		DVTGKLDCam_Close(m_hCamera);
 		delete[]pImageBuffer;
 		pImageBuffer = nullptr;
@@ -1508,7 +1568,7 @@ void DataCenter::CloseCamera()
 	}
 }
 
-bool DataCenter::StartDetect(void* pContext, int nDetectMilliSeconds, int nTimeoutMilliSeconds)
+bool DataCenter::StartFaceDetect(void* pContext, int nDetectMilliSeconds, int nTimeoutMilliSeconds)
 {
 	if (!m_hCamera)
 		return false;
@@ -1529,23 +1589,40 @@ bool DataCenter::SaveFaceImage(string strPhotoFile, bool bFull)
 	int nDataLen = 0;
 	bool bSucceed = false;
 	ZeroMemory(pImageBuffer, nBufferSize);
-	if (bFull)
+	//if (bFull)
+	//{
+	try
 	{
-		if (LD_RET_OK == DVTGKLDCam_GetImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nDataLen))
+		if (fs::exists(strPhotoFile))
 		{
-			WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, m_nWidth, m_nHeight);
-			bSucceed = true;
+			fs::remove(strPhotoFile);
 		}
+		int nRes = DVTGKLDCam_Snapshot(m_hCamera, IMG_JPG, pImageBuffer, nBufferSize, &nDataLen);
+		if (nRes != LD_RET_OK)
+			return false;
+		ofstream ofs(strPhotoFile, ios::out | ios::binary);
+		//WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, m_nWidth, m_nHeight);
+		string strBuffer((char*)pImageBuffer, nDataLen);
+		ofs << strBuffer;
+		ofs.flush();
+		bSucceed = true;
 	}
+	catch (std::exception& e)
+	{
+		gInfo() << "保存图片发生异常:" << e.what();
+		bSucceed = false;
+	}
+
+	/*}
 	else
 	{
 		int nFaceWidth = 0, nFaceHeight = 0;
-		if (LD_RET_OK == DVTGKLDCam_GetFaceImage(m_hCamera, IMG_RGB24, pImageBuffer, nBufferSize, &nFaceWidth, &nFaceHeight, &nDataLen))
+		if (LD_RET_OK == DVTGKLDCam_GetFaceImage(m_hCamera, IMG_JPG, pImageBuffer, nBufferSize, &nFaceWidth, &nFaceHeight, &nDataLen))
 		{
 			WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, nFaceWidth, nFaceHeight);
 			bSucceed = true;
 		}
-	}
+	}*/
 	return bSucceed;
 }
 
@@ -1576,7 +1653,7 @@ bool DataCenter::FaceCompareByImage(string strFacePhoto1, string strFacePhoto2, 
 	return true;
 }
 
-void DataCenter::StopDetect()
+void DataCenter::StopFaceDetect()
 {
 	if (m_bDetectStarted)
 	{
@@ -1698,7 +1775,6 @@ bool DataCenter::LoadAdminConfigure()
 	}
 	vecAdminister.clear();
 	QJsonArray jsArray = jsdoc.array();
-	int nItems = 0;
 	for (auto var : jsArray)
 	{
 		auto jsObj = var.toObject();
@@ -1712,4 +1788,126 @@ bool DataCenter::LoadAdminConfigure()
 		vecAdminister.push_back(pIDCard);
 	}
 	return true;
+}
+
+int DataCenter::ReadSSCardInfo(SSCardInfoPtr& pSSCardInfo, int& nStatus, QString& strMessage)
+{
+	int nResult = 0;
+	char szStatus[1024] = { 0 };
+	if (QFailed(nResult = queryPersonInfo(*pSSCardInfo, szStatus)))
+	{
+		FailureMessage("查询人员信息", pSSCardInfo, szStatus, strMessage);
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+	char szDigit[16] = { 0 }, szText[1024] = { 0 };
+	SplitString(szStatus, szDigit, szText);
+	if (strlen(szText))
+		strMessage = QString::fromLocal8Bit(szText);
+	if (strlen(szDigit))
+	{
+		nStatus = strtolong(szDigit, 10);
+		return 0;
+	}
+	else
+		return -1;
+}
+
+
+int	 DataCenter::QuerySSCardStatus(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
+{
+	int nResult = 0;
+	char* szStatus[1024] = { 0 };
+	// 这里需要旧卡号
+	if (QFailed(nResult = queryCardStatus(*pSSCardInfo, reinterpret_cast<char*>(szStatus))))
+	{
+		FailureMessage("查询卡状态", pSSCardInfo, szStatus, strMessage);
+		/*if (strcmp((const char*)szStatus, "08") == 0)
+		{
+			strMessage = QString("查询卡状态失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\t卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+		}
+		else
+			strMessage = QString("查询卡状态失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);*/
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+
+	if (strcmp(_strupr((char*)szStatus), "OK") == 0)
+	{
+		strcpy(pSSCardInfo->strCardStatus, "正常");
+	}
+	else
+	{
+
+		QString strStatus = QString::fromLocal8Bit((char*)szStatus);
+		strcpy(pSSCardInfo->strCardStatus, (char*)strStatus.toStdString().c_str());
+	}
+
+	return 0;
+}
+
+char VerifyCardID(const char* pszSrc)
+{
+	int iS = 0;
+	int iW[] = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+	static char szVerCode[] = "10X98765432";
+	int i;
+	for (i = 0; i < 17; i++)
+	{
+		iS += (int)(pszSrc[i] - '0') * iW[i];
+	}
+	int iY = iS % 11;
+	return szVerCode[iY];
+}
+
+// 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
+int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage)
+{
+	QWaitCursor Wait;
+	QString strAppPath = QApplication::applicationDirPath();
+	QString strCurrentPath = strAppPath + "/PhotoProcess";
+	QString strProcessPath = strAppPath + "/PhotoProcess/MattingTool.bin";
+
+	try
+	{
+		if (!fs::exists(strProcessPath.toStdString()))
+		{
+			strMessage = "找不到人像处理组件:MattingTool.bin";
+			return -1;
+		}
+
+		QString strPhotoPath2 = strAppPath + "/PhotoProcess/2.jpg";
+
+		if (fs::exists(strPhotoPath2.toStdString()))
+			fs::remove(strPhotoPath2.toStdString());
+
+		wchar_t wszCurrentPath[1024] = { 0 };
+		wcscpy_s(wszCurrentPath, 1024, strCurrentPath.toStdWString().c_str());
+		QProcess tProcess;
+		tProcess.setCreateProcessArgumentsModifier([&](QProcess::CreateProcessArguments* args)
+			{
+				//args->flags |= CREATE_NEW_CONSOLE;
+				args->startupInfo->dwFlags &= ~STARTF_USESTDHANDLES;
+				args->startupInfo->dwFlags |= STARTF_USEFILLATTRIBUTE;
+				args->startupInfo->dwFillAttribute = BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+				args->currentDirectory = wszCurrentPath;
+			});
+		tProcess.start(strProcessPath);
+		tProcess.waitForFinished();
+
+		QFileInfo fi2(strPhotoPath2);
+		if (!fi2.isFile())
+		{
+			strMessage = "人像处理失败!";
+			return -1;
+		}
+		strHeaderPhoto = strPhotoPath2;
+		return 0;
+
+	}
+	catch (std::exception& e)
+	{
+		gInfo() << "发生异常" << e.what();
+	}
+	return -1;
 }

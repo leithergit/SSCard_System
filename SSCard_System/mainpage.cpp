@@ -30,12 +30,11 @@ MainPage::MainPage(QWidget* parent) :
 		"QPushButton:hover{border-image: url(./Image/%1_Hover.png);}"
 		"QPushButton:pressed{border-image: url(./Image/%1_Pressed.png);}";
 	QString strNewCard = QString(strButtonStyle).arg("NewCard");
-	QString strUpdateCard = QString(strButtonStyle).arg("UpdateCard_big");
+	QString strUpdateCard = QString(strButtonStyle).arg("UpdateCard");
 	QString strRegisterLost = QString(strButtonStyle).arg("RegisterLost");
 	QString strChangePassword = QString(strButtonStyle).arg("ChangePassword");
 
-	//ui->pushButton_NewCard->setStyleSheet(strNewCard);
-	//ui->pushButton_NewCard->hide();
+	ui->pushButton_NewCard->setStyleSheet(strNewCard);
 	ui->pushButton_Updatecard->setStyleSheet(strUpdateCard);
 	ui->pushButton_RegisterLost->setStyleSheet(strRegisterLost);
 	ui->pushButton_ChangePWD->setStyleSheet(strChangePassword);
@@ -64,7 +63,7 @@ MainPage::~MainPage()
 void MainPage::on_pushButton_NewCard_clicked()
 {
 	g_pDataCenter->ResetIDData();
-	((MainWindow*)m_pMainWindow)->on_pushButton_Updatecard_clicked();
+	((MainWindow*)m_pMainWindow)->on_pushButton_NewCard_clicked();
 }
 
 void MainPage::on_pushButton_Updatecard_clicked()

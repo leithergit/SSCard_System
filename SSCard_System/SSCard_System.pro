@@ -43,6 +43,7 @@ SOURCES += \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
+    nc_commitPersonInfo.cpp \
     newcard.cpp \
     openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
@@ -56,6 +57,7 @@ SOURCES += \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
+    uc_inputidcardinfo.cpp \
     uc_inputmobile.cpp \
     uc_makecard.cpp \
     uc_pay.cpp \
@@ -93,6 +95,7 @@ HEADERS += \
     license.h \
     mainpage.h \
     mainwindow.h \
+    nc_commitPersonInfo.h \
     newcard.h \
     openssl-1.0.1g/include/openssl/aes.h \
     openssl-1.0.1g/include/openssl/asn1.h \
@@ -180,6 +183,7 @@ HEADERS += \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
+    uc_inputidcardinfo.h \
     uc_inputmobile.h \
     uc_makecard.h \
     uc_pay.h \
@@ -214,6 +218,7 @@ FORMS += \
     license.ui \
     mainpage.ui \
     mainwindow.ui \
+    nc_commitpersoninfo.ui \
     registerlost.ui \
     showlicense.ui \
     sys_dialogreadidcard.ui \
@@ -221,6 +226,7 @@ FORMS += \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \
+    uc_inputidcardinfo.ui \
     uc_inputmobile.ui \
     uc_makecard.ui \
     uc_pay.ui \

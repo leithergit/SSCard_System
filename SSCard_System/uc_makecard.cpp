@@ -213,15 +213,33 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 		//nResult = ResgisterPayment(strMessage, nStatus, pSSCardInfo);          // 缴费登记
 		//if (QFailed(nResult))
 		//	break;
-
 		//if (nStatus != 0 && nStatus != 1)
 		//{
 		//	strMessage = QString("缴费登记失败:%1!").arg(nStatus);
 		//	nResult = -1;
 		//	break;
 		//}
-
-		nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
+		if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+		{
+			QByteArray baPhoto;
+			// 16岁以上，需要照片
+// if (GetAge(pSSCardInfo->strBirthday) >= 16)
+			QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
+			if (!fi.isFile())
+			{
+				QFile qfile(g_pDataCenter->strSSCardPhotoFile.c_str());
+				if (qfile.open(QIODevice::ReadOnly))
+				{
+					baPhoto = qfile.readAll();
+					pSSCardInfo->strPhoto = baPhoto.toBase64().data();
+				}
+			}
+			nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
+		}
+		else
+		{
+			nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
+		}
 		if (QFailed(nResult))
 			break;
 		if (nStatus != 0 && nStatus != 1)

@@ -266,8 +266,8 @@ int IDCardSDK::LoadCardInfo(IDCardInfo& IDCard)
 	nLen = sizeof(IDCard.szBirthday);
 	GetPeopleAddress(IDCard.szAddress, &nLen);
 
-	nLen = sizeof(IDCard.szIdentify);
-	GetPeopleIDCode(IDCard.szIdentify, &nLen);
+	nLen = sizeof(IDCard.szIdentity);
+	GetPeopleIDCode(IDCard.szIdentity, &nLen);
 
 	nLen = sizeof(IDCard.szIszssueAuthority);
 	GetDepartment(IDCard.szIszssueAuthority, &nLen);

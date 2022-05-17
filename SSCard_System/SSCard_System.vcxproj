@@ -67,11 +67,11 @@
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets;</QtModules>
+    <QtModules>core;sql;network;gui;widgets;</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;network;gui;axcontainer;widgets;</QtModules>
+    <QtModules>core;sql;network;gui;widgets;</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
@@ -146,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;SDK\IDCard;glog;SDK\QREncode;SDK\Printer;./SDK/Reader;SDK;debug;/include;../openssl-1.0.1g/include;../utility;./SDK/Bugtrap;./QtSingleton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;./SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;../SDK/SSCardInfo_Henan;../SSCardService;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -212,7 +212,6 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\SDK\dvtldcamocx\dvtldcamocxlib.cpp" />
     <ClCompile Include="..\utility\json\cJSON.c" />
     <ClCompile Include="..\utility\json\CJsonObject.cpp" />
     <ClCompile Include="administer.cpp" />
@@ -222,6 +221,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
+    <ClCompile Include="nc_commitPersonInfo.cpp" />
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
@@ -251,7 +251,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="uc_adforfinance.cpp" />
     <ClCompile Include="uc_ensureinformation.cpp" />
     <ClCompile Include="uc_facecapture.cpp" />
-    <ClCompile Include="uc_facecapture_ocx.cpp" />
+    <ClCompile Include="uc_inputidcardinfo.cpp" />
     <ClCompile Include="uc_inputmobile.cpp" />
     <ClCompile Include="uc_makecard.cpp" />
     <ClCompile Include="uc_pay.cpp" />
@@ -265,7 +265,6 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\SDK\dvtldcamocx\dvtldcamocxlib.h" />
     <ClInclude Include="..\utility\AutoLock.h" />
     <QtMoc Include="showlicense.h" />
     <QtMoc Include="newcard.h" />
@@ -274,11 +273,12 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <QtMoc Include="administer.h" />
     <ClInclude Include="aes.h" />
     <ClInclude Include="aestools.h" />
+    <QtMoc Include="nc_commitPersonInfo.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="sys_manualmakecard.h" />
     <QtMoc Include="waitingprogress.h" />
-    <QtMoc Include="uc_facecapture_ocx.h" />
     <QtMoc Include="sys_dialogreadidcard.h" />
+    <QtMoc Include="uc_inputidcardinfo.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -380,6 +380,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="MaskWidget.ui">
     </QtUic>
+    <QtUic Include="nc_commitpersoninfo.ui" />
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>
@@ -417,7 +418,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="uc_facecapture.ui">
     </QtUic>
-    <QtUic Include="uc_facecapture_ocx.ui" />
+    <QtUic Include="uc_inputidcardinfo.ui" />
     <QtUic Include="uc_inputmobile.ui">
     </QtUic>
     <QtUic Include="uc_makecard.ui">

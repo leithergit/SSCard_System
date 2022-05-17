@@ -38,7 +38,7 @@ void uc_FaceCapture::ShutDown()
 	//ShutDownDevice();		// 不关闭摄像机，防止后开摄像机等待时间过长
 	//if (m_pFaceDetectOcx)
 	//	m_pFaceDetectOcx->EndLiveDectection();
-	g_pDataCenter->StopDetect();
+	g_pDataCenter->StopFaceDetect();
 	//g_pDataCenter->StopVideo();
 
 }
@@ -135,7 +135,7 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 		//	}
 		//	m_bDetectionStart = true;
 		//}
-		g_pDataCenter->StopDetect();
+		g_pDataCenter->StopFaceDetect();
 		if (g_pDataCenter->IsVideoStart())
 		{
 			if (!g_pDataCenter->SwitchVideoWnd((HWND)ui->label_FaceDetect->winId()))
@@ -154,7 +154,7 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 			}
 
 		}
-		if (!g_pDataCenter->StartDetect(this, 2000, m_nTimeout * 1000))
+		if (!g_pDataCenter->StartFaceDetect(this, 2000, m_nTimeout * 1000))
 		{
 			strError = "启动人脸检测失败!";
 			return -1;
@@ -193,7 +193,7 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 		//delete m_pFaceDetectOcx;
 		//m_pFaceDetectOcx = nullptr;
 		g_pDataCenter->StopVideo();
-		g_pDataCenter->StopDetect();
+		g_pDataCenter->StopFaceDetect();
 
 	} while (0);
 	return nResult;
@@ -203,7 +203,7 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
 	QString strError;
 	//m_pFaceDetectOcx->EndLiveDectection();
-	g_pDataCenter->StopDetect();
+	g_pDataCenter->StopFaceDetect();
 
 	//m_bDetectionStart = false;
 	gInfo() << "OnFaceCaptureSucceed!";
@@ -214,7 +214,7 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 void uc_FaceCapture::OnFaceCaptureFailed()
 {
 	QString strError;
-	g_pDataCenter->StopDetect();
+	g_pDataCenter->StopFaceDetect();
 	// m_pFaceDetectOcx->EndLiveDectection();
 	// m_bDetectionStart = false;
 	gInfo() << "OnFaceCaptureFailed!";

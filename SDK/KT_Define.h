@@ -69,7 +69,7 @@ struct HSMInfo
 	char strNation[3];			//民族
 	char strCardATR[27];		//卡复位信息
 	char stralgoCode[3];		//算法标识
-	char strKeyAddr[5];			//秘钥地址
+	char strKeyAddr[64];		//秘钥地址
 	char strReleaseDate[9];		//发卡日期
 	char strValidDate[9];		//有效日期
 	char strBirthday[9];		//出生日期
@@ -116,6 +116,8 @@ struct SSCardInfo
 	char strClassName[50] = { 0 };		//班级名称
 	char strUniversity[2] = { 0 };		//是否大学
 	char strDepartmentName[50] = { 0 };	//所在院系名称
+	char strFailType[10] = { 0 };		//失败类型(银行,制卡)
+	char strFailReason[101] = { 0 };	//失败原因
 	char* strPhoto = NULL;				//相片
 };
 
@@ -158,6 +160,9 @@ struct SD_SSCardInfo
 	std::string strContactsName;	//联系人姓名
 	std::string strContactsMobile;	//联系人电话
 	std::string strReason;			//补换原因
+	std::string strGuardianCardType;//监护人证件类型
+	std::string strGuardianCardID;	//监护人证件号
+	std::string strGuardianType;	//监护人关系
 	std::string strPhoto;			//相片
 };
 struct CAInfo 

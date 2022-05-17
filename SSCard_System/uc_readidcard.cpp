@@ -6,8 +6,11 @@
 #include <algorithm>
 #include "Payment.h"
 #include "MaskWidget.h"
+#include "uc_inputidcardinfo.h"
 #include <QMovie>
 extern MaskWidget* g_pMaskWindow;
+
+#include "mainwindow.h"
 //#include "mainwindow.h"
 using namespace std;
 using namespace chrono;
@@ -26,7 +29,17 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 	QMovie* movie = new QMovie("./Image/SwipeIDCard.gif");
 	ui->label_Swipecard->setMovie(movie);
 	movie->start();
+
+	ui->checkBox_WithoutIDCard->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
+		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
+		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
+		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
+	/*ui->checkBox_Agency->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
+		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
+		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
+		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");*/
 	connect(this, &QStackPage::ErrorMessage, this, &uc_ReadIDCard::OnErrorMessage);
+	qDebug() << geometry();
 }
 
 uc_ReadIDCard::~uc_ReadIDCard()
@@ -35,32 +48,8 @@ uc_ReadIDCard::~uc_ReadIDCard()
 	delete ui;
 }
 
-
-int uc_ReadIDCard::ProcessBussiness()
+void uc_ReadIDCard::StartDetect()
 {
-	if (!g_pDataCenter->OpenCamera())
-	{
-		gInfo() << "Failed in OpenCamera";
-		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
-		return -1;
-	}
-	/*if (g_pMaskWindow)
-		g_pMaskWindow->hide();*/
-	QSize WindowsSize = size();
-	qDebug() << "Height = " << WindowsSize.height() << "Width = " << WindowsSize.width();
-	m_bSucceed = false;
-
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
-
-	IDCardInfoPtr pIDCardInfo = make_shared<IDCardInfo>();
-	g_pDataCenter->SetIDCardInfo(pIDCardInfo);
-
-	m_pIDCard = g_pDataCenter->GetIDCardInfo();
-
-	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
-	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
-	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
 	if (!m_pWorkThread)
 	{
 		m_bWorkThreadRunning = true;
@@ -70,10 +59,57 @@ int uc_ReadIDCard::ProcessBussiness()
 			QString strError = QString("内存不足,创建读卡线程失败!");
 			gError() << strError.toLocal8Bit().data();
 			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-			return -1;
+			return;
 		}
 	}
+}
 
+void uc_ReadIDCard::StopDetect()
+{
+	m_bWorkThreadRunning = false;
+	if (m_pWorkThread && m_pWorkThread->joinable())
+	{
+		m_pWorkThread->join();
+		m_pWorkThread = nullptr;
+	}
+	CloseReader();
+}
+
+int uc_ReadIDCard::ProcessBussiness()
+{
+	if (!g_pDataCenter->OpenCamera())
+	{
+		gInfo() << "Failed in OpenCamera";
+		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
+		return -1;
+	}
+
+	/*if (g_pMaskWindow)
+		g_pMaskWindow->hide();*/
+	QSize WindowsSize = size();
+	qDebug() << "Height = " << WindowsSize.height() << "Width = " << WindowsSize.width();
+	m_bSucceed = false;
+
+	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+
+	m_pIDCard = make_shared<IDCardInfo>();
+	//g_pDataCenter->SetIDCardInfo(m_pIDCard);;
+
+	SysConfigPtr& pConfigure = g_pDataCenter->GetSysConfigure();
+	m_strDevPort = pConfigure->DevConfig.strIDCardReaderPort;
+	transform(m_strDevPort.begin(), m_strDevPort.end(), m_strDevPort.begin(), ::toupper);
+	//ShowReadCardID();
+
+	disconnect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+		ui->checkBox_WithoutIDCard->show();
+	else
+		ui->checkBox_WithoutIDCard->hide();
+	StartDetect();
+	ui->checkBox_WithoutIDCard->setChecked(false);
+	m_bAgency = false;
+	connect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
 	return 0;
 }
 
@@ -85,15 +121,8 @@ void uc_ReadIDCard::OnTimeout()
 void  uc_ReadIDCard::ShutDown()
 {
 	gInfo() << __FUNCTION__;
-
-	m_bWorkThreadRunning = false;
-	if (m_pWorkThread && m_pWorkThread->joinable())
-	{
-		m_pWorkThread->join();
-		m_pWorkThread = nullptr;
-	}
-	m_pIDCard = nullptr;
-	CloseReader();
+	StopDetect();
+	//on_checkBox_WithoutIDCard_stateChanged(0);
 }
 
 void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
@@ -104,32 +133,74 @@ void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
 void uc_ReadIDCard::ThreadWork()
 {
 	auto tLast = high_resolution_clock::now();
-	QString strError;
+	QString strMessage;
 	while (m_bWorkThreadRunning)
 	{
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
 		if (tDuration.count() >= 1000)
 		{
 			tLast = high_resolution_clock::now();
-			int nResult = ReaderIDCard();
+			int nResult = g_pDataCenter->ReaderIDCard(m_pIDCard.get());
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
-				if (nReadIDType == ReadID_UpdateCard)
-					strError = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
-				else if (nReadIDType == ReadID_RegisterLost)
-					strError = "读取身份证成功,稍后请进行挂失/解挂操作!";
-				gInfo() << strError.toLocal8Bit().data();
-				emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
+				g_pDataCenter->SetIDCardInfo(m_pIDCard);
+
+				if (QSucceed(GetImageStorePath(g_pDataCenter->strIDImageFile)))
+				{
+					QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);
+					ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
+				}
+
+				int nNewPage = Page_FaceCapture;
+				int nOperation = Goto_Page;
+
+				QString strProgressFile = QString("%1/data/Progress_%2.json").arg(QCoreApplication::applicationDirPath()).arg((char*)m_pIDCard->szIdentity);
+				if (fs::exists(strProgressFile.toStdString()))
+				{
+					strMessage = "读取身份证成功,业务流程已开始!";
+					switch (g_pDataCenter->nCardServiceType)
+					{
+					case ServiceType::Service_NewCard:
+						nNewPage = Page_CommitNewInfo;
+						break;
+					case ServiceType::Service_ReplaceCard:
+						nNewPage = Page_EnsureInformation;
+						break;
+					default:
+						nOperation = Switch_NextPage;
+						nNewPage = 0;
+						strMessage = "读取身份证成功,稍后请进行挂失/解挂操作!";
+						break;
+					}
+				}
+				else
+				{
+					strMessage = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
+					switch (g_pDataCenter->nCardServiceType)
+					{
+					case ServiceType::Service_NewCard:
+					case ServiceType::Service_ReplaceCard:
+						break;
+					default:
+						nOperation = Switch_NextPage;
+						nNewPage = 0;
+						strMessage = "读取身份证成功,稍后请进行挂失/解挂操作!";
+						break;
+					}
+				}
+
+				gInfo() << gQStr(strMessage);
+				g_pDataCenter->SetIDCardInfo(m_pIDCard);
+				emit ShowMaskWidget("操作成功", strMessage, Success, nOperation, nNewPage);
 				break;
 			}
 			else
 			{
 				char szText[256] = { 0 };
 				GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
-				strError = QString("读取身份证失败:%1").arg(szText);
-				emit ErrorMessage(strError);
-				//emit ShowMaskWidget("操作失败", strError, Failed, Stay_CurrentPage);
-				gError() << strError.toLocal8Bit().data();
+				strMessage = QString("读取身份证失败:%1").arg(szText);
+				gInfo() << gQStr(strMessage);
+				emit ErrorMessage(strMessage);
 			}
 		}
 		else
@@ -139,95 +210,17 @@ void uc_ReadIDCard::ThreadWork()
 	}
 }
 
-// int  uc_ReadIDCard::GetIDImageStorePath(string& strFilePath)
-// {
-// 	QString strStorePath = QCoreApplication::applicationDirPath();
-// 	strStorePath += "/IDImage/";
-// 	strStorePath += QDateTime::currentDateTime().toString("yyyyMMdd/");
-// 	QFileInfo fi(strStorePath);
-// 	if (!fi.isDir())
-// 	{// 当天目录不存在？则创建目录
-// 		QDir storeDir;
-// 		if (!storeDir.mkpath(strStorePath))
-// 		{
-// 			char szError[1024] = { 0 };
-// 			_strerror_s(szError, 1024, nullptr);
-// 			QString Info = QString("创建身份证照片保存目录'%1'失败:%2").arg(strStorePath, szError);
-// 			gInfo() << Info.toLocal8Bit().data();
-// 			return -1;
-// 		}
-// 	}
-// 	QString strTempPath = strStorePath + QString("ID_%1.bmp").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
-// 	strFilePath = strTempPath.toStdString();
-// 	return 0;
-// }
-
-#define    Error_Not_IDCARD         (-1)
-
-int uc_ReadIDCard::ReaderIDCard()
-{
-	int nResult = IDCard_Status::IDCard_Succeed;
-	bool bDevOpened = false;
-	do
-	{
-		if (m_bSucceed)
-			break;
-		//if (m_bSucceed && m_nDelayCount <= 3)
-		//{
-		//	m_nDelayCount++;
-		//	break;
-		//}
-		//else
-		//{
-		//	m_nDelayCount = 0;
-		//	m_bSucceed = false;
-		//}
-
-		if (m_strDevPort == "AUTO" || !m_strDevPort.size())
-		{
-			gInfo() << "Try to open IDCard Reader auto!" << m_strDevPort;
-			nResult = OpenReader(nullptr);
-		}
-		else
-		{
-			gInfo() << "Try to open IDCard Reader " << m_strDevPort;
-			nResult = OpenReader(m_strDevPort.c_str());
-		}
-
-		if (nResult != IDCard_Status::IDCard_Succeed)
-		{
-			bDevOpened = true;
-			break;
-		}
-		nResult = FindIDCard();
-		if (nResult != IDCard_Status::IDCard_Succeed)
-		{
-			break;
-		}
-
-		nResult = ReadIDCard(*m_pIDCard.get());
-		if (nResult != IDCard_Status::IDCard_Succeed)
-		{
-			break;
-		}
-		g_pDataCenter->SetIDCardInfo(m_pIDCard);
-
-		if (QSucceed(GetImageStorePath(g_pDataCenter->strIDImageFile)))
-		{
-			QImage ImagePhoto = QImage::fromData(m_pIDCard->szPhoto, m_pIDCard->nPhotoSize);
-			ImagePhoto.save(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
-		}
-		m_bSucceed = true;
-	} while (0);
-	if (bDevOpened)
-	{
-		gInfo() << "Try to close IDCard Reader!";
-		CloseReader();
-	}
-
-	return nResult;
-}
 void uc_ReadIDCard::timerEvent(QTimerEvent* event)
 {
 
+}
+
+void uc_ReadIDCard::On_WithoutIDCard(int arg1)
+{
+	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
+	if (pMainWind && pMainWind->pLastStackPage)
+	{
+		g_pDataCenter->bWithoutIDCard = true;
+		pMainWind->pLastStackPage->emit SwitchPage(Goto_Page, Page_InputIDCardInfo);
+	}
 }

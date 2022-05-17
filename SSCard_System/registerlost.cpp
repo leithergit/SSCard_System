@@ -19,13 +19,13 @@ RegisterLost::RegisterLost(QWidget* parent) :
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-		ui->stackedWidget->addWidget(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard, ReadID_RegisterLost));
-		ui->stackedWidget->addWidget(new uc_EnsureInformation(ui->label_step, "Registerlost2.png", Page_RegisterLost));
-		ui->stackedWidget->addWidget(new OperatorSucceed(nullptr, "", Page_Succeed));
+		AddPage(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard, ReadID_RegisterLost));
+		AddPage(new uc_EnsureInformation(ui->label_step, "Registerlost2.png", Page_RegisterLost));
+		AddPage(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < m_pStackWidget->count(); i++)
 		{
 			QStackPage* pPage = dynamic_cast<QStackPage*>(ui->stackedWidget->widget(i));
-			connect(pPage, &QStackPage::SwitchNextPage, this, &QMainStackPage::on_SwitchNextPage);
+			connect(pPage, &QStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}
 	}
@@ -40,7 +40,7 @@ RegisterLost::~RegisterLost()
 	delete ui;
 }
 
-void  RegisterLost::SetTimeOut(int nTimeout)
+void  RegisterLost::ShowTimeOut(int nTimeout)
 {
 	ui->label_CountDown->setText(QString("%1").arg(nTimeout));
 }
