@@ -456,8 +456,6 @@ copy /y $(TargetPath) Z:\SSCardSystem.mvc.d</Command>
     </QtUic>
     <QtUic Include="up_changepwd.ui">
     </QtUic>
-    <QtUic Include="up_readsscard.bak.ui">
-    </QtUic>
     <QtUic Include="up_readsscard.ui">
     </QtUic>
     <QtUic Include="updatecard.ui">

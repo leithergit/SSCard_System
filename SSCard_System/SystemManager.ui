@@ -42,6 +42,24 @@ color: 0
       </spacer>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkBox_shutdownVPN">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+#checkBox_SkipPrint{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: rgb(255, 0, 0);
+}</string>
+       </property>
+       <property name="text">
+        <string>退出时关闭VPN</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_Save">
        <property name="minimumSize">
         <size>

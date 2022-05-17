@@ -10,7 +10,7 @@ MaskWidget::MaskWidget(QWidget* parent) :
 	ui(new Ui::MaskWidget)
 {
 	ui->setupUi(this);
-	//ui->pushButton_OK->hide();
+	ui->pushButton_OK->hide();
 	hide();
 }
 
@@ -103,7 +103,6 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nOper
 	ui->label_Title->setText(strTitle);
 	ui->label_Title->setStyleSheet(strQSS);
 	ui->label_Desc->setText(strDesc);
-
 }
 
 void MaskWidget::timerEvent(QTimerEvent* event)

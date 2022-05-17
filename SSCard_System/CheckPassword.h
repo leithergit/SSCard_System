@@ -18,6 +18,8 @@ private slots:
 
     void on_pushButton_Cancel_clicked();
 
+    void on_pushButton_T_clicked();
+
 private:
 	Ui::CheckPassword ui;
 };

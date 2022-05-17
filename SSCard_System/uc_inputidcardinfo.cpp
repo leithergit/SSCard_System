@@ -244,9 +244,12 @@ bool uc_InputIDCardInfo::LoadPersonInfo()
 			if (json.KeyExist("GuardianShip"))
 			{
 				json.Get("GuardianShip", pSSCardInfo->strGuardianShip);
-				int nIndex = ui->comboBox_Guardianship->findText(QString::fromLocal8Bit(pSSCardInfo->strGuardianShip.c_str()));
-				if (nIndex != -1)
-					ui->comboBox_Guardianship->setCurrentIndex(nIndex);
+				QString strGuardianShip = pSSCardInfo->strGuardianShip.c_str();
+				int nIndex = strGuardianShip.toInt();
+				if (nIndex >= 1 && nIndex <= ui->comboBox_Guardianship->count())
+					ui->comboBox_Guardianship->setCurrentIndex(nIndex - 1);
+				/*int nIndex = ui->comboBox_Guardianship->findText(QString::fromLocal8Bit(pSSCardInfo->strGuardianShip.c_str()));
+				if (nIndex != -1)*/
 			}
 
 			if (json.KeyExist("GuardianCardID"))
@@ -466,9 +469,9 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 		return -1;
 	}
 	QString strMobile = ui->lineEdit_GuardianMobile->text();
-	if (strMobile.isEmpty())
+	if (strMobile.size() < 11)
 	{
-		strMessage = "手机号码不能为空!";
+		strMessage = "手机号码输入有误,必须为11位数字!";
 		return -1;
 	}
 
@@ -510,10 +513,10 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 			return -1;
 		}
 
-		QString strGuandianShip = ui->comboBox_Guardianship->currentText();
+		int nGuandianShip = ui->comboBox_Guardianship->currentIndex() + 1;
 		pSSCardInfo->strGuardianName = strGuardian.toLocal8Bit().data();
 		pSSCardInfo->strGuardianIDentity = strGuardianCardID.toStdString();
-		pSSCardInfo->strGuardianShip = strGuandianShip.toLocal8Bit().data();
+		pSSCardInfo->strGuardianShip = QString("%1").arg(nGuandianShip).toStdString();
 	}
 	g_pDataCenter->strCardVersion = "3.00";
 
@@ -558,6 +561,12 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 		strMessage = "姓名中不能含有空格!";
 		return -1;
 	}
+	if (strCardID.size() < 18)
+	{
+		strMessage = "身份证号码位数不足18位，请检查后重新输入!";
+		return -1;
+	}
+
 	char nX = VerifyCardID(strCardID.toStdString().c_str());
 	if (nX != strCardID.toStdString().at(17))
 	{

@@ -422,7 +422,7 @@ font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
          <item>
           <widget class="QLabel" name="label_Career">
            <property name="minimumSize">
@@ -561,6 +561,68 @@ QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
              <string>其他从业人员</string>
             </property>
            </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_Bank">
+           <property name="minimumSize">
+            <size>
+             <width>180</width>
+             <height>61</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>180</width>
+             <height>61</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Medium</family>
+             <pointsize>-1</pointsize>
+             <weight>7</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
+           </property>
+           <property name="text">
+            <string>服务银行</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_BankName">
+           <property name="minimumSize">
+            <size>
+             <width>450</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;
+line-height: 44px;
+letter-spacing: 1px;
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;</string>
+           </property>
+           <property name="text">
+            <string>未设置</string>
+           </property>
           </widget>
          </item>
         </layout>

@@ -179,6 +179,12 @@ int nc_commitPersonInfo::ProcessBussiness()
 		ui->label_Birthday->setText(QString::fromLocal8Bit(pSSCardInfo->strBirthday.c_str()));
 		ui->label_Identity->setText(QString::fromLocal8Bit(pSSCardInfo->strIdentity.c_str()));
 		ui->label_Address->setText(QString::fromLocal8Bit(pSSCardInfo->strAddress.c_str()));
+		string strBankName;
+		if (QFailed(g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName)))
+		{
+			strBankName = pSSCardInfo->strBankCode;
+		}
+		ui->label_BankName->setText(QString::fromLocal8Bit(strBankName.c_str()));
 
 		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
 		ui->label_Photo->setStyleSheet(strStyle);

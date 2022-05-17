@@ -35,7 +35,7 @@ DeviceManager::DeviceManager(QWidget* parent)
 	ui.lineEdit_SSCardReaderModule->setText(DevConfig.strReaderModule.c_str());
 
 	ui.lineEdit_PrintCount->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
-
+	ui.lineEdit_TestCount->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
 
 	//QMenu* pBtnMenu = new QMenu(this);
 
@@ -268,6 +268,34 @@ void DeviceManager::on_pushButton_BrowseReaderModule_clicked()
 
 void DeviceManager::on_pushButton_ReaderTest_clicked()
 {
+	int nTestCount = ui.lineEdit_TestCount->text().toInt();
+	if (nTestCount > 1)
+	{
+		int nRes = QMessageBox_CN(QMessageBox::Question, tr("提示"), "多次测试过程不会显示中间测试结果,测试结束后会有一个成功和失败的统计,是否继续?", QMessageBox::Yes | QMessageBox::No, this);
+		if (nRes == QMessageBox::No)
+			return;
+		int nFailed = 0;
+		int nSucceed = 0;
+		for (int i = 0; i < nTestCount; i++)
+		{
+			gInfo() << __FUNCTION__ << " Test for [" << i << "];";
+			if (ReaderTest_clicked(true) == -1)
+				nFailed++;
+			else
+				nSucceed++;
+			google::FlushLogFiles(0);
+		}
+		QString  strMessage = QString("读取成功次数:%1\n失败次数:%2").arg(nSucceed).arg(nFailed);
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	}
+	else
+	{
+		ReaderTest_clicked(false);
+	}
+}
+
+int DeviceManager::ReaderTest_clicked(bool bContinue)
+{
 	QString strMessage;
 	QString strPrinterLib;
 	PrinterType nPrinterType;
@@ -276,8 +304,10 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 #pragma warning(disable:4700)
 	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
-		return;
+		if (bContinue)
+			return 1;
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return 1;
 	}
 
 	CardPowerType nPowerType;
@@ -287,13 +317,19 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 
 	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
 	{
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
-		return;
+		if (bContinue)
+			return 1;
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return 1;
 	}
 
-	int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
-	if (nRes == QMessageBox::Cancel)
-		return;
+	if (!bContinue)
+	{
+		int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
+		if (nRes == QMessageBox::Cancel)
+			return 1;
+	}
+
 	char szRCode[128] = { 0 };
 	bool bSucceed = false;
 	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
@@ -368,10 +404,27 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 		bSucceed = true;
 		strMessage = QString("读卡测试成功\n卡芯片号:%1\n银行卡号:%2\n稍后请取出卡片").arg(pSSCardInfo->strChipNum.c_str()).arg(pSSCardInfo->strBankNum.c_str());
 	} while (0);
-	if (!bSucceed)
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+	if (!bContinue)
+	{
+		if (!bSucceed)
+		{
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return 0;
+		}
+		else
+		{
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return -1;
+		}
+	}
 	else
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	{
+		gInfo() << gQStr(strMessage);
+		if (bSucceed)
+			return 0;
+		else
+			return -1;
+	}
 }
 
 void DeviceManager::on_pushButton_BrowseDesktopReaderModule_clicked()
@@ -1089,6 +1142,34 @@ void DeviceManager::on_pushButton_PrintCard_clicked()
 
 void DeviceManager::on_pushButton_WriteTest_clicked()
 {
+	int nTestCount = ui.lineEdit_TestCount->text().toInt();
+	if (nTestCount > 1)
+	{
+		int nRes = QMessageBox_CN(QMessageBox::Question, tr("提示"), "多次测试过程不会显示中间测试结果,测试结束后会有一个成功和失败的统计,是否继续?", QMessageBox::Yes | QMessageBox::No, this);
+		if (nRes == QMessageBox::No)
+			return;
+		int nFailed = 0;
+		int nSucceed = 0;
+		for (int i = 0; i < nTestCount; i++)
+		{
+			gInfo() << __FUNCTION__ << " Test for [" << i << "];";
+			if (WriteTest_clicked(true) == -1)
+				nFailed++;
+			else
+				nSucceed++;
+			google::FlushLogFiles(0);
+		}
+		QString  strMessage = QString("写入成功次数:%1\n失败次数:%2").arg(nSucceed).arg(nFailed);
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	}
+	else
+	{
+		WriteTest_clicked(false);
+	}
+}
+
+int DeviceManager::WriteTest_clicked(bool bContinue)
+{
 	QString strMessage;
 	QString strPrinterLib;
 	PrinterType nPrinterType;
@@ -1097,8 +1178,10 @@ void DeviceManager::on_pushButton_WriteTest_clicked()
 #pragma warning(disable:4700)
 	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
-		return;
+		if (bContinue)
+			return 1;
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return 1;
 	}
 
 	CardPowerType nPowerType;
@@ -1108,13 +1191,18 @@ void DeviceManager::on_pushButton_WriteTest_clicked()
 
 	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
 	{
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
-		return;
+		if (bContinue)
+			return 1;
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return 1;
+	}
+	if (!bContinue)
+	{
+		int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
+		if (nRes == QMessageBox::Cancel)
+			return 1;
 	}
 
-	int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
-	if (nRes == QMessageBox::Cancel)
-		return;
 	char szRCode[128] = { 0 };
 	bool bSucceed = false;
 	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
@@ -1141,7 +1229,6 @@ void DeviceManager::on_pushButton_WriteTest_clicked()
 			strMessage = QString("Printer_Dispense失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
-
 
 		char szCardATR[1024] = { 0 };
 		char szRCode[1024] = { 0 };
@@ -1209,9 +1296,21 @@ void DeviceManager::on_pushButton_WriteTest_clicked()
 
 		bSucceed = true;
 	} while (0);
-	if (!bSucceed)
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+	if (!bContinue)
+	{
+		if (!bSucceed)
+		{
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return 0;
+		}
+		else
+		{
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), "写卡成功,所有数据已写入!", QMessageBox::Ok, this);
+			return -1;
+		}
+	}
 	else
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), "写卡成功,所有数据已写入!", QMessageBox::Ok, this);
-	//g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+	{
+		return bSucceed ? 0 : -1;
+	}
 }

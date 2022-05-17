@@ -27,7 +27,6 @@ OtherOptions::OtherOptions(QWidget* parent) :
 		pItem->setFlags(pItem->flags() & (~Qt::ItemIsEditable));
 	}
 
-
 	SysConfigPtr& pConfig = g_pDataCenter->GetSysConfigure();
 	int nRow = 0;
 	ui->tableWidget_Other->setItem(nRow++, 2, new QTableWidgetItem(pConfig->PaymentConfig.strHost.c_str()));

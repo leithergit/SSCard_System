@@ -29,6 +29,9 @@ public:
 
 	bool TryOpenPinKeyBroadPort(int nPort, int nBaudrate, bool bClose = true);
 
+	int ReaderTest_clicked(bool bContinue = false);
+	int WriteTest_clicked(bool bContinue = false);
+
 	bool CheckPrinterModule(QString& strPrinterLib, PrinterType& nType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
 	enum ReaderUsage
@@ -74,17 +77,17 @@ private slots:
 
 	void on_pushButton_MakePhoto_clicked();
 
-    void on_pushButton_Excute_clicked(int nIndex);
+	void on_pushButton_Excute_clicked(int nIndex);
 
-    void on_pushButton_Depense_clicked();
+	void on_pushButton_Depense_clicked();
 
-    void on_pushButton_Eject_clicked();
+	void on_pushButton_Eject_clicked();
 
-    void on_pushButton_Retract_clicked();
+	void on_pushButton_Retract_clicked();
 
-    void on_pushButton_PrintCard_clicked();
+	void on_pushButton_PrintCard_clicked();
 
-    void on_pushButton_WriteTest_clicked();
+	void on_pushButton_WriteTest_clicked();
 
 private:
 	Ui::DeviceManager ui;

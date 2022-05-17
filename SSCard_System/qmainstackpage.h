@@ -31,12 +31,6 @@ public:
 	virtual void  StartBusiness();
 	virtual void  ShowTimeOut(int nTimeout) {};
 	virtual void  ResetTimer(bool boolStop, QStackPage* pCurPage = nullptr);
-	// 	virtual void paintEvent(QPaintEvent* event) override
-	// 	{
-	// 		QPainter painter(this);
-	// 		painter.setRenderHint(/*QPainter::Antialiasing | */QPainter::TextAntialiasing, true);
-	// 		QWidget::paintEvent(event);
-	// 	}
 
 public slots:
 	void on_pushButton_MainPage_clicked();
@@ -46,10 +40,6 @@ public slots:
 		qDebug() << __FUNCTION__ << "strTitle = " << strTitle << "strDesc = " << strDesc << "nStatus = " << nStatus << "nOperation = " << nOperation;
 		emit ShowMaskWidget(strTitle, strDesc, nStatus, nOperation, nPage);
 	}
-	//void On_RetryCurrentPage(QString strTitle, QString strDesc, int nStatus, int nPageOperation)
-	//{
-	//	emit ShowMaskWidget(strTitle, strDesc, nStatus, nPageOperation);
-	//}
 signals:
 	void ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage = 0);
 	void SwitchPage(int nOperation, int nPage = 0);

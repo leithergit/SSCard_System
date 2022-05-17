@@ -84,7 +84,7 @@ void Sys_BatchMakeCard::on_ShowMessage(QString strMessage)
 void Sys_BatchMakeCard::on_UpdateTableWidget(int nRow, int nCol, QString strMessage)
 {
 	ui->tableWidget->item(nRow, nCol)->setText(strMessage);
-	QString strDateTime = QDateTime::currentDateTime().toString("HH:MM:SS");
+	QString strDateTime = QDateTime::currentDateTime().toString("hh:mm:ss");
 	ui->textEdit->append(strDateTime + " " + strMessage);
 	QTextCursor cursor = ui->textEdit->textCursor();
 	cursor.movePosition(QTextCursor::End);

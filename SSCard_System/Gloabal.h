@@ -94,6 +94,7 @@ namespace fs = std::filesystem;
 extern const char* szPrinterTypeList[PRINTER_MAX];
 extern const char* szReaderTypeList[READER_MAX + 1];
 extern QScreen* g_pCurScreen;
+extern HWND hTouchKeybroad;
 
 using KT_PrinterLibPtr = shared_ptr<KTModule<KT_Printer>>;
 using KT_ReaderLibPtr = shared_ptr<KTModule<KT_Reader>>;
@@ -1148,6 +1149,8 @@ void EnableWidgets(QWidget* pUIObj, bool bEnable = true);
 void ShowWidgets(QWidget* pUIObj, bool bShow = true);
 
 char VerifyCardID(const char* pszSrc);
+
+HWND GetTouchKeybroadWnd();
 
 QString CardStatusString(CardStatus nCardStratus);
 // 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg

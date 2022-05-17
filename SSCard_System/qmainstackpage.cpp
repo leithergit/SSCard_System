@@ -27,6 +27,7 @@ void QMainStackPage::AddPage(QWidget* pWidget)
 	m_pStackWidget->addWidget(pWidget);
 	vecStackPage.push_back(dynamic_cast<QStackPage*>(pWidget));
 }
+
 QMainStackPage::~QMainStackPage()
 {
 	if (m_nTimerID)

@@ -894,10 +894,48 @@ color: 0
              </spacer>
             </item>
             <item>
+             <widget class="QLabel" name="label_PoweronType_3">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>次数</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_TestCount">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>1</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="pushButton_ReaderTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>150</width>
                 <height>55</height>
                </size>
               </property>
@@ -910,7 +948,7 @@ color: 0
              <widget class="QPushButton" name="pushButton_WriteTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>150</width>
                 <height>55</height>
                </size>
               </property>

@@ -432,9 +432,6 @@
     <QtUic Include="up_Inputpwd.ui">
       <Filter>Page\form</Filter>
     </QtUic>
-    <QtUic Include="up_readsscard.bak.ui">
-      <Filter>Page\form</Filter>
-    </QtUic>
     <QtUic Include="up_readsscard.ui">
       <Filter>Page\form</Filter>
     </QtUic>

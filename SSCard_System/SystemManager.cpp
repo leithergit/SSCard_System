@@ -40,6 +40,10 @@ void SystemManager::on_pushButton_Exit_clicked()
 {
 	if (QMessageBox_CN(QMessageBox::Warning, "警告", "该操作将会关闭社保卡制卡系统,是否继续?", QMessageBox::Yes | QMessageBox::No, this) == QMessageBox::Yes)
 	{
+		if (ui.checkBox_shutdownVPN->isChecked())
+		{
+
+		}
 		QString strInfo = "退出制卡系统!";
 		gInfo() << gQStr(strInfo);
 		std::this_thread::sleep_for(chrono::milliseconds(200));

@@ -248,8 +248,35 @@ void MainWindow::On_LoadSystemManager()
 	CheckPassword checkpwd;
 	SystemTool& sysTool = SystemTool::Instance();
 	sysTool.OpenScreenKeyboard();
+	//HWND hTouchKeybroad = GetTouchKeybroadWnd();
+	//if (hTouchKeybroad)
+	//{
+	//	RECT rtWin;
+	//	GetWindowRect(hTouchKeybroad, &rtWin);
+
+	//	QRect qRect(rtWin.left, rtWin.top, rtWin.right, rtWin.bottom);
+	//	qDebug() << "Rect of TouchKeybroad = " << qRect;
+	//	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, rtWin.left + 100, rtWin.top + 10, 0, 0);
+	//	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN, rtWin.left + 100, rtWin.top + 10, 0, 0);
+	//	Sleep(100);
+	//	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, rtWin.left + 100, rtWin.top + 500, 0, 0);
+	//	Sleep(100);
+	//	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP, rtWin.left + 100, rtWin.top + 500, 0, 0);
+	//	// 443,734 1483x1081
+	//	rtWin.left = 443;
+	//	rtWin.top = 734;
+	//	rtWin.right = 1483;
+	//	rtWin.bottom = 1081;
+	//	//SetWindowPos(hTouchKeybroad, HWND_TOPMOST, rtWin.left, rtWin.top, rtWin.right - rtWin.left, rtWin.bottom - rtWin.top, SWP_SHOWWINDOW);
+	//	//::MoveWindow(hTouchKeybroad, rtWin.left, rtWin.top, rtWin.right - rtWin.left, rtWin.bottom - rtWin.top, TRUE);
+	//}
+
 	if (checkpwd.exec() == QDialog::Accepted)
 	{
+		RECT rtWnd;
+		GetWindowRect(hTouchKeybroad, &rtWnd);
+		QRect qRect(rtWnd.left, rtWnd.top, rtWnd.right, rtWnd.bottom);
+		qDebug() << "Rect of TouchKeybroad = " << qRect;
 		QWaitCursor Wait;
 		if (pThreadAsync)
 		{
@@ -278,12 +305,10 @@ void MainWindow::On_LoadSystemManager()
 	//		hr = inputPane->Location(&prcInputPaneScreenLocation);
 	//		if (!SUCCEEDED(hr))
 	//		{
-
-//			}
-//		}
-//		inputPane->Release();
-//	}
-//
+	//		}
+	//	}
+	//	inputPane->Release();
+	//}
 }
 
 
@@ -401,21 +426,22 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
 	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
 	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+	g_pDataCenter->ResetIDData();
 	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
 	m_pNewCard->StartBusiness();
 	ui->stackedWidget->setCurrentWidget(m_pNewCard);
@@ -476,6 +502,12 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 void MainWindow::on_pushButton_ChangePWD_clicked()
 {
 	QWaitCursor Wait;
+	if (pThreadAsync)
+	{
+		pThreadAsync->join();
+		delete pThreadAsync;
+		pThreadAsync = nullptr;
+	}
 	if (pLastStackPage)
 	{
 		pLastStackPage->ResetAllPages(0);
@@ -561,10 +593,6 @@ void MainWindow::on_pushButton_MainPage_clicked()
 void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatus, int nOperation, int nPage)
 {
 	QMainStackPage* pCurPageSender = qobject_cast<QMainStackPage*>(sender());
-	//if (m_pMaskWindow)
-	//{
-	//	delete m_pMaskWindow;
-	//}
 
 	m_pMaskWindow = new MaskWidget(this);
 	g_pMaskWindow = m_pMaskWindow;
@@ -802,12 +830,6 @@ void MainWindow::ThreadUpdateLauncher()
 		}
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
-}
-
-void MainWindow::OnNewInstance(const QString& strMessage)
-{
-	showNormal();
-	activateWindow();
 }
 
 void MainWindow::on_pushButton_QueryInfo_clicked()

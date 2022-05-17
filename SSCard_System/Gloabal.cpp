@@ -84,6 +84,7 @@ QWaitCursor::~QWaitCursor()
 
 extern DataCenterPtr g_pDataCenter;
 
+HWND hTouchKeybroad = nullptr;
 
 QScreen* g_pCurScreen = nullptr;
 vector<NationaltyCode> g_vecNationCode = {
@@ -1889,39 +1890,39 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
 		gInfo() << "Try to GetCA";
-		if (QFailed(nResult = pSScardSerivce->GetCA(strJsonIn, strJsonOut)))
-		{
-			CJsonObject jsonOut(strJsonOut);
-			string strErrText;
-			jsonOut.Get("Message", strErrText);
-			strMessage = QString("GetCA失败:%1,PowerOnType:%2").arg(QString::fromLocal8Bit(strErrText.c_str())).arg((int)DevConfig.nSSCardReaderPowerOnType);
-			break;
-		}
-		CJsonObject jsonOut(strJsonOut);
-		string strQMZS, strJMZS, strJMMY, strGLYPIN, strZKMY;
-		jsonOut.Get("JMZS", strJMZS);
-		jsonOut.Get("QMZS", strQMZS);
-		jsonOut.Get("JMMY", strJMMY);
-		jsonOut.Get("GLYPIN", strGLYPIN);
-		jsonOut.Get("ZKMY", strZKMY);
-		if (strJMZS.empty() || strQMZS.empty() || strJMMY.empty() || strGLYPIN.empty())
-		{
-			strMessage = QString("签名证书,加密证书,加密密钥或管理密码中有一项或多项为空!");
-			break;
-		}
+		//if (QFailed(nResult = pSScardSerivce->GetCA(strJsonIn, strJsonOut)))
+		//{
+		//	CJsonObject jsonOut(strJsonOut);
+		//	string strErrText;
+		//	jsonOut.Get("Message", strErrText);
+		//	strMessage = QString("GetCA失败:%1,PowerOnType:%2").arg(QString::fromLocal8Bit(strErrText.c_str())).arg((int)DevConfig.nSSCardReaderPowerOnType);
+		//	break;
+		//}
+		//CJsonObject jsonOut(strJsonOut);
+		//string strQMZS, strJMZS, strJMMY, strGLYPIN, strZKMY;
+		//jsonOut.Get("JMZS", strJMZS);
+		//jsonOut.Get("QMZS", strQMZS);
+		//jsonOut.Get("JMMY", strJMMY);
+		//jsonOut.Get("GLYPIN", strGLYPIN);
+		//jsonOut.Get("ZKMY", strZKMY);
+		//if (strJMZS.empty() || strQMZS.empty() || strJMMY.empty() || strGLYPIN.empty())
+		//{
+		//	strMessage = QString("签名证书,加密证书,加密密钥或管理密码中有一项或多项为空!");
+		//	break;
+		//}
 
-		gInfo() << gQStr(strInfo);
-		//QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
-		gInfo() << "Try to iWriteCA";
-		nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, (char*)strQMZS.c_str(), (char*)strJMZS.c_str(), (char*)strJMMY.c_str(), (char*)strGLYPIN.c_str(), (char*)strZKMY.c_str(), szWriteCARes);
-		if (QSucceed(nResult))
-			break;
-		else
-		{
-			strMessage = QString("写CA失败:%1,PowerOnType:%2,nResult:%3").arg(szWriteCARes).arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
-			gInfo() << gQStr(strMessage);
-			break;
-		}
+		//gInfo() << gQStr(strInfo);
+		////QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
+		//gInfo() << "Try to iWriteCA";
+		//nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, (char*)strQMZS.c_str(), (char*)strJMZS.c_str(), (char*)strJMMY.c_str(), (char*)strGLYPIN.c_str(), (char*)strZKMY.c_str(), szWriteCARes);
+		//if (QSucceed(nResult))
+		//	break;
+		//else
+		//{
+		//	strMessage = QString("写CA失败:%1,PowerOnType:%2,nResult:%3").arg(szWriteCARes).arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
+		//	gInfo() << gQStr(strMessage);
+		//	break;
+		//}
 
 		nResult = 0;
 
@@ -2983,4 +2984,81 @@ bool  DataCenter::InitializeDB(QString& strMessage)
 		return false;
 	}
 	return true;
+}
+
+#include <TlHelp32.h>
+/*
+*@brief 根据进程名获取进程ID
+@param lpProcessName进程名称
+*/
+DWORD GetProcessHandle(LPCWSTR lpProcessName)//根据进程名查找进程PID 
+{
+	DWORD dwRet = 0;
+	HANDLE hSnapShot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnapShot == INVALID_HANDLE_VALUE)
+	{
+		gInfo() << "获得进程快照失败,返回的GetLastError():" << ::GetLastError();
+		return 0;
+	}
+
+	PROCESSENTRY32 pe32;//声明进程入口对象 
+	pe32.dwSize = sizeof(PROCESSENTRY32);//填充进程入口对象大小 
+	::Process32First(hSnapShot, &pe32);//遍历进程列表 
+	do
+	{
+		if (!lstrcmp(pe32.szExeFile, lpProcessName))//查找指定进程名的PID 
+		{
+			dwRet = pe32.th32ProcessID;
+			break;
+		}
+	} while (::Process32Next(hSnapShot, &pe32));
+	::CloseHandle(hSnapShot);
+	return dwRet;//返回 
+}
+
+typedef struct
+{
+	HWND    hMainWnd;     // 窗口句柄
+	DWORD   dwProcessID;    // 进程ID
+}EnumWindowsArg;
+
+///< 枚举窗口回调函数
+BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam)
+{
+	EnumWindowsArg* pArg = (EnumWindowsArg*)lParam;
+	DWORD  dwProcessID = 0;
+	// 通过窗口句柄取得进程ID
+	::GetWindowThreadProcessId(hWnd, &dwProcessID);
+	if ((GetWindowLong(hWnd, GWL_STYLE) & WS_VISIBLE) &&
+		GetParent(hWnd) == NULL &&
+		(dwProcessID == pArg->dwProcessID))
+	{
+		pArg->hMainWnd = hWnd;
+		return false;
+	}
+	// 没找到，继续找，返回TRUE
+	return TRUE;
+}
+
+HWND GetWindowHwndByPID(DWORD dwProcessID)
+{
+	HWND hwndRet = NULL;
+	EnumWindowsArg ewa;
+	ewa.dwProcessID = dwProcessID;
+	ewa.hMainWnd = NULL;
+	EnumWindows(EnumWindowsProc, (LPARAM)&ewa);
+	if (ewa.hMainWnd)
+	{
+		hwndRet = ewa.hMainWnd;
+	}
+	return hwndRet;
+}
+
+HWND GetTouchKeybroadWnd()
+{
+	static const WCHAR* szProcessName = L"TabTip.exe";
+	DWORD nPID = GetProcessHandle(szProcessName);
+	if (!nPID)
+		return nullptr;
+	return GetWindowHwndByPID(nPID);
 }

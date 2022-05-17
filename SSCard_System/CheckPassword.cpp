@@ -52,3 +52,9 @@ void CheckPassword::on_pushButton_Cancel_clicked()
 {
 	QDialog::reject();
 }
+
+void CheckPassword::on_pushButton_T_clicked()
+{
+
+}
+
