@@ -42,6 +42,7 @@ SOURCES += \
     SystemManager.cpp \
     WMIQuery.cpp \
     clickablelabel.cpp \
+    dialogconfigbank.cpp \
     imageviewlabel.cpp \
     license.cpp \
     main.cpp \
@@ -99,6 +100,7 @@ HEADERS += \
     SystemManager.h \
     WMIQuery.h \
     clickablelabel.h \
+    dialogconfigbank.h \
     imageviewlabel.h \
     license.h \
     mainpage.h \
@@ -152,6 +154,7 @@ FORMS += \
     Sys_regionconfigure.ui \
     Sys_sscardservicet.ui \
     SystemManager.ui \
+    dialogconfigbank.ui \
     mainpage.ui \
     mainwindow.ui \
     nc_commitpersoninfo.ui \

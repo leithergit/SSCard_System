@@ -837,7 +837,7 @@ struct SysConfig
 	bool			bTestCard = false;
 	bool			bSkipWriteCard = false;
 	bool			bSkipPrintCard = false;
-	bool			bEnableUpdate = false;
+	bool			bEnableUpdate = true;
 	bool			bWriteTest = false;
 	int				nNetTimeout = 1500;
 	map<string, string> MapBankSupported;
@@ -970,7 +970,7 @@ public:
 	QSqlDatabase	SQLiteDB;
 	bool			bGuardian;	// 启用监护人
 	bool			bDebug;
-	bool			bEnableUpdate = false;
+	bool			bEnableUpdate = true;
 	bool			bSkipWriteCard = false;
 	bool			bSkipPrintCard = false;
 	bool            bWriteTest = false;

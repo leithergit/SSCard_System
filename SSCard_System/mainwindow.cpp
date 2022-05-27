@@ -10,6 +10,8 @@
 #include "qmainstackpage.h"
 #include "CheckPassword.h"
 MaskWidget* g_pMaskWindow = nullptr;
+extern std::string strLauncher;
+extern int nRetryCount;
 
 int TestHost(string strIP, USHORT nPort, int nNetTimeout)
 {
@@ -794,23 +796,60 @@ void MainWindow::ThreadUpdateLauncher()
 		auto duration = duration_cast<chrono::seconds>(chrono::high_resolution_clock::now() - tStart);
 		if (duration.count() > 15)
 		{
-			string strMessage, strLocalVersion, strNewVersion, strFilePath;
-			do
+			string strMessage, strLocalVersion, strNewVersion, strFilePath, strMD5_Query, strMD5_Download;
+			Update(UpdateType::Launcher, strMessage);
+			/*do
 			{
 				if (QFailed(LoadUpgradeInfo(strMessage)))
 					break;
 
-				if (QFailed(GetLocalVersion("Launcher.exe", strLocalVersion, strMessage)))
+				if (QFailed(GetLocalVersion(strLauncher, strLocalVersion, strMessage)))
 				{
 					gError() << "Failed in GetLocalVersion:" << strMessage;
 					break;
 				}
-				gInfo() << "Launcher.exe" << " Local Version" << strLocalVersion;
-				if (QFailed(CheckNewVersion(UpdateType::Launcher, strLocalVersion, strNewVersion, strMessage)))
+
+				gInfo() << strLauncher << " Local Version" << strLocalVersion;
+				if (QFailed(CheckNewVersion(UpdateType::Launcher, strLocalVersion, strNewVersion, strMD5_Query, strMessage)))
 				{
 					gError() << "Failed in CheckNewVersion" << strMessage;
 					break;
 				}
+
+				bool bDownloadSucceed = false;
+				int nTryCount = 0;
+				do
+				{
+					gInfo() << strLocalVersion << " Remote Version" << strNewVersion << "\tMD5:" << strMD5_Query;
+					if (QFailed(DownloadNewVerion(UpdateType::Launcher, strNewVersion, strFilePath, strMessage)))
+					{
+						gError() << "Failed in DownloadNewVerion" << strMessage;
+						break;
+					}
+
+					if (QFailed(MD5(strFilePath, strMD5_Download)))
+					{
+						gError() << "Failed in getgtin MD5 string of file :" << strFilePath;
+						break;
+					}
+					std::transform(strMD5_Query.begin(), strMD5_Query.end(), strMD5_Query.begin(), ::toupper);
+					std::transform(strMD5_Download.begin(), strMD5_Download.end(), strMD5_Download.begin(), ::toupper);
+					if (strMD5_Query == strMD5_Download)
+					{
+						bDownloadSucceed = true;
+						break;
+					}
+					nTryCount++;
+					gError() << "Failed in MD5 string for file :" << strFilePath;
+
+				} while (nTryCount < nRetryCount);
+				if (!bDownloadSucceed)
+				{
+					gError() << "Failed in downloading new version:" << strNewVersion;
+					break;
+				}
+
+
 				gInfo() << "Launcher.exe" << " Remote Version" << strNewVersion;
 				if (QFailed(DownloadNewVerion(UpdateType::Launcher, strNewVersion, strFilePath, strMessage)))
 				{
@@ -825,7 +864,7 @@ void MainWindow::ThreadUpdateLauncher()
 					break;
 				}
 
-			} while (true);
+			} while (true);*/
 			tStart = chrono::high_resolution_clock::now();
 		}
 		this_thread::sleep_for(chrono::milliseconds(100));

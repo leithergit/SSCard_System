@@ -16,6 +16,7 @@
 #include "../utility/json/CJsonObject.hpp"
 #include "../Utility/Markup.h"
 #include "waitingprogress.h"
+#include "dialogconfigbank.h"
 
 extern QScreen* g_pCurScreen;
 
@@ -193,20 +194,32 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	//WaitingProgress WaitingUI;
-	//WaitingUI.show();
-	//a.exec();
-	//if (!WaitingUI.bPrinterReady)
-	//{
-	//	QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
-	//	return 0;
-	//}
-	//if (!CheckLocalLicense(Code_License))
-	//{
-	//	ShowLicense s;
-	//	s.show();
-	//	return a.exec();
-	//}
+	WaitingProgress WaitingUI;
+	WaitingUI.show();
+	a.exec();
+	if (!WaitingUI.bPrinterReady)
+	{
+		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+		return 0;
+	}
+	if (!CheckLocalLicense(Code_License))
+	{
+		ShowLicense s;
+		s.show();
+		return a.exec();
+	}
+
+	QString strMessage;
+	string strBankName;
+	if (QFailed(g_pDataCenter->CheckBankCode(strBankName, strMessage)))
+	{
+		DialogConfigBank dlg;
+		if (dlg.exec() != QDialog::Accepted)
+		{
+			gError() << GBKString("放弃配置银行代码!");
+			return 0;
+		}
+	}
 
 	MainWindow w;
 

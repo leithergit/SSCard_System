@@ -18,6 +18,7 @@
 #include <vector>
 #include <iostream>
 #include <filesystem>
+#include <QCryptographicHash>
 #include "../SDK/libcurl/curl.h"
 #include "../SDK/glog/logging.h"
 #include "../SDK/7Z/include/bitextractor.hpp"
@@ -46,6 +47,9 @@ using namespace bit7z;
 namespace fs = std::filesystem;
 string strUpdateCode;
 string strUpdateServer;
+string strMainProcess;
+string strLauncher;
+int nRetryCount = 5;
 
 #ifdef _DEBUG
 #pragma comment(lib, "../SDK/glog/glogd")
@@ -229,8 +233,9 @@ int SendHttpRequest(string strMothod, string szUrl, string& strRespond, string& 
 			gError() << "curl_easy_getinfo failed:" << nCurResult;
 			break;
 		}
+		gInfo() << "Httpcode:" << nHttpCode;
 
-		if (retcode == 401)
+		if (nHttpCode == 401)
 		{
 			long nAuthorize;
 			nCurResult = curl_easy_getinfo(pCurl, CURLINFO_HTTPAUTH_AVAIL, &nAuthorize);
@@ -394,8 +399,14 @@ int LoadUpgradeInfo(string& strMessage)
 	setting.beginGroup("Update");
 	strUpdateCode = setting.value("RegionCode", "").toString().toStdString();
 	strUpdateServer = setting.value("Server", "").toString().toStdString();
+	strMainProcess = setting.value("MainProcess", "SSCard_System.exe").toString().toStdString();
+	strLauncher = setting.value("Launcher", "Launcher.exe").toString().toStdString();
+	nRetryCount = setting.value("RetryCount", 5).toUInt();
 	gInfo() << "UpgradeCode = " << strUpdateCode;
 	gInfo() << "UpgradeServer = " << strUpdateServer;
+	gInfo() << "MainProcess = " << strMainProcess;
+	gInfo() << "Launcher = " << strLauncher;
+	gInfo() << "RetryCount = " << nRetryCount;
 	if (strUpdateCode.empty())
 	{
 		gError() << "RegionCode is empty!";
@@ -406,7 +417,7 @@ int LoadUpgradeInfo(string& strMessage)
 	return 0;
 }
 
-int  CheckNewVersion(UpdateType nType, string& strLocalVersion, string& strNewVersion, string& strMessage)
+int  CheckNewVersion(UpdateType nType, string& strLocalVersion, string& strNewVersion, string& strMD5, string& strMessage)
 {
 	QString strUrl = QString("http://%1/updateservice/checkupdate?targetarea=%2&version=%3&type=%4").arg(strUpdateServer.c_str()).arg(strUpdateCode.c_str()).arg(strLocalVersion.c_str()).arg((int)nType);
 
@@ -434,6 +445,7 @@ int  CheckNewVersion(UpdateType nType, string& strLocalVersion, string& strNewVe
 	if (strCode == "0")
 	{
 		strNewVersion = jsObj.value("version").toString().toStdString();
+		strMD5 = jsObj.value("hash").toString().toStdString();
 		string strUploadTime = jsObj.value("uploadtime").toString().toStdString();
 		string strDesc = jsObj.value("description").toString().toLocal8Bit().data();
 		gInfo() << "Code:" << strCode << "Version:" << strNewVersion << "UploadTime" << strUploadTime << "Description" << strDesc;
@@ -534,9 +546,9 @@ void BackupOldVersion(UpdateType nType, string strFileZipPath)
 		QString strAppPath = QCoreApplication::applicationDirPath();
 
 		string strLocalVersion, strMessage;
-		string strProcess = "/SSCard_System.exe";
+		string strProcess = "/" + strMainProcess;
 		if (nType == UpdateType::Launcher)
-			strProcess = "/Launcher.exe";
+			strProcess = "/" + strLauncher;
 
 		if (QFailed(GetLocalVersion(strProcess, strLocalVersion, strMessage)))
 		{
@@ -667,4 +679,104 @@ int InstallNewVersion(string& strFilePath, string& strMessage)
 		gInfo() << "Catch a exception :" << ex.what();
 		return 1;
 	}
+}
+
+int MD5(const string& strFileName, string& strMD5)
+{
+	QFile file(strFileName.c_str());
+	QByteArray fileArray;
+
+	if (!file.open(QIODevice::ReadOnly))
+	{
+		//打开失败  
+		gError() << "Failed in opening file " << strFileName;
+		return 1;
+	}
+	fileArray = file.readAll();
+	file.close();
+
+	QByteArray baMD5 = QCryptographicHash::hash(fileArray, QCryptographicHash::Md5);
+	strMD5 = baMD5.toHex().data();
+	return 0;
+}
+
+bool Update(UpdateType nType, string& strMessage)
+{
+	string strMD_Remote, strMD5_Local;
+	string strLocalVersion, strNewVersion;
+	string strFilePath;
+
+	bool bSucceed = false;
+	do
+	{
+		if (QFailed(LoadUpgradeInfo(strMessage)))
+		{
+			gError() << "Failed in load upgrade info:" << strMessage;
+			break;
+		}
+
+		string strUpdateProcess[] = { strMainProcess,strLauncher };
+		if ((int)nType >= sizeof(strUpdateProcess) / sizeof(string))
+		{
+			gError() << "Update type is invalid:" << (int)nType;
+			break;
+		}
+
+		if (QFailed(GetLocalVersion(strUpdateProcess[(int)nType], strLocalVersion, strMessage)))
+		{
+			gError() << "Failed in GetLocalVersion:" << strMessage;
+			break;
+		}
+
+		gInfo() << strMainProcess << " Local Version" << strLocalVersion;
+		if (QFailed(CheckNewVersion(nType, strLocalVersion, strNewVersion, strMD_Remote, strMessage)))
+		{
+			gError() << "Failed in CheckNewVersion" << strMessage;
+			break;
+		}
+		bool bDownloadSucceed = false;
+		int nTryCount = 0;
+		do
+		{
+			gInfo() << strMainProcess << " Remote Version" << strNewVersion << "\tMD5:" << strMD_Remote;
+			if (QFailed(DownloadNewVerion(nType, strNewVersion, strFilePath, strMessage)))
+			{
+				gError() << "Failed in DownloadNewVerion" << strMessage;
+				break;
+			}
+
+			if (QFailed(MD5(strFilePath, strMD5_Local)))
+			{
+				gError() << "Failed in getgtin MD5 string of file :" << strFilePath;
+				break;
+			}
+			std::transform(strMD_Remote.begin(), strMD_Remote.end(), strMD_Remote.begin(), ::toupper);
+			std::transform(strMD5_Local.begin(), strMD5_Local.end(), strMD5_Local.begin(), ::toupper);
+			if (strMD_Remote == strMD5_Local)
+			{
+				bDownloadSucceed = true;
+				break;
+			}
+			nTryCount++;
+			gError() << "Failed in MD5 string for file :" << strFilePath;
+
+		} while (nTryCount < nRetryCount);
+
+		if (!bDownloadSucceed)
+		{
+			gError() << "Failed in downloading new version:" << strNewVersion;
+			break;
+		}
+
+		gInfo() << "Try to BackupOldVersion";
+		BackupOldVersion(nType, strFilePath);
+		if (QFailed(InstallNewVersion(strFilePath, strMessage)))
+		{
+			gError() << "Failed in InstallNewVersion" << strMessage;
+			break;
+		}
+
+		bSucceed = true;
+	} while (true);
+	return bSucceed;
 }

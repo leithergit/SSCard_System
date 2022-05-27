@@ -1,16 +1,17 @@
 ﻿// SampleCode.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <thread>
+#include<filesystem>
 #include "../utility/Markup.h"
 #include "../utility/json/CJsonObject.hpp"
 using namespace std;
 using namespace neb;
-#include<filesystem>
 using namespace std::filesystem;
 
 bool IsDigitString(const char* szStr)
@@ -372,16 +373,22 @@ void GetAge()
 
 int main()
 {
+	string strT(1024, 0);
+	strT.at(0) = '1';
 
-	GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR gdiplusToken;
-	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+	char* pBuffer = strT.data();
+	for (int i = 0; i < strT.size(); i++)
+		pBuffer[i] = 0x30 + i % 10;
+	string strT2 = std::move(strT);
+	//GdiplusStartupInput gdiplusStartupInput;
+	//ULONG_PTR gdiplusToken;
+	//GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-	Image* image = new Image(L"FakePhoto.jpg");
-	CLSID encoderClsID;
+	//Image* image = new Image(L"FakePhoto.jpg");
+	//CLSID encoderClsID;
 
 
-	GdiplusShutdown(gdiplusToken);
+	//GdiplusShutdown(gdiplusToken);
 
 	string strBirthday = "19761216";
 	int nYear, nMonth, nDay;

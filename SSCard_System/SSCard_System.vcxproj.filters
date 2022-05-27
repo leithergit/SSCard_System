@@ -246,6 +246,9 @@
     <ClCompile Include="qi_information.cpp">
       <Filter>Page</Filter>
     </ClCompile>
+    <ClCompile Include="dialogconfigbank.cpp">
+      <Filter>MainPage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -443,6 +446,9 @@
     </QtUic>
     <QtUic Include="qi_information.ui">
       <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="dialogconfigbank.ui">
+      <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -711,6 +717,9 @@
     </QtMoc>
     <QtMoc Include="qi_information.h">
       <Filter>Page</Filter>
+    </QtMoc>
+    <QtMoc Include="dialogconfigbank.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogConfigBank</class>
+ <widget class="QDialog" name="DialogConfigBank">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>240</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>640</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>640</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>配置服务银行</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">color: #666666;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>服务银行</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QComboBox{
+  padding: 1px 15px 1px 3px;
+  border:1px solid rgba(228,228,228,1);
+color: #727275;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+}
+QComboBox::drop-down {			/*下拉按钮*/
+      subcontrol-origin: padding;
+      subcontrol-position: top right;
+      width: 36px;
+      border:none;
+}
+
+QComboBox::down-arrow {		/*下拉按钮*/
+ 	image: url(:/Image/down_arrow.png);
+  }
+
+QComboBox QAbstractItemView{	/*列表 */
+	margin-top: 8px;
+	margin-left: 6px;
+	margin-bottom: 6px;
+	margin-right: 6px;
+	background:rgba(255,255,255,1);
+    border:1px solid rgba(228,228,228,1);
+    outline: 2px;
+    padding-left: 16px;
+    padding-top: 12px;
+	padding-bottom:12px;
+  }
+  
+ QComboBox::QAbstractItemView::item {		/*下拉按钮*/
+ 	height:56px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+ }
+
+QComboBox QScrollBar::vertical{ /*滑条 主体部分*/
+    width:36px;
+    background:rgb(255,255,255);
+    border:none;
+}
+QComboBox QScrollBar::handle::vertical{ /*滑块主体*/
+    border-radius:3px;
+    background-color: rgba(30, 34, 43, 0.2);
+}
+QComboBox QScrollBar::handle::vertical::hover{
+    background-color: rgba(30, 34, 43, 0.2);
+}
+QComboBox QScrollBar::add-line::vertical{/*上箭头*/
+    border:none;
+}
+QComboBox QScrollBar::sub-line::vertical{/*下箭头*/
+    border:none;
+}
+</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_OK">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 15px;
+font: 57 36px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+</string>
+       </property>
+       <property name="text">
+        <string>确定</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Cancel">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 15px;
+font: 57 36px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+</string>
+       </property>
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
