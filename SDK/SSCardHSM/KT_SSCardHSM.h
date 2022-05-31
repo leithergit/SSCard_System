@@ -14,7 +14,7 @@ EXTERN_C_START
  * @brief 初始化库,设置当前环境
  * @param[in] region 地区枚举
  */
-DLL_PUBLIC bool InitEnv(BaseInfo& info);
+DLL_PUBLIC bool InitEnv(SSCardProvince province, BaseInfo& info);
 
 /**
  * @brief 加密机外部认证

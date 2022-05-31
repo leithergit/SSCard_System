@@ -19,26 +19,7 @@ namespace Ui {
 	class MakeCard;
 }
 
-enum MakeCard_Progress
-{
-	MP_Unknow = -1,
-	MP_PreMakeCard = 0,
-	//Depense,
-	MP_WriteCard,
-	MP_PrintCard,
-	MP_EnableCard,
-	MP_RejectCard
-};
 
-enum Step_Index
-{
-	Step_Mark = 0,
-	Step_PreMake,
-	Step_WriteCard,
-	Step_PrintCard,
-	Step_ReturnData,
-	Step_EnableCard
-};
 
 class uc_MakeCard : public QStackPage
 {

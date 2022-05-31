@@ -216,9 +216,6 @@
     <ClCompile Include="newcard.cpp">
       <Filter>manpage</Filter>
     </ClCompile>
-    <ClCompile Include="nc_commitPersonInfo.cpp">
-      <Filter>Page</Filter>
-    </ClCompile>
     <ClCompile Include="uc_inputidcardinfo.cpp">
       <Filter>Page</Filter>
     </ClCompile>
@@ -408,9 +405,6 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="uc_inputidcardinfo.ui">
-      <Filter>Page</Filter>
-    </QtUic>
-    <QtUic Include="nc_commitpersoninfo.ui">
       <Filter>Page</Filter>
     </QtUic>
     <QtUic Include="uc_ensureinformation.ui">
@@ -656,9 +650,6 @@
     </QtMoc>
     <QtMoc Include="newcard.h">
       <Filter>manpage</Filter>
-    </QtMoc>
-    <QtMoc Include="nc_commitPersonInfo.h">
-      <Filter>Page</Filter>
     </QtMoc>
     <QtMoc Include="uc_inputidcardinfo.h">
       <Filter>Page</Filter>

@@ -66,7 +66,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 
 		g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pTempSSCardInfo->strCardStatus).toStdString();
-		if (g_pDataCenter->strCardMakeProgress == "制卡中")
+		if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard &&
+			g_pDataCenter->strCardMakeProgress == "制卡中")
 		{
 			// 可以获取新的社保卡一些数据
 			if (QFailed(nResult = g_pDataCenter->ReadSSCardInfo(pSSCardInfo, nStatus, strMessage)))

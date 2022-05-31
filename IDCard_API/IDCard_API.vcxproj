@@ -160,6 +160,10 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;IDCARD_API_LIBRARY;_HAS_STD_BYTE=0;_WINDOWS;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN32_LEAN_AND_MEAN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>@echo copy $(TargetPath) to remote device
+copy /y $(TargetPath) Z:\SSCard_System</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\utility\Utility.cpp" />

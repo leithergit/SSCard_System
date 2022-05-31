@@ -131,7 +131,7 @@ MainWindow::MainWindow(QWidget* parent)
 	strcpy(Bi.strAccount, region.strEMAccount.c_str());
 	strcpy(Bi.strPassword, region.strEMPassword.c_str());
 	gInfo() << "InitEnv" << "EMUrl:" << Bi.strEMUrl << "EMAccount:" << Bi.strAccount << "EMPassword:" << Bi.strPassword;
-	if (!InitEnv(Bi))
+	if (!InitEnv(HN_SSCARD, Bi))
 	{
 		gInfo() << "Failed in InitEnv";
 	}
@@ -157,7 +157,10 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->stackedWidget->addWidget(m_pUpdatePassword);
 	ui->stackedWidget->addWidget(m_pRegiserLost);
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
+	ui->checkBox_Debug->setVisible(g_pDataCenter->bDebug);
 	m_pMainpage->show();
+	QString strError;
+	LoadConfigure(strError);		// 加载配置时会自动关闭已经打开的打印和读卡器
 
 	/*
 	Constant                Value           Description
@@ -182,6 +185,11 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(this, &MainWindow::LoadSystemManager, this, &MainWindow::On_LoadSystemManager);
 	// 	bThreadUploadlogRunning = true;
 	// 	ThreadUploadlog = std::thread(&MainWindow::fnThreadUploadlog, this);
+	if (g_pDataCenter->bEnableUpdate)
+	{
+		bThreadUpdateLauncherRunning = true;
+		pThreadUpdateLauncher = new std::thread(&MainWindow::ThreadUpdateLauncher, this);
+	}
 
 	m_nTimerTestHost = startTimer(5000);
 	QString strMessage;
@@ -215,6 +223,7 @@ void MainWindow::On_LoadSystemManager()
 			delete pThreadAsync;
 			pThreadAsync = nullptr;
 		}
+		Wait.RestoreCursor();
 		SystemManager d(this);
 		d.setGeometry(g_pCurScreen->geometry());
 		d.exec();
@@ -223,7 +232,7 @@ void MainWindow::On_LoadSystemManager()
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
 {
-	if ((e->x() >= 1880 && e->y() >= 960) &&
+	if ((e->x() >= 1820 && e->y() >= 900) &&
 		(e->x() <= 1920 && e->y() <= 990))
 	{
 		qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
@@ -232,19 +241,13 @@ void MainWindow::mousePressEvent(QMouseEvent* e)
 		{
 			m_nContinuePressCount++;
 			if (m_nContinuePressCount >= 6)
-			{
 				emit LoadSystemManager();
-			}
 		}
 		else
-		{
 			m_nContinuePressCount = 1;
-		}
 	}
 	else
-	{
 		m_nContinuePressCount = 1;
-	}
 	m_tLastPress = chrono::high_resolution_clock::now();
 }
 
@@ -547,7 +550,7 @@ void MainWindow::On_MaskWidgetTimeout(int nOperation, int nPage)
 		delete m_pMaskWindow;
 		m_pMaskWindow = nullptr;
 	}
-	if (pLastStackPage)
+	if (pLastStackPage && nOperation != Stay_CurrentPage)
 	{
 		if (pLastStackPage->m_nTimerID)
 		{
@@ -662,13 +665,15 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::ThreadUpdateLauncher()
 {
-	auto tStart = chrono::high_resolution_clock::now();
+	auto tStart = chrono::high_resolution_clock::now() - chrono::seconds(15 * 60 - 1);
 	while (bThreadUpdateLauncherRunning)
 	{
 		auto duration = duration_cast<chrono::seconds>(chrono::high_resolution_clock::now() - tStart);
-		if (duration.count() > 15)
+		if (duration.count() > 15 * 60)
 		{
-			string strMessage, strLocalVersion, strNewVersion, strFilePath;
+			string strMessage;
+			Update(UpdateType::Launcher, strMessage);
+			/*string strMessage, strLocalVersion, strNewVersion, strFilePath;
 			do
 			{
 				if (QFailed(LoadUpgradeInfo(strMessage)))
@@ -699,7 +704,7 @@ void MainWindow::ThreadUpdateLauncher()
 					break;
 				}
 
-			} while (true);
+			} while (true);*/
 			tStart = chrono::high_resolution_clock::now();
 		}
 		this_thread::sleep_for(chrono::milliseconds(100));

@@ -199,12 +199,12 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	//if (!CheckLocalLicense(Code_License))
-	//{
-	//	ShowLicense s;
-	//	s.show();
-	//	return a.exec();
-	//}
+	if (!CheckLocalLicense(Code_License))
+	{
+		ShowLicense s;
+		s.show();
+		return a.exec();
+	}
 
 	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;

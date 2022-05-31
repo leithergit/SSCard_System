@@ -14,7 +14,7 @@
 if (strcmp((const char*)strStatus, "08") == 0)\
 	strMessage = QString("%1失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%2\t卡号:%3\t").arg(strFuncName).arg(QString::fromLocal8Bit(pSSCardInfo->strName)).arg(pSSCardInfo->strCardNum);\
 else\
-	strMessage = QString("%1失败:\n姓名:%2\t卡号:%3\t").arg(strFuncName).arg(QString::fromLocal8Bit(pSSCardInfo->strName)).arg(pSSCardInfo->strCardNum); }\
+	strMessage = QString("%1失败:\n姓名:%2\t卡号:%3\t%4").arg(strFuncName).arg(QString::fromLocal8Bit(pSSCardInfo->strName)).arg(pSSCardInfo->strCardNum).arg(QString::fromLocal8Bit((char *)strStatus)); }\
 
 void  SplitString(const char* szStr, char* szDigit, char* szText);
 

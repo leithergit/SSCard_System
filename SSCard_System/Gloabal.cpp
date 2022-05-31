@@ -179,6 +179,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			return -1;
 		}
 		bDebug = GetSysConfigure()->bDebug;
+		bEnableUpdate = GetSysConfigure()->bEnableUpdate;
 		nSkipPayTime = GetSysConfigure()->nSkipPayTime;
 		bTestCard = GetSysConfigure()->bTestCard;
 		nNetTimeout = GetSysConfigure()->nNetTimeout;
@@ -775,6 +776,121 @@ int DataCenter::TestCard(QString& strMessage)
 		m_pPrinter->Printer_Retract(1, szRCode);
 	}
 	return nResult;
+}
+#define	UpdateJson(j,f,v)	if (j->KeyExist(f)) \
+								j->Replace(f, v);\
+							else\
+								j->Add(f, v);
+bool DataCenter::OpenProgress()
+{
+	if (!pIDCard)
+		return false;
+
+	QString strAppPath = QApplication::applicationDirPath();
+	QString strJsonPath = QString("%1/data/Person_%2.json").arg(strAppPath).arg(pSSCardInfo->strCardID);
+	strPersonProgressFile = strJsonPath.toLocal8Bit().data();
+	try
+	{
+		if (pJsonProgress)
+			delete pJsonProgress;
+		pJsonProgress = new CJsonObject();
+		if (fs::exists(strPersonProgressFile))
+		{
+			ifstream ifs(strPersonProgressFile, ios::in | ios::binary);
+			stringstream ss;
+			ss << ifs.rdbuf();
+			if (!pJsonProgress->Parse(ss.str()))
+				fs::remove(strJsonPath.toLocal8Bit().data());
+		}
+
+		UpdateJson(pJsonProgress, "Name", (char*)pIDCard->szName);
+		UpdateJson(pJsonProgress, "Identity", (char*)pIDCard->szIdentity);
+		UpdateJson(pJsonProgress, "Gender", (char*)pIDCard->szGender);
+		UpdateJson(pJsonProgress, "Nation", (char*)pIDCard->szName);
+		UpdateJson(pJsonProgress, "Identity", (char*)pIDCard->szName);
+		UpdateJson(pJsonProgress, "PaperIssuedate", (char*)pIDCard->szExpirationDate1);
+		UpdateJson(pJsonProgress, "PaperExpiredate", (char*)pIDCard->szExpirationDate2);
+		ofstream ifs(strJsonPath.toLocal8Bit().data(), ios::out | ios::binary);
+		ifs << pJsonProgress->ToFormattedString();
+
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+		return false;
+	}
+}
+
+bool DataCenter::UpdateProgress()
+{
+	if (!pSSCardInfo || !pJsonProgress)
+		return false;
+
+	try
+	{
+		if (!fs::exists(strPersonProgressFile))
+		{
+			return false;
+		}
+
+		UpdateJson(pJsonProgress, "Mobile", pSSCardInfo->strMobile);
+		UpdateJson(pJsonProgress, "BankCode", pSSCardInfo->strBankCode);
+		UpdateJson(pJsonProgress, "City", pSSCardInfo->strCity);
+		UpdateJson(pJsonProgress, "PersonType", pSSCardInfo->strPersonType);
+		UpdateJson(pJsonProgress, "Company", pSSCardInfo->strCompanyName);
+		UpdateJson(pJsonProgress, "Community", pSSCardInfo->strCommunity);
+		UpdateJson(pJsonProgress, "LocalNum", pSSCardInfo->strLocalNum);
+		UpdateJson(pJsonProgress, "Department", pSSCardInfo->strDepartmentName);
+		UpdateJson(pJsonProgress, "Class", pSSCardInfo->strClassName);
+
+		ofstream ifs(strPersonProgressFile, ios::out | ios::binary);
+		ifs << pJsonProgress->ToFormattedString();
+
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+		return false;
+	}
+}
+
+bool DataCenter::GetProgress(string strProcess, int& nStatus)
+{
+	try
+	{
+		if (!pJsonProgress)
+			return false;
+		if (pJsonProgress->KeyExist(strProcess))
+			return pJsonProgress->Get(strProcess, nStatus);
+		else
+		{
+			nStatus = 0;
+			return true;
+		}
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+	}
+}
+
+bool DataCenter::SetProgress(string strProcess, int nStatus)
+{
+	try
+	{
+		if (!pJsonProgress)
+			return;
+		UpdateJson(pJsonProgress, strProcess, nStatus);
+
+		ofstream ifs(strPersonProgressFile, ios::out | ios::binary);
+		ifs << pJsonProgress->ToFormattedString();
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+	}
 }
 
 int DataCenter::TestPrinter(QString& strMessage)
@@ -1760,14 +1876,14 @@ bool DataCenter::LoadAdminConfigure()
 	if (byData.isEmpty())
 		return false;
 
-	AesTools AesDecrypt((unsigned char*)szAesKey, 16);
-	unsigned char* pBuffer = new unsigned char[byData.size() + 1];
-	shared_ptr<unsigned char> pBufferFree(pBuffer);
-	int nDataLen = AesDecrypt.Decrypt((unsigned char*)byData.data(), byData.size(), pBuffer);
-	qDebug() << (char*)pBuffer;
-	QByteArray baJson((char*)pBuffer, nDataLen);
+	//AesTools AesDecrypt((unsigned char*)szAesKey, 16);
+	//unsigned char* pBuffer = new unsigned char[byData.size() + 1];
+	//shared_ptr<unsigned char> pBufferFree(pBuffer);
+	//int nDataLen = AesDecrypt.Decrypt((unsigned char*)byData.data(), byData.size(), pBuffer);
+	//qDebug() << (char*)pBuffer;
+	//QByteArray baJson((char*)pBuffer, nDataLen);
 	QJsonParseError jsErr;
-	QJsonDocument jsdoc = QJsonDocument::fromJson(baJson, &jsErr);
+	QJsonDocument jsdoc = QJsonDocument::fromJson(byData, &jsErr);
 	if (jsdoc.isNull())
 	{
 		qDebug() << jsErr.errorString();
@@ -1788,6 +1904,18 @@ bool DataCenter::LoadAdminConfigure()
 		vecAdminister.push_back(pIDCard);
 	}
 	return true;
+}
+
+void DataCenter::RemoveTempPerson()
+{
+	QString strAppPath = QApplication::applicationDirPath();
+	strAppPath += "/data/TempPerson.json";
+
+	if (!fs::exists(strAppPath.toLocal8Bit().data()))
+	{
+		gInfo() << GBKStr("删除人员数据:") << GBKStr(strAppPath);
+		QFile::remove(strAppPath.toLocal8Bit().data());
+	}
 }
 
 int DataCenter::ReadSSCardInfo(SSCardInfoPtr& pSSCardInfo, int& nStatus, QString& strMessage)

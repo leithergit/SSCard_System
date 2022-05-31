@@ -221,7 +221,6 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="Gloabal.cpp" />
     <ClCompile Include="license.cpp" />
     <ClCompile Include="MaskWidget.cpp" />
-    <ClCompile Include="nc_commitPersonInfo.cpp" />
     <ClCompile Include="newcard.cpp" />
     <ClCompile Include="OperatorSucceed.cpp" />
     <ClCompile Include="Payment.cpp" />
@@ -273,7 +272,6 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <QtMoc Include="administer.h" />
     <ClInclude Include="aes.h" />
     <ClInclude Include="aestools.h" />
-    <QtMoc Include="nc_commitPersonInfo.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="sys_manualmakecard.h" />
     <QtMoc Include="waitingprogress.h" />
@@ -380,7 +378,6 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="MaskWidget.ui">
     </QtUic>
-    <QtUic Include="nc_commitpersoninfo.ui" />
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui">
     </QtUic>

@@ -178,6 +178,9 @@ void uc_Pay::ThreadReadIDCard()
 {
 	auto tLast = high_resolution_clock::now();
 	QString strError;
+	int nResult = 0;
+	PayResult nPayResult = PayResult::WaitforPay;
+	QString strMessage;
 	IDCardInfo* pIDCard = new IDCardInfo();
 	while (bThreadReadIDCard)
 	{
@@ -190,9 +193,36 @@ void uc_Pay::ThreadReadIDCard()
 			{
 				if (!g_pDataCenter->IsAdmin((char*)pIDCard->szIdentity))
 					continue;
-				gInfo() << GBKStr("管理员:") << pIDCard->szName << " 刷卡身份跳过付费!";
-				emit SkipPay();
-				break;
+
+				int nStatus = -1;
+				bool bSucceed = false;
+				int nRetry = 0;
+				do
+				{
+					nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+					if (QFailed(nResult))
+					{
+						strMessage = QString("缴费登记失败,Result:%1!").arg(nResult);
+						if (!Delay(bThreadReadIDCard, 1000))
+							break;
+					}
+					else if (nStatus != 0 && nStatus != 1)
+						strMessage = QString("缴费登记失败,Status:%1!").arg(nStatus);
+					else
+					{
+						strMessage = "缴费登记,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
+						bSucceed = true;
+						break;
+					}
+					gInfo() << GBKStr(strMessage);
+					nRetry++;
+				} while (nRetry < 5);
+				if (bSucceed)
+				{
+					gInfo() << GBKStr("管理员:") << pIDCard->szName << " 刷卡身份跳过付费!";
+					emit SkipPay();
+					break;
+				}
 			}
 			else
 			{
@@ -257,10 +287,12 @@ void uc_Pay::ThreadWork()
 		emit ShowMaskWidget("操作失败", strMessage, Failed, Return_MainPage);
 		return;
 	}
+
 	if (nPayResult == PayResult::PaySucceed)
 	{
 		int nStatus = -1;
 		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+		gInfo() << GBKStr("注册缴费:") << "Result = " << nResult << " Status = " << nStatus;
 		if (QFailed(nResult))
 		{
 			emit ShowMaskWidget("操作失败", strMessage, Success, Return_MainPage);
@@ -275,6 +307,7 @@ void uc_Pay::ThreadWork()
 			strMessage = "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
 			emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
 		}
+		gInfo() << GBKStr(strMessage);
 	}
 	else
 	{

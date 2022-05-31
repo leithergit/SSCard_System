@@ -40,6 +40,7 @@ void SystemManager::on_pushButton_Exit_clicked()
 		QString strInfo = "退出制卡系统!";
 		gInfo() << gQStr(strInfo);
 		std::this_thread::sleep_for(chrono::milliseconds(200));
+		QDialog::accepted();
 		((MainWindow*)parent())->emit Shutdown();
 		//this->deleteLater();
 	}

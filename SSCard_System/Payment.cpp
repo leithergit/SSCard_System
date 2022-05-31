@@ -448,7 +448,22 @@ void SaveCardDataField(const char* szField, char* szValue, QString strINIFile)
 	CardIni.endGroup();
 }
 
-int GetCardDataField(const char* szField, char* szValue, QString strINIFile)
+int GetCardDataField(const char* szField, char* pValue, QString strINIFile)
+{
+	QFileInfo fi(strINIFile);
+	if (!fi.isFile())
+		return -1;
+
+	QSettings CardIni(strINIFile, QSettings::IniFormat);
+	CardIni.beginGroup("CardData");	
+	strcpy(pValue, CardIni.value(szField).toString().toStdString().c_str());
+	CardIni.endGroup();
+	if (strlen(pValue) == 0)
+		return -1;
+	return 0;
+}
+
+int GetCardDataFieldp(const char* szField, char** ppValue, QString strINIFile)
 {
 	QFileInfo fi(strINIFile);
 	if (!fi.isFile())
@@ -456,10 +471,16 @@ int GetCardDataField(const char* szField, char* szValue, QString strINIFile)
 
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
 	CardIni.beginGroup("CardData");
-	strcpy(szValue, CardIni.value(szField).toString().toStdString().c_str());
-	CardIni.setValue(szField, szValue);
+	string strData = CardIni.value(szField).toString().toStdString();
+	if (!*ppValue)
+	{
+		*ppValue = new char[strData.size() + 1];
+		ZeroMemory(*ppValue, strData.size() + 1);
+	}
+
+	strcpy(*ppValue, strData.c_str());
 	CardIni.endGroup();
-	if (strlen(szValue) == 0)
+	if (strlen(*ppValue) == 0)
 		return -1;
 	return 0;
 }
@@ -663,9 +684,10 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			strFnName = "即制卡人员";
 			if (QFailed(nResult = getJZKRY(*pSSCardInfo, szStatus)))
 				break;
-
+			using LPCHAR = char*;
 			strFnName = "获取批次号";
-			if (!GetCardDataField("strPCH", pSSCardInfo->strPCH, strAppPath))
+			
+			if (QFailed(GetCardDataField("strPCH", (char *)pSSCardInfo->strPCH, strAppPath)))
 			{
 				if (QFailed(nResult = getHQPCH(*pSSCardInfo, szStatus)))
 					break;
@@ -678,12 +700,12 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			}
 
 			strFnName = "即制卡批次";
-			if (!GetCardDataField("strCardNum", pSSCardInfo->strCardNum, strAppPath))
+			if (QFailed(GetCardDataField("strCardNum", (char*)pSSCardInfo->strCardNum, strAppPath)))
 			{
 				if (QFailed(nResult = getJZKPC(*pSSCardInfo, szStatus)))
 				{
 					strMessage = QString::fromLocal8Bit(szStatus);
-					if (!strMessage.contains("已经有批次号"))
+					if (!strMessage.contains("已经有批次号") || !strMessage.contains("批次号已经被使用"))
 						break;
 				}
 				SaveCardDataField("strCardNum", pSSCardInfo->strCardNum, strAppPath);
@@ -695,8 +717,9 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			}
 
 			strFnName = "获取制卡数据";
-			if (!GetCardDataField("strPhoto", pSSCardInfo->strPhoto, strAppPath))
+			if (QFailed(GetCardDataFieldp("strPhoto", &pSSCardInfo->strPhoto, strAppPath)))
 			{
+				shared_ptr<char> FreePhoto(pSSCardInfo->strPhoto);
 				nResult = getCardData(*pSSCardInfo, szStatus);
 				if (QFailed(nResult))
 				{
@@ -732,6 +755,14 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			}
 			else
 			{
+				SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
+				LoadSSCardData(pSSCardTemp, strAppPath);				
+				strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
+				strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
+				strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
+				strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
+				strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
+				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 				gInfo() << GBKStr(strFnName.c_str()) << GBKStr("使用已有照片数据.");
 				nResult = 0;
 			}

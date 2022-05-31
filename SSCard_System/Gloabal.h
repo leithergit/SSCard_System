@@ -103,6 +103,27 @@ enum ReaderSide
 	ReaderDesktop
 };
 
+enum MakeCard_Progress
+{
+	MP_Unknow = -1,
+	MP_PreMakeCard = 0,
+	//Depense,
+	MP_WriteCard,
+	MP_PrintCard,
+	MP_EnableCard,
+	MP_RejectCard
+};
+
+enum Step_Index
+{
+	Step_Mark = 0,
+	Step_PreMake,
+	Step_WriteCard,
+	Step_PrintCard,
+	Step_ReturnData,
+	Step_EnableCard
+};
+
 enum FaceDetectStatus
 {
 	FD_Succeed,
@@ -691,6 +712,7 @@ struct SysConfig
 		pSettings->setValue("logServerPort", nLogServerPort);            // 日志服务器端口
 		pSettings->setValue("logSavePeroid", nLogSavePeroid);            // 日志保存天数
 		pSettings->setValue("EnableDebug", bDebug);
+		bEnableUpdate = pSettings->value("EnableUpdate", true).toBool();
 		pSettings->setValue("SkipPay", bDebug);
 		pSettings->endGroup();
 	}
@@ -789,6 +811,7 @@ struct SysConfig
 	int             nLogSavePeroid = 30;                // 日志保存天数
 	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
 	bool			bDebug = false;
+	bool			bEnableUpdate = true;
 	bool			nSkipPayTime = false;
 	bool			bTestCard = false;
 	int				nNetTimeout = 1500;
@@ -861,6 +884,8 @@ public:
 		pIDCard.reset();
 		pSSCardInfo.reset();
 	}
+	void RemoveTempPerson();
+
 	SSCardInfoPtr& GetSSCardInfo()
 	{
 		return pSSCardInfo;
@@ -917,6 +942,7 @@ public:
 	// 	}
 	string         strIDImageFile;
 	string		   strSSCardPhotoFile;
+	string		   strPersonProgressFile;
 	string         strMobilePhone;
 	string         strSSCardOldPassword;
 	string         strSSCardNewPassword;
@@ -924,6 +950,7 @@ public:
 	string		   strPayCode;
 	string		   strCardVersion = "3.0";
 	bool		   bDebug;
+	bool			bEnableUpdate = true;
 	int			   nSkipPayTime = 0;
 	bool		   bTestCard = false;
 	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
@@ -979,6 +1006,14 @@ public:
 	int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage);
 
 	int TestPrinter(QString& strMessage);
+
+	bool OpenProgress();
+
+	bool UpdateProgress();
+
+	bool GetProgress(string strProcess, int& nStatus);
+
+	bool SetProgress(string strProcess, int nStatus);
 
 	int TestCard(QString& strMessage);
 
@@ -1054,6 +1089,7 @@ private:
 	KT_Reader* m_pSSCardReader = nullptr;
 	vector<IDCardInfoPtr> vecAdminister;
 	Manager_Level	nManagerLevel = Manager_Level::Manager;
+	CJsonObject* pJsonProgress = nullptr;
 };
 
 using DataCenterPtr = shared_ptr<DataCenter>;

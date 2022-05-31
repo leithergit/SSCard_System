@@ -34,20 +34,21 @@ Administer::Administer(QWidget* parent) :
 Administer::~Administer()
 {
 	SaveConfigure();
-	LoadConfigure();
+	//LoadConfigure();
 	delete ui;
 }
 
 bool Administer::LoadConfigure()
 {
 	int nItems = 0;
+	g_pDataCenter->LoadAdminConfigure();
 	for (auto var : g_pDataCenter->GetAdminConfigure())
 	{
 		ui->tableWidget->insertRow(nItems);
 		ui->tableWidget->setItem(nItems, 0, new QTableWidgetItem(QString("%1").arg(nItems + 1)));
 		ui->tableWidget->setItem(nItems, 1, new QTableWidgetItem(QString::fromLocal8Bit((char*)var->szName)));
 		ui->tableWidget->setItem(nItems, 2, new QTableWidgetItem((char*)var->szIdentity));
-		//ui->tableWidget->setItem(nItems, 3, new QTableWidgetItem(QString::fromLocal8Bit(var->szGender)));
+		ui->tableWidget->setItem(nItems, 3, new QTableWidgetItem(QString::fromLocal8Bit((char*)var->szGender)));
 		nItems++;
 	}
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -85,12 +86,12 @@ void Administer::SaveConfigure()
 	jsonDoc.setArray(jsArray);
 	QByteArray ba = jsonDoc.toJson();
 
-	AesTools AesDecrypt((unsigned char*)szAesKey, 16);
-	unsigned char* pBuffer = new unsigned char[ba.size() * 2];
-	ZeroMemory(pBuffer, ba.size() * 2);
+	//AesTools AesDecrypt((unsigned char*)szAesKey, 16);
+	//unsigned char* pBuffer = new unsigned char[ba.size() * 2 + 1];
+	//ZeroMemory(pBuffer, ba.size() * 2 + 1);
 
-	shared_ptr<unsigned char> pBufferFree(pBuffer);
-	int nDataLen = AesDecrypt.Encrypt((unsigned char*)ba.data(), ba.size(), pBuffer);
+	//shared_ptr<unsigned char> pBufferFree(pBuffer);
+	//int nDataLen = AesDecrypt.Encrypt((unsigned char*)ba.data(), ba.size(), pBuffer);
 
 	QString strDocPath = qApp->applicationDirPath() + "/Data";
 	QFileInfo fi(strDocPath);
@@ -112,7 +113,7 @@ void Administer::SaveConfigure()
 	QFile jsfile(strDocPath);
 
 	jsfile.open(QIODevice::ReadWrite);
-	jsfile.write((char*)pBuffer, nDataLen);
+	jsfile.write((char*)ba.data(), ba.size());
 	jsfile.close();
 }
 
@@ -209,7 +210,7 @@ void Administer::on_AddNewIDCard(IDCardInfo* pIDCard)
 	ui->tableWidget->setItem(nItems, 0, new QTableWidgetItem(QString("%1").arg(nItems + 1)));
 	ui->tableWidget->setItem(nItems, 1, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szName)));
 	ui->tableWidget->setItem(nItems, 2, new QTableWidgetItem(QString("%1").arg((char*)pIDCard->szIdentity)));
-	//ui->tableWidget->setItem(nItems, 3, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szGender)));
+	ui->tableWidget->setItem(nItems, 3, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szGender)));
 
 	ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui->tableWidget->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);

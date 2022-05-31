@@ -225,13 +225,13 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 			// 16岁以上，需要照片
 // if (GetAge(pSSCardInfo->strBirthday) >= 16)
 			QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
-			if (!fi.isFile())
+			if (fi.isFile())
 			{
 				QFile qfile(g_pDataCenter->strSSCardPhotoFile.c_str());
 				if (qfile.open(QIODevice::ReadOnly))
 				{
-					baPhoto = qfile.readAll();
-					pSSCardInfo->strPhoto = baPhoto.toBase64().data();
+					baPhoto = qfile.readAll().toBase64();
+					pSSCardInfo->strPhoto = baPhoto.data();
 				}
 			}
 			nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
@@ -352,6 +352,7 @@ void uc_MakeCard::ThreadWork()
 				break;
 			}
 			StepStatus[Step_EnableCard] = true;
+			g_pDataCenter->RemoveTempPerson();
 		}
 
 		if (nStatus != 0 && nStatus != 1)
