@@ -433,6 +433,7 @@ struct RegionInfo
 		strCityCode = pSettings->value("City").toString().toStdString();
 		strCountry = pSettings->value("Country").toString().toStdString();
 		strAgency = pSettings->value("Agency").toString().toStdString();
+		strPostCode = pSettings->value("PostCode").toString().toStdString();
 
 		strLicense = pSettings->value("License").toString().toStdString();
 		strEMURL = pSettings->value("EMURL").toString().toStdString();
@@ -496,6 +497,7 @@ struct RegionInfo
 	string		strCityCode;						    // 地市编码 410700
 	string		strCountry;							    // 所属区县 410700
 	string		strAgency;								// 经办机构
+	string		strPostCode;							// 邮政编码
 	string		strLicense;							    // LICENSE = STZOLdFrhbc
 	string		strEMURL;							    // 加密机ip http://10.120.6.239:7777/
 	string		strEMAccount;							// 加密机帐号
@@ -872,19 +874,8 @@ public:
 	{
 		return pCardForm;
 	}
-	void ResetIDData()
-	{
-		strMobilePhone = "";
-		strIDImageFile = "";
-		strSSCardOldPassword = "";
-		strSSCardNewPassword = "";
-		strCardMakeProgress = "";
-		strPayCode = "";
-		bWithoutIDCard = false;
-		pIDCard.reset();
-		pSSCardInfo.reset();
-	}
-	void RemoveTempPerson();
+
+	void ResetIDData();
 
 	SSCardInfoPtr& GetSSCardInfo()
 	{
@@ -942,6 +933,7 @@ public:
 	// 	}
 	string         strIDImageFile;
 	string		   strSSCardPhotoFile;
+	string		   strPhotoBase64;
 	string		   strPersonProgressFile;
 	string         strMobilePhone;
 	string         strSSCardOldPassword;
@@ -1008,6 +1000,8 @@ public:
 	int TestPrinter(QString& strMessage);
 
 	bool OpenProgress();
+
+	void CloseProgress();
 
 	bool UpdateProgress();
 
@@ -1108,8 +1102,9 @@ public:
 	~QWaitCursor();
 };
 
+int GetAge(string strBirthday);
 char VerifyCardID(const char* pszSrc);
-
+void EnableWidgets(QWidget* pUIObj, bool bEnable = true);
 // 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
 int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage);
 

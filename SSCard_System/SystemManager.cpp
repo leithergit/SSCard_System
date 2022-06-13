@@ -11,6 +11,7 @@
 #include "administer.h"
 #include <QMessageBox>
 #include "Gloabal.h"
+#include "sys_sscardapitest.h"
 #include <thread>
 #include "mainwindow.h"
 
@@ -26,6 +27,7 @@ SystemManager::SystemManager(QWidget* parent)
 	//ui.tabWidget->addTab(new PageConfigure, "页面设置");	
 	ui.tabWidget->addTab(new logManager, "日志管理");
 	ui.tabWidget->addTab(new OtherOptions, "其它选项");
+	//ui.tabWidget->addTab(new Sys_SSCardAPITest, "新卡测试");
 	showFullScreen();
 }
 

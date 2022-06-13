@@ -35,6 +35,7 @@ SOURCES += \
     Sys_pageconfigure.cpp \
     Sys_qwidgetreadidcard.cpp \
     Sys_regionconfigure.cpp \
+    Sys_sscardservicet.cpp \
     SystemManager.cpp \
     WMIQuery.cpp \
     administer.cpp \
@@ -54,6 +55,7 @@ SOURCES += \
     showlicense.cpp \
     sys_dialogreadidcard.cpp \
     sys_manualmakecard.cpp \
+    sys_sscardapitest.cpp \
     uc_adforfinance.cpp \
     uc_ensureinformation.cpp \
     uc_facecapture.cpp \
@@ -88,6 +90,7 @@ HEADERS += \
     Sys_pageconfigure.h \
     Sys_qwidgetreadidcard.h \
     Sys_regionconfigure.h \
+    Sys_sscardservicet.h \
     SystemManager.h \
     WMIQuery.h \
     administer.h \
@@ -180,6 +183,7 @@ HEADERS += \
     showlicense.h \
     sys_dialogreadidcard.h \
     sys_manualmakecard.h \
+    sys_sscardapitest.h \
     uc_adforfinance.h \
     uc_ensureinformation.h \
     uc_facecapture.h \
@@ -213,6 +217,7 @@ FORMS += \
     Sys_pageconfigure.ui \
     Sys_qwidgetreadidcard.ui \
     Sys_regionconfigure.ui \
+    Sys_sscardservicet.ui \
     SystemManager.ui \
     administer.ui \
     license.ui \
@@ -223,6 +228,7 @@ FORMS += \
     showlicense.ui \
     sys_dialogreadidcard.ui \
     sys_manualmakecard.ui \
+    sys_sscardapitest.ui \
     uc_adforfinance.ui \
     uc_ensureinformation.ui \
     uc_facecapture.ui \

@@ -219,6 +219,9 @@
     <ClCompile Include="uc_inputidcardinfo.cpp">
       <Filter>Page</Filter>
     </ClCompile>
+    <ClCompile Include="sys_sscardapitest.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -437,6 +440,9 @@
     <QtUic Include="up_readsscard.ui">
       <Filter>Page</Filter>
     </QtUic>
+    <QtUic Include="sys_sscardapitest.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png">
@@ -653,6 +659,9 @@
     </QtMoc>
     <QtMoc Include="uc_inputidcardinfo.h">
       <Filter>Page</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_sscardapitest.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,7 @@ public:
 	void PrintCardData();
 	void PrintPhoto();
 	void EnableCard();
+    void TestApplyNewCard();
 
 	int LoadPersonSSCardData(QString& strMesssage);
 

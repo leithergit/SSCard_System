@@ -39,9 +39,17 @@ int uc_EnsureInformation::ProcessBussiness()
 			string strCardID, strName, strMobile;
 			if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
 			{
-				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentity;
+				if (!pIDCard)
+				{
+					pIDCard = make_shared<IDCardInfo>();
+				}
+				else
+				{
+					gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentity;
+
+				}
 				strcpy((char*)pIDCard->szName, strName.c_str());
-				strcpy((char*)pIDCard->szIdentity, strCardID.c_str());
+				strcpy((char*)pIDCard->szIdentity, strCardID.c_str());				
 				gInfo() << "Name:" << pIDCard->szName << "\tID:" << pIDCard->szIdentity;
 			}
 		}

@@ -123,6 +123,11 @@ color: 0
          <string>启用卡片</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>测试新制卡</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>

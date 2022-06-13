@@ -31,7 +31,7 @@
 #pragma comment(lib, "../SDK/glog/glogd")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z_d.lib")
-#pragma comment(lib, "../Update/Debug/update")
+#pragma comment(lib, "../SDK/Update/Debug/update")
 #else
 #pragma comment(lib, "../SDK/KT_Printer/KT_Printer")
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
@@ -44,7 +44,7 @@
 #pragma comment(lib, "../SDK/glog/glog")
 #pragma comment(lib, "../SDK/PinKeybroad/XZ_F31_API")
 #pragma comment(lib, "../SDK/7Z/lib/bit7z.lib")
-#pragma comment(lib, "../Update/release/update")
+#pragma comment(lib, "../SDK/Update/release/update")
 #endif
 
 const char* szPrinterTypeList[PRINTER_MAX] =
@@ -777,10 +777,11 @@ int DataCenter::TestCard(QString& strMessage)
 	}
 	return nResult;
 }
-#define	UpdateJson(j,f,v)	if (j->KeyExist(f)) \
-								j->Replace(f, v);\
-							else\
-								j->Add(f, v);
+#define	UpdateJson(json,field,value)	if (json->KeyExist(field)) \
+											json->Replace(field, value);\
+										else\
+											json->Add(field, value);
+
 bool DataCenter::OpenProgress()
 {
 	if (!pIDCard)
@@ -822,6 +823,42 @@ bool DataCenter::OpenProgress()
 	}
 }
 
+void DataCenter::CloseProgress()
+{
+	try
+	{
+		if (!fs::exists(strPersonProgressFile))
+		{
+			return;
+		}
+		if (pJsonProgress)
+		{
+			delete pJsonProgress;
+			pJsonProgress = nullptr;
+		}
+		QString strAppPath = QApplication::applicationDirPath();
+		QString strFinishPath = QString("%1/data/Finished/Person_%2.json").arg(strAppPath).arg((char*)pIDCard->szIdentity);
+		string strBaseFile = strFinishPath.toLocal8Bit().data();
+		int nIndex = 0;
+
+		do
+		{
+			if (fs::exists(strBaseFile))
+				strBaseFile = strFinishPath.toStdString() + std::to_string(nIndex++);
+			else
+				break;
+		} while (true);
+		fs::copy(strPersonProgressFile, strBaseFile);
+		fs::remove(strPersonProgressFile);
+		strPersonProgressFile = "";
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+		return;
+	}
+}
+
 bool DataCenter::UpdateProgress()
 {
 	if (!pSSCardInfo || !pJsonProgress)
@@ -833,6 +870,13 @@ bool DataCenter::UpdateProgress()
 		{
 			return false;
 		}
+#define	UpdateSSCard(j,f,v)	if (strlen(v))\
+							{\
+								if (pJsonProgress->KeyExist(f))\
+									pJsonProgress->Replace(f,v);\
+								else\
+									pJsonProgress->Add(f,v);\
+							}\
 
 		UpdateJson(pJsonProgress, "Mobile", pSSCardInfo->strMobile);
 		UpdateJson(pJsonProgress, "BankCode", pSSCardInfo->strBankCode);
@@ -843,6 +887,26 @@ bool DataCenter::UpdateProgress()
 		UpdateJson(pJsonProgress, "LocalNum", pSSCardInfo->strLocalNum);
 		UpdateJson(pJsonProgress, "Department", pSSCardInfo->strDepartmentName);
 		UpdateJson(pJsonProgress, "Class", pSSCardInfo->strClassName);
+
+		UpdateJson(pJsonProgress, "OrganID", pSSCardInfo->strOrganID);
+		UpdateJson(pJsonProgress, "CardNum", pSSCardInfo->strCardNum);
+		UpdateJson(pJsonProgress, "Address", pSSCardInfo->strAdress);
+		UpdateJson(pJsonProgress, "PostalCode", pSSCardInfo->strPostalCode);
+		UpdateJson(pJsonProgress, "Email", pSSCardInfo->strEmail);
+		UpdateJson(pJsonProgress, "GuardianName", pSSCardInfo->strGuardianName);
+		UpdateJson(pJsonProgress, "TransType", pSSCardInfo->strTransType);
+		UpdateJson(pJsonProgress, "City", pSSCardInfo->strCity);
+		UpdateJson(pJsonProgress, "SSQX", pSSCardInfo->strSSQX);
+		UpdateJson(pJsonProgress, "CityAccTime", pSSCardInfo->strCityAccTime);
+		UpdateJson(pJsonProgress, "CityInfo", pSSCardInfo->strCityInfo);
+		UpdateJson(pJsonProgress, "CardStatus", pSSCardInfo->strCardStatus);
+		UpdateJson(pJsonProgress, "Card", pSSCardInfo->strCard);
+		UpdateJson(pJsonProgress, "ReleaseDate", pSSCardInfo->strReleaseDate);
+		UpdateJson(pJsonProgress, "ValidDate", pSSCardInfo->strValidDate);
+		UpdateJson(pJsonProgress, "IdentifyNum", pSSCardInfo->strIdentifyNum);
+		UpdateJson(pJsonProgress, "CardATR", pSSCardInfo->strCardATR);
+		UpdateJson(pJsonProgress, "BankNum", pSSCardInfo->strBankNum);
+		UpdateJson(pJsonProgress, "PCH", pSSCardInfo->strPCH);
 
 		ofstream ifs(strPersonProgressFile, ios::out | ios::binary);
 		ifs << pJsonProgress->ToFormattedString();
@@ -873,6 +937,7 @@ bool DataCenter::GetProgress(string strProcess, int& nStatus)
 	catch (std::exception& e)
 	{
 		gError() << "Catch a exception:" << e.what();
+		return false;
 	}
 }
 
@@ -881,15 +946,17 @@ bool DataCenter::SetProgress(string strProcess, int nStatus)
 	try
 	{
 		if (!pJsonProgress)
-			return;
+			return false;
 		UpdateJson(pJsonProgress, strProcess, nStatus);
 
 		ofstream ifs(strPersonProgressFile, ios::out | ios::binary);
 		ifs << pJsonProgress->ToFormattedString();
+		return true;
 	}
 	catch (std::exception& e)
 	{
 		gError() << "Catch a exception:" << e.what();
+		return false;
 	}
 }
 
@@ -1297,7 +1364,6 @@ int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		string strCardIdentify = strFieldList[3].toStdString();
 		strcpy(pSSCardInfo->strIdentifyNum, strCardIdentify.c_str());
 
-
 		nResult = 0;
 
 	} while (0);
@@ -1336,6 +1402,27 @@ int	 DataCenter::SafeWriteCard(QString& strMessage)
 		nResult = 0;
 	}
 	return nResult;
+}
+
+void DataCenter::ResetIDData()
+{
+	strMobilePhone = "";
+	strIDImageFile = "";
+	strSSCardOldPassword = "";
+	strSSCardNewPassword = "";
+	strCardMakeProgress = "";
+	strPayCode = "";
+	bWithoutIDCard = false;
+	pIDCard.reset();
+	//if (pSSCardInfo && pSSCardInfo->strPhoto)
+	//{
+	//	delete[]pSSCardInfo->strPhoto;
+	//	pSSCardInfo->strPhoto = nullptr;
+	//}
+	strPhotoBase64 = "";
+	strSSCardPhotoFile = "";
+
+	pSSCardInfo.reset();
 }
 
 int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
@@ -1446,6 +1533,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		strcpy(HsmInfo.strBirthday, pSSCardInfo->strBirthday);
 		strcpy(HsmInfo.strRandom1, strRomdom[1].toStdString().c_str());
 		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
+		gInfo() << "HsmInfo.strRandom1 = " << HsmInfo.strRandom1 << " HsmInfo.strRandom2 = " << HsmInfo.strRandom2;
 
 		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
 		{
@@ -1906,18 +1994,6 @@ bool DataCenter::LoadAdminConfigure()
 	return true;
 }
 
-void DataCenter::RemoveTempPerson()
-{
-	QString strAppPath = QApplication::applicationDirPath();
-	strAppPath += "/data/TempPerson.json";
-
-	if (!fs::exists(strAppPath.toLocal8Bit().data()))
-	{
-		gInfo() << GBKStr("删除人员数据:") << GBKStr(strAppPath);
-		QFile::remove(strAppPath.toLocal8Bit().data());
-	}
-}
-
 int DataCenter::ReadSSCardInfo(SSCardInfoPtr& pSSCardInfo, int& nStatus, QString& strMessage)
 {
 	int nResult = 0;
@@ -2038,4 +2114,56 @@ int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage)
 		gInfo() << "发生异常" << e.what();
 	}
 	return -1;
+}
+
+void EnableWidgets(QWidget* pUIObj, bool bEnable)
+{
+	if (!pUIObj)
+		return;
+
+	QObjectList list = pUIObj->children();
+	if (pUIObj->inherits("QWidget"))
+	{
+		QWidget* pWidget = qobject_cast<QWidget*>(pUIObj);
+		pWidget->setEnabled(bEnable);
+		return;
+	}
+	else if (list.isEmpty())
+	{
+		return;
+	}
+	foreach(QObject * pObj, list)
+	{
+		qDebug() << pObj->metaObject()->className();
+		EnableWidgets((QWidget*)pObj, bEnable);
+	}
+	pUIObj->setEnabled(true);
+}
+
+int GetAge(string strBirthday)
+{
+	if (strBirthday.empty())
+		return -1;
+
+	int nBirthYear, nBirthMonth, nBirthDay;
+	int nCount = sscanf_s(strBirthday.c_str(), "%04d%02d%02d", &nBirthYear, &nBirthMonth, &nBirthDay);
+	if (nCount != 3)
+		return -1;
+
+	time_t tNow = time(nullptr);
+	tm* tmNow = localtime(&tNow);
+	tmNow->tm_year += 1900;
+	tmNow->tm_mon += 1;
+
+	int nAge = tmNow->tm_year - nBirthYear;
+	if (tmNow->tm_mon < nBirthMonth)
+	{
+		nAge--;
+	}
+	else if (tmNow->tm_mon == nBirthMonth)
+	{
+		if (tmNow->tm_mday < nBirthDay)
+			nAge--;
+	}
+	return nAge;
 }

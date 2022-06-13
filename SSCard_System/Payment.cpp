@@ -220,13 +220,13 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 	gInfo() << "PayResult request url = " << strUrl.c_str();
 
 	string strRespond, strMessage1;
-	if (SendHttpRequest("GET", strUrl, strRespond, strMessage1))
+	if (QSucceed(SendHttpRequest("GET", strUrl, strRespond, strMessage1)))
 	{
 		gInfo() << strRespond;
-		QString strRes = strRespond.c_str();
-		QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
+		QString strHttpRes = strRespond.c_str();
+		//QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
 		QJsonParseError jsonParseError;
-		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes[5].toLatin1(), &jsonParseError));
+		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes.toLatin1(), &jsonParseError));
 		if (QJsonParseError::NoError != jsonParseError.error)
 		{
 			strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
@@ -269,7 +269,15 @@ int  ApplyNewCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 	char szDigit[16] = { 0 }, szText[1024] = { 0 };
 	SplitString(szStatus, szDigit, szText);
 	if (strlen(szText))
+	{
 		strMessage = QString::fromLocal8Bit(szText);
+		if (strMessage == "已提交过办卡申请")
+		{
+			nStatus = 0;
+			return 0;
+		}
+	}
+
 	if (strlen(szDigit))
 	{
 		nStatus = strtolong(szDigit, 10);
@@ -455,7 +463,7 @@ int GetCardDataField(const char* szField, char* pValue, QString strINIFile)
 		return -1;
 
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
-	CardIni.beginGroup("CardData");	
+	CardIni.beginGroup("CardData");
 	strcpy(pValue, CardIni.value(szField).toString().toStdString().c_str());
 	CardIni.endGroup();
 	if (strlen(pValue) == 0)
@@ -463,7 +471,7 @@ int GetCardDataField(const char* szField, char* pValue, QString strINIFile)
 	return 0;
 }
 
-int GetCardDataFieldp(const char* szField, char** ppValue, QString strINIFile)
+int GetCardDataFieldp(const char* szField, string& strValue, QString strINIFile)
 {
 	QFileInfo fi(strINIFile);
 	if (!fi.isFile())
@@ -471,16 +479,9 @@ int GetCardDataFieldp(const char* szField, char** ppValue, QString strINIFile)
 
 	QSettings CardIni(strINIFile, QSettings::IniFormat);
 	CardIni.beginGroup("CardData");
-	string strData = CardIni.value(szField).toString().toStdString();
-	if (!*ppValue)
-	{
-		*ppValue = new char[strData.size() + 1];
-		ZeroMemory(*ppValue, strData.size() + 1);
-	}
-
-	strcpy(*ppValue, strData.c_str());
+	strValue = CardIni.value(szField).toString().toStdString();
 	CardIni.endGroup();
-	if (strlen(*ppValue) == 0)
+	if (!strValue.size())
 		return -1;
 	return 0;
 }
@@ -558,10 +559,9 @@ int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	GetCardField(CardIni, pSSCardInfoOut, strCard);
 	GetCardField(CardIni, pSSCardInfoOut, strReleaseDate);
 	GetCardField(CardIni, pSSCardInfoOut, strValidDate);
-	QByteArray ba = CardIni.value("strPhoto").toString().toLatin1();
-	qDebug() << "Load photo,size = " << ba.size();
-	pSSCardInfoOut->strPhoto = new char[ba.size() + 1];
-	strcpy_s(pSSCardInfoOut->strPhoto, ba.size() + 1, ba.data());
+
+	g_pDataCenter->strPhotoBase64 = CardIni.value("strPhoto").toString().toStdString();
+	pSSCardInfoOut->strPhoto = (char*)g_pDataCenter->strPhotoBase64.c_str();
 	GetCardField(CardIni, pSSCardInfoOut, strIdentifyNum);
 	GetCardField(CardIni, pSSCardInfoOut, strCardATR);
 	GetCardField(CardIni, pSSCardInfoOut, strBankNum);
@@ -625,7 +625,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 }
 
 // nStatus 返回0为成功，其它都为失败
-int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bSkipPreStep)
+int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bSkipPreStep)
 {
 	bool bLoaded = false;
 	QString strAppPath = QCoreApplication::applicationDirPath();
@@ -686,8 +686,8 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 				break;
 			using LPCHAR = char*;
 			strFnName = "获取批次号";
-			
-			if (QFailed(GetCardDataField("strPCH", (char *)pSSCardInfo->strPCH, strAppPath)))
+
+			if (QFailed(GetCardDataField("strPCH", (char*)pSSCardInfo->strPCH, strAppPath)))
 			{
 				if (QFailed(nResult = getHQPCH(*pSSCardInfo, szStatus)))
 					break;
@@ -717,9 +717,10 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			}
 
 			strFnName = "获取制卡数据";
-			if (QFailed(GetCardDataFieldp("strPhoto", &pSSCardInfo->strPhoto, strAppPath)))
+			string strPhoto;
+			if (QFailed(GetCardDataFieldp("strPhoto", strPhoto, strAppPath)))
 			{
-				shared_ptr<char> FreePhoto(pSSCardInfo->strPhoto);
+				// 可返回照片信息
 				nResult = getCardData(*pSSCardInfo, szStatus);
 				if (QFailed(nResult))
 				{
@@ -756,12 +757,14 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 			else
 			{
 				SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-				LoadSSCardData(pSSCardTemp, strAppPath);				
+				LoadSSCardData(pSSCardTemp, strAppPath);
 				strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
 				strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
 				strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
 				strcpy(pSSCardInfo->strReleaseDate, pSSCardTemp->strReleaseDate);
 				strcpy(pSSCardInfo->strValidDate, pSSCardTemp->strValidDate);
+				g_pDataCenter->strPhotoBase64 = strPhoto;
+				pSSCardInfo->strPhoto = (char*)strPhoto.c_str();
 				SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 				gInfo() << GBKStr(strFnName.c_str()) << GBKStr("使用已有照片数据.");
 				nResult = 0;
@@ -836,7 +839,7 @@ int     GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInf
 	return 0;
 }
 
-int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bFailed)
+int  ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bFailed)
 {
 	char szStatus[1024] = { 0 };
 	if (bFailed)
@@ -866,7 +869,7 @@ int     ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCard
 		return -1;
 }
 
-int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+int  EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
 	char szStatus[1024] = { 0 };
 	int nResult = enableCard(*pSSCardInfo, szStatus);
@@ -887,6 +890,66 @@ int     EnalbeCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo
 	}
 	else
 		return -1;
+}
+
+void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
+{
+	try
+	{
+		if (!pSSCardInfo)
+			return;
+
+		bool bLoaded = false;
+		QString strAppPath = QCoreApplication::applicationDirPath();
+		strAppPath += "/Debug";
+
+		QFileInfo fdir(strAppPath);
+		if (fdir.exists())
+		{
+			if (!fdir.isDir())
+			{
+				QFile f(strAppPath);
+				f.remove();
+			}
+		}
+		else
+		{
+			QDir dir;
+			dir.mkdir(strAppPath);
+		}
+		QString strFinishPath = strAppPath + "/Finished";
+		QFileInfo ffdir(strFinishPath);
+		if (ffdir.exists())
+		{
+			if (!ffdir.isDir())
+			{
+				QFile f(strFinishPath);
+				f.remove();
+			}
+		}
+		else
+		{
+			QDir dir;
+			dir.mkdir(strFinishPath);
+		}
+
+		strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
+		strFinishPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
+		if (!fs::exists(strAppPath.toStdString()))
+			return;
+
+		if (fs::exists(strFinishPath.toStdString()))
+			fs::remove(strFinishPath.toStdString());
+
+		string strBaseFile = strFinishPath.toLocal8Bit().data();
+		fs::copy_file(strAppPath.toStdString(), strFinishPath.toStdString());
+		fs::remove(strAppPath.toStdString());
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+		return;
+	}
 }
 
 int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const char* QMGY, const char* szAlgorithm, CAInfo& caInfo)
@@ -931,6 +994,9 @@ int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardI
 	char szStatus[1024] = { 0 };
 	if (QFailed(nResult = queryCardProgress(*pSSCardInfo, szStatus)))
 	{
+		QString strStatus = QString::fromLocal8Bit(szStatus);
+		if (strStatus == "身份证号不存在")
+			return 0;
 		FailureMessage("查询制卡进度", pSSCardInfo, szStatus, strMessage);
 
 		//strMessage = "获取制卡进度信息失败!";

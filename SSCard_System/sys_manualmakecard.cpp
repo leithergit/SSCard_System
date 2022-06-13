@@ -635,6 +635,11 @@ void Sys_ManualMakeCard::EnableCard()
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), "启用成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
 
+void Sys_ManualMakeCard::TestApplyNewCard()
+{
+
+}
+
 void Sys_ManualMakeCard::PrintCardData()
 {
 	int nResult = -1;
@@ -783,66 +788,66 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 			break;
 		strInfo = "写卡成功";
 		gInfo() << gQStr(strInfo);
-		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
-		{
-			strMessage = "片卡打印失败,请稍后重试!";
-			strInfo = strMessage;
-			gInfo() << gQStr(strInfo);
-			break;
-		}
-		strInfo = "卡片打印成功";
+		//if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+		//{
+		//	strMessage = "片卡打印失败,请稍后重试!";
+		//	strInfo = strMessage;
+		//	gInfo() << gQStr(strInfo);
+		//	break;
+		//}
+		//strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
 		nResult = 0;
 	} while (0);
 
-	if (QFailed(nResult))
-	{
-		gInfo() << gQStr(strMessage);
-		do
-		{
-			gInfo() << "Try to CancelMarkCard";
-			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
-			{
-				strMessage = QString("取消标注失败:%1").arg(strMessage);
-				gInfo() << gQStr(strMessage);
-				nResult = -1;
-				break;
-			}
-
-		} while (0);
-
-		gError() << strMessage.toLocal8Bit().data();
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-		return;
-	}
-	gInfo() << gQStr(QString("写卡，打印成功"));
-	nResult = -1;
-	do
-	{
-		// 数据回盘
-		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
-		{
-			gError() << strMessage.toLocal8Bit().data();
-			break;
-		}
-#pragma Warning("回盘失败如何处理？")
-		if (nStatus != 0 && nStatus != 1)
-			break;
-
-		// 启用
-		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
-		{
-			gError() << strMessage.toLocal8Bit().data();
-			break;
-		}
-		if (nStatus != 0 && nStatus != 1)
-			break;
-
-		nResult = 0;
-	} while (0);
-
-	char* szResCode[128] = { 0 };
-	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
+//	if (QFailed(nResult))
+//	{
+//		gInfo() << gQStr(strMessage);
+//		do
+//		{
+//			gInfo() << "Try to CancelMarkCard";
+//			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
+//			{
+//				strMessage = QString("取消标注失败:%1").arg(strMessage);
+//				gInfo() << gQStr(strMessage);
+//				nResult = -1;
+//				break;
+//			}
+//
+//		} while (0);
+//
+//		gError() << strMessage.toLocal8Bit().data();
+//		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+//		return;
+//	}
+//	gInfo() << gQStr(QString("写卡，打印成功"));
+//	nResult = -1;
+//	do
+//	{
+//		// 数据回盘
+//		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+//		{
+//			gError() << strMessage.toLocal8Bit().data();
+//			break;
+//		}
+//#pragma Warning("回盘失败如何处理？")
+//		if (nStatus != 0 && nStatus != 1)
+//			break;
+//
+//		// 启用
+//		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+//		{
+//			gError() << strMessage.toLocal8Bit().data();
+//			break;
+//		}
+//		if (nStatus != 0 && nStatus != 1)
+//			break;
+//
+//		nResult = 0;
+//	} while (0);
+//
+//	char* szResCode[128] = { 0 };
+//	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
 
 	if (QFailed(nResult))
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -853,6 +858,7 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 {
 	QString strMessage;
+	QWaitCursor Wait;
 
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
@@ -897,6 +903,11 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 	case 4:
 	{
 		this->EnableCard();
+		break;
+	}
+	case 5:
+	{
+		TestApplyNewCard();
 		break;
 	}
 

@@ -247,6 +247,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <ClCompile Include="qpinkeybroad.cpp" />
     <ClCompile Include="qstackpage.cpp" />
     <ClCompile Include="registerlost.cpp" />
+    <ClCompile Include="sys_sscardapitest.cpp" />
     <ClCompile Include="uc_adforfinance.cpp" />
     <ClCompile Include="uc_ensureinformation.cpp" />
     <ClCompile Include="uc_facecapture.cpp" />
@@ -277,6 +278,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <QtMoc Include="waitingprogress.h" />
     <QtMoc Include="sys_dialogreadidcard.h" />
     <QtMoc Include="uc_inputidcardinfo.h" />
+    <QtMoc Include="sys_sscardapitest.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">
@@ -409,6 +411,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </QtUic>
     <QtUic Include="registerlost.ui">
     </QtUic>
+    <QtUic Include="sys_sscardapitest.ui" />
     <QtUic Include="uc_adforfinance.ui">
     </QtUic>
     <QtUic Include="uc_ensureinformation.ui">

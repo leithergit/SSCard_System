@@ -312,6 +312,31 @@ void DeviceManager::on_pushButton_BrowseReaderModule_clicked()
 
 void DeviceManager::on_pushButton_ReaderTest_clicked()
 {
+	int nTestCount = ui.lineEdit_SSCardReader_TestCount->text().toInt();
+	if (nTestCount > 1)
+	{
+		int nRes = QMessageBox_CN(QMessageBox::Question, tr("提示"), "多次测试过程不会显示中间测试结果,测试结束后会有一个成功和失败的统计,是否继续?", QMessageBox::Yes | QMessageBox::No, this);
+		if (nRes == QMessageBox::No)
+			return;
+		int nFailed = 0;
+		int nSucceed = 0;
+		for (int i = 0; i < nTestCount; i++)
+		{
+			gInfo() << __FUNCTION__ << " Test for [" << i << "];";
+			if (ReaderTest_clicked(true) == -1)
+				nFailed++;
+			else
+				nSucceed++;
+			google::FlushLogFiles(0);
+		}
+		QString  strMessage = QString("读取成功次数:%1\n失败次数:%2").arg(nSucceed).arg(nFailed);
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	}
+	else
+	{
+		ReaderTest_clicked(false);
+	}
+
 	QString strMessage;
 	QString strPrinterLib;
 	PrinterType nPrinterType;
@@ -372,7 +397,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 		}
 		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
 		{
-			strMessage = QString("iReadCardBas失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+			strMessage = QString("Reader_PowerOn,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
 			break;
 		}
 		bSucceed = true;
@@ -800,6 +825,130 @@ bool DeviceManager::Save(QString& strMessage)
 	}
 
 	return true;
+}
+
+int DeviceManager::ReaderTest_clicked(bool bContinue)
+{
+	QString strMessage;
+	QString strPrinterLib;
+	PrinterType nPrinterType;
+	int nDepenseBox;
+	QString strDPI;
+#pragma warning(disable:4700)
+	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	{
+		if (bContinue)
+			return 1;
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return 1;
+	}
+
+	CardPowerType nPowerType;
+	ReaderBrand nSSCardReaderType;
+	QString strSSCardReaderType;
+	QString strReaderLib;
+
+	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
+	{
+		if (bContinue)
+			return 1;
+		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+		return 1;
+	}
+
+	if (!bContinue)
+	{
+		int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
+		if (nRes == QMessageBox::Cancel)
+			return 1;
+	}
+
+	char szRCode[128] = { 0 };
+	bool bSucceed = false;
+	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+	BOXINFO BoxInfo;
+	ZeroMemory(&BoxInfo, sizeof(BOXINFO));
+	do
+	{
+		QWaitCursor Wait;
+		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+			break;
+
+		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
+			break;
+		int nDepensePos = 4;	// 1-读磁位；2-接触IC位;3-非接IC位;4-打印位， 默认为接触位
+		if (nPowerType == CardPowerType::READER_UNCONTACT)
+			nDepensePos = 3;
+		else if (nPowerType == CardPowerType::READER_CONTACT)
+			nDepensePos = 2;
+
+		if (QFailed(g_pDataCenter->GetPrinter()->Printer_Dispense(nDepenseBox - 1, nDepensePos, szRCode)))
+		{
+			strMessage = QString("Printer_Dispense失败，错误代码:%1!").arg(szRCode);
+			break;
+		}
+
+		//if (g_pDataCenter->Depense(nDepenseBox, nPowerType, strMessage))
+		//	break;
+
+		char szCardATR[1024] = { 0 };
+		char szRCode[1024] = { 0 };
+		int nCardATRLen = 0;
+		string strCardATR;
+		QString strPowerType = ui.comboBox_PoweronType->currentText();
+
+		if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
+		{
+			strMessage = QString("DriverInit失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+			break;
+		}
+
+		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
+		{
+			strMessage = QString("Reader_PowerOn,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
+			break;
+		}
+		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+
+		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+		strcpy(pSSCardInfo->strReleaseDate, "20220416");
+		strcpy(pSSCardInfo->strValidDate, "");
+		strcpy(pSSCardInfo->strCardNum, "PP1234567");
+		strcpy(pSSCardInfo->strCardID, "123456789012345678");
+		QString strName = "测试卡";
+		strcpy(pSSCardInfo->strName, strName.toLocal8Bit().data());
+		strcpy(pSSCardInfo->strSex, "1");
+		strcpy(pSSCardInfo->strNation, "01");
+		strcpy(pSSCardInfo->strBirthday, "19991231");
+		if (QFailed(g_pDataCenter->ReadCard(pSSCardInfo, strMessage)))
+		{
+			break;
+		}
+		bSucceed = true;
+		strMessage = QString("读卡测试成功\n银行卡号:%2\n稍后请取出卡片").arg(pSSCardInfo->strBankNum);
+	} while (0);
+	if (!bContinue)
+	{
+		if (!bSucceed)
+		{
+			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return 0;
+		}
+		else
+		{
+			QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+			return -1;
+		}
+	}
+	else
+	{
+		gInfo() << gQStr(strMessage);
+		if (bSucceed)
+			return 0;
+		else
+			return -1;
+	}
 }
 
 void DeviceManager::on_pushButton_DetectIDPinBroadPort_clicked()

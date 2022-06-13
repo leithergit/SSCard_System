@@ -95,7 +95,8 @@ int uc_MakeCard::ProcessBussiness()
 	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
 	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 	ZeroMemory(StepStatus, sizeof(StepStatus));
-
+	int nStatus = 0;
+	ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
 	if (g_pDataCenter->strCardMakeProgress == "制卡中")
 	{
 		if (QFailed(PrecessCardInMaking(strMessage)))
@@ -221,19 +222,24 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 		//}
 		if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
 		{
-			QByteArray baPhoto;
-			// 16岁以上，需要照片
-// if (GetAge(pSSCardInfo->strBirthday) >= 16)
-			QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
-			if (fi.isFile())
+			if (!pSSCardInfo->strPhoto)
 			{
-				QFile qfile(g_pDataCenter->strSSCardPhotoFile.c_str());
-				if (qfile.open(QIODevice::ReadOnly))
+				QByteArray baPhoto;
+				// 16岁以上，需要照片
+	// if (GetAge(pSSCardInfo->strBirthday) >= 16)
+				QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
+				if (fi.isFile())
 				{
-					baPhoto = qfile.readAll().toBase64();
-					pSSCardInfo->strPhoto = baPhoto.data();
+					QFile qfile(g_pDataCenter->strSSCardPhotoFile.c_str());
+					if (qfile.open(QIODevice::ReadOnly))
+					{
+						baPhoto = qfile.readAll().toBase64();
+						g_pDataCenter->strPhotoBase64 = baPhoto.data();
+						pSSCardInfo->strPhoto = (char*)g_pDataCenter->strPhotoBase64.c_str();
+					}
 				}
 			}
+
 			nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
 		}
 		else
@@ -352,7 +358,10 @@ void uc_MakeCard::ThreadWork()
 				break;
 			}
 			StepStatus[Step_EnableCard] = true;
-			g_pDataCenter->RemoveTempPerson();
+			gInfo() << "关闭制卡进度";
+			g_pDataCenter->CloseProgress();
+			gInfo() << "移除制卡数据文件";
+			RemoveCardData(pSSCardInfo);
 		}
 
 		if (nStatus != 0 && nStatus != 1)

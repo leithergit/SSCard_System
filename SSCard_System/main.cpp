@@ -227,10 +227,10 @@ int main(int argc, char* argv[])
 
 	w.showFullScreen();
 	w.setGeometry(g_pCurScreen->geometry());
-	//w.showMaximized();
-	//QRect size(1, 1, 1918, 1078);
-	//w.setGeometry(size);
-	//w.show();
+	w.showMaximized();
+	QRect size(1, 1, 1918, 1078);
+	w.setGeometry(size);
+	w.show();
 	int nRes = a.exec();
 	QString strInfo = "系统正常关闭!";
 	gInfo() << gQStr(strInfo);

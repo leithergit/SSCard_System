@@ -51,6 +51,8 @@ int  MarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 // nStatus = 0 成功
 int  CancelMarkCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 
+void RemoveCardData(SSCardInfoPtr& pSSCardInfo);
+
 int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bSkipPreStep = false);
 
 int  ReturnCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool Failed = false);
