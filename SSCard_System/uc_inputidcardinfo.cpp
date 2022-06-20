@@ -46,7 +46,9 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 
 	ShowGuardianWidget(false);
 	ui->lineEdit_CardID->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")));   //只能输入数字
-	ui->lineEdit_GuardianMobile->setValidator(new QRegExpValidator(QRegExp("^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$")));   //只能输入数字
+	ui->lineEdit_Name->setValidator(new QRegExpValidator(QRegExp("[\u4e00-\u9fa5]{2,10}")));
+
+	ui->lineEdit_GuardianMobile->setValidator(new QRegExpValidator(QRegExp("0?(13|15|16|17|18|19)[0-9]{9}")));   //只能输入数字
 	//ui->lineEdit_ExpiredDate->setValidator(new QRegExpValidator(QRegExp("((\\d{3}[1-9]|\\d{2}[1-9]\\d|\\d[1-9]\\d{2}|[1-9]\\d{3})(((0[13578]|1[02])(0[1-9]|[12]\\d|3[01]))|((0[469]|11)(0[1-9]|[12]\\d|30))|(02(0[1-9]|[1]\\d|2[0-8]))))|(((\\d{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)")));
 	//ui->lineEdit_IssuedDate->setValidator(new QRegExpValidator(QRegExp("((\\d{3}[1-9]|\\d{2}[1-9]\\d|\\d[1-9]\\d{2}|[1-9]\\d{3})(((0[13578]|1[02])(0[1-9]|[12]\\d|3[01]))|((0[469]|11)(0[1-9]|[12]\\d|30))|(02(0[1-9]|[1]\\d|2[0-8]))))|(((\\d{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)")));
 	for (auto var : g_vecNationCode)
@@ -88,6 +90,16 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 		ui->comboBox_Career->addItem(var.strName, var.strCode);
 	}
 
+	ui->lineEdit_Name->installEventFilter(this);
+	ui->lineEdit_Name->setFocusPolicy(Qt::ClickFocus);
+	pCompleter = new QCompleter(this);
+	if (pCompleter)
+	{
+		QAbstractItemView* popup = pCompleter->popup();
+		if (popup)
+			popup->setStyleSheet("font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";");
+	}
+	ui->lineEdit_Name->setCompleter(pCompleter);
 	//ui->comboBox_Nationality->setCurrentIndex(0);
 	//connect(&ui->lineEdit_Nation,&QClickableLineEdit::clicked,this,)
 	QString strMessage;
@@ -102,19 +114,22 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 		"QComboBox QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}"
 		"QComboBox QScrollBar::add-line::vertical{border:none;}"
 		"QComboBox QScrollBar::sub-line::vertical{border:none;}";
-	ui->comboBox_Province->setStyleSheet(strQSS);
-	ui->comboBox_City->setStyleSheet(strQSS);
-	ui->comboBox_County->setStyleSheet(strQSS);
+	//ui->comboBox_Province->setStyleSheet(strQSS);
+	//ui->comboBox_City->setStyleSheet(strQSS);
+	//ui->comboBox_County->setStyleSheet(strQSS);
 	/*ui->comboBox_Town->setStyleSheet(strQSS);
 	ui->comboBox_Street->setStyleSheet(strQSS);*/
 	ui->comboBox_Guardianship->setStyleSheet(strQSS);
 	ui->comboBox_Nationality->setStyleSheet(strQSS);
 	ui->comboBox_Career->setStyleSheet(strQSS);
-	InitializeDB(strMessage);
+	//InitializeDB(strMessage);
 	connect(this, &uc_InputIDCardInfo::AddNewIDCard, this, &uc_InputIDCardInfo::on_AddNewIDCard, Qt::QueuedConnection);
-	qDebug() << geometry();
+	connect(this, &uc_InputIDCardInfo::CheckPersonInfo, this, &uc_InputIDCardInfo::on_CheckPersonInfo);
+	//connect(ui->lineEdit_Name, &QLineEdit::editingFinished, this, &uc_InputIDCardInfo::on_Name_EditingFinished);
+	connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
 }
 
+/*
 bool  uc_InputIDCardInfo::InitializeDB(QString& strMessage)
 {
 	QSqlQuery query = g_pDataCenter->SQLiteDB.exec("SELECT ID,Name FROM Area_2022 as t where t.LevelType=1 ORDER BY ID");
@@ -156,22 +171,21 @@ bool  uc_InputIDCardInfo::InitializeDB(QString& strMessage)
 
 	return true;
 }
+*/
 
 uc_InputIDCardInfo::~uc_InputIDCardInfo()
 {
 	delete ui;
 }
 
-bool uc_InputIDCardInfo::LoadPersonInfo()
+bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 {
 	try
 	{
-		QString strAppPath = QApplication::applicationDirPath();
-		strAppPath += "/data/TempPerson.json";
-		if (!fs::exists(strAppPath.toLocal8Bit().data()))
+		if (!fs::exists(strJson.toLocal8Bit().data()))
 			return false;
 
-		ifstream ifs(strAppPath.toLocal8Bit().data(), ios::in | ios::binary);
+		ifstream ifs(strJson.toLocal8Bit().data(), ios::in | ios::binary);
 		stringstream ss;
 		ss << ifs.rdbuf();
 		CJsonObject json;
@@ -191,26 +205,28 @@ bool uc_InputIDCardInfo::LoadPersonInfo()
 		json.Get("BankCode", pSSCardInfo->strBankCode);
 		json.Get("City", pSSCardInfo->strCity);
 
-		string strProvince, strCity, strCounty, strAddress;
-		json.Get("Province", strProvince);
-		json.Get("CityName", strCity);
-		json.Get("County", strCounty);
-		json.Get("Address", strAddress);
-		int nProvince = ui->comboBox_Province->findText(QString::fromLocal8Bit(strProvince.c_str()));
-		if (nProvince >= 0)
-		{
-			ui->comboBox_Province->setCurrentIndex(nProvince);
-			on_comboBox_Province_currentIndexChanged(nProvince);
-			int nCity = ui->comboBox_City->findText(QString::fromLocal8Bit(strCity.c_str()));
-			if (nCity >= 0)
-			{
-				ui->comboBox_City->setCurrentIndex(nCity);
-				on_comboBox_City_currentIndexChanged(nCity);
-				int nCounty = ui->comboBox_County->findText(QString::fromLocal8Bit(strCounty.c_str()));
-				if (nCounty >= 0)
-					ui->comboBox_County->setCurrentIndex(nCounty);
-			}
-		}
+		string strAddress;
+		//string strProvince, strCity, strCounty;
+		//json.Get("Province", strProvince);
+		//json.Get("CityName", strCity);
+		//json.Get("County", strCounty);
+		//json.Get("Address", strAddress);
+		//int nProvince = ui->comboBox_Province->findText(QString::fromLocal8Bit(strProvince.c_str()));
+		//if (nProvince >= 0)
+		//{
+		//	ui->comboBox_Province->setCurrentIndex(nProvince);
+		//	on_comboBox_Province_currentIndexChanged(nProvince);
+		//	int nCity = ui->comboBox_City->findText(QString::fromLocal8Bit(strCity.c_str()));
+		//	if (nCity >= 0)
+		//	{
+		//		ui->comboBox_City->setCurrentIndex(nCity);
+		//		on_comboBox_City_currentIndexChanged(nCity);
+		//		int nCounty = ui->comboBox_County->findText(QString::fromLocal8Bit(strCounty.c_str()));
+		//		if (nCounty >= 0)
+		//			ui->comboBox_County->setCurrentIndex(nCounty);
+		//	}
+		//}
+
 
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
 		ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
@@ -224,7 +240,9 @@ bool uc_InputIDCardInfo::LoadPersonInfo()
 		ui->dateEdit_Issued->setDateTime(QDateTime::fromString(pSSCardInfo->strReleaseDate.c_str(), "yyyyMMdd"));
 		ui->dateEdit_Expired->setDateTime(QDateTime::fromString(pSSCardInfo->strValidDate.c_str(), "yyyyMMdd"));
 		ui->lineEdit_GuardianMobile->setText(pSSCardInfo->strMobile.c_str());
-		ui->lineEdit_Address->setText(QString::fromLocal8Bit(pSSCardInfo->strAddress.c_str()));
+		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit(pSSCardInfo->strAddress.c_str()));
+		if (strAddress.size())
+			ui->plainTextEdit_Address->setPlainText(strAddress.c_str());
 		QString strNation = QString::fromLocal8Bit(pSSCardInfo->strNation.c_str());
 		int nIndex = ui->comboBox_Nationality->findText(strNation);
 		if (nIndex != -1)
@@ -234,6 +252,7 @@ bool uc_InputIDCardInfo::LoadPersonInfo()
 		if (nAge >= 0 && nAge < 16)
 		{
 			ui->checkBox_Agency->setChecked(true);
+			g_pDataCenter->bGuardian = true;
 			ShowGuardianWidget(true);
 			if (json.KeyExist("Guardian"))
 			{
@@ -257,6 +276,11 @@ bool uc_InputIDCardInfo::LoadPersonInfo()
 				json.Get("GuardianCardID", pSSCardInfo->strGuardianIDentity);
 				ui->lineEdit_GuardianCardID->setText(pSSCardInfo->strGuardianIDentity.c_str());
 			}
+		}
+		else
+		{
+			ui->checkBox_Agency->setChecked(false);
+			g_pDataCenter->bGuardian = false;
 		}
 
 		string strPhoto;
@@ -286,10 +310,10 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	CJsonObject json;
 
-	QString strProvince = ui->comboBox_Province->currentText();
-	QString strCity = ui->comboBox_City->currentText();
-	QString strCounty = ui->comboBox_County->currentText();
-	QString strAddress = ui->lineEdit_Address->text();
+	//QString strProvince = ui->comboBox_Province->currentText();
+	//QString strCity = ui->comboBox_City->currentText();
+	//QString strCounty = ui->comboBox_County->currentText();
+	QString strAddress = ui->plainTextEdit_Address->toPlainText();
 	json.Add("Name", pSSCardInfo->strName);
 	json.Add("Identity", pSSCardInfo->strIdentity);
 	json.Add("Gender", pSSCardInfo->strGender);
@@ -301,9 +325,9 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	json.Add("BankCode", pSSCardInfo->strBankCode);
 	json.Add("City", pSSCardInfo->strCity);
 
-	json.Add("Province", strProvince.toLocal8Bit().data());
-	json.Add("CityName", strCity.toLocal8Bit().data());
-	json.Add("County", strCounty.toLocal8Bit().data());
+	//json.Add("Province", strProvince.toLocal8Bit().data());
+	//json.Add("CityName", strCity.toLocal8Bit().data());
+	//json.Add("County", strCounty.toLocal8Bit().data());
 	json.Add("Address", strAddress.toLocal8Bit().data());
 
 	if (ui->checkBox_Agency->isChecked())
@@ -320,9 +344,11 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	try
 	{
 		QString strAppPath = QApplication::applicationDirPath();
-		strAppPath += "/data/TempPerson.json";
-		ofstream ifs(strAppPath.toLocal8Bit().data(), ios::out | ios::binary);
-		ifs << json.ToFormattedString();
+		QString strJsonPath = QString("%1/data/Person_%2.json").arg(strAppPath).arg(pSSCardInfo->strIdentity.c_str());
+		ofstream ofs(strJsonPath.toLocal8Bit().data(), ios::out | ios::binary);
+		ofs << json.ToFormattedString();
+		ofs.flush();
+		ofs.close();
 	}
 	catch (std::exception& e)
 	{
@@ -338,14 +364,94 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		pMainWind->pLastStackPage->ResetTimer(true, this);
 	}
 	ResetPage();
-	LoadPersonInfo();
+	if (g_pDataCenter->GetIDCardInfo())
+	{
+		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+		ui->lineEdit_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
+		ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
+		QString strGender = QString::fromLocal8Bit((char*)pIDCard->szGender);
+		if (strGender == "男")
+			ui->radioButton_Male->setChecked(true);
+		else
+			ui->radioButton_Female->setChecked(true);
+		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit((char*)pIDCard->szAddress));
+
+		ui->dateEdit_Issued->setDateTime(QDateTime::fromString((char*)pIDCard->szExpirationDate1, "yyyyMMdd"));
+		ui->dateEdit_Expired->setDateTime(QDateTime::fromString((char*)pIDCard->szExpirationDate2, "yyyyMMdd"));
+
+		QString strNationalty = QString::fromLocal8Bit((char*)pIDCard->szNationalty) + "族";
+		int nIndex = ui->comboBox_Nationality->findText(strNationalty);
+		if (nIndex != -1)
+			ui->comboBox_Nationality->setCurrentIndex(nIndex);
+	}
+	QString strAppPath = qApp->applicationDirPath();
+	QString path = strAppPath + "/data";
+	QDirIterator iter(path, QStringList() << "Person*.json", QDir::Files | QDir::NoSymLinks);
+	QStringList strNameList;
+	while (iter.hasNext())
+	{
+		iter.next();
+		qDebug() << "fileName:" << iter.fileName();  // 只有文件名
+		qDebug() << "filePath:" << iter.filePath();  //包含文件名的文件的全路径
+
+		QString strAbsoluteFilePath = iter.filePath();
+		QString strName;
+		if (GetPersonName(strAbsoluteFilePath, strName))
+		{
+			strNameList << strName;
+			auto [it, Inserted] = mapPersonFile.try_emplace(strName, strAbsoluteFilePath);
+		}
+	}
+	pCompleter->setModel(new QStringListModel(strNameList, pCompleter));
 	return 0;
 }
+
+bool uc_InputIDCardInfo::GetPersonName(QString strPersonFile, QString& strName)
+{
+	try
+	{
+		if (!fs::exists(strPersonFile.toLocal8Bit().data()))
+			return false;
+
+		ifstream ifs(strPersonFile.toLocal8Bit().data(), ios::in | ios::binary);
+		stringstream ss;
+		ss << ifs.rdbuf();
+		CJsonObject json;
+		if (!json.Parse(ss.str()))
+			return false;
+
+		string strTemp;
+		if (!json.Get("Name", strTemp))
+			return false;
+
+		strName = QString::fromLocal8Bit(strTemp.c_str());
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+		return false;
+	}
+}
+
+bool uc_InputIDCardInfo::eventFilter(QObject* watched, QEvent* event)
+{
+	if (watched == ui->lineEdit_Name)
+	{
+		if (event->type() == QEvent::FocusIn || event->type() == QEvent::MouseButtonDblClick)
+		{
+			pCompleter->complete();
+		}
+	}
+	return QWidget::eventFilter(watched, event);
+}
+
 void uc_InputIDCardInfo::OnTimeout()
 {
 	gInfo() << __FUNCTION__;
 	ShutDown();
 }
+
 void  uc_InputIDCardInfo::ShutDown()
 {
 	gInfo() << __FUNCTION__;
@@ -358,11 +464,13 @@ void  uc_InputIDCardInfo::ShutDown()
 
 	StopDetect();
 }
+
 void uc_InputIDCardInfo::timerEvent(QTimerEvent* event)
 {
 
 }
 
+/*
 void uc_InputIDCardInfo::on_comboBox_Province_currentIndexChanged(int index)
 {
 	if (!bInitialized)
@@ -401,48 +509,47 @@ void uc_InputIDCardInfo::on_comboBox_City_currentIndexChanged(int index)
 
 void uc_InputIDCardInfo::on_comboBox_County_currentIndexChanged(int index)
 {
-	//if (!bInitialized)
-	//	return;
-	//ui->comboBox_Town->clear();
-	//int nProvinces = ui->comboBox_County->count();
-	//if (index >= nProvinces)
-	//	return;
-	//QString strID = ui->comboBox_County->itemData(index).toString();
-	//QSqlQuery query = g_pDataCenter->SQLiteDB.exec(QString("SELECT id,Name FROM Area_2022 as t where   t.LevelType = 4 and t.ParentId = %1 ORDER BY ID").arg(strID));
-	//while (query.next())
-	//{
-	//	QString strID = query.value("ID").toString();
-	//	QString strName = query.value("Name").toString();
-	//	ui->comboBox_Town->addItem(strName, strID);
-	//}
+	if (!bInitialized)
+		return;
+	ui->comboBox_Town->clear();
+	int nProvinces = ui->comboBox_County->count();
+	if (index >= nProvinces)
+		return;
+	QString strID = ui->comboBox_County->itemData(index).toString();
+	QSqlQuery query = g_pDataCenter->SQLiteDB.exec(QString("SELECT id,Name FROM Area_2022 as t where   t.LevelType = 4 and t.ParentId = %1 ORDER BY ID").arg(strID));
+	while (query.next())
+	{
+		QString strID = query.value("ID").toString();
+		QString strName = query.value("Name").toString();
+		ui->comboBox_Town->addItem(strName, strID);
+	}
 }
 
 void uc_InputIDCardInfo::on_comboBox_Town_currentIndexChanged(int index)
 {
-	//gInfo() << __FUNCTION__;
-	//if (!bInitialized)
-	//	return;
-	//ui->comboBox_Street->clear();
-	//int nProvinces = ui->comboBox_Town->count();
-	//if (index >= nProvinces)
-	//	return;
-	//QString strID = ui->comboBox_Town->itemData(index).toString();
-	//QSqlQuery query = g_pDataCenter->SQLiteDB.exec(QString("SELECT id,Name FROM Area_2022 as t where   t.LevelType = 5 and t.ParentId = %1 ORDER BY ID").arg(strID));
-	//while (query.next())
-	//{
-	//	QString strID = query.value("ID").toString();
-	//	QString strName = query.value("Name").toString();
-	//	ui->comboBox_Street->addItem(strName, strID);
-	//}
-}
-
-void uc_InputIDCardInfo::ResetPage()
-{
 	gInfo() << __FUNCTION__;
+	if (!bInitialized)
+		return;
+	ui->comboBox_Street->clear();
+	int nProvinces = ui->comboBox_Town->count();
+	if (index >= nProvinces)
+		return;
+	QString strID = ui->comboBox_Town->itemData(index).toString();
+	QSqlQuery query = g_pDataCenter->SQLiteDB.exec(QString("SELECT id,Name FROM Area_2022 as t where   t.LevelType = 5 and t.ParentId = %1 ORDER BY ID").arg(strID));
+	while (query.next())
+	{
+		QString strID = query.value("ID").toString();
+		QString strName = query.value("Name").toString();
+		ui->comboBox_Street->addItem(strName, strID);
+	}
+}
+*/
+
+void uc_InputIDCardInfo::ClearInfo()
+{
 	ui->lineEdit_Name->setText("");
-	//ui->lineEdit_Mobile->setText("");
 	ui->lineEdit_CardID->setText("");
-	ui->lineEdit_Address->setText("");
+	ui->plainTextEdit_Address->setPlainText("");
 	ui->lineEdit_GuardianMobile->setText("");
 	ui->comboBox_Nationality->setCurrentIndex(0);
 	ui->radioButton_Male->setChecked(false);
@@ -453,10 +560,16 @@ void uc_InputIDCardInfo::ResetPage()
 	pSSCardInfo = nullptr;
 	ui->label_Photo->setStyleSheet("border-image: url();");
 	ui->label_Photo->setText("照片");
+}
+
+void uc_InputIDCardInfo::ResetPage()
+{
+	gInfo() << __FUNCTION__;
+	ClearInfo();
+	mapPersonFile.clear();
 	ShowGuardianWidget(false);
 	ClearGuardianInfo();
 }
-
 
 int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMessage)
 {
@@ -524,6 +637,44 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	return 0;
 }
 
+// 只取姓名和身份证号
+int uc_InputIDCardInfo::GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage)
+{
+	gInfo() << __FUNCTION__;
+	QString strName = ui->lineEdit_Name->text();
+	//QString strMobile = ui->lineEdit_Mobile->text();
+	QString strCardID = ui->lineEdit_CardID->text();
+
+	if (strName.isEmpty() ||
+		strCardID.isEmpty())
+
+	{
+		strMessage = "姓名、身份证号码不能为空!";
+		return -1;
+	}
+	if (strName.contains(" "))
+	{
+		strMessage = "姓名中不能含有空格!";
+		return -1;
+	}
+	if (strCardID.size() < 18)
+	{
+		strMessage = "身份证号码位数不足18位，请检查后重新输入!";
+		return -1;
+	}
+
+	char nX = VerifyCardID(strCardID.toStdString().c_str());
+	if (nX != strCardID.toStdString().at(17))
+	{
+		strMessage = "身份证号码有误，请检查后重新输入!";
+		return -1;
+	}
+
+	strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
+	strcpy((char*)pIDCard->szIdentity, strCardID.toLocal8Bit().data());
+	return 0;
+}
+
 int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMessage)
 {
 	gInfo() << __FUNCTION__;
@@ -534,10 +685,10 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	QString strNationCode = ui->comboBox_Nationality->currentData().toString();
 	QString strIssuedate = ui->dateEdit_Issued->dateTime().toString("yyyyMMdd");
 	QString strExpireDate = ui->dateEdit_Expired->dateTime().toString("yyyyMMdd");
-	QString strAddress = ui->lineEdit_Address->text();
-	QString strProvince = ui->comboBox_Province->currentText();
-	QString strCity = ui->comboBox_City->currentText();
-	QString strCounty = ui->comboBox_County->currentText();
+	QString strAddress = ui->plainTextEdit_Address->toPlainText();
+	//QString strProvince = ui->comboBox_Province->currentText();
+	//QString strCity = ui->comboBox_City->currentText();
+	//QString strCounty = ui->comboBox_County->currentText();
 	/*QString strTown = ui->comboBox_Town->currentText();
 	QString strStreet = ui->comboBox_Street->currentText();*/
 	int nGender = pButtonGrp->checkedId();
@@ -604,8 +755,8 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	strcpy((char*)pIDCard->szNationaltyCode, strNationCode.toStdString().c_str());
 	strcpy((char*)pIDCard->szExpirationDate1, strIssuedate.toLocal8Bit().data());
 	strcpy((char*)pIDCard->szExpirationDate2, strExpireDate.toLocal8Bit().data());
-	QString strFullAddress = strProvince + strCity + strCounty /*+ strTown + strStreet */ + strAddress;
-	strcpy((char*)pIDCard->szAddress, strFullAddress.toLocal8Bit().data());
+	//QString strFullAddress = /*+strProvince + strCity + strCounty  strTown + strStreet  +*/ strAddress;
+	strcpy((char*)pIDCard->szAddress, strAddress.toLocal8Bit().data());
 	g_pDataCenter->SetIDCardInfo(pIDCard);
 
 	return 0;
@@ -645,148 +796,145 @@ void uc_InputIDCardInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 //
 //}
 
-//void uc_InputIDCardInfo::on_pushButton_Query_clicked()
-//{
-//	QString strMessage;
-//	int nResult = -1;
-//	QString strCardProgress;
-//	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-//	int nErrCode = -1;
-//	do
-//	{
-//		if (QFailed(GetCardInfo(strMessage)))
-//		{
-//			break;
-//		}
-//
-//		SSCardService* pService = nullptr;
-//		if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
-//		{
-//			break;
-//		}
-//
-//		if (!pService)
-//		{
-//			strMessage = "社保卡卡管服务不可用!";
-//			break;
-//		}
-//
-//		CJsonObject jsonIn;
-//		string strCardID = ui->lineEdit_CardID->text().toStdString();
-//		string strName = ui->lineEdit_Name->text().toLocal8Bit().data();
-//
-//		jsonIn.Add("CardID", strCardID);
-//		jsonIn.Add("Name", strName);
-//		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
-//		jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
-//		string strJsonIn = jsonIn.ToString();
-//		string strJsonOut;
-//		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
-//		{
-//			CJsonObject jsonOut(strJsonOut);
-//			string strText;
-//
-//			jsonOut.Get("Result", nErrCode);
-//			jsonOut.Get("Message", strText);
-//			strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-//			break;
-//		}
-//
-//		CJsonObject jsonOut(strJsonOut);
-//		jsonOut.Get("Result", nErrCode);
-//		if (QFailed(nErrCode))
-//		{
-//			string strText;
-//			jsonOut.Get("Result", nErrCode);
-//			jsonOut.Get("Message", strText);
-//			strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-//			break;
-//		}
-//		string strSSCardNum, strBankName;
-//		int nCardStatus;
-//		jsonOut.Get("CardNum", strSSCardNum);
-//		jsonOut.Get("CardStatus", nCardStatus);
-//		jsonOut.Get("BankName", strBankName);
-//
-//		//ui->lineEditl_SSCard->setText(QString::fromLocal8Bit(strSSCardNum.c_str()));
-//		//ui->lineEdit_Status->setText(CardStatusString((CardStatus)nCardStatus));
-//		//ui->lineEdit_Bank->setText(QString::fromLocal8Bit(strBankName.c_str()));
-//
-//		jsonIn.Clear();
-//		jsonIn.Add("CardID", strCardID);
-//		jsonIn.Add("Name", strName);
-//		jsonIn.Add("City", Reginfo.strCityCode);
-//
-//		strJsonIn = jsonIn.ToString();
-//		string strJsonout;
-//		string strCommand = "QueryPersonPhoto";
-//
-//		if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
-//		{
-//			CJsonObject jsonOut(strJsonOut);
-//			string strText;
-//			int nErrCode = -1;
-//			jsonOut.Get("Result", nErrCode);
-//			jsonOut.Get("Message", strText);
-//			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-//			break;
-//		}
-//		jsonOut.Parse(strJsonOut);
-//		string strPhoto;
-//		if (jsonOut.Get("Photo", strPhoto))
-//		{
-//			SaveSSCardPhoto(strMessage, strPhoto.c_str());
-//			if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
-//			{
-//				strMessage = QString("保存照片数据失败!");
-//				break;
-//			}
-//		}
-//		else
-//		{
-//			strMessage = QString("社保后台未返回个人照片!");
-//			break;
-//		}
-//
-//		strCommand = "QueryPersonInfo";
-//		if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
-//		{
-//			CJsonObject jsonOut(strJsonOut);
-//			string strText;
-//			int nErrCode = -1;
-//			jsonOut.Get("Result", nErrCode);
-//			jsonOut.Get("Message", strText);
-//			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-//			break;
-//		}
-//		jsonOut.Parse(strJsonOut);
-//		string strAddress;
-//		jsonOut.Get("Address", strAddress);
-//		/*
-//		jsonOut.Get("CardID", CardInfo.strCardID);
-//		jsonOut.Get("CardNum", CardInfo.strCardNum);
-//		jsonOut.Get("Name", CardInfo.strName);
-//		jsonOut.Get("Gender", CardInfo.strSex);
-//		jsonOut.Get("Birthday", CardInfo.strBirthday);
-//		jsonOut.Get("Nation", CardInfo.strNation);
-//		jsonOut.Get("Address", CardInfo.strAdress);
-//		jsonOut.Get("Mobile", CardInfo.strMobile);
-//		jsonOut.Get("OccupType", CardInfo.strOccupType);
-//		*/
-//		ui->lineEdit_Address->setText(QString::fromLocal8Bit(strAddress.c_str()));
-//
-//		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
-//		ui->label_Photo->setStyleSheet(strStyle);
-//		nResult = 0;
-//	} while (0);
-//
-//	if (QFailed(nResult))
-//	{
-//		((uc_ReadIDCard*)parent())->emit ShowMaskWidget("操作失败", strMessage, Fetal, Stay_CurrentPage);
-//	}
-//	ui->pushButton_OK->setEnabled(true);
-//	return;
-//}
+void uc_InputIDCardInfo::QueryPersonInfo()
+{
+	QWaitCursor W;
+	QString strMessage;
+	QString strCardProgress;
+
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
+	do
+	{
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+		if (QFailed(GetCardInfo(pIDCard, strMessage)))
+		{
+			break;
+		}
+
+		SSCardService* pService = nullptr;
+		if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage, pIDCard)))
+		{
+			break;
+		}
+
+		if (!pService)
+		{
+			strMessage = "社保卡卡管服务模块不可用!";
+			break;
+		}
+
+		CJsonObject jsonIn;
+		string strCardID = ui->lineEdit_CardID->text().toStdString();
+		string strName = ui->lineEdit_Name->text().toLocal8Bit().data();
+
+		/*jsonIn.Add("CardID", strCardID);
+		jsonIn.Add("Name", strName);
+		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+		jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
+		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			break;
+		}
+
+		CJsonObject jsonOut(strJsonOut);
+		jsonOut.Get("Result", nErrCode);
+		if (QFailed(nErrCode))
+		{
+			string strText;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			break;
+		}
+		string strSSCardNum, strBankName;
+		int nCardStatus;
+		jsonOut.Get("CardNum", strSSCardNum);
+		jsonOut.Get("CardStatus", nCardStatus);
+		jsonOut.Get("BankName", strBankName);
+		jsonIn.Clear();*/
+
+		jsonIn.Add("CardID", strCardID);
+		jsonIn.Add("Name", strName);
+		jsonIn.Add("City", Reginfo.strCityCode);
+
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
+		string strCommand = "QueryPersonPhoto";
+
+		if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText;
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			break;
+
+		}
+		CJsonObject jsonOut(strJsonOut);
+		string strPhoto;
+		if (jsonOut.Get("Photo", strPhoto))
+		{
+			SaveSSCardPhoto(strMessage, strPhoto.c_str(), (char*)pIDCard->szIdentity);
+			if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
+			{
+				strMessage = QString("保存照片数据失败!");
+				break;
+			}
+		}
+		else
+		{
+			strMessage = QString("社保后台未返回个人照片!");
+			break;
+		}
+
+		strCommand = "QueryPersonInfo";
+		if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText;
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			strMessage = QString("获取个人信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			break;
+		}
+		jsonOut.Parse(strJsonOut);
+		string strAddress, strMobile, strOccupation, strNation, strPaperIssuedDate, strPaperExpireDate;
+		jsonOut.Get("Address", strAddress);
+		jsonOut.Get("Mobile", strMobile);
+		jsonOut.Get("Occupation", strOccupation);
+		jsonOut.Get("Nation", strNation);
+		jsonOut.Get("PaperIssuedDate", strPaperIssuedDate);
+		jsonOut.Get("PaperExpireDate", strPaperExpireDate);
+
+		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit(strAddress.c_str()));
+		int nIndex = ui->comboBox_Nationality->findData(strNation.c_str());
+		if (nIndex != -1)
+			ui->comboBox_Nationality->setCurrentIndex(nIndex);
+		nIndex = ui->comboBox_Career->findData(strOccupation.c_str());
+		if (nIndex != -1)
+			ui->comboBox_Career->setCurrentIndex(nIndex);
+		if (strMobile.size())
+			ui->lineEdit_GuardianMobile->setText(strMobile.c_str());
+		ui->dateEdit_Issued->setDate(QDate::fromString(strPaperIssuedDate.c_str(), "yyyyMMdd"));
+		ui->dateEdit_Expired->setDate(QDate::fromString(strPaperExpireDate.c_str(), "yyyyMMdd"));
+
+		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+		ui->label_Photo->setStyleSheet(strStyle);
+		ui->label_Photo->setText("");
+	} while (0);
+
+}
 
 void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
 {
@@ -799,18 +947,39 @@ void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
 	ui->lineEdit_GuardianCardID->setVisible(bShow);
 	if (bShow)
 	{
-		ui->label_GuardianMobile->setMinimumSize(QSize(200, 40));
-		ui->label_GuardianMobile->setMaximumSize(QSize(200, 16777215));
+		ui->label_GuardianMobile->setMinimumSize(QSize(200, 60));
+		ui->label_GuardianMobile->setMaximumSize(QSize(200, 60));
+		ui->lineEdit_GuardianMobile->setMinimumSize(QSize(300, 60));
+		ui->lineEdit_GuardianMobile->setMaximumSize(QSize(300, 60));
 
-		horizontalSpacer_Mobile = new QSpacerItem(40, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
-		ui->horizontalLayout_Guardian->insertSpacerItem(2, horizontalSpacer_Mobile);
+
+		if (ui->horizontalLayout_Guardian->count() == 5)
+		{
+			horizontalSpacer_Mobile = new QSpacerItem(40, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+			ui->horizontalLayout_Guardian->insertSpacerItem(2, horizontalSpacer_Mobile);
+		}
+
+		qDebug() << "Item Count =" << ui->horizontalLayout_Guardian->count();
 	}
 	else
 	{
-		ui->label_GuardianMobile->setMinimumSize(QSize(220, 40));
-		ui->label_GuardianMobile->setMaximumSize(QSize(220, 16777215));
-		ui->horizontalLayout_Guardian->removeItem(horizontalSpacer_Mobile);
+		ui->label_GuardianMobile->setMinimumSize(QSize(220, 60));
+		ui->label_GuardianMobile->setMaximumSize(QSize(220, 60));
+		ui->lineEdit_GuardianMobile->setMinimumSize(QSize(700, 60));
+		ui->lineEdit_GuardianMobile->setMaximumSize(QSize(700, 60));
+		if (ui->horizontalLayout_Guardian->count() == 6)
+		{
+			horizontalSpacer_Mobile = (QSpacerItem*)ui->horizontalLayout_Guardian->itemAt(2);
+			ui->horizontalLayout_Guardian->removeItem(horizontalSpacer_Mobile);
+			qDebug() << "Item Count =" << ui->horizontalLayout_Guardian->count();
+			//horizontalSpacer_Mobile->objectName();
+		}
 	}
+	//int nCount = ui->horizontalLayout_Guardian->count();
+	//for (int i = 0; i < nCount; i++)
+	//{
+	//	ui->horizontalLayout_Guardian->itemAt(i);
+	//}
 }
 
 void	uc_InputIDCardInfo::ClearGuardianInfo()
@@ -998,6 +1167,37 @@ void uc_InputIDCardInfo::on_pushButton_SelectPhoto_clicked()
 		emit ShowMaskWidget("提示", QString::fromLocal8Bit(e.what()), Fetal, Stay_CurrentPage);
 	}
 }
+
+
+//void uc_InputIDCardInfo::on_pushButton_Query_clicked()
+//{
+//	gInfo() << __FUNCTION__;
+//	WaitCursor();
+//	QString strMessage;
+//	int nResult = -1;
+//	int nOperation = -1;
+//	int nPage = 0;
+//	MaskStatus nStatus = Success;
+//	QString strTips = "操作成功";
+//	SSCardService* pService = nullptr;
+//	do
+//	{
+//		if (QFailed(GetCardInfo(strMessage)))
+//			break;
+//
+//	} while (0);
+//
+//	if (QFailed(nResult))
+//	{
+//		nStatus = Failed;
+//		nOperation = Stay_CurrentPage;
+//		strTips = "操作失败";
+//	}
+//
+//	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
+//}
+
+
 void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 {
 	gInfo() << __FUNCTION__;
@@ -1016,6 +1216,13 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 
 		if (QFailed(GetSSCardInfo(strMessage)))
 			break;
+
+		// 图像文件内容非空，但不是当前人员的照片
+		//if (!g_pDataCenter->strSSCardPhotoFile.empty() &&
+		//	g_pDataCenter->strSSCardPhotoFile.find((char*)pIDCard->szIdentity) == string::npos)
+		//{
+
+		//}
 
 		SavePersonInfo();
 
@@ -1101,5 +1308,64 @@ void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
 		pDialogReadIDCard = nullptr;
 		StopDetect();
 	}
+}
 
+void uc_InputIDCardInfo::on_Name_textChanged(const QString& arg1)
+{
+	auto itfind = mapPersonFile.find(arg1);
+	if (itfind != mapPersonFile.end())
+	{
+		disconnect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+		ClearInfo();
+		LoadPersonInfo(itfind->second);
+		connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+	}
+}
+
+void uc_InputIDCardInfo::on_Name_EditingFinished()
+{
+	//QString arg1 = ui->lineEdit_Name->text();
+	//auto itfind = mapPersonFile.find(arg1);
+	//if (itfind != mapPersonFile.end())
+	//{
+	//	ClearInfo();
+	//	LoadPersonInfo(itfind->second);
+	//}
+}
+
+void uc_InputIDCardInfo::on_CheckPersonInfo()
+{
+	WaitCursor();
+	QueryPersonInfo();
+}
+
+void uc_InputIDCardInfo::on_lineEdit_Name_textEdited(const QString& arg1)
+{
+	if (arg1.size() < 2)
+		return;
+
+	QString strCardID = ui->lineEdit_CardID->text();
+	if (strCardID.size() < 18)
+		return;
+
+	char nX = VerifyCardID(strCardID.toStdString().c_str());
+	if (nX != strCardID.toStdString().at(17))
+		return;
+	emit CheckPersonInfo();
+}
+
+void uc_InputIDCardInfo::on_lineEdit_CardID_textEdited(const QString& arg1)
+{
+	QString strCardID = arg1;
+	if (strCardID.size() < 18)
+		return;
+
+	char nX = VerifyCardID(strCardID.toStdString().c_str());
+	if (nX != strCardID.toStdString().at(17))
+		return;
+
+	QString strName = ui->lineEdit_Name->text();
+	if (strName.size() < 2)
+		return;
+	emit CheckPersonInfo();
 }

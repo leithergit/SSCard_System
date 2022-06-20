@@ -216,6 +216,10 @@ MainWindow::MainWindow(QWidget* parent)
 		bThreadUpdateLauncherRunning = true;
 		pThreadUpdateLauncher = new std::thread(&MainWindow::ThreadUpdateLauncher, this);
 	}
+	else
+	{
+		gWarning() << GBKString("警告:自动升级功能被关闭!");
+	}
 
 	m_nTimerTestHost = startTimer(5000);
 	QString strMessage;

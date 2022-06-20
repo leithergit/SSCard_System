@@ -775,7 +775,6 @@ bool Update(UpdateType nType, string& strMessage)
 			gError() << "Failed in InstallNewVersion" << strMessage;
 			break;
 		}
-
 		bSucceed = true;
 	} while (true);
 	return bSucceed;

@@ -44,7 +44,6 @@ SOURCES += \
     clickablelabel.cpp \
     dialogconfigbank.cpp \
     imageviewlabel.cpp \
-    license.cpp \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
@@ -102,7 +101,6 @@ HEADERS += \
     clickablelabel.h \
     dialogconfigbank.h \
     imageviewlabel.h \
-    license.h \
     mainpage.h \
     mainwindow.h \
     nc_commitpersoninfo.h \

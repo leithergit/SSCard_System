@@ -366,6 +366,16 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
      </column>
      <column>
       <property name="text">
+       <string>证件有效期</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>通讯地址</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>手机</string>
       </property>
      </column>

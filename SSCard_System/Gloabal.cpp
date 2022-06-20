@@ -492,7 +492,7 @@ int DataCenter::OpenDevice(QString& strMessage)
 	return 0;
 }
 
-int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage)
+int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage, IDCardInfoPtr pInputIDCard)
 {
 	int nResult = -1;
 	RegionInfo& Regcfg = pSysConfig->Region;
@@ -558,12 +558,12 @@ int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage
 				strMessage = QString::fromLocal8Bit(strJsonOut.c_str());
 				break;
 			}
-			if (!pIDCard)
+			if (!pIDCard && !pInputIDCard)
 			{
 				strMessage = "设置业务类型失败,身份证信息无效！";
 				break;
 			}
-			string strIdentity = (const char*)pIDCard->szIdentity;
+			string strIdentity = pIDCard ? (const char*)pIDCard->szIdentity : (const char*)pInputIDCard->szIdentity;
 			if (QFailed(pSScardSerivce->SetServiceType(nCardServiceType, strIdentity)))
 			{
 				strMessage = "设置业务类型失败,只能是新办卡,补办和挂失/解挂";
@@ -587,7 +587,14 @@ int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage
 
 int DataCenter::CloseSSCardService(QString& strMessage)
 {
-	m_pPrinterlib = nullptr;
+	if (pSScardSerivce)
+	{
+		delete pSScardSerivce;
+		pSScardSerivce = nullptr;
+	}
+	if (pSServiceLib)
+		pSServiceLib = nullptr;
+
 	return 0;
 }
 
@@ -2486,8 +2493,10 @@ int  DataCenter::PremakeCard(QString& strMessage)
 
 int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage)
 {
-	if (strSSCardPhotoFile.empty())
+	if (strSSCardPhotoFile.empty() ||
+		strSSCardPhotoFile.find((char*)pIDCard->szIdentity) == string::npos)
 	{
+		gInfo() << "用户照片为空或照片文本名与当前用户身份证号码不符,准备下载照片!";
 		return DownloadPhoto(strBase64Photo, strMessage);
 	}
 	else
@@ -2672,7 +2681,7 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		if QFailed(LoadPhoto(pSSCardInfo->strPhoto, strMessage))
 			break;
 
-		gInfo() << "JsonIn(without photo) = " << strJsonIn;
+		gInfo() << "JsonIn(without photo) = " << jsonIn.ToFormattedString();
 		jsonIn.Add("Photo", pSSCardInfo->strPhoto);
 
 		switch (g_pDataCenter->nCardServiceType)
@@ -2907,7 +2916,7 @@ void DataCenter::RemoveTempPersonInfo()
 	{
 		string strAppPath = QApplication::applicationDirPath().toLocal8Bit().data();
 		strAppPath += "/data/TempPerson.json";
-		if (!fs::exists(strAppPath))
+		if (fs::exists(strAppPath))
 			fs::remove(strAppPath);
 	}
 	catch (std::exception& e)

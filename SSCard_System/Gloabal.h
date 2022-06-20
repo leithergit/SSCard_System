@@ -744,7 +744,7 @@ struct SysConfig
 		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
 		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
 		bDebug = pSettings->value("EnableDebug", false).toBool();
-		bEnableUpdate = pSettings->value("EnableUpdate", false).toBool();
+		bEnableUpdate = pSettings->value("EnableUpdate", true).toBool();
 		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
 		bSkipWriteCard = pSettings->value("SkipWriteCard", false).toBool();
 		bSkipPrintCard = pSettings->value("SkipPrintCard", false).toBool();
@@ -1021,7 +1021,7 @@ public:
 
 	int OpenDevice(QString& strMessage);
 
-	int OpenSSCardService(SSCardService** ppService, QString& strMessage);
+	int OpenSSCardService(SSCardService** ppService, QString& strMessage, IDCardInfoPtr pInputIDCard = nullptr);
 
 	int CloseSSCardService(QString& strMessage);
 

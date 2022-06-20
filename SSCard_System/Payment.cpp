@@ -490,7 +490,7 @@ int LoadJsonCardData(SSCardBaseInfoPtr& pSSCardInfoOut, string strJsonFile)
 	}
 }
 
-int  GetImageStorePath(string& strFilePath, int nType)
+int  GetImageStorePath(string& strFilePath, int nType, char* szCardID)
 {
 	QString strStorePath = QCoreApplication::applicationDirPath();
 	strStorePath += "/IDImage/";
@@ -509,18 +509,19 @@ int  GetImageStorePath(string& strFilePath, int nType)
 		}
 	}
 	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
-	if (!pIDCard)
+	if (!pIDCard && !szCardID)
 		return -1;
 	QString strTempPath;
+	char* szIdentity = pIDCard ?(char*)pIDCard->szIdentity : szCardID;
 	if (nType == 0)
-		strTempPath = strStorePath + QString("ID_%1.jpg").arg((const char*)pIDCard->szIdentity);
+		strTempPath = strStorePath + QString("ID_%1.jpg").arg(szIdentity);
 	else if (nType == 1)
 	{
 		if (g_pDataCenter->GetSSCardInfo() &&
 			g_pDataCenter->GetSSCardInfo()->strCardNum.size() == 9)
-			strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg((const char*)pIDCard->szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
+			strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg(szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
 		else
-			strTempPath = strStorePath + QString("ID_%1_SSCard.jpg").arg((const char*)pIDCard->szIdentity);
+			strTempPath = strStorePath + QString("ID_%1_SSCard.jpg").arg(szIdentity);
 	}
 	else if (nType == 2)		// 原始base64 文本
 	{
@@ -533,7 +534,7 @@ int  GetImageStorePath(string& strFilePath, int nType)
 	return 0;
 }
 
-int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
+int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64,char *szCardID)
 {
 	if (!szPhotoBase64)
 	{
@@ -545,7 +546,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 	Base64Decode(szPhotoBase64, strlen(szPhotoBase64), (BYTE*)g_szPhotoBuffer, &nPhotoSize);
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
 	string strPhotoPath;
-	GetImageStorePath(strPhotoPath, 1);
+	GetImageStorePath(strPhotoPath, 1,szCardID);
 	photo.save(strPhotoPath.c_str(), "jpg", 90);
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
 	return 0;

@@ -52,7 +52,7 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 //int QueryCardProgress(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo);
 
 // nType，0为保存身份证照片，1为保存社保卡照片,2为原始base64数据
-int GetImageStorePath(string& strFilePath, int nType = 0);
+int GetImageStorePath(string& strFilePath, int nType = 0, char* szCardID = nullptr);
 
 int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo);
 
@@ -60,7 +60,7 @@ int LoadIniCardData(SSCardBaseInfoPtr& pSSCardInfoOut, QString strINIFile);
 
 int LoadJsonCardData(SSCardBaseInfoPtr& pSSCardInfoOut, string strJsonFile);
 
-int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64);
+int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64, char* szCardID = nullptr);
 
 int SaveSSCardPhotoBase64(QString strMessage, const char* szPhotoBase64);
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1327</width>
-    <height>827</height>
+    <width>1389</width>
+    <height>839</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -118,7 +118,7 @@ font:42px &quot;思源黑体 CN Medium&quot;;
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_11">
+              <spacer name="horizontalSpacer_9">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -132,15 +132,43 @@ font:42px &quot;思源黑体 CN Medium&quot;;
              </item>
              <item>
               <widget class="QCheckBox" name="checkBox_Agency">
+               <property name="minimumSize">
+                <size>
+                 <width>210</width>
+                 <height>60</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>210</width>
+                 <height>60</height>
+                </size>
+               </property>
                <property name="text">
                 <string>代办</string>
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="horizontalSpacer_11">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,1">
+            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,1,0">
              <item>
               <widget class="QLabel" name="label_Gender">
                <property name="minimumSize">
@@ -175,7 +203,7 @@ font:42px &quot;思源黑体 CN Medium&quot;;
                 <widget class="QRadioButton" name="radioButton_Male">
                  <property name="minimumSize">
                   <size>
-                   <width>80</width>
+                   <width>100</width>
                    <height>40</height>
                   </size>
                  </property>
@@ -198,10 +226,23 @@ QRadioButton::indicator::checked {
                 </widget>
                </item>
                <item>
+                <spacer name="horizontalSpacer_17">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
                 <widget class="QRadioButton" name="radioButton_Female">
                  <property name="minimumSize">
                   <size>
-                   <width>80</width>
+                   <width>100</width>
                    <height>40</height>
                   </size>
                  </property>
@@ -226,12 +267,9 @@ QRadioButton::indicator::checked {
               </layout>
              </item>
              <item>
-              <spacer name="horizontalSpacer_4">
+              <spacer name="horizontalSpacer_13">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -282,6 +320,22 @@ QRadioButton::indicator::checked {
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </item>
            <item>
@@ -312,13 +366,13 @@ QRadioButton::indicator::checked {
               <widget class="QLineEdit" name="lineEdit_CardID">
                <property name="minimumSize">
                 <size>
-                 <width>500</width>
-                 <height>40</height>
+                 <width>700</width>
+                 <height>60</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>500</width>
+                 <width>700</width>
                  <height>60</height>
                 </size>
                </property>
@@ -373,7 +427,7 @@ QRadioButton::indicator::checked {
               <widget class="QDateEdit" name="dateEdit_Issued">
                <property name="minimumSize">
                 <size>
-                 <width>300</width>
+                 <width>330</width>
                  <height>60</height>
                 </size>
                </property>
@@ -399,13 +453,13 @@ QRadioButton::indicator::checked {
               <widget class="Line" name="line">
                <property name="minimumSize">
                 <size>
-                 <width>20</width>
+                 <width>25</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>20</width>
+                 <width>25</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -418,7 +472,7 @@ QRadioButton::indicator::checked {
               <widget class="QDateEdit" name="dateEdit_Expired">
                <property name="minimumSize">
                 <size>
-                 <width>300</width>
+                 <width>330</width>
                  <height>60</height>
                 </size>
                </property>
@@ -483,7 +537,7 @@ QRadioButton::indicator::checked {
               <widget class="QComboBox" name="comboBox_Career">
                <property name="minimumSize">
                 <size>
-                 <width>400</width>
+                 <width>700</width>
                  <height>60</height>
                 </size>
                </property>
@@ -569,119 +623,29 @@ QRadioButton::indicator::checked {
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_Province">
+            <widget class="QPlainTextEdit" name="plainTextEdit_Address">
              <property name="minimumSize">
               <size>
-               <width>300</width>
-               <height>60</height>
+               <width>700</width>
+               <height>100</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>300</width>
-               <height>60</height>
+               <width>16777215</width>
+               <height>120</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true"/>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
-             <property name="maxVisibleItems">
-              <number>16</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBox_City">
-             <property name="minimumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBox_County">
-             <property name="minimumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
+             <property name="plainText">
+              <string>山东省滨州市滨城区黄河28路滨管小区154号楼102单元189弄</string>
              </property>
             </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer_10">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_26">
-           <item>
-            <spacer name="horizontalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>225</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_Address">
-             <property name="minimumSize">
-              <size>
-               <width>800</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>6555</width>
-               <height>60</height>
-              </size>
-             </property>
-             <property name="readOnly">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_9">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -723,7 +687,7 @@ QRadioButton::indicator::checked {
             <widget class="QLineEdit" name="lineEdit_Guardian">
              <property name="minimumSize">
               <size>
-               <width>400</width>
+               <width>500</width>
                <height>60</height>
               </size>
              </property>
@@ -737,6 +701,19 @@ QRadioButton::indicator::checked {
               <bool>false</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item>
             <widget class="QLabel" name="label_GuardianMobile">
@@ -764,18 +741,18 @@ QRadioButton::indicator::checked {
             <widget class="QLineEdit" name="lineEdit_GuardianMobile">
              <property name="minimumSize">
               <size>
-               <width>350</width>
+               <width>300</width>
                <height>60</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>500</width>
+               <width>300</width>
                <height>60</height>
               </size>
              </property>
              <property name="text">
-              <string/>
+              <string>18017348763</string>
              </property>
              <property name="readOnly">
               <bool>false</bool>
@@ -783,7 +760,7 @@ QRadioButton::indicator::checked {
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer">
+            <spacer name="horizontalSpacer_7">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -826,7 +803,7 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>500</width>
-               <height>40</height>
+               <height>60</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -882,13 +859,13 @@ QRadioButton::indicator::checked {
             <widget class="QComboBox" name="comboBox_Guardianship">
              <property name="minimumSize">
               <size>
-               <width>280</width>
+               <width>300</width>
                <height>60</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>280</width>
+               <width>300</width>
                <height>60</height>
               </size>
              </property>
@@ -918,7 +895,7 @@ QRadioButton::indicator::checked {
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_7">
+            <spacer name="horizontalSpacer_8">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -971,14 +948,14 @@ QRadioButton::indicator::checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>266</width>
-           <height>90</height>
+           <width>220</width>
+           <height>70</height>
           </size>
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
+border-radius: 15px;
+font: 36px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;
 letter-spacing: 1px;
@@ -999,14 +976,14 @@ QPushButton:!enabled{background:#cacaca;}
          </property>
          <property name="minimumSize">
           <size>
-           <width>266</width>
-           <height>90</height>
+           <width>220</width>
+           <height>70</height>
           </size>
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
+border-radius: 15px;
+font: 36px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;
 letter-spacing: 1px;
@@ -1027,14 +1004,14 @@ QPushButton:!enabled{background:#cacaca;}
          </property>
          <property name="minimumSize">
           <size>
-           <width>266</width>
-           <height>90</height>
+           <width>220</width>
+           <height>70</height>
           </size>
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
+border-radius: 15px;
+font: 36px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;
 letter-spacing: 1px;

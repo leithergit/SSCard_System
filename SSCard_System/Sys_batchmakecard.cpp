@@ -16,6 +16,8 @@ enum class BatchTable_Column
 	Col_Identity,
 	Col_Gender,
 	Col_Nation,
+	Col_PaperDate,
+	Col_Address,
 	Col_Mobile,
 	Col_Career,
 	Col_ServiceType,
@@ -29,6 +31,8 @@ int nColumnWidthList[] =
 	110,
 	240,
 	40,
+	100,
+	200,
 	200,
 	230,
 	300,
@@ -37,6 +41,7 @@ int nColumnWidthList[] =
 	250
 };
 QStringList ListServiceType = { "新办","补换" };
+QString strTableHeader[] = { "姓名","身份证","性别","民族","证件有效期","通讯地址","手机","职业","业务类型" };
 Sys_BatchMakeCard::Sys_BatchMakeCard(QWidget* parent) :
 	QWidget(parent),
 	ui(new Ui::Sys_BatchMakeCard)
@@ -240,31 +245,13 @@ int Sys_BatchMakeCard::BuildNewCardInfo(QString& strMessage)
 				break;
 			}
 		}
-		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
-		{
-			CJsonObject jsonOut(strJsonOut);
-			string strText;
-			int nErrCode = -1;
-			jsonOut.Get("Result", nErrCode);
-			jsonOut.Get("Message", strText);
-			strMessage = QString("查询卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-			break;
-		}
-
-		CJsonObject jsonOut(strJsonOut);
-		string strBankCode, strMobile;
-		if (!jsonOut.Get("CardNum", pSSCardInfo->strCardNum) ||
-			!jsonOut.Get("BankCode", pSSCardInfo->strBankCode))
-		{
-			strMessage = "社保卡号或银行代码无效!";
-			gInfo() << strJsonOut;
-			break;
-		}
 
 		pSSCardInfo->strName = (const char*)pIDCard->szName;
 		pSSCardInfo->strGender = (const char*)pIDCard->szGender;
 		pSSCardInfo->strNation = (const char*)pIDCard->szNationalty;
 		pSSCardInfo->strNationCode = (const char*)pIDCard->szNationaltyCode;
+		pSSCardInfo->strReleaseDate = (const char*)pIDCard->szExpirationDate1;
+		pSSCardInfo->strValidDate = (const char*)pIDCard->szExpirationDate2;
 		pSSCardInfo->strBirthday = (const char*)pIDCard->szBirthday;
 		pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
 		pSSCardInfo->strAddress = (const char*)pIDCard->szAddress;
@@ -295,6 +282,7 @@ int Sys_BatchMakeCard::BuildNewCardInfo(QString& strMessage)
 			strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
+		CJsonObject jsonOut;
 		jsonOut.Parse(strJsonOut);
 		string strPhoto;
 		if (jsonOut.Get("Photo", strPhoto))
@@ -311,6 +299,7 @@ int Sys_BatchMakeCard::BuildNewCardInfo(QString& strMessage)
 			strMessage = QString("社保后台未返回个人照片!");
 			break;
 		}
+
 		nResult = 0;
 	} while (0);
 	return nResult;
@@ -417,6 +406,7 @@ int Sys_BatchMakeCard::BuildUpdateCardInfo(QString& strMessage)
 			strMessage = QString("社保后台未返回个人照片!");
 			break;
 		}
+
 		nResult = 0;
 	} while (0);
 	return nResult;
@@ -453,9 +443,19 @@ void Sys_BatchMakeCard::ThreadBatchMakeCard()
 				break;
 			}
 			g_pDataCenter->nCardServiceType = var->nServiceType;
-			if (QFailed(nResult = BuildNewCardInfo(strMessage)))
-				break;
+			if (var->nServiceType == ServiceType::Service_NewCard)
+			{
+				if (QFailed(nResult = BuildNewCardInfo(strMessage)))
+					break;
+
+			}
+			else
+			{
+				if (QFailed(nResult = BuildUpdateCardInfo(strMessage)))
+					break;
+			}
 			emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_Progress, "信息生成");
+
 			this_thread::sleep_for(chrono::milliseconds(nDelay));
 			if (var->nServiceType == ServiceType::Service_ReplaceCard)
 			{
@@ -474,6 +474,7 @@ void Sys_BatchMakeCard::ThreadBatchMakeCard()
 				break;
 			emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_Progress, "预制卡");
 			emit UpdateTableWidget(nRow, (int)BatchTable_Column::Col_SSCardNum, var->pSSCardInfo->strCardNum.c_str());
+			return;
 
 			if (QFailed(nResult = g_pDataCenter->Depense(strMessage)))
 				break;
@@ -587,8 +588,35 @@ int	Sys_BatchMakeCard::ImportNewIDCard(vector<QString>& vecField)
 	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 	strcpy((char*)pIDCard->szName, vecField[(int)BatchTable_Column::Col_Name].toLocal8Bit().data());
 	strcpy((char*)pIDCard->szIdentity, vecField[(int)BatchTable_Column::Col_Identity].toStdString().c_str());
+	QString strBirthday = QString((char*)pIDCard->szIdentity).mid(6, 8);
+	strcpy((char*)pIDCard->szBirthday, strBirthday.toStdString().c_str());
 	strcpy((char*)pIDCard->szGender, vecField[(int)BatchTable_Column::Col_Gender].toLocal8Bit().data());
-	strcpy((char*)pIDCard->szNationalty, vecField[(int)BatchTable_Column::Col_Nation].toLocal8Bit().data());
+	
+
+	QString strNation = vecField[(int)BatchTable_Column::Col_Nation];
+	bool bNationValid = false;
+	if (!strNation.contains("族"))
+		strNation += "族";
+	for (auto var : g_vecNationCode)
+	{
+		string strNation2 = strNation.toStdString();
+		if (var.strNationalty == strNation2)
+		{
+			strcpy((char*)pIDCard->szNationalty, vecField[(int)BatchTable_Column::Col_Nation].toLocal8Bit().data());
+			strcpy((char*)pIDCard->szNationaltyCode,var.strCode.c_str());
+			bNationValid = true;
+		}
+	}
+
+	QString strPaperDatetime = vecField[(int)BatchTable_Column::Col_PaperDate];
+	QStringList strDateTime = strPaperDatetime.split('-');
+	if (strDateTime.size() == 2)
+	{
+		strcpy((char*)pIDCard->szExpirationDate1, strDateTime[0].toLocal8Bit().data());
+		strcpy((char*)pIDCard->szExpirationDate2, strDateTime[1].toLocal8Bit().data());
+	}
+
+	strcpy((char*)pIDCard->szAddress, vecField[(int)BatchTable_Column::Col_Address].toLocal8Bit().data());
 
 	auto var = find_if(vecMakeCardInfo.begin(), vecMakeCardInfo.end(), [pIDCard](MakeCardInfoPtr pItem)
 		{
@@ -605,7 +633,8 @@ int	Sys_BatchMakeCard::ImportNewIDCard(vector<QString>& vecField)
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Identity, new QTableWidgetItem(QString("%1").arg((char*)pIDCard->szIdentity)));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Gender, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szGender)));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Nation, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szNationalty)));
-	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Mobile, new QTableWidgetItem(""));
+	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_PaperDate, new QTableWidgetItem(vecField[(int)BatchTable_Column::Col_PaperDate]));
+	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Address, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szAddress)));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Mobile, new QTableWidgetItem(vecField[(int)BatchTable_Column::Col_Mobile]));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Career, new QTableWidgetItem(vecField[(int)BatchTable_Column::Col_Career]));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_ServiceType, new QTableWidgetItem(vecField[(int)BatchTable_Column::Col_ServiceType]));
@@ -660,13 +689,33 @@ void Sys_BatchMakeCard::on_pushButton_StartMakeCard_clicked()
 	for (int nRow = 0; nRow < nCount; nRow++)
 	{
 		QString strOccupation = ui->tableWidget->item(nRow, (int)BatchTable_Column::Col_Career)->text();
+		QString strPaperDate = ui->tableWidget->item(nRow, (int)BatchTable_Column::Col_PaperDate)->text();
+		QString strAddress = ui->tableWidget->item(nRow, (int)BatchTable_Column::Col_Address)->text();
 		QString strServiceType = ui->tableWidget->item(nRow, (int)BatchTable_Column::Col_ServiceType)->text();
 		QString strMobile = ui->tableWidget->item(nRow, (int)BatchTable_Column::Col_Mobile)->text();
-		if (strOccupation.isEmpty() || strServiceType.isEmpty() || strMobile.isEmpty())
+		QString strNation = ui->tableWidget->item(nRow, (int)BatchTable_Column::Col_Nation)->text();
+
+		if (strOccupation.isEmpty() || strPaperDate.isEmpty() || strAddress.isEmpty() || strServiceType.isEmpty() || strMobile.isEmpty())
 		{
 			bFault = true;
-			strMessage = QString("'%1'的职业,业务类型或手机号码未选择/输入!").arg(QString::fromLocal8Bit((char*)vecMakeCardInfo[nRow]->pIDCard->szName));
-			QMessageBox_CN(QMessageBox::Critical, "提示", strMessage, QMessageBox::Ok, this);
+			strMessage = QString("'%1'的证件有效期,通讯地址,职业,业务类型或手机号码无效!").arg(QString::fromLocal8Bit((char*)vecMakeCardInfo[nRow]->pIDCard->szName));
+			
+			break;
+		}
+		QStringList dtPaper = strPaperDate.split("-", Qt::KeepEmptyParts);
+		QDate dtIssued = QDate::fromString(dtPaper[0], "yyyyMMdd");
+		QDate dtExpired = QDate::fromString(dtPaper[1], "yyyyMMdd");
+		if (dtPaper.size() != 2 || !dtIssued.isValid() || !dtExpired.isValid())
+		{
+			bFault = true;
+			strMessage = QString("'%1'的证件有效期,格式无效,请参照样表格式输入!").arg(QString::fromLocal8Bit((char*)vecMakeCardInfo[nRow]->pIDCard->szName));
+			break;
+		}
+
+		if (dtIssued >= dtExpired)
+		{
+			bFault = true;
+			strMessage = QString("证件签发日期不能晚于失效日期!");
 			break;
 		}
 		for (auto var : vecCareer)
@@ -682,10 +731,37 @@ void Sys_BatchMakeCard::on_pushButton_StartMakeCard_clicked()
 				vecMakeCardInfo[nRow]->nServiceType = (ServiceType)nIndex;
 			}
 		}
+
+		bool bNationValid = false;
+		if (!strNation.contains("族"))
+			strNation += "族";
+		for (auto var : g_vecNationCode)
+		{
+			string strNation2 = strNation.toStdString();
+			if (var.strNationalty == strNation2)
+			{
+				vecMakeCardInfo[nRow]->pSSCardInfo->strNation = strNation.toStdString();
+				vecMakeCardInfo[nRow]->pSSCardInfo->strNationCode = var.strCode;
+				bNationValid = true;
+			}
+		}
+		if (!bNationValid)
+		{
+			bFault = true;
+			strMessage = QString("'%1'的民族信息格式无效,请参照样表格式输入!").arg(QString::fromLocal8Bit((char*)vecMakeCardInfo[nRow]->pIDCard->szName));
+			break;
+		}
 		vecMakeCardInfo[nRow]->pSSCardInfo->strMobile = strMobile.toStdString();
+		vecMakeCardInfo[nRow]->pSSCardInfo->strAddress = strAddress.toStdString();
+		vecMakeCardInfo[nRow]->pSSCardInfo->strValidDate = dtPaper[0].toStdString();
+		vecMakeCardInfo[nRow]->pSSCardInfo->strReleaseDate = dtPaper[1].toStdString();
 	}
 	if (bFault)
+	{
+		QMessageBox_CN(QMessageBox::Critical, "提示", strMessage, QMessageBox::Ok, this);
 		return;
+	}
+		
 
 	m_bWorkThreadRunning = true;
 	m_pWorkThread = new std::thread(&Sys_BatchMakeCard::ThreadBatchMakeCard, this);
@@ -732,14 +808,15 @@ void Sys_BatchMakeCard::on_pushButton_ImportList_clicked()
 		return;
 	QXlsx::Document xlsx(strXlsxFile);
 	xlsx.selectSheet("Sheet1");
-	QString strTitle[] = { "姓名","身份证","性别","民族","手机","职业","业务类型" };
+
+	char nMaxCol = 'A' + sizeof(strTableHeader) / sizeof(QString) - 1;
 	bool bValid = true;
-	for (char Col = 'A'; Col <= 'G'; Col++)
+	for (char Col = 'A'; Col <= nMaxCol; Col++)
 	{
 		QString strCell = Col;
 		strCell += '1';
 		QString strValue = xlsx.read(strCell).toString();
-		if (strValue != strTitle[Col - 'A'])
+		if (strValue != strTableHeader[Col - 'A'])
 		{
 			bValid = false;
 			break;
@@ -756,7 +833,7 @@ void Sys_BatchMakeCard::on_pushButton_ImportList_clicked()
 	{
 		vector<QString> vecField;
 		vecField.push_back("");
-		for (char Col = 'A'; Col <= 'G'; Col++)
+		for (char Col = 'A'; Col <= nMaxCol; Col++)
 		{
 			QString strCell = QString("%1%2").arg(Col).arg(nRow);
 			QString strValue = xlsx.read(strCell).toString();
@@ -768,7 +845,7 @@ void Sys_BatchMakeCard::on_pushButton_ImportList_clicked()
 			vecField.push_back(strValue);
 		}
 		nRow++;
-		if (vecField.size() == 8)
+		if (vecField.size() == (sizeof(strTableHeader) / sizeof(QString) + 1))
 			ImportNewIDCard(vecField);
 
 	} while (!bEmpty);
@@ -787,12 +864,11 @@ void Sys_BatchMakeCard::on_pushButton_ExportList_clicked()
 	if (strXlsxFile.isEmpty())
 		return;
 	QXlsx::Document xlsx(strXlsxFile);
-	QString strTitle[] = { "姓名","身份证","性别","民族","手机","职业","业务类型","卡号","状态" };
-	for (int i = 0; i < sizeof(strTitle) / sizeof(QString); i++)
+	for (int i = 0; i < sizeof(strTableHeader) / sizeof(QString); i++)
 	{
 		QString strCell = 'A' + i;
 		strCell += '1';
-		xlsx.write(strCell, strTitle[i]);
+		xlsx.write(strCell, strTableHeader[i]);
 	}
 	for (int nRow = 0; nRow < nRowCount; nRow++)
 	{
@@ -832,6 +908,8 @@ void Sys_BatchMakeCard::on_AddNewIDCard(IDCardInfo* pIDCard)
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Identity, new QTableWidgetItem(QString("%1").arg((char*)pIDCard->szIdentity)));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Gender, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szGender)));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Nation, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szNationalty)));
+	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_PaperDate, new QTableWidgetItem(QString("%1-%2").arg((char*)pIDCard->szExpirationDate1).arg((char*)pIDCard->szExpirationDate2)));
+	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Address, new QTableWidgetItem(QString::fromLocal8Bit((char*)pIDCard->szAddress)));
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Mobile, new QTableWidgetItem(""));
 	int nServiceType = pButttonGrp->checkedId();
 	ui->tableWidget->setItem(nItems, (int)BatchTable_Column::Col_Career, new QTableWidgetItem("其他从业人员"));
@@ -845,8 +923,8 @@ void Sys_BatchMakeCard::on_AddNewIDCard(IDCardInfo* pIDCard)
 	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_No, nColumnWidthList[(int)BatchTable_Column::Col_No]);
 	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Gender, nColumnWidthList[(int)BatchTable_Column::Col_Gender]);
 	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Mobile, nColumnWidthList[(int)BatchTable_Column::Col_Mobile]);
-	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Career, nColumnWidthList[(int)BatchTable_Column::Col_Career]);
-	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Mobile, nColumnWidthList[(int)BatchTable_Column::Col_Mobile]);
+	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_PaperDate, nColumnWidthList[(int)BatchTable_Column::Col_PaperDate]);
+	ui->tableWidget->setColumnWidth((int)BatchTable_Column::Col_Address, nColumnWidthList[(int)BatchTable_Column::Col_Address]);
 }
 
 void Sys_BatchMakeCard::on_pushButton_MainPage_clicked()

@@ -884,6 +884,7 @@ public:
 			ds.Get("sjhm", pCardInfo->strMobile);
 			ds.Get("yhbh", pCardInfo->strBankCode);
 			ds.Get("sjhm", pCardInfo->strMobile);
+
 			string strCardStatus;
 			string strBankName;
 			ds.Get("kztmc", strCardStatus);
@@ -924,6 +925,7 @@ public:
 			outJson.Add("BankCode", pCardInfo->strBankCode);
 			outJson.Add("CardStatus", (int)nCardStatus);
 			outJson.Add("Mobile", pCardInfo->strMobile);
+
 			strJsonOut = outJson.ToString();
 
 			nErrFlag = 0;
@@ -2290,25 +2292,29 @@ public:
 			}
 
 			ds.Get("yxzjhm", pCardInfo->strCardID);		//有效证件号码			
-			ds.Get("shbzhm", pCardInfo->strCardNum);		//社会保障号码			
+			ds.Get("shbzhm", pCardInfo->strCardNum);	//社会保障号码			
 			ds.Get("xm", pCardInfo->strName);			//姓名
-			ds.Get("xb", pCardInfo->strSex);				//性别
+			ds.Get("xb", pCardInfo->strSex);			//性别
 			ds.Get("csrq", pCardInfo->strBirthday);		//出生日期
 			ds.Get("mz", pCardInfo->strNation);			//民族
 			ds.Get("txdz", pCardInfo->strAdress);		//通讯地址
 			ds.Get("sjhm", pCardInfo->strMobile);		//手机号码
-			ds.Get("zylb", pCardInfo->strOccupType);		//职业类别
+			ds.Get("zylb", pCardInfo->strOccupType);	//职业类别
+			ds.Get("zjqsrq", pCardInfo->strReleaseDate);
+			ds.Get("zjdqrq", pCardInfo->strValidDate);
 
 			CJsonObject jsonOut;
 			//jsonOut.Add("CardID", CardInfo.strCardID);			
 			//jsonOut.Add("Name", CardInfo.strName);
-			//jsonOut.Add("Gender", CardInfo.strSex);
-			//jsonOut.Add("Birthday", CardInfo.strBirthday);
-			//jsonOut.Add("Nation", CardInfo.strNation);
-			//jsonOut.Add("Address", CardInfo.strAdress);
-			//jsonOut.Add("Mobile", CardInfo.strMobile);
+			jsonOut.Add("Gender", pCardInfo->strSex);
+			jsonOut.Add("Birthday", pCardInfo->strBirthday);
+			jsonOut.Add("Nation", pCardInfo->strNation);
+			jsonOut.Add("Address", pCardInfo->strAdress);
+			jsonOut.Add("Mobile", pCardInfo->strMobile);
 			jsonOut.Add("CardNum", pCardInfo->strCardNum);
 			jsonOut.Add("Occupation", pCardInfo->strOccupType);
+			jsonOut.Add("PaperIssuedDate", pCardInfo->strReleaseDate);
+			jsonOut.Add("PaperExpireDate", pCardInfo->strValidDate);
 			strJsonOut = jsonOut.ToString();
 			nErrFlag = 0;
 			nResult = 0;
