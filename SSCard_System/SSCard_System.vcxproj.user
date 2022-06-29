@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <RemoteDebuggerCommand>D:\SSCard_System\SSCard_System.exe</RemoteDebuggerCommand>
     <RemoteDebuggerWorkingDirectory>D:\SSCard_System</RemoteDebuggerWorkingDirectory>
-    <RemoteDebuggerServerName>10.0.0.126</RemoteDebuggerServerName>
+    <RemoteDebuggerServerName>10.0.0.142</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>

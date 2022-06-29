@@ -175,11 +175,21 @@ DeviceManager::~DeviceManager()
 {
 	bThreadReadIDCardRunning = false;
 	bThreadReadPinRunning = false;
-	if (ThreadReadIDCard.joinable())
-		ThreadReadIDCard.join();
+	if (pThreadReadIDCard && pThreadReadIDCard->joinable())
+	{
+		pThreadReadIDCard->join();
+		delete pThreadReadIDCard;
+		pThreadReadIDCard = nullptr;
+	}
 
-	if (ThreadReadPin.joinable())
-		ThreadReadPin.join();
+
+	if (pThreadReadPin && pThreadReadPin->joinable())
+	{
+		pThreadReadPin->join();
+		delete pThreadReadPin;
+		pThreadReadPin = nullptr;
+	}
+
 }
 
 bool DeviceManager::CheckPrinterModule(QString& strPrinterLib, PrinterType& nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
@@ -342,6 +352,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	PrinterType nPrinterType;
 	int nDepenseBox;
 	QString strDPI;
+	char szRCode[128] = { 0 };
 #pragma warning(disable:4700)
 	if (!CheckPrinterModule(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
@@ -349,64 +360,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 		return;
 	}
 
-	CardPowerType nPowerType;
-	ReaderBrand nSSCardReaderType;
-	QString strSSCardReaderType;
-	QString strReaderLib;
 
-	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
-	{
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
-		return;
-	}
-
-	int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
-	if (nRes == QMessageBox::Cancel)
-		return;
-	char szRCode[128] = { 0 };
-	bool bSucceed = false;
-	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
-
-	do
-	{
-		QWaitCursor Wait;
-		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
-			break;
-
-		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
-			break;
-
-		if (g_pDataCenter->Depense(nDepenseBox, nPowerType, strMessage))
-			break;
-
-		char szCardATR[1024] = { 0 };
-		char szRCode[1024] = { 0 };
-		int nCardATRLen = 0;
-		string strCardATR;
-		QString strPowerType = ui.comboBox_PoweronType->currentText();
-
-		if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
-		{
-			strMessage = QString("DriverInit失败,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
-			break;
-		}
-
-		if (QFailed(g_pDataCenter->MoveCard(strMessage)))
-		{
-			break;
-		}
-		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
-		{
-			strMessage = QString("Reader_PowerOn,上电类型:%1,错误代码:%2").arg(strPowerType).arg(szRCode);
-			break;
-		}
-		bSucceed = true;
-		strMessage = QString("读卡测试成功,ATR:%1,稍后请取出卡片").arg(szCardATR);
-	} while (0);
-	if (!bSucceed)
-		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
-	else
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 }
 
@@ -634,7 +588,7 @@ void DeviceManager::on_pushButton_IDCardReaderTest_clicked()
 	EnableUI(this, false);
 
 	bThreadReadIDCardRunning = true;
-	ThreadReadIDCard = std::thread(&DeviceManager::fnThreadReadIDCard, this, strPort);
+	pThreadReadIDCard = new ::thread(&DeviceManager::fnThreadReadIDCard, this, strPort);
 }
 
 void DeviceManager::on_pushButton_TestCamera_clicked()
@@ -663,7 +617,13 @@ void DeviceManager::on_InputPin(char ch)
 	case 0x1b:		// cancel
 	{
 		bThreadReadPinRunning = false;
-		ThreadReadPin.join();
+		if (pThreadReadPin)
+		{
+			pThreadReadPin->join();
+			delete pThreadReadPin;
+			pThreadReadPin = nullptr;
+		}
+
 		EnableUI(this, true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
 		break;
@@ -683,7 +643,12 @@ void DeviceManager::on_InputPin(char ch)
 	{
 		qDebug("confirm...");
 		bThreadReadPinRunning = false;
-		ThreadReadPin.join();
+		if (pThreadReadPin)
+		{
+			pThreadReadPin->join();
+			delete pThreadReadPin;
+			pThreadReadPin = nullptr;
+		}
 		EnableUI(this, true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
 		break;
@@ -999,14 +964,19 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 		ui.pushButton_PinBroadTest->setEnabled(true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
 		bThreadReadPinRunning = true;
-		ThreadReadPin = std::thread(&DeviceManager::fnThreadReadPin, this);
+		pThreadReadPin = new std::thread(&DeviceManager::fnThreadReadPin, this);
 	}
 	else
 	{
 		EnableUI(this, true);
 		bThreadReadPinRunning = false;
 		ui.pushButton_PinBroadTest->setText("输入测试");
-		ThreadReadPin.join();
+		if (pThreadReadPin)
+		{
+			pThreadReadPin->join();
+			delete pThreadReadPin;
+			pThreadReadPin = nullptr;
+		}
 		SUNSON_CloseCom();
 	}
 }
@@ -1129,6 +1099,13 @@ void DeviceManager::on_pushButton_Excute_clicked()
 		}
 		Wait.RestoreCursor();
 		strMessage = tr("卡片打印成功,请取走卡片!");
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+		break;
+	}
+	case 4:		// 出口卡进卡
+	{
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "请在确认后5秒内在出卡口放入卡片!", QMessageBox::Ok, this);
+		g_pDataCenter->Print_EnableCard(5000, 1, strMessage);
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		break;
 	}

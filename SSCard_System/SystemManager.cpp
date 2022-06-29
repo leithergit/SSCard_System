@@ -28,6 +28,7 @@ SystemManager::SystemManager(QWidget* parent)
 	ui.tabWidget->addTab(new logManager, "日志管理");
 	ui.tabWidget->addTab(new OtherOptions, "其它选项");
 	//ui.tabWidget->addTab(new Sys_SSCardAPITest, "新卡测试");
+	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint));
 	showFullScreen();
 }
 

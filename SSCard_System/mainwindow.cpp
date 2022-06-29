@@ -173,7 +173,7 @@ MainWindow::MainWindow(QWidget* parent)
 	w.setWindowFlags(flags);
 	*/
 	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint));
-	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint));
+	setWindowFlags((Qt::WindowFlags)(windowFlags() /*| Qt::WindowStaysOnTopHint*/ | Qt::FramelessWindowHint));
 	// Qt::WindowFlags flags = w.windowFlags();
 
 	//connect(m_pUpdateCard, SIGNAL(ShowMaskWidget(QString ,MaskStatus ,PageOperation )), this, SLOT(On_ShowMaskWidget(QString ,MaskStatus ,PageOperation)));
@@ -203,6 +203,8 @@ MainWindow::MainWindow(QWidget* parent)
 		strMessage = "银行代码配置有误或未配置银行代码!";
 		QMessageBox_CN(QMessageBox::Critical, "严重错误", strMessage, QMessageBox::Ok, this);
 	}
+	ui->label_BankName->setText(strBankName.c_str());
+	ui->label_Title->setText(g_pDataCenter->strTitle.c_str());
 
 	QString strAppPath = QApplication::applicationFilePath();
 	short nMajorVer = 0, nMinorVer = 0, nBuildNum = 0, nRevsion = 0;

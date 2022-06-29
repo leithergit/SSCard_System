@@ -81,8 +81,8 @@ private:
 	//KT_Reader* m_pReader = nullptr;
 	bool bThreadReadIDCardRunning = false;
 	bool bThreadReadPinRunning = false;
-	std::thread ThreadReadIDCard;
-	std::thread ThreadReadPin;
+	std::thread* pThreadReadIDCard = nullptr;
+	std::thread* pThreadReadPin = nullptr;
 	QString     strPin;
 	uchar   szPin[128];
 	int     nPinSize = 0;

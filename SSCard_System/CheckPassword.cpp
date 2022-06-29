@@ -7,6 +7,7 @@ CheckPassword::CheckPassword(QWidget* parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint ));
 }
 
 CheckPassword::~CheckPassword()

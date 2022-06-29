@@ -10,6 +10,12 @@
     <height>1080</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
     <width>1280</width>
@@ -26,31 +32,10 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_DateTime">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">#label_DateTime{font-family: &quot;思源黑体 CN Medium&quot;;
-font-size: 32px;
-font-weight: bold;
-line-height: 49px;
-letter-spacing: 1px;
-color: #ffffff;}</string>
-        </property>
-        <property name="text">
-         <string>2021-11-04 16:23:50</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
        <widget class="QLabel" name="label_logo">
         <property name="enabled">
          <bool>true</bool>
@@ -81,24 +66,8 @@ color: #ffffff;}</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>534</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label">
+      <item>
+       <widget class="QLabel" name="label_Title">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -107,19 +76,18 @@ color: #ffffff;}</string>
         </property>
         <property name="minimumSize">
          <size>
-          <width>410</width>
+          <width>470</width>
           <height>67</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>410</width>
+          <width>65535</width>
           <height>67</height>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">#label{	width: 410px;
-	height: 63px;
+         <string notr="true">#label_Title{
 	font-family: &quot;思源黑体 CN Medium&quot;;
 	font-size: 66px;
 	font-weight: bold;
@@ -132,6 +100,43 @@ color: #ffffff;}</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>200</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_DateTime">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#label_DateTime{font-family: &quot;思源黑体 CN Medium&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}</string>
+        </property>
+        <property name="text">
+         <string>2021-11-04 16:23:50</string>
         </property>
        </widget>
       </item>
@@ -275,6 +280,39 @@ color: rgb(255, 0, 0);
         <property name="sizeHint" stdset="0">
          <size>
           <width>508</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_BankName">
+        <property name="styleSheet">
+         <string notr="true">#label_BankName{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
+        </property>
+        <property name="text">
+         <string>银行名称</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>60</width>
           <height>20</height>
          </size>
         </property>

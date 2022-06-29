@@ -741,6 +741,7 @@ struct SysConfig
 		nLogServerPort = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
 		nLogSavePeroid = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
 		nTimeWaitForPrinter = pSettings->value("TimeWaitForPrinter", 300).toInt();
+		strTitle = pSettings->value("Title", "社保卡制卡系统").toString().toStdString();
 
 		pSettings->endGroup();
 	}
@@ -812,6 +813,7 @@ struct SysConfig
 	int             nLogServerPort = 80;                // 日志服务器端口
 	int             nLogSavePeroid = 30;                // 日志保存天数
 	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
+	string		    strTitle = "社保卡制卡系统";
 	bool			bDebug = false;
 	bool			bEnableUpdate = true;
 	bool			nSkipPayTime = false;
@@ -941,8 +943,9 @@ public:
 	string		   strCardMakeProgress;
 	string		   strPayCode;
 	string		   strCardVersion = "3.0";
+	string		   strTitle = "社保卡制卡系统";
 	bool		   bDebug;
-	bool			bEnableUpdate = true;
+	bool		   bEnableUpdate = true;
 	int			   nSkipPayTime = 0;
 	bool		   bTestCard = false;
 	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
@@ -987,7 +990,11 @@ public:
 
 	int  OpenDevice(QString& strMessage);
 
-	int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
+	int  OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
+
+	int  Print_EnableCard(long lTimeout, int nCheckable, QString& strMessage);
+
+	int  Print_DisableCard(long lTimeout, char* pszRcCode);
 
 	void CloseDevice();
 

@@ -25,7 +25,9 @@ public:
 	explicit uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent = nullptr);
 	~uc_InputIDCardInfo();
 	virtual int ProcessBussiness() override;
+
 	virtual void OnTimeout() override;
+
 	bool  InitializeDB(QString& strMessage);
 
 	bool LoadPersonInfo(QString strJson);

@@ -452,6 +452,7 @@ void uc_InputIDCardInfo::OnTimeout()
 	gInfo() << __FUNCTION__;
 	ShutDown();
 }
+
 void  uc_InputIDCardInfo::ShutDown()
 {
 	gInfo() << __FUNCTION__;
@@ -464,6 +465,7 @@ void  uc_InputIDCardInfo::ShutDown()
 
 	StopDetect();
 }
+
 void uc_InputIDCardInfo::timerEvent(QTimerEvent* event)
 {
 
@@ -531,6 +533,11 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 			strMessage = "城镇职工的单位名称不能为空!";
 			return -1;
 		}
+		if (strOrganization.toLocal8Bit().size() > 100)
+		{
+			strMessage = "“单位名称”字数不能超过50个汉字!";
+			return -1;
+		}
 		strcpy_s((char*)pSSCardInfo->strCompanyName, sizeof(pSSCardInfo->strCompanyName), strOrganization.toLocal8Bit().data());
 		//strcpy_s((char*)pSSCardInfo->strLocalNum, sizeof(pSSCardInfo->strLocalNum), strOrganizationCode.toStdString().c_str());
 	}
@@ -540,7 +547,12 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	{
 		if (strOrganization.isEmpty())
 		{
-			strMessage = "社区[村]不能为空!";
+			strMessage = "“社区[村]”不能为空!";
+			return -1;
+		}
+		if (strOrganization.toLocal8Bit().size() > 20)
+		{
+			strMessage = "“社区[村]”字数不能超过10个汉字!";
 			return -1;
 		}
 		strcpy_s((char*)pSSCardInfo->strCommunity, sizeof(pSSCardInfo->strCommunity), strOrganization.toLocal8Bit().data());
@@ -551,7 +563,17 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	{
 		if (strOrganization.isEmpty() || strDepartment.isEmpty())
 		{
-			strMessage = "在读大学生院校名称、所在系不能为空!";
+			strMessage = "在读大学生院校名称、所在院系不能为空!";
+			return -1;
+		}
+		if (strOrganization.toLocal8Bit().size() > 100)
+		{
+			strMessage = "“学校名称”字数不能超过50个汉字!";
+			return -1;
+		}
+		if (strDepartment.toLocal8Bit().size() > 100)
+		{
+			strMessage = "“所在院系”字数不能超过25个汉字!";
 			return -1;
 		}
 		strcpy_s((char*)pSSCardInfo->strCompanyName, sizeof(pSSCardInfo->strCompanyName), strOrganization.toLocal8Bit().data());

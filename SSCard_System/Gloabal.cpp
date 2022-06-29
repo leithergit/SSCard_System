@@ -183,6 +183,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 		nSkipPayTime = GetSysConfigure()->nSkipPayTime;
 		bTestCard = GetSysConfigure()->bTestCard;
 		nNetTimeout = GetSysConfigure()->nNetTimeout;
+		strTitle = GetSysConfigure()->strTitle;
 		return 0;
 	}
 
@@ -483,6 +484,107 @@ int DataCenter::OpenPrinter(QString& strMessage)
 		return -1;
 	}
 }
+
+// nCheckMode   为0时，则一直开启从出卡口进卡，否再时在lTimeout时间定内，开启从出卡口进卡，超时则恢复从卡箱进卡
+int  DataCenter::Print_EnableCard(long lTimeout, int nCheckable, QString& strMessage)
+{
+
+	char pszRCode[128];
+	memset(pszRCode, 0x00, 128);
+	const char* szCommand[] = {
+						 "Psmgr;2",     // 防止进卡和出卡阻塞
+						 "Pcim;M;S",    // 从卡箱进卡,并移动到接触位
+						 "Pcem;M",      // 从出卡口出卡
+						 //"Pneab;E"    // 打印结束后不出卡
+	};
+	// Pcim;B       // 设置为可同时从卡箱和出卡口手动进卡
+	/* 关于Pcim;B
+	1. 如果卡盒有卡时输入进卡指令，机器还是会从卡盒进卡，从缝隙处手动插卡无效
+	2. 如果卡盒无卡时输入进卡指令，可以此时放一张卡在卡盒或缝隙，都可以进卡
+	3. 输入Pcim;B后，即使卡盒无卡，打印机在驱动里也会显示就绪，此前在Pcim;F同状态下会显示卡片装载的黄色警告
+	*/
+	int nResult = -1;
+
+	if (!m_pPrinter)
+	{
+		strMessage = "打印机未就绪!";
+		return -1;
+	}
+
+	//if (QFailed(nResult = TestPrinter(strMessage)))
+	//{
+	//	return nResult;
+	//}
+	int Res = 0;
+	for (auto var : szCommand)
+	{
+		gInfo() << "Try to Printer_ExtraCommand(" << var << ").";
+		if (QFailed(m_pPrinter->Printer_ExtraCommand(var, pszRCode)))
+		{
+			gInfo() << "Printer_ExtraCommand (" << var << ") Failed:" << pszRCode;
+			strMessage = QString("执行命令:%1失败").arg(var);
+			return -1;
+		}
+	}
+
+	if (nCheckable)
+	{
+		auto tStart = chrono::system_clock::now();
+		bool bCardReady = false;
+		int nResult = 1;
+		PRINTERSTATUS lpStatus;
+		while (!bCardReady)
+		{
+			// 检查卡片是否已经就绪
+			this_thread::sleep_for(chrono::milliseconds(500));
+			nResult = m_pPrinter->Printer_Status(lpStatus, pszRCode);
+			if (nResult == 0)
+			{
+				if ((lpStatus.fwMedia == 2 || lpStatus.fwDevice == 3))
+				{
+					gInfo() << "The card is ready,leave.";
+					break;
+				}
+			}
+			auto duration = duration_cast<milliseconds>(system_clock::now() - tStart);
+			if (duration.count() >= lTimeout)
+			{
+				gInfo() << "Wait timeout,leave.";
+				break;
+			}
+		}
+
+		Print_DisableCard(lTimeout, pszRCode);
+	}
+	return  0;
+}
+
+int  DataCenter::Print_DisableCard(long lTimeout, char* pszRcCode)
+{
+	Q_UNUSED(lTimeout);
+
+	char szReply[128] = { 0 };
+	const char* szCmd[] = {
+						 "Psmgr;2",     // 防止进卡和出卡阻塞
+						 "Pcim;F",      // 从卡箱进卡
+						 "Pcem;M",      // 从出卡口出卡
+						 //"Pneab;E"      // 打印结束后不出卡
+	};
+
+	for (auto var : szCmd)
+	{
+		gInfo() << "Try to evolis_command(" << var << ").";
+		if (QFailed(m_pPrinter->Printer_ExtraCommand(var, pszRcCode)))
+		{
+			gInfo() << "Printer_ExtraCommand (" << var << ") Failed!";
+			break;
+		}
+	}
+
+	strcpy(pszRcCode, "0000");
+	return  0;
+}
+
 
 int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
 {
