@@ -3,6 +3,7 @@
 #include "ui_registerlost.h"
 #include "mainwindow.h"
 #include "uc_readidcard.h"
+#include "uc_inputidcardinfo.h"
 #include "uc_ensureinformation.h"
 #include "OperatorSucceed.h"
 #include <array>
@@ -20,6 +21,8 @@ RegisterLost::RegisterLost(QWidget* parent) :
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
 		AddPage(new uc_ReadIDCard(ui->label_step, "Registerlost1.png", Page_ReaderIDCard, ReadID_RegisterLost));
+		// 挂失必须要身份证，防止他人恶意挂失
+		//AddPage(new uc_InputIDCardInfo(ui->label_step, "Registerlost1.png", Page_InputIDCardInfo));		// step 1
 		AddPage(new uc_EnsureInformation(ui->label_step, "Registerlost2.png", Page_RegisterLost));
 		AddPage(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < m_pStackWidget->count(); i++)

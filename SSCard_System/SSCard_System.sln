@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Update", "..\Update\Update.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MoveAppWnd", "..\MoveAppWnd\MoveAppWnd.vcxproj", "{353A4AE5-2BC3-320A-90BB-7B31F856FB8F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSCardReport", "..\SSCardReport\SSCardReport.vcxproj", "{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -159,6 +161,12 @@ Global
 		{353A4AE5-2BC3-320A-90BB-7B31F856FB8F}.Release|x64.ActiveCfg = Release|Win32
 		{353A4AE5-2BC3-320A-90BB-7B31F856FB8F}.Release|x86.ActiveCfg = Release|Win32
 		{353A4AE5-2BC3-320A-90BB-7B31F856FB8F}.Release|x86.Build.0 = Release|Win32
+		{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}.Debug|x64.ActiveCfg = Debug|Win32
+		{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}.Debug|x86.ActiveCfg = Debug|Win32
+		{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}.Debug|x86.Build.0 = Debug|Win32
+		{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}.Release|x64.ActiveCfg = Release|Win32
+		{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}.Release|x86.ActiveCfg = Release|Win32
+		{0E5F4F2A-84D8-3010-A94E-12DBF1AAFA96}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

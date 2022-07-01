@@ -792,13 +792,14 @@ void MainWindow::fnThreadUploadlog()
 	}
 }
 
+#define  CheckUpdate_Interval	30*60
 void MainWindow::ThreadUpdateLauncher()
 {
-	auto tStart = chrono::high_resolution_clock::now();
+	auto tStart = chrono::high_resolution_clock::now() - static_cast<chrono::seconds>(CheckUpdate_Interval - 5);
 	while (bThreadUpdateLauncherRunning)
 	{
 		auto duration = duration_cast<chrono::seconds>(chrono::high_resolution_clock::now() - tStart);
-		if (duration.count() > 15)
+		if (duration.count() > CheckUpdate_Interval)
 		{
 			string strMessage, strLocalVersion, strNewVersion, strFilePath, strMD5_Query, strMD5_Download;
 			Update(UpdateType::Launcher, strMessage);
@@ -871,7 +872,7 @@ void MainWindow::ThreadUpdateLauncher()
 			} while (true);*/
 			tStart = chrono::high_resolution_clock::now();
 		}
-		this_thread::sleep_for(chrono::milliseconds(100));
+		this_thread::sleep_for(chrono::milliseconds(200));
 	}
 }
 
@@ -896,12 +897,12 @@ void MainWindow::on_pushButton_QueryInfo_clicked()
 	}
 
 	m_pQueryInfo->ResetAllPages();
-	g_pDataCenter->nCardServiceType = ServiceType::Service_RegisterLost;
+	g_pDataCenter->nCardServiceType = ServiceType::Service_QueryInformation;
 	m_pQueryInfo->StartBusiness();
 	ui->stackedWidget->setCurrentWidget(m_pQueryInfo);
 
 	m_pQueryInfo->show();
-	pLastStackPage = m_pRegiserLost;
+	pLastStackPage = m_pQueryInfo;
 }
 
 void MainWindow::on_pushButton_BatchMake_clicked()
@@ -928,4 +929,9 @@ void MainWindow::on_pushButton_BatchMake_clicked()
 	ui->stackedWidget->setCurrentWidget(m_pBatchMakeCard);
 	m_pBatchMakeCard->Reset();
 	m_pBatchMakeCard->show();
+}
+
+void MainWindow::on_pushButton_Report_clicked()
+{
+
 }

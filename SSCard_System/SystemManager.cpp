@@ -29,6 +29,7 @@ SystemManager::SystemManager(QWidget* parent)
 	//ui.tabWidget->addTab(new logManager, "日志管理");
 	ui.tabWidget->addTab(new SSCardServiceT, "社保功能测试");
 	ui.tabWidget->addTab(new OtherOptions, "其它选项");
+	ui.checkBox_shutdownVPN->setVisible(false);
 	showFullScreen();
 }
 

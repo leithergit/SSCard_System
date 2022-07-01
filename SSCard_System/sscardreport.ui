@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SSCardReport</class>
+ <widget class="QWidget" name="SSCardReport">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1846</width>
+    <height>805</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 32px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: 0
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>邮箱地址:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_MailAddress"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Send">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 10px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+</string>
+       </property>
+       <property name="text">
+        <string>发送</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_MainPage">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{image: url(:/Image/Homepage.png);
+image-position: left;
+padding-left: 2px;
+text-align: right;
+padding-right: 2px;
+font-size: 12px;
+color: rgb(0, 0, 0);}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+QPushButton:focus{outline: none;}
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="font">
+      <font>
+       <family>思源黑体 CN Medium</family>
+       <pointsize>-1</pointsize>
+       <weight>7</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#tableWidget{
+font-weight: bold;
+letter-spacing: 1px;
+color: #727275;
+font: 57 20px &quot;思源黑体 CN Medium&quot;;
+}
+QHeaderView{
+font-weight: bold;
+letter-spacing: 1px;
+color: #727275;
+font: 57 16px &quot;思源黑体 CN Medium&quot;;
+}
+QScrollBar::vertical{width:28px;background:rgb(255,255,255);border:none;}
+QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::add-line::vertical{border:none;}
+QScrollBar::sub-line::vertical{border:none;}
+QScrollBar::horizontal{height:28px;background:rgb(255,255,255);border:none;}
+QScrollBar::handle::horizontal{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::handle::horizontal::hover{background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::add-line::horizontal{border:none;}
+QScrollBar::sub-line::horizontal{border:none;}
+
+
+</string>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>序号</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>姓名</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>身份证</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>性别</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>民族</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>手机</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>社保卡号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>银行卡号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>业务类型</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

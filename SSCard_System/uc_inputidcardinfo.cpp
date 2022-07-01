@@ -7,6 +7,7 @@
 #include "sys_dialogreadidcard.h"
 #include "mainwindow.h"
 #include "Sys_dialogcameratest.h"
+#include "waitingprogress.h"
 
 #include <ctime>
 
@@ -45,6 +46,7 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	ui->setupUi(this);
 
 	ShowGuardianWidget(false);
+	ui->pushButton_GetCardID->setVisible(false);
 	ui->lineEdit_CardID->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")));   //只能输入数字
 	ui->lineEdit_Name->setValidator(new QRegExpValidator(QRegExp("[\u4e00-\u9fa5]{2,10}")));
 
@@ -364,6 +366,7 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		pMainWind->pLastStackPage->ResetTimer(true, this);
 	}
 	ResetPage();
+
 	if (g_pDataCenter->GetIDCardInfo())
 	{
 		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
@@ -432,6 +435,38 @@ bool uc_InputIDCardInfo::GetPersonName(QString strPersonFile, QString& strName)
 		gError() << "Catch a exception:" << e.what();
 		return false;
 	}
+}
+
+void uc_InputIDCardInfo::HideItem()
+{
+	ui->checkBox_Agency->setVisible(false);
+	ui->label_Gender->setVisible(false);
+	ui->radioButton_Male->setVisible(false);
+	ui->radioButton_Female->setVisible(false);
+	ui->label_Nation->setVisible(false);
+	ui->comboBox_Nationality->setVisible(false);
+	ui->label_ExpireDate->setVisible(false);
+	ui->dateEdit_Issued->setVisible(false);
+	ui->line->setVisible(false);
+	ui->dateEdit_Expired->setVisible(false);
+	ui->label_Career->setVisible(false);
+	ui->comboBox_Career->setVisible(false);
+	ui->label_Address->setVisible(false);
+	ui->plainTextEdit_Address->setVisible(false);
+	ui->label_Guardian->setVisible(false);
+	ui->lineEdit_Guardian->setVisible(false);
+	ui->label_GuardianMobile->setVisible(false);
+	ui->lineEdit_GuardianMobile->setVisible(false);
+	ui->label_GuardianIDCard->setVisible(false);
+	ui->lineEdit_GuardianCardID->setVisible(false);
+	ui->label_Guardianship->setVisible(false);
+	ui->comboBox_Guardianship->setVisible(false);
+	ui->label_Photo->setVisible(false);
+	ui->pushButton_TakePhoto->setVisible(false);
+	ui->pushButton_SelectPhoto->setVisible(false);
+	ui->pushButton_OK->setVisible(false);
+	ui->pushButton_GetCardID->setVisible(true);
+
 }
 
 bool uc_InputIDCardInfo::eventFilter(QObject* watched, QEvent* event)
@@ -566,9 +601,11 @@ void uc_InputIDCardInfo::ResetPage()
 {
 	gInfo() << __FUNCTION__;
 	ClearInfo();
+
 	mapPersonFile.clear();
 	ShowGuardianWidget(false);
 	ClearGuardianInfo();
+	ui->plainTextEdit_Address->setPlainText("山东省滨州市");
 }
 
 int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMessage)
@@ -796,21 +833,21 @@ void uc_InputIDCardInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 //
 //}
 
-void uc_InputIDCardInfo::QueryPersonInfo()
+int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 {
 	QWaitCursor W;
 	QString strMessage;
 	QString strCardProgress;
-
+	if (!p)
+		return -1;
+	SSCardBaseInfo* pSSCardInfo = (SSCardBaseInfo*)p;
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-
+	int nResult = -1;
 	do
 	{
 		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
-		if (QFailed(GetCardInfo(pIDCard, strMessage)))
-		{
-			break;
-		}
+		strcpy((char*)pIDCard->szName, pSSCardInfo->strName.c_str());
+		strcpy((char*)pIDCard->szIdentity, pSSCardInfo->strIdentity.c_str());
 
 		SSCardService* pService = nullptr;
 		if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage, pIDCard)))
@@ -825,8 +862,6 @@ void uc_InputIDCardInfo::QueryPersonInfo()
 		}
 
 		CJsonObject jsonIn;
-		string strCardID = ui->lineEdit_CardID->text().toStdString();
-		string strName = ui->lineEdit_Name->text().toLocal8Bit().data();
 
 		/*jsonIn.Add("CardID", strCardID);
 		jsonIn.Add("Name", strName);
@@ -861,8 +896,8 @@ void uc_InputIDCardInfo::QueryPersonInfo()
 		jsonOut.Get("BankName", strBankName);
 		jsonIn.Clear();*/
 
-		jsonIn.Add("CardID", strCardID);
-		jsonIn.Add("Name", strName);
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
 
 		string strJsonIn = jsonIn.ToString();
@@ -910,30 +945,17 @@ void uc_InputIDCardInfo::QueryPersonInfo()
 		}
 		jsonOut.Parse(strJsonOut);
 		string strAddress, strMobile, strOccupation, strNation, strPaperIssuedDate, strPaperExpireDate;
-		jsonOut.Get("Address", strAddress);
-		jsonOut.Get("Mobile", strMobile);
-		jsonOut.Get("Occupation", strOccupation);
-		jsonOut.Get("Nation", strNation);
-		jsonOut.Get("PaperIssuedDate", strPaperIssuedDate);
-		jsonOut.Get("PaperExpireDate", strPaperExpireDate);
+		jsonOut.Get("Address", pSSCardInfo->strAddress);
+		jsonOut.Get("Mobile", pSSCardInfo->strMobile);
+		jsonOut.Get("Occupation", pSSCardInfo->strOccupType);
+		jsonOut.Get("Nation", pSSCardInfo->strNation);
+		jsonOut.Get("PaperIssuedDate", pSSCardInfo->strReleaseDate);
+		jsonOut.Get("PaperExpireDate", pSSCardInfo->strValidDate);
 
-		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit(strAddress.c_str()));
-		int nIndex = ui->comboBox_Nationality->findData(strNation.c_str());
-		if (nIndex != -1)
-			ui->comboBox_Nationality->setCurrentIndex(nIndex);
-		nIndex = ui->comboBox_Career->findData(strOccupation.c_str());
-		if (nIndex != -1)
-			ui->comboBox_Career->setCurrentIndex(nIndex);
-		if (strMobile.size())
-			ui->lineEdit_GuardianMobile->setText(strMobile.c_str());
-		ui->dateEdit_Issued->setDate(QDate::fromString(strPaperIssuedDate.c_str(), "yyyyMMdd"));
-		ui->dateEdit_Expired->setDate(QDate::fromString(strPaperExpireDate.c_str(), "yyyyMMdd"));
-
-		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
-		ui->label_Photo->setStyleSheet(strStyle);
-		ui->label_Photo->setText("");
+		nResult = 0;
 	} while (0);
-
+	gInfo() << GBKString(strMessage);
+	return nResult;
 }
 
 void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
@@ -1168,36 +1190,6 @@ void uc_InputIDCardInfo::on_pushButton_SelectPhoto_clicked()
 	}
 }
 
-
-//void uc_InputIDCardInfo::on_pushButton_Query_clicked()
-//{
-//	gInfo() << __FUNCTION__;
-//	WaitCursor();
-//	QString strMessage;
-//	int nResult = -1;
-//	int nOperation = -1;
-//	int nPage = 0;
-//	MaskStatus nStatus = Success;
-//	QString strTips = "操作成功";
-//	SSCardService* pService = nullptr;
-//	do
-//	{
-//		if (QFailed(GetCardInfo(strMessage)))
-//			break;
-//
-//	} while (0);
-//
-//	if (QFailed(nResult))
-//	{
-//		nStatus = Failed;
-//		nOperation = Stay_CurrentPage;
-//		strTips = "操作失败";
-//	}
-//
-//	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
-//}
-
-
 void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 {
 	gInfo() << __FUNCTION__;
@@ -1218,11 +1210,20 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 			break;
 
 		// 图像文件内容非空，但不是当前人员的照片
-		//if (!g_pDataCenter->strSSCardPhotoFile.empty() &&
-		//	g_pDataCenter->strSSCardPhotoFile.find((char*)pIDCard->szIdentity) == string::npos)
-		//{
-
-		//}
+		if (!g_pDataCenter->strSSCardPhotoFile.empty())
+		{
+			QImage Photo(g_pDataCenter->strSSCardPhotoFile.c_str());
+			if (Photo.isNull())
+			{
+				strMessage = "照片读取失败,请重新采集或上传照片!";
+				break;
+			}
+			if (Photo.width() != 358 || Photo.height() != 441)
+			{
+				strMessage = "照片尺寸不符要求,请重新采集或上传照片!";
+				break;
+			}
+		}
 
 		SavePersonInfo();
 
@@ -1288,6 +1289,39 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
 }
 
+void uc_InputIDCardInfo::on_pushButton_GetCardID_clicked()
+{
+	gInfo() << __FUNCTION__;
+	WaitCursor();
+	QString strMessage;
+	int nResult = -1;
+	int nOperation = -1;
+	int nPage = 0;
+	MaskStatus nStatus = Success;
+	QString strTips = "操作成功";
+	do
+	{
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+		if (QFailed(GetCardInfo(pIDCard, strMessage)))
+		{
+			break;
+		}
+		g_pDataCenter->SetIDCardInfo(pIDCard);
+		nOperation = Goto_Page;
+		nPage = Page_QueryInformation;
+		strMessage = "请稍候,正在查询!";
+		nResult = 0;
+	} while (0);
+	if (QFailed(nResult))
+	{
+		nStatus = Failed;
+		nOperation = Stay_CurrentPage;
+		strTips = "操作失败";
+	}
+
+	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
+}
+
 void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
 {
 	bool bChecked = ui->checkBox_Agency->isChecked();
@@ -1335,8 +1369,44 @@ void uc_InputIDCardInfo::on_Name_EditingFinished()
 
 void uc_InputIDCardInfo::on_CheckPersonInfo()
 {
-	WaitCursor();
-	QueryPersonInfo();
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_QueryInformation)
+		return;
+
+	QString strMessage;
+	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+	if (QFailed(GetCardInfo(pIDCard, strMessage)))
+	{
+		return;
+	}
+
+	SSCardBaseInfoPtr  pSSCardInfo = make_shared<SSCardBaseInfo>();
+	pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
+	pSSCardInfo->strName = (const char*)pIDCard->szName;
+
+	int nResult = -1;
+	WaitingProgress WaitingUI(uc_InputIDCardInfo::QueryPersonInfo,
+		pSSCardInfo.get(),
+		30,
+		QString("正在查询人员信息:%1%"),
+		false);
+	if (WaitingUI.exec() == QDialog::Accepted)
+	{
+		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit(pSSCardInfo->strAddress.c_str()));
+		int nIndex = ui->comboBox_Nationality->findData(pSSCardInfo->strNation.c_str());
+		if (nIndex != -1)
+			ui->comboBox_Nationality->setCurrentIndex(nIndex);
+		nIndex = ui->comboBox_Career->findData(pSSCardInfo->strOccupType.c_str());
+		if (nIndex != -1)
+			ui->comboBox_Career->setCurrentIndex(nIndex);
+		if (pSSCardInfo->strMobile.size())
+			ui->lineEdit_GuardianMobile->setText(pSSCardInfo->strMobile.c_str());
+		ui->dateEdit_Issued->setDate(QDate::fromString(pSSCardInfo->strReleaseDate.c_str(), "yyyyMMdd"));
+		ui->dateEdit_Expired->setDate(QDate::fromString(pSSCardInfo->strValidDate.c_str(), "yyyyMMdd"));
+
+		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+		ui->label_Photo->setStyleSheet(strStyle);
+		ui->label_Photo->setText("");
+	}
 }
 
 void uc_InputIDCardInfo::on_lineEdit_Name_textEdited(const QString& arg1)

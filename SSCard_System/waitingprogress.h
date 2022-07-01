@@ -1,35 +1,40 @@
 ﻿#ifndef WAITINGPROGRESS_H
 #define WAITINGPROGRESS_H
 
-#include <QWidget>
+#include <QDialog>
 #include <thread>
+#include <functional>
 using namespace  std;
 namespace Ui {
 	class WaitingProgress;
 }
 
-class WaitingProgress : public QWidget
+class WaitingProgress : public QDialog
 {
 	Q_OBJECT
 
 public:
-	explicit WaitingProgress(QWidget* parent = nullptr);
+	explicit WaitingProgress(std::function<int(void*)> pInFunction, void* pParam, int nTimeout, QString strFormat, bool bLoop = true,QWidget* parent = nullptr);
 	~WaitingProgress();
 	int     nWatingTimeout = 180;
 	int		nMaxTime = 180;
 	int     nTimerEvent = -1;
-	bool	bPrinterReady = false;
+	QString strFormat;
+	QString strMessage;
 	virtual void timerEvent(QTimerEvent* event) override;
-	void ThreadTestPrinter();
-	volatile bool bThreadTestPrinter = false;
+	void ThreadFunction();
 	std::thread* pThread = nullptr;
+	volatile bool bLoop = true;
+
 signals:
-	void PrinterIsReady();
+	void TheadFinished(/*int ,QString strMessage*/);
 public slots:
-	void On_PrinterIsReady();
+	void On_TheadFinished(/*int, QString strMessage*/);
 
 private:
 	Ui::WaitingProgress* ui;
+	std::function<int(void*)> pFunction;
+	void* pParam = nullptr;
 };
 
 #endif // WAITINGPROGRESS_H

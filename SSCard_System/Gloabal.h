@@ -752,12 +752,13 @@ struct SysConfig
 		nNetTimeout = pSettings->value("NetTimeout", 1500).toInt();
 
 		bUpoadlog = pSettings->value("logUpload", false).toBool();;
-		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
-		nDiskFreeSpace = pSettings->value("DiskFreeSpace", 10).toInt();;                  // 保留磁盘空间，超过时，删除最早一天的日志
+		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;  // 上传成功后删除日志
+		nDiskFreeSpace = pSettings->value("DiskFreeSpace", 10).toInt();;             // 保留磁盘空间，超过时，删除最早一天的日志
 		strLogServer = pSettings->value("logServer", "").toString().toStdString();   // 日志服务器
 		nLogServerPort = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
 		nLogSavePeroid = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
-		nTimeWaitForPrinter = pSettings->value("TimeWaitForPrinter", 300).toInt();
+		nTimeWaitForPrinter = pSettings->value("TimeWaitForPrinter", 300).toInt();	 // 等待打印机上电超时
+		bPreSetBankCard = pSettings->value("PresetBankCard", true).toBool();		 // 批量制卡时预先绑定解行卡号
 
 		pSettings->endGroup();
 	}
@@ -833,6 +834,7 @@ struct SysConfig
 	int             nLogServerPort = 80;                // 日志服务器端口
 	int             nLogSavePeroid = 30;                // 日志保存天数
 	int             nTimeWaitForPrinter = 180;          // 等待打印机上电超时
+	bool			bPreSetBankCard = true;				// 批量制卡时使用预置银行卡号
 	bool			bDebug = false;
 	bool			bTestCard = false;
 	bool			bSkipWriteCard = false;
@@ -977,6 +979,7 @@ public:
 	bool			bTestCard = false;
 	bool			bWithoutIDCard = false;
 	bool			bBatchMode = false;	// 批量制卡模式
+	bool		    bPreSetBankCard = true;	// 批量制卡时使用预置银行卡号
 	int				nNetTimeout = 1500;
 public:
 	bool			m_bDetectStarted = false;

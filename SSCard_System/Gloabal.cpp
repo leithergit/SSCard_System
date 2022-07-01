@@ -23,7 +23,7 @@
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriverd")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSMd")
 #pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfod")
-#pragma comment(lib, "../SDK/libcurl/libcurld")
+#pragma comment(lib, "../SDK/libcurl/libcurl")
 #pragma comment(lib, "../SDK/QREncode/qrencoded")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
 #pragma comment(lib, "../SDK/glog/glogd")
@@ -264,6 +264,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 		bSkipPrintCard = GetSysConfigure()->bSkipPrintCard;
 		nNetTimeout = GetSysConfigure()->nNetTimeout;
 		bTestCard = GetSysConfigure()->bTestCard;
+		bPreSetBankCard = GetSysConfigure()->bPreSetBankCard;
 		return 0;
 	}
 
@@ -348,6 +349,11 @@ int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, Q
 		{QMessageBox::ButtonMask        ,""}         // obsolete
 	};
 
+	QString strQSS = ".QPushButton{background-color:#298cf0;border-radius:8px;color:#ffffff;}";
+	//".QPushButton:pressed{background:#38a357;}"\
+		//".QPushButton:!enabled{background:#cacaca;}";
+
+
 	for (auto btnType : ButtonMap)
 	{
 		if ((btnType.first & stdButtons) == btnType.first)
@@ -355,6 +361,7 @@ int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, Q
 			Msgbox.setButtonText(btnType.first, btnType.second);
 		}
 	}
+	Msgbox.setStyleSheet(strQSS);
 	return Msgbox.exec();
 }
 
@@ -634,27 +641,23 @@ int DataCenter::OpenPrinter(QString& strMessage)
 					strMessage = QString("创建‘%1’实例失败!").arg(strPrinterMudule);
 					break;
 				}
-
-				if (QFailed(nResult = m_pPrinter->Printer_Init(DevConfig.nPrinterType, szRCode)))
-				{
-					strMessage = QString("打印机初始化‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
-					break;
-				}
-
-				if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
-				{
-					if (strcmp(szRCode, "0010") == 0)
-						strMessage = QString("打开打印机‘%1’失败,未安装色带!").arg(DevConfig.strPrinterType.c_str());
-					else if (strcmp(szRCode, "0011") == 0)
-						strMessage = QString("打开打印机‘%1’失败,色带与打印不兼容!").arg(DevConfig.strPrinterType.c_str());
-					else
-						strMessage = QString("打开打印机‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
-					break;
-				}
-				nResult = 0;
 			}
-			else
-				return 0;
+			if (QFailed(nResult = m_pPrinter->Printer_Init(DevConfig.nPrinterType, szRCode)))
+			{
+				strMessage = QString("打印机初始化‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+				break;
+			}
+			if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
+			{
+				if (strcmp(szRCode, "0010") == 0)
+					strMessage = QString("打开打印机‘%1’失败,未安装色带!").arg(DevConfig.strPrinterType.c_str());
+				else if (strcmp(szRCode, "0011") == 0)
+					strMessage = QString("打开打印机‘%1’失败,色带与打印不兼容!").arg(DevConfig.strPrinterType.c_str());
+				else
+					strMessage = QString("打开打印机‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+				break;
+			}
+			nResult = 0;
 		} while (0);
 		if (QFailed(nResult))
 			return -1;
@@ -940,6 +943,7 @@ int DataCenter::TestCard(QString& strMessage)
 				bSucceed = true;
 				break;
 			}
+
 			char szCardATR[128] = { 0 };
 			char szRCode[128] = { 0 };
 			int nCardATRLen = 0;
@@ -964,6 +968,7 @@ int DataCenter::TestCard(QString& strMessage)
 				break;
 			}
 			gInfo() << "BankNum:" << szBankNum;
+
 			string strMatchBankName;
 			for (auto var : mapBankCode)
 			{
@@ -1780,7 +1785,7 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 	char szCardBaseWrite[1024] = { 0 };
 	char szExAuthData[1024] = { 0 };
 	char szWHSM1[1024] = { 0 };
-	char szWriteCARes[1024] = { 0 };
+	//char szWriteCARes[1024] = { 0 };
 	/*char szWHSM2[1024] = { 0 };*/
 	char szSignatureKey[1024] = { 0 };
 	char szCardATR[1024] = { 0 };
@@ -2921,6 +2926,7 @@ void DataCenter::RemoveTempPersonInfo()
 	}
 	catch (std::exception& e)
 	{
+		gInfo() << "发生异常:" << e.what();
 	}
 }
 // 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg

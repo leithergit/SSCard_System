@@ -678,7 +678,7 @@ void DeviceManager::on_InputPin(char ch)
 		bThreadReadPinRunning = false;
 		ThreadReadPin.join();
 		EnableWidgets(this, true);
-		ui.pushButton_PinBroadTest->setText("停止测试");
+		ui.pushButton_PinBroadTest->setText("输入测试");
 		break;
 	}
 	case 0x41:

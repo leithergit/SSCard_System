@@ -150,6 +150,22 @@ border-radius: 24px;</string>
         </spacer>
        </item>
        <item>
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>206</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBox_WithoutIDCard">
          <property name="styleSheet">
           <string notr="true">QCheckBox::indicator {width: 28px;height: 28px;}

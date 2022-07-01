@@ -38,8 +38,8 @@ public:
 	UpdatePassword* m_pUpdatePassword = nullptr;
 	Sys_BatchMakeCard* m_pBatchMakeCard = nullptr;
 	RegisterLost* m_pRegiserLost = nullptr;
-	MaskWidget* m_pMaskWindow = nullptr;
 	QueryInfo* m_pQueryInfo = nullptr;
+	MaskWidget* m_pMaskWindow = nullptr;
 	QMainStackPage* pLastStackPage = nullptr;
 	high_resolution_clock::time_point	m_tLastPress = high_resolution_clock::now();
 	int		m_nContinuePressCount = 0;
@@ -96,6 +96,9 @@ public slots:
 	void On_MaskWidgetTimeout(int nOperation, int nStatus);
 	void On_MaskWidgetEnsure(int nOperation, int nStatus);
 	void on_Shutdown();
+
+private slots:
+    void on_pushButton_Report_clicked();
 
 private:
 	Ui::MainWindow* ui;

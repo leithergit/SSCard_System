@@ -13,8 +13,10 @@ namespace Ui {
 
 enum ReadID_Type
 {
-	ReadID_UpdateCard = 0,
-	ReadID_RegisterLost = 1
+	ReadID_NewCard = 0,
+	ReadID_UpdateCard = 1,
+	ReadID_RegisterLost = 2,
+	ReadID_QueryInfo = 3,
 };
 
 class uc_ReadIDCard : public QStackPage

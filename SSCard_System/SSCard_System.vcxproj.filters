@@ -249,6 +249,9 @@
     <ClCompile Include="dialogconfigbank.cpp">
       <Filter>MainPage</Filter>
     </ClCompile>
+    <ClCompile Include="sscardreport.cpp">
+      <Filter>MainPage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -449,6 +452,9 @@
     </QtUic>
     <QtUic Include="dialogconfigbank.ui">
       <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="sscardreport.ui">
+      <Filter>MainPage</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -720,6 +726,9 @@
     </QtMoc>
     <QtMoc Include="dialogconfigbank.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="sscardreport.h">
+      <Filter>MainPage</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

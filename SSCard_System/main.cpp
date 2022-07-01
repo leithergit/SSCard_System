@@ -43,6 +43,22 @@ static void SetupExceptionHandler()
 	BT_InstallSehFilter();
 }
 
+
+int TestPrinter(void* pParam)
+{
+	if (!pParam)
+		return -1;
+	int nResult = -1;
+	QString* pStrMessage = (QString*)pParam;
+	if (QFailed(nResult = g_pDataCenter->OpenPrinter(*pStrMessage)))
+	{
+		gInfo() << pStrMessage->toLocal8Bit().data();
+		return -1;
+	}
+	else
+		return 0;
+}
+
 #define WSA_VERSION MAKEWORD(2,2)
 const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
@@ -193,11 +209,12 @@ int main(int argc, char* argv[])
 		gError() << gQStr(strError);
 		return -1;
 	}
-
-	WaitingProgress WaitingUI;
-	WaitingUI.show();
-	a.exec();
-	if (!WaitingUI.bPrinterReady)
+	QString strMessage;
+	WaitingProgress WaitingUI(TestPrinter,		// 执行回调
+		&strMessage,		// 参数
+		g_pDataCenter->GetSysConfigure()->nTimeWaitForPrinter,	// 超时
+		QString("正在初始化打印机:%1%"));	// 显示格式
+	if (WaitingUI.exec() == QDialog::Rejected)
 	{
 		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
 		return 0;
@@ -209,7 +226,6 @@ int main(int argc, char* argv[])
 		return a.exec();
 	}
 
-	QString strMessage;
 	string strBankName;
 	if (QFailed(g_pDataCenter->CheckBankCode(strBankName, strMessage)))
 	{
@@ -239,10 +255,7 @@ int main(int argc, char* argv[])
 
 	w.showFullScreen();
 	w.setGeometry(g_pCurScreen->geometry());
-	//w.showMaximized();
-	//QRect size(1, 1, 1918, 1078);
-	//w.setGeometry(size);
-	//w.show();
+	//w.showMaximized();		// 会导致窗口无法覆盖任务栏
 	int nRes = a.exec();
 	QString strInfo = "系统正常关闭!";
 	gInfo() << gQStr(strInfo);

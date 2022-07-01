@@ -58,6 +58,7 @@ SOURCES += \
     queryinfo.cpp \
     registerlost.cpp \
     showlicense.cpp \
+    sscardreport.cpp \
     sys_dialogreadidcard.cpp \
     sys_manualmakecard.cpp \
     sys_readidcard.cpp \
@@ -114,6 +115,7 @@ HEADERS += \
     queryinfo.h \
     registerlost.h \
     showlicense.h \
+    sscardreport.h \
     sys_dialogreadidcard.h \
     sys_manualmakecard.h \
     sys_readidcard.h \
@@ -161,6 +163,7 @@ FORMS += \
     queryinfo.ui \
     registerlost.ui \
     showlicense.ui \
+    sscardreport.ui \
     sys_dialogreadidcard.ui \
     sys_manualmakecard.ui \
     sys_readidcard.ui \

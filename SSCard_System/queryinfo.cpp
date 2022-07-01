@@ -3,6 +3,7 @@
 #include "ui_queryinfo.h"
 #include "uc_readidcard.h"
 #include "qi_information.h"
+#include "uc_inputidcardinfo.h"
 #include "OperatorSucceed.h"
 
 QueryInfo::QueryInfo(QWidget* parent) :
@@ -15,7 +16,9 @@ QueryInfo::QueryInfo(QWidget* parent) :
 		m_pStackWidget = ui->stackedWidget;
 		//ui->stackedWidget->addWidget(new FailedWindow(nullptr));
 		//SysConfigPtr& pSysConfig = g_pDataCenter->GetSysConfigure();
-		AddPage(new uc_ReadIDCard(ui->label_step, "QueryInfo1.png", Page_ReaderIDCard, ReadID_RegisterLost));
+		AddPage(new uc_ReadIDCard(ui->label_step, "QueryInfo1.png", Page_ReaderIDCard, ReadID_QueryInfo));
+		uc_InputIDCardInfo* puc_InputIDCardInfo = new uc_InputIDCardInfo(ui->label_step, "QueryInfo1.png", Page_InputIDCardInfo);
+		AddPage(puc_InputIDCardInfo);		// step 1
 		AddPage(new qi_Information(ui->label_step, "QueryInfo2.png", Page_QueryInformation));
 		AddPage(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < m_pStackWidget->count(); i++)
@@ -25,6 +28,8 @@ QueryInfo::QueryInfo(QWidget* parent) :
 			connect(pPage, &QStackPage::SwitchPage, this, &QMainStackPage::on_SwitchPage);
 			connect(pPage, &QStackPage::ShowMaskWidget, this, &QMainStackPage::On_ShowMaskWidget);
 		}
+		puc_InputIDCardInfo->HideItem();
+
 	}
 	catch (exception& e)
 	{

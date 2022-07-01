@@ -27,7 +27,7 @@ NewCard::NewCard(QWidget* parent) :
 	{
 		m_pStackWidget = ui->stackedWidget;
 
-		AddPage(new uc_ReadIDCard(ui->label_step, "Sandong/newcard1.png", Page_ReaderIDCard));				// step 0
+		AddPage(new uc_ReadIDCard(ui->label_step, "Sandong/newcard1.png", Page_ReaderIDCard, ReadID_NewCard));// step 0
 		AddPage(new uc_InputIDCardInfo(ui->label_step, "Sandong/newcard1.png", Page_InputIDCardInfo));		// step 1
 		AddPage(new uc_FaceCapture(ui->label_step, "Sandong/newcard2.png", Page_FaceCapture));				// step 1
 		AddPage(new nc_commitPersonInfo(ui->label_step, "Sandong/newcard3.png", Page_CommitNewInfo));		// step 2

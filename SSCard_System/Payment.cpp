@@ -486,6 +486,7 @@ int LoadJsonCardData(SSCardBaseInfoPtr& pSSCardInfoOut, string strJsonFile)
 	}
 	catch (std::exception& e)
 	{
+		gInfo() << "发生异常:" << e.what();
 		return -1;
 	}
 }
@@ -512,7 +513,7 @@ int  GetImageStorePath(string& strFilePath, int nType, char* szCardID)
 	if (!pIDCard && !szCardID)
 		return -1;
 	QString strTempPath;
-	char* szIdentity = pIDCard ?(char*)pIDCard->szIdentity : szCardID;
+	char* szIdentity = pIDCard ? (char*)pIDCard->szIdentity : szCardID;
 	if (nType == 0)
 		strTempPath = strStorePath + QString("ID_%1.jpg").arg(szIdentity);
 	else if (nType == 1)
@@ -534,7 +535,7 @@ int  GetImageStorePath(string& strFilePath, int nType, char* szCardID)
 	return 0;
 }
 
-int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64,char *szCardID)
+int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64, char* szCardID)
 {
 	if (!szPhotoBase64)
 	{
@@ -546,7 +547,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64,char *szCardID
 	Base64Decode(szPhotoBase64, strlen(szPhotoBase64), (BYTE*)g_szPhotoBuffer, &nPhotoSize);
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
 	string strPhotoPath;
-	GetImageStorePath(strPhotoPath, 1,szCardID);
+	GetImageStorePath(strPhotoPath, 1, szCardID);
 	photo.save(strPhotoPath.c_str(), "jpg", 90);
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
 	return 0;

@@ -49,6 +49,7 @@ public:
 	bool	eventFilter(QObject* watched, QEvent* event) override;
 	void	ClearInfo();
 	bool	GetPersonName(QString strPersonFile, QString& strName);
+	void	HideItem();
 
 	QSpacerItem* horizontalSpacer_Mobile = nullptr;
 	QCompleter* pCompleter = nullptr;
@@ -65,7 +66,9 @@ private slots:
 
 	void on_pushButton_OK_clicked();
 
-	void QueryPersonInfo();
+	void on_pushButton_GetCardID_clicked();
+
+	static int QueryPersonInfo(void*);
 
 	void on_AddNewIDCard(IDCardInfo* pIDCard);
 

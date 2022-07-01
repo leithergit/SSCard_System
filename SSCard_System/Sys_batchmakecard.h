@@ -23,6 +23,14 @@ struct MakeCardInfo
 		nServiceType = ServiceType::Service_Unknown;
 		bFinished = false;
 	}
+	MakeCardInfo(IDCardInfoPtr pIDCard, string strBankCard)
+	{
+		pSSCardInfo = make_shared<SSCardBaseInfo>();
+		pSSCardInfo->strBankNum = strBankCard;
+		this->pIDCard = pIDCard;
+		nServiceType = ServiceType::Service_Unknown;
+		bFinished = false;
+	}
 };
 using MakeCardInfoPtr = shared_ptr<MakeCardInfo>;
 class Sys_BatchMakeCard : public QWidget
@@ -37,6 +45,8 @@ public:
 	vector<MakeCardInfoPtr> vecMakeCardInfo;
 	QButtonGroup* pButttonGrp = nullptr;
 	void    ThreadBatchMakeCard();
+	void    ThreadBatchMakeCard2();
+	bool	IsBatchMakeCardFinished();
 	int		BuildNewCardInfo(QString& strMessage);
 	int		BuildUpdateCardInfo(QString& strMessage);
 	int		ImportNewIDCard(vector<QString>& vecInfo);
@@ -44,6 +54,7 @@ public:
 
 	void    ThreadReadIDCard();
 	volatile bool    m_bWorkThreadRunning = false;
+	volatile bool    m_bBatchMakeCard2ThreadRunning = false;
 	std::thread* m_pWorkThread = nullptr;
 
 signals:

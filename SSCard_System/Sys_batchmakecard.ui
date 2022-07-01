@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1570</width>
-    <height>796</height>
+    <width>1844</width>
+    <height>805</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -267,6 +267,25 @@ QPushButton:!enabled{background:#cacaca;}
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkBox_PreBankcard">
+       <property name="minimumSize">
+        <size>
+         <width>270</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox::indicator {width: 48px;height: 48px;}
+QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}
+QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}
+QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px &quot;思源黑体 CN Medium&quot;;border-radius: 24px;}</string>
+       </property>
+       <property name="text">
+        <string>预录银行卡</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -314,12 +333,41 @@ QPushButton:!enabled{background:#cacaca;}
    </item>
    <item>
     <widget class="QTableWidget" name="tableWidget">
+     <property name="font">
+      <font>
+       <family>思源黑体 CN Medium</family>
+       <pointsize>-1</pointsize>
+       <weight>7</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
      <property name="styleSheet">
-      <string notr="true">font-weight: bold;
-line-height: 28px;
+      <string notr="true">#tableWidget{
+font-weight: bold;
 letter-spacing: 1px;
 color: #727275;
-font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
+font: 57 20px &quot;思源黑体 CN Medium&quot;;
+}
+QHeaderView{
+font-weight: bold;
+letter-spacing: 1px;
+color: #727275;
+font: 57 16px &quot;思源黑体 CN Medium&quot;;
+}
+QScrollBar::vertical{width:28px;background:rgb(255,255,255);border:none;}
+QScrollBar::handle::vertical{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::handle::vertical::hover{background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::add-line::vertical{border:none;}
+QScrollBar::sub-line::vertical{border:none;}
+QScrollBar::horizontal{height:28px;background:rgb(255,255,255);border:none;}
+QScrollBar::handle::horizontal{border-radius:3px;background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::handle::horizontal::hover{background-color: rgba(30, 34, 43, 0.2);}
+QScrollBar::add-line::horizontal{border:none;}
+QScrollBar::sub-line::horizontal{border:none;}
+
+
+</string>
      </property>
      <attribute name="horizontalHeaderVisible">
       <bool>true</bool>
@@ -335,7 +383,7 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
        <string>序号</string>
       </property>
       <property name="textAlignment">
-       <set>AlignTrailing|AlignVCenter</set>
+       <set>AlignLeading|AlignVCenter</set>
       </property>
      </column>
      <column>
@@ -353,7 +401,7 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
        <string>性别</string>
       </property>
       <property name="textAlignment">
-       <set>AlignCenter</set>
+       <set>AlignLeading|AlignVCenter</set>
       </property>
      </column>
      <column>
@@ -361,7 +409,7 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
        <string>民族</string>
       </property>
       <property name="textAlignment">
-       <set>AlignCenter</set>
+       <set>AlignLeading|AlignVCenter</set>
       </property>
      </column>
      <column>
@@ -381,6 +429,11 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
      </column>
      <column>
       <property name="text">
+       <string>银行卡号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>职业</string>
       </property>
      </column>
@@ -391,7 +444,7 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
      </column>
      <column>
       <property name="text">
-       <string>卡号</string>
+       <string>社保卡号</string>
       </property>
      </column>
      <column>
@@ -403,8 +456,23 @@ font: 57 32px &quot;思源黑体 CN Medium&quot;;</string>
    </item>
    <item>
     <widget class="QTextEdit" name="textEdit">
+     <property name="styleSheet">
+      <string notr="true">#textEdit{
+font-weight: bold;
+letter-spacing: 1px;
+color: #727275;
+font: 57 20px &quot;思源黑体 CN Medium&quot;;
+}</string>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'思源黑体 CN Medium'; font-size:20px; font-weight:56; font-style:normal; letter-spacing:1px;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

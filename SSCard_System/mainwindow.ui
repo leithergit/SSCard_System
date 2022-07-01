@@ -26,10 +26,10 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0">
     <item>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="3">
+      <item row="0" column="4">
        <widget class="QLabel" name="label_DateTime">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -49,6 +49,22 @@ color: #ffffff;}</string>
          <string>2021-11-04 16:23:50</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>534</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_logo">
@@ -80,22 +96,6 @@ color: #ffffff;}</string>
          <string/>
         </property>
        </widget>
-      </item>
-      <item row="0" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>534</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label">
@@ -132,6 +132,30 @@ color: #ffffff;}</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QPushButton" name="pushButton_Report">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{image:url(./Image/Report.png);
+border-radius: 8px;
+background: transparent;
+border: 2px solid;
+border-color: rgb(255, 255, 0);
+padding:5px}
+QPushButton:pressed{background-color: rgb(85, 255, 0);}
+QPushButton:!enabled{background:#cacaca;}
+QPushButton:focus{outline: none;} </string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
