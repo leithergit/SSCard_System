@@ -163,9 +163,9 @@ int up_ChangePWD::ProcessBussiness()
 	m_nInputFocus = 0;
 	m_nSSCardPWDSize = g_pDataCenter->GetSysConfigure()->nSSCardPasswordSize;
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
-	m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadPort.c_str();
-	m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadBaudrate.c_str()).toUShort();
-	m_pPinKeybroad = make_shared<QPinKeybroad>(m_strDevPort, m_nBaudreate);
+	//m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadPort.c_str();
+	//m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadBaudrate.c_str()).toUShort();
+	m_pPinKeybroad = make_shared<QPinKeybroad>();
 	QString strMessage;
 	if (!m_pPinKeybroad)
 	{
@@ -175,7 +175,7 @@ int up_ChangePWD::ProcessBussiness()
 		return -1;
 	}
 
-	if (QFailed(m_pPinKeybroad->OpenDevice(strMessage)))
+	if (!m_pPinKeybroad->OpenDevice(strMessage))
 	{
 		gError() << strMessage.toLocal8Bit().data();
 		emit ShowMaskWidget("严重错误", strMessage, Fetal, Return_MainPage);
@@ -311,7 +311,7 @@ void up_ChangePWD::ThreadWork()
 
 	while (m_bWorkThreadRunning)
 	{
-		nRet = SUNSON_ScanKeyPress(szTemp);
+		nRet = m_pPinKeybroad->SUNSON_ScanKeyPress(szTemp);
 		if (nRet > 0)
 			emit InputPin(szTemp[0]);
 		this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -346,7 +346,7 @@ void up_ChangePWD::on_pushButton_OK_clicked()
 				emit ShowMaskWidget("操作失败", strMessage, Error, Stay_CurrentPage);
 				return;
 			}
-			emit ShowMaskWidget("操作成功", "密码修改成功,请妥善保管好您的新密码!", Success, Switch_NextPage);
+			emit ShowMaskWidget("操作成功", "密码修改成功,请妥善保管好您的新密码!", Success, Return_MainPage);
 		}
 		else
 		{

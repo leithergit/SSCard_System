@@ -116,12 +116,21 @@ int TestHost(string strIP, USHORT nPort, int nNetTimeout)
 		return false;
 }
 
+#include "resource.h"
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 	, ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
 	installEventFilter(this);
+	//HMODULE hInstance = GetModuleHandle(nullptr);
+	//HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SSCARDSYSTEM));
+	//SendMessage((HWND)this->winId(), WM_SETICON, TRUE, (LPARAM)hIcon);
+	//SendMessage((HWND)this->winId(), WM_SETICON, FALSE, (LPARAM)hIcon);
+	setWindowIcon(QIcon(":/SSCard_System.ico"));
+	//QIcon icon;
+	//icon.addFile(QString::fromUtf8(":/SSCard_System.ico"), QSize(), QIcon::Normal, QIcon::Off);
+	//setWindowIcon(icon);
 	BaseInfo Bi;
 	RegionInfo& region = g_pDataCenter->GetSysConfigure()->Region;
 	strcpy(Bi.strLicense, "1234567890");
@@ -236,8 +245,9 @@ void MainWindow::On_LoadSystemManager()
 
 void MainWindow::mousePressEvent(QMouseEvent* e)
 {
-	if ((e->x() >= 1820 && e->y() >= 900) &&
-		(e->x() <= 1920 && e->y() <= 990))
+	QRect rt = this->geometry();
+	if ((e->x() >= rt.width() - 100 && e->y() >= rt.height() - 190) &&
+		e->x() <= rt.width() && e->y() <= rt.height() - 90)
 	{
 		qDebug() << "Mouse X=" << e->x() << " Mouse Y=" << e->y();
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - m_tLastPress);

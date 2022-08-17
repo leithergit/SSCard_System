@@ -1,4 +1,4 @@
-#include "aestools.h"
+﻿#include "aestools.h"
 #include <QDebug>
 #include "qstring.h"
 #include <QFile>

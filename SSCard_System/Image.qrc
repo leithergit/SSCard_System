@@ -23,6 +23,7 @@
         <file>Image/RadioCheck.png</file>
         <file>Image/RadioUnChecked.png</file>
         <file>Image/down_arrow.png</file>
+        <file>SSCard_System.ico</file>
     </qresource>
     <qresource prefix="/qt/etc">
         <file>qt.conf</file>

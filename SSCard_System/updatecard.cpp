@@ -32,7 +32,8 @@ UpdateCard::UpdateCard(QWidget* parent) :
 		//if (g_pDataCenter->GetSysConfigure()->DevConfig.nCameraDrv == CameraDriver::Driver_OCX)
 		//	ui->stackedWidget->addWidget(new uc_FaceCapture_ocx(ui->label_step, "updatecard2.png", Page_FaceCapture));		// step 1
 		//else
-		AddPage(new uc_FaceCapture(ui->label_step, "updatecard2.png", Page_FaceCapture));			// step 1
+		if (g_pDataCenter->GetSysConfigure()->DevConfig.nEnableCamera)
+			AddPage(new uc_FaceCapture(ui->label_step, "updatecard2.png", Page_FaceCapture));			// step 1
 		AddPage(new uc_EnsureInformation(ui->label_step, "updatecard3.png", Page_EnsureInformation));	// step 2
 		AddPage(new uc_InputMobile(ui->label_step, "updatecard4.png", Page_InputMobile));				// step 3
 		AddPage(new uc_Pay(ui->label_step, "updatecard5.png", Page_Payment));							// step 4

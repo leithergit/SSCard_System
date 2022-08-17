@@ -28,6 +28,7 @@ extern "C"
 	int WINAPI	SUNSON_SetBuzzerEnabled(unsigned char ucBuzzerStatus,unsigned char *ReturnInfo);
 	//B.9 设定初始向量
 	int WINAPI  SUNSON_SetStartValue(unsigned char *StartValue,unsigned char *ReturnInfo);
+
 	int WINAPI  SUNSON_SetStartValueEx(int nDataLen,unsigned char *StartValue,unsigned char *ReturnInfo);
 	//B.10数据运算
 	int WINAPI	SUNSON_DataCompute(int KeyId,unsigned char JM_mode,unsigned char SF_mode,unsigned char padchar,int datalen,unsigned char *data,unsigned char *DataResult);

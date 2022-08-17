@@ -1,4 +1,4 @@
-#ifndef SRC_UTILS_AES_H
+﻿#ifndef SRC_UTILS_AES_H
 #define SRC_UTILS_AES_H
 
 typedef unsigned long DWORD;

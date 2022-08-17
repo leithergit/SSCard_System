@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <RemoteDebuggerCommand>D:\SSCard_System\SSCard_System.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>D:\SSCard_System</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerCommand>D:\SSCardSystem.Desktop\SSCard_System.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\SSCardSystem.Desktop</RemoteDebuggerWorkingDirectory>
     <RemoteDebuggerServerName>10.0.0.126</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
@@ -11,10 +11,13 @@
     <LocalDebuggerCommandArguments />
     <LocalDebuggerWorkingDirectory>Z:\SSCard_System\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2022-06-08T01:36:21.1122499Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-08-11T09:24:14.9993369Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2022-06-08T01:36:19.1478641Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-08-11T09:24:14.8048564Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

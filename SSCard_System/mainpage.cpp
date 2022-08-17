@@ -13,11 +13,11 @@ MainPage::MainPage(QWidget* parent) :
 	//this->setStyleSheet(QString("#MainPage{background-color: rgb(255, 255, 255);}"));
 	//ui->quickWidget->setSource(QUrl(QString::fromUtf8("./qml/SliderPlayer.qml")));
 
-	const QList<std::pair<QString, QString>>&& imagepairlst = { std::make_pair("./image/Card1.png", QString::fromLocal8Bit("")),
-																std::make_pair("./image/Card2.png", QString::fromLocal8Bit("")),
-																std::make_pair("./image/Card3.png", QString::fromLocal8Bit("")) };
+	//const QList<std::pair<QString, QString>>&& imagepairlst = { std::make_pair("./image/Card1.png", QString::fromLocal8Bit("")),
+	//															std::make_pair("./image/Card2.png", QString::fromLocal8Bit("")),
+	//															std::make_pair("./image/Card3.png", QString::fromLocal8Bit("")) };
 
-	ui->label_Image->addImage(imagepairlst);
+	//ui->label_Image->addImage(imagepairlst);
 
 	foreach(QWidget * w, qApp->topLevelWidgets())
 	{

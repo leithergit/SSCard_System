@@ -6,16 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1416</width>
-    <height>791</height>
+    <width>1200</width>
+    <height>777</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1200</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="styleSheet">
    <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
-font-size: 30px;
+font-size: 18px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
@@ -29,7 +35,7 @@ color: 0
       <widget class="QPushButton" name="pushButton_ReadID">
        <property name="minimumSize">
         <size>
-         <width>240</width>
+         <width>150</width>
          <height>60</height>
         </size>
        </property>
@@ -55,7 +61,7 @@ color: 0
       <widget class="QPushButton" name="pushButton_QueryCardStatus">
        <property name="minimumSize">
         <size>
-         <width>240</width>
+         <width>150</width>
          <height>60</height>
         </size>
        </property>
@@ -68,7 +74,7 @@ color: 0
       <widget class="QPushButton" name="pushButton_LoadCardData">
        <property name="minimumSize">
         <size>
-         <width>240</width>
+         <width>150</width>
          <height>60</height>
         </size>
        </property>
@@ -81,7 +87,7 @@ color: 0
       <widget class="QPushButton" name="pushButton_MakeCard">
        <property name="minimumSize">
         <size>
-         <width>240</width>
+         <width>150</width>
          <height>60</height>
         </size>
        </property>
@@ -94,7 +100,7 @@ color: 0
       <widget class="QComboBox" name="comboBox_Failure">
        <property name="minimumSize">
         <size>
-         <width>240</width>
+         <width>150</width>
          <height>0</height>
         </size>
        </property>

@@ -6,12 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1119</width>
-    <height>602</height>
+    <width>662</width>
+    <height>478</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>452</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>839</width>
+    <height>613</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #707070;
+font:24px &quot;思源黑体 CN Medium&quot;;
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -20,7 +40,7 @@
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
+      <enum>QSizePolicy::Expanding</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -49,8 +69,14 @@
       <widget class="QLabel" name="label_Swipecard">
        <property name="minimumSize">
         <size>
-         <width>600</width>
-         <height>400</height>
+         <width>807</width>
+         <height>452</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>807</width>
+         <height>452</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -82,7 +108,7 @@
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
+      <enum>QSizePolicy::Expanding</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -118,12 +144,7 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">font-weight: normal;
-line-height: 49px;
-letter-spacing: 1px;
-color: #707070;
-font:42px &quot;思源黑体 CN Medium&quot;;
-border-radius: 24px;</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>请刷身份证</string>
@@ -152,15 +173,10 @@ border-radius: 24px;</string>
        <item>
         <widget class="QCheckBox" name="checkBox_WithoutIDCard">
          <property name="styleSheet">
-          <string notr="true">QCheckBox::indicator {width: 28px;height: 28px;}
-QCheckBox{
-font-weight: normal;
-line-height: 49px;
-letter-spacing: 1px;
-color: #707070;
-font:42px &quot;思源黑体 CN Medium&quot;;
-border-radius: 24px;
-}</string>
+          <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}\
+		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
+		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
+		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \&quot;思源黑体 CN Medium\&quot;;border-radius: 24px;}&quot;</string>
          </property>
          <property name="text">
           <string>无证办理</string>

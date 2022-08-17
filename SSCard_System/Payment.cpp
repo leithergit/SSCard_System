@@ -9,7 +9,7 @@ char* g_szPhotoBuffer = new char[PhotoBufferSize];
 #include "QREncode/qrencode.h"
 #include "Gloabal.h"
 #include "../update/Update.h"
-
+#define Unused(x)	(void)x;
 
 bool TestDigit(char ch)
 {
@@ -899,7 +899,6 @@ void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
 		if (!pSSCardInfo)
 			return;
 
-		bool bLoaded = false;
 		QString strAppPath = QCoreApplication::applicationDirPath();
 		strAppPath += "/Debug";
 

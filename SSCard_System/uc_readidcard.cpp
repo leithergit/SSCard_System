@@ -28,12 +28,13 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 	ui->setupUi(this);
 	QMovie* movie = new QMovie("./Image/SwipeIDCard.gif");
 	ui->label_Swipecard->setMovie(movie);
+	movie->setScaledSize(ui->label_Swipecard->size());
 	movie->start();
 
-	ui->checkBox_WithoutIDCard->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
+	/*ui->checkBox_WithoutIDCard->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
 		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
 		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
-		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
+		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");*/
 	/*ui->checkBox_Agency->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
 		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
 		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
@@ -86,8 +87,7 @@ int uc_ReadIDCard::ProcessBussiness()
 
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
-	QSize WindowsSize = size();
-	qDebug() << "Height = " << WindowsSize.height() << "Width = " << WindowsSize.width();
+
 	m_bSucceed = false;
 
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
@@ -161,7 +161,7 @@ void uc_ReadIDCard::ThreadWork()
 					switch (g_pDataCenter->nCardServiceType)
 					{
 					case ServiceType::Service_NewCard:
-						nNewPage = Page_CommitNewInfo;
+						nNewPage = Page_InputIDCardInfo;
 						break;
 					case ServiceType::Service_ReplaceCard:
 						nNewPage = Page_EnsureInformation;
@@ -179,7 +179,12 @@ void uc_ReadIDCard::ThreadWork()
 					switch (g_pDataCenter->nCardServiceType)
 					{
 					case ServiceType::Service_NewCard:
+						if (!g_pDataCenter->GetSysConfigure()->DevConfig.nEnableCamera)
+							nNewPage = Page_InputIDCardInfo;
+						break;
 					case ServiceType::Service_ReplaceCard:
+						if (!g_pDataCenter->GetSysConfigure()->DevConfig.nEnableCamera)
+							nNewPage = Page_EnsureInformation;
 						break;
 					default:
 						nOperation = Switch_NextPage;

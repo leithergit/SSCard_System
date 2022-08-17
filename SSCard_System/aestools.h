@@ -1,4 +1,4 @@
-//#ifndef SRC_UTILS_TAESCLASS_H
+﻿//#ifndef SRC_UTILS_TAESCLASS_H
 #define SRC_UTILS_TAESCLASS_H
 
 #include <string.h>

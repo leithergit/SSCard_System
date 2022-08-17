@@ -452,6 +452,7 @@ void uc_InputIDCardInfo::OnTimeout()
 	gInfo() << __FUNCTION__;
 	ShutDown();
 }
+
 void  uc_InputIDCardInfo::ShutDown()
 {
 	gInfo() << __FUNCTION__;
@@ -464,6 +465,7 @@ void  uc_InputIDCardInfo::ShutDown()
 
 	StopDetect();
 }
+
 void uc_InputIDCardInfo::timerEvent(QTimerEvent* event)
 {
 
@@ -893,7 +895,7 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 	MaskStatus nStatus = Success;
 	int nCardStatus = -1;
 	QString strTips = "操作成功";
-	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+
 	do
 	{
 		if (QFailed(GetCardInfo(strMessage)))

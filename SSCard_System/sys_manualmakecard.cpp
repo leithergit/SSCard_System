@@ -756,8 +756,6 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 {
 	int nResult = -1;
 	QString strMessage;
-
-	int nStatus = 0;
 	QString strInfo;
 	SSCardInfoPtr pSSCardInfo;
 

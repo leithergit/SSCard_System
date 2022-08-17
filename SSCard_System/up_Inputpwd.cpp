@@ -34,9 +34,9 @@ int up_InputPWD::ProcessBussiness()
 	ClearPassword();
 	ui->lineEdit_OldPassword->setFocus();
 	m_nSSCardPWDSize = g_pDataCenter->GetSysConfigure()->nSSCardPasswordSize;
-	m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadPort.c_str();
-	m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadBaudrate.c_str()).toUShort();
-	m_pPinKeybroad = make_shared<QPinKeybroad>(m_strDevPort, m_nBaudreate);
+	//m_strDevPort = g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadPort.c_str();
+	//m_nBaudreate = QString(g_pDataCenter->GetSysConfigure()->DevConfig.strPinBroadBaudrate.c_str()).toUShort();
+	m_pPinKeybroad = make_shared<QPinKeybroad>();
 	QString strError;
 	if (!m_pPinKeybroad)
 	{
@@ -46,7 +46,7 @@ int up_InputPWD::ProcessBussiness()
 		return -1;
 	}
 
-	if (QFailed(m_pPinKeybroad->OpenDevice(strError)))
+	if (!m_pPinKeybroad->OpenDevice(strError))
 	{
 		gError() << strError.toLocal8Bit().data();
 		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
@@ -250,12 +250,12 @@ void up_InputPWD::OnInputPin(unsigned char ch)
 void up_InputPWD::ThreadWork()
 {
 	uchar szTemp[16] = { 0 };
-	int nRet = 0;
+	bool nRet = false;
 
 	while (m_bWorkThreadRunning)
 	{
-		nRet = SUNSON_ScanKeyPress(szTemp);
-		if (nRet > 0)
+		nRet = m_pPinKeybroad->SUNSON_ScanKeyPress(szTemp);
+		if (nRet)
 			emit InputPin(szTemp[0]);
 		this_thread::sleep_for(std::chrono::milliseconds(50));
 	}

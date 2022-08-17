@@ -17,12 +17,13 @@ public:
 	void fnThreadReadIDCard(QString strPort);
 	void fnThreadReadPin();
 	IDCardInfo CardInfo;
+	QPinKeybroadPtr  pPinKeyBroad = nullptr;
 	void EnableUI(QObject* pUIObj, bool bEnable = true);
 	bool DetectPinBroadPort(QString& strPort);
 
 	bool Save(QString& strMessage);
 
-	bool TryOpenPinKeyBroadPort(int nPort, int nBaudrate, bool bClose = true);
+	bool TryOpenPinKeyBroadPort(string strDevPort, int nBaudrate, bool bClose = true);
 
 	bool CheckPrinterModule(QString& strPrinterLib, PrinterType& nType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 

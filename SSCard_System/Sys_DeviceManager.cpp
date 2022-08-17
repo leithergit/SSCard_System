@@ -10,6 +10,7 @@
 #include "Sys_dialogidcardinfo.h"
 #include "Sys_dialogcameratest.h"
 #include "Payment.h"
+#include "qpinkeybroad.h"
 
 DWORD GetModuleVersion(QString strModulePath, WORD& nMajorVer, WORD& nMinorVer, WORD& nBuildNum, WORD& nRevsion)
 {
@@ -336,8 +337,9 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	{
 		ReaderTest_clicked(false);
 	}
-
-	QString strMessage;
+	char szRCode[128] = { 0 };
+	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+	/*QString strMessage;
 	QString strPrinterLib;
 	PrinterType nPrinterType;
 	int nDepenseBox;
@@ -363,7 +365,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	int nRes = QMessageBox_CN(QMessageBox::Information, tr("提示"), tr("上电测试前请放好一张卡芯片卡到打印机进卡口,准备就绪后请按确定按钮继续!"), QMessageBox::Ok | QMessageBox::Cancel, this);
 	if (nRes == QMessageBox::Cancel)
 		return;
-	char szRCode[128] = { 0 };
+	
 	bool bSucceed = false;
 	RegionInfo& reginfo = g_pDataCenter->GetSysConfigure()->Region;
 
@@ -406,8 +408,8 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	if (!bSucceed)
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
 	else
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);*/
+	
 }
 
 void DeviceManager::on_pushButton_BrowseDesktopReaderModule_clicked()
@@ -470,17 +472,13 @@ void DeviceManager::on_pushButton_DesktopReaderTest_clicked()
 void DeviceManager::fnThreadReadPin()
 {
 	uchar szTemp[16] = { 0 };
-	int nRet = 0;
+	bool nRet = 0;
 	while (bThreadReadPinRunning)
 	{
-		nRet = SUNSON_ScanKeyPress(szTemp);
-		if (nRet > 0)
+		nRet = pPinKeyBroad->SUNSON_ScanKeyPress(szTemp);
+		if (nRet)
 		{
 			emit InputPin(szTemp[0]);
-		}
-		else
-		{
-			qDebug() << "nRet = " << nRet;
 		}
 
 		this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -665,7 +663,7 @@ void DeviceManager::on_InputPin(char ch)
 		bThreadReadPinRunning = false;
 		ThreadReadPin.join();
 		EnableUI(this, true);
-		ui.pushButton_PinBroadTest->setText("停止测试");
+		ui.pushButton_PinBroadTest->setText("输入测试");
 		break;
 	}
 	case 0x08:		// update
@@ -716,22 +714,22 @@ void DeviceManager::on_InputPin(char ch)
 
 }
 
-bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate, bool bClose)
+bool DeviceManager::TryOpenPinKeyBroadPort(string strDevPort, int nBaudrate, bool bClose)
 {
 	bool bSucceed = false;
+	QString strError;
+	pPinKeyBroad = make_shared<QPinKeybroad>();
 	do
 	{
-		if (!SUNSON_OpenCom(nPort, nBaudrate))
+		if (!pPinKeyBroad)
 			break;
-
-		unsigned char szRetInfo[255] = { 0 };
-		if (!SUNSON_UseEppPlainTextMode(0x06, 0, szRetInfo))
+		if (!pPinKeyBroad->OpenDevice(strDevPort,nBaudrate,strError))
 			break;
-
+		
 		bSucceed = true;
 	} while (0);
 	if (bClose)
-		SUNSON_CloseCom();
+		pPinKeyBroad->SUNSON_CloseCom();
 	return bSucceed;
 }
 
@@ -752,10 +750,8 @@ bool DeviceManager::DetectPinBroadPort(QString& strPort)
 		{
 			wchar_t szPort[8] = { 0 };
 			wcscpy_s(szPort, 8, (wchar_t*)&szPortsList[i * 8]);
-			long nPort = wcstol(&szPort[3], nullptr, 10);
-			if (nPort < 1)
-				continue;
-			if (TryOpenPinKeyBroadPort(nPort, 9600))
+			
+			if (TryOpenPinKeyBroadPort(_AnsiString(szPort,CP_ACP), 9600))
 			{
 				strPort = QString::fromStdWString(szPort);
 				return true;
@@ -869,9 +865,10 @@ int DeviceManager::ReaderTest_clicked(bool bContinue)
 
 	BOXINFO BoxInfo;
 	ZeroMemory(&BoxInfo, sizeof(BOXINFO));
+	QWaitCursor Wait;
 	do
 	{
-		QWaitCursor Wait;
+		
 		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 			break;
 
@@ -968,7 +965,7 @@ void DeviceManager::on_pushButton_DetectIDPinBroadPort_clicked()
 
 void DeviceManager::on_pushButton_PinBroadTest_clicked()
 {
-	wstring strPinPort = ui.lineEdit_PinBroadPort->text().toStdWString();
+	string strPinPort = ui.lineEdit_PinBroadPort->text().toStdString();
 	if (!strPinPort.size())
 	{
 		if (QMessageBox::No == QMessageBox_CN(QMessageBox::Question, tr("提示"), "密码键盘端口为空,是否要自动检测键盘端口?", QMessageBox::Yes | QMessageBox::No, this))
@@ -987,8 +984,7 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 	{
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), "请在密码键盘上进行输入，按'确认'或'取消'键结束测试!", QMessageBox::Ok, this);
 
-		int nPort = wcstol(&strPinPort.c_str()[3], nullptr, 10);
-		if (!TryOpenPinKeyBroadPort(nPort, 9600, false))
+		if (!TryOpenPinKeyBroadPort(strPinPort, 9600, false))
 		{
 			QMessageBox_CN(QMessageBox::Information, tr("提示"), "打开密码键盘失败!", QMessageBox::Ok, this);
 			return;
@@ -1007,7 +1003,8 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 		bThreadReadPinRunning = false;
 		ui.pushButton_PinBroadTest->setText("输入测试");
 		ThreadReadPin.join();
-		SUNSON_CloseCom();
+
+		pPinKeyBroad = nullptr;
 	}
 }
 

@@ -6,27 +6,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1280</width>
+    <height>1024</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>1280</width>
-    <height>800</height>
+    <height>1024</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1280</width>
+    <height>1024</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
+    <property name="topMargin">
+     <number>3</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="3">
@@ -63,14 +69,14 @@ color: #ffffff;}</string>
         </property>
         <property name="minimumSize">
          <size>
-          <width>546</width>
-          <height>102</height>
+          <width>354</width>
+          <height>60</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>546</width>
-          <height>105</height>
+          <width>354</width>
+          <height>60</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -87,7 +93,7 @@ color: #ffffff;}</string>
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
+         <enum>QSizePolicy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -108,20 +114,20 @@ color: #ffffff;}</string>
         <property name="minimumSize">
          <size>
           <width>410</width>
-          <height>67</height>
+          <height>44</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>410</width>
-          <height>67</height>
+          <height>44</height>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">#label{	width: 410px;
+         <string notr="true">#label{	width: 286px;
 	height: 63px;
 	font-family: &quot;思源黑体 CN Medium&quot;;
-	font-size: 66px;
+	font-size: 46px;
 	font-weight: bold;
 	line-height: 49px;
 	letter-spacing: 2px;
@@ -141,14 +147,14 @@ color: #ffffff;}</string>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="minimumSize">
        <size>
-        <width>1920</width>
-        <height>874</height>
+        <width>1280</width>
+        <height>820</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>1920</width>
-        <height>874</height>
+        <width>1280</width>
+        <height>820</height>
        </size>
       </property>
       <property name="styleSheet">
@@ -157,11 +163,19 @@ color: #ffffff;}</string>
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLabel" name="label_Version">
-        <property name="styleSheet">
-         <string notr="true">#label_Version{
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="label_Version">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">#label_Version{
 font-family: &quot;思源黑体 CN Regular&quot;;
 font-size: 25px;
 font-weight: bold;
@@ -169,11 +183,13 @@ line-height: 49px;
 letter-spacing: 1px;
 color: #ffffff;
 }</string>
-        </property>
-        <property name="text">
-         <string>当前版本:1.0.0.1</string>
-        </property>
-       </widget>
+          </property>
+          <property name="text">
+           <string>当前版本:1.0.0.1</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <spacer name="horizontalSpacer_2">
@@ -215,6 +231,12 @@ color: #ffffff;
       </item>
       <item>
        <widget class="QLabel" name="label_Net">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>60</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">#label_Net{
 font-family: &quot;思源黑体 CN Regular&quot;;
@@ -231,25 +253,15 @@ color: #ffffff;
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>25</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QCheckBox" name="checkBox_Debug">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>32</height>
+         </size>
         </property>
         <property name="styleSheet">
          <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
@@ -268,13 +280,13 @@ color: rgb(255, 0, 0);
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_4">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>508</width>
+          <width>40</width>
           <height>20</height>
          </size>
         </property>
@@ -282,6 +294,18 @@ color: rgb(255, 0, 0);
       </item>
       <item>
        <widget class="QLabel" name="label_Support">
+        <property name="minimumSize">
+         <size>
+          <width>550</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>85</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">#label_Support{
 font-family: &quot;思源黑体 CN Regular&quot;;
@@ -293,10 +317,14 @@ color: #ffffff;
 }</string>
         </property>
         <property name="text">
-         <string>技术支持：金乔炜煜(上海)智能科技有限公司   服务电话：4008-917-968</string>
+         <string>技术支持：金乔炜煜(上海)智能科技有限公司
+服务电话：4008-917-968</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

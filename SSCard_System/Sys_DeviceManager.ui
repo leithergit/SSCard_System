@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1729</width>
-    <height>855</height>
+    <width>1200</width>
+    <height>776</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1187</width>
+    <width>1200</width>
     <height>600</height>
    </size>
   </property>
@@ -27,9 +27,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
-font-size: 30px;
+font-size: 18px;
 font-weight: bold;
-line-height: 49px;
 letter-spacing: 1px;
 color: 0
 </string>
@@ -51,7 +50,7 @@ color: 0
              <widget class="QLabel" name="label_PrinterModule">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -70,7 +69,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_PrinterModule">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>180</width>
                 <height>0</height>
                </size>
               </property>
@@ -106,7 +105,7 @@ color: 0
              <widget class="QLabel" name="label_PrinterType">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -125,18 +124,18 @@ color: 0
              <widget class="QComboBox" name="comboBox_PrinterType">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>180</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>280</width>
+                <width>0</width>
                 <height>16777215</height>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">font: 25 20pt &quot;思源黑体 CN Light&quot;;</string>
+               <string notr="true"/>
               </property>
               <item>
                <property name="text">
@@ -206,7 +205,7 @@ color: 0
              <widget class="QLabel" name="label_DepenseBox">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -225,7 +224,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_DepenseBox">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>180</width>
                 <height>0</height>
                </size>
               </property>
@@ -261,7 +260,7 @@ color: 0
              <widget class="QLabel" name="label_DPI">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -280,7 +279,7 @@ color: 0
              <widget class="QComboBox" name="comboBox_DPI">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>180</width>
                 <height>0</height>
                </size>
               </property>
@@ -360,8 +359,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_MakePhoto">
               <property name="minimumSize">
                <size>
-                <width>150</width>
-                <height>60</height>
+                <width>100</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -373,8 +372,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_BrowsePrinterModule">
               <property name="minimumSize">
                <size>
-                <width>150</width>
-                <height>60</height>
+                <width>100</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -386,8 +385,8 @@ color: 0
              <widget class="QComboBox" name="comboBox_PrinterTest">
               <property name="minimumSize">
                <size>
-                <width>120</width>
-                <height>60</height>
+                <width>80</width>
+                <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -422,8 +421,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_Excute">
               <property name="minimumSize">
                <size>
-                <width>150</width>
-                <height>60</height>
+                <width>80</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -448,7 +447,7 @@ color: 0
              <widget class="QLabel" name="label_IDCardReaderPort">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -510,8 +509,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_DetectIDCardReadPort">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -529,8 +528,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_IDCardReaderTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -561,7 +560,7 @@ color: 0
              <widget class="QLabel" name="label_PinKeybroadPort">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -610,7 +609,7 @@ color: 0
              <widget class="QLabel" name="label_StringInput">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -629,7 +628,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_StringInput">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -678,8 +677,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_DetectIDPinBroadPort">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -697,8 +696,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_PinBroadTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -746,7 +745,7 @@ color: 0
              <widget class="QLabel" name="label_SSCardReaderModule">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -765,7 +764,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_SSCardReaderModule">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -801,7 +800,7 @@ color: 0
              <widget class="QLabel" name="label_SSCardReaderType">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -818,9 +817,15 @@ color: 0
             </item>
             <item>
              <widget class="QComboBox" name="comboBox_SSCardReaderType">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -868,7 +873,7 @@ color: 0
              <widget class="QLabel" name="label_SSCardReaderPort">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -885,9 +890,15 @@ color: 0
             </item>
             <item>
              <widget class="QComboBox" name="comboBox_SSCardReaderPort">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -925,7 +936,7 @@ color: 0
              <widget class="QLabel" name="label_PoweronType">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -942,9 +953,15 @@ color: 0
             </item>
             <item>
              <widget class="QComboBox" name="comboBox_PoweronType">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -987,7 +1004,7 @@ color: 0
              <widget class="QLabel" name="label_PoweronType_3">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1006,7 +1023,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_SSCardReader_TestCount">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1058,8 +1075,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_BrowseReaderModule">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -1071,8 +1088,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_ReaderTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -1097,7 +1114,7 @@ color: 0
              <widget class="QLabel" name="label_SSCardReaderModule_2">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1116,7 +1133,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_DesktopSSCardReaderModule">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -1152,7 +1169,7 @@ color: 0
              <widget class="QLabel" name="label_SSCardReaderType_2">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1171,7 +1188,7 @@ color: 0
              <widget class="QComboBox" name="comboBox_DesktopSSCardReaderType">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -1219,7 +1236,7 @@ color: 0
              <widget class="QLabel" name="label_SSCardReaderPort_2">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1238,7 +1255,7 @@ color: 0
              <widget class="QComboBox" name="comboBox_DesktopSSCardReaderPort">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -1276,7 +1293,7 @@ color: 0
              <widget class="QLabel" name="label_PoweronType_2">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1295,7 +1312,7 @@ color: 0
              <widget class="QComboBox" name="comboBox_DesktopPoweronType">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -1338,7 +1355,7 @@ color: 0
              <widget class="QLabel" name="label_PoweronType_4">
               <property name="minimumSize">
                <size>
-                <width>200</width>
+                <width>100</width>
                 <height>0</height>
                </size>
               </property>
@@ -1357,7 +1374,7 @@ color: 0
              <widget class="QLineEdit" name="lineEdit_DesktopReader_TestCount">
               <property name="minimumSize">
                <size>
-                <width>250</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -1409,8 +1426,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_BrowseDesktopReaderModule">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -1422,8 +1439,8 @@ color: 0
              <widget class="QPushButton" name="pushButton_DesktopReaderTest">
               <property name="minimumSize">
                <size>
-                <width>200</width>
-                <height>60</height>
+                <width>120</width>
+                <height>40</height>
                </size>
               </property>
               <property name="text">
@@ -1463,8 +1480,8 @@ color: 0
                <widget class="QPushButton" name="pushButton_TestCamera">
                 <property name="minimumSize">
                  <size>
-                  <width>200</width>
-                  <height>60</height>
+                  <width>120</width>
+                  <height>40</height>
                  </size>
                 </property>
                 <property name="text">

@@ -6,13 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>875</height>
+    <width>1282</width>
+    <height>824</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1276</width>
+    <width>1280</width>
+    <height>791</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1282</width>
     <height>824</height>
    </size>
   </property>
@@ -52,8 +58,14 @@
     <widget class="QFrame" name="MaskFrame">
      <property name="minimumSize">
       <size>
-       <width>1276</width>
+       <width>915</width>
        <height>824</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>915</width>
+       <height>16777215</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -218,7 +230,7 @@ letter-spacing: 1px;
           </property>
           <property name="styleSheet">
            <string notr="true">color: #666666;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;
 letter-spacing: 1px;</string>
@@ -281,14 +293,14 @@ letter-spacing: 1px;</string>
          <widget class="QPushButton" name="pushButton_OK">
           <property name="minimumSize">
            <size>
-            <width>266</width>
-            <height>101</height>
+            <width>200</width>
+            <height>80</height>
            </size>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
-font: 57 42px &quot;思源黑体 CN Medium&quot;;
+border-radius: 15px;
+font: 57 32px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;
 letter-spacing: 1px;
@@ -341,17 +353,14 @@ QPushButton:pressed{background:#38a357;}
       <number>0</number>
      </property>
      <item>
-      <spacer name="verticalSpacer_4">
+      <spacer name="horizontalSpacer_10">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>6</height>
+         <height>20</height>
         </size>
        </property>
       </spacer>
@@ -390,13 +399,13 @@ QPushButton:pressed{background:#38a357;}
       <widget class="QLabel" name="label_step">
        <property name="minimumSize">
         <size>
-         <width>436</width>
+         <width>300</width>
          <height>760</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>436</width>
+         <width>300</width>
          <height>760</height>
         </size>
        </property>
@@ -436,7 +445,7 @@ QPushButton:pressed{background:#38a357;}
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>30</width>
+       <width>20</width>
        <height>20</height>
       </size>
      </property>

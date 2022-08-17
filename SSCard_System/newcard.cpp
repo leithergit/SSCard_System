@@ -28,7 +28,8 @@ NewCard::NewCard(QWidget* parent) :
 	{
 		m_pStackWidget = ui->stackedWidget;
 		AddPage(new uc_ReadIDCard(ui->label_step, "newcard1.png", Page_ReaderIDCard));				// step 0
-		AddPage(new uc_FaceCapture(ui->label_step, "newcard2.png", Page_FaceCapture));				// step 1
+		if (g_pDataCenter->GetSysConfigure()->DevConfig.nEnableCamera)
+			AddPage(new uc_FaceCapture(ui->label_step, "newcard2.png", Page_FaceCapture));				// step 1
 		AddPage(new uc_InputIDCardInfo(ui->label_step, "newcard3.png", Page_InputIDCardInfo));		// step 1
 		AddPage(new uc_MakeCard(ui->label_step, "newcard4.png", Page_MakeCard));					// step 5
 		AddPage(new uc_AdforFinance(nullptr, "", Page_AdforFinance));									// step 6

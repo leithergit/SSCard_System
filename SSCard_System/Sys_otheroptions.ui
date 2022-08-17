@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>988</width>
+    <width>722</width>
     <height>607</height>
    </rect>
   </property>
@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
-font-size: 30px;
+font-size: 18px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
@@ -287,7 +287,7 @@ color: 0
         <widget class="QPushButton" name="pushButton_TestUploadLog">
          <property name="minimumSize">
           <size>
-           <width>240</width>
+           <width>160</width>
            <height>48</height>
           </size>
          </property>

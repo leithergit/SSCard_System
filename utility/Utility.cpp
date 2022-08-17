@@ -2548,91 +2548,86 @@ bool IsValidSmsAddressW(WCHAR* szSms)
 	return true;
 }
 
-shared_ptr<char> UTF8StringW(IN LPCWSTR pTextW, int& OUT nReturnLength)
+string UTF8StringW(IN LPCWSTR pTextW, int& OUT nReturnLength)
 {
 	int nLenW = wcslen(pTextW);
 	int nNeedBuffSize = ::WideCharToMultiByte(CP_UTF8, NULL, pTextW, nLenW, NULL, 0, NULL, NULL);
-	char* pUTF8 = new char[nNeedBuffSize + 1];
-	ZeroMemory(pUTF8, nNeedBuffSize + 1);
+	string strUTF8(nNeedBuffSize + 1,'\0');
 
-	nReturnLength = WideCharToMultiByte(CP_UTF8, NULL, pTextW, nLenW, pUTF8, nNeedBuffSize + 1, NULL, NULL);
-	return shared_ptr<char>(pUTF8);
+	nReturnLength = WideCharToMultiByte(CP_UTF8, NULL, pTextW, nLenW, strUTF8.data(), nNeedBuffSize + 1, NULL, NULL);
+	return strUTF8;
 }
 
-shared_ptr<char> UTF8StringW_(IN LPCWSTR pTextW)
+string UTF8StringW_(IN LPCWSTR pTextW)
 {
 	int nLenW = wcslen(pTextW);
 	int nNeedBuffSize = ::WideCharToMultiByte(CP_UTF8, NULL, pTextW, nLenW, NULL, 0, NULL, NULL);
-	char* pUTF8 = new char[nNeedBuffSize + 1];
-	ZeroMemory(pUTF8, nNeedBuffSize + 1);
+	string strUTF8(nNeedBuffSize + 1,'\0');
 
-	WideCharToMultiByte(CP_UTF8, NULL, pTextW, nLenW, pUTF8, nNeedBuffSize + 1, NULL, NULL);
-	return shared_ptr<char>(pUTF8);
+	WideCharToMultiByte(CP_UTF8, NULL, pTextW, nLenW, strUTF8.data(), nNeedBuffSize + 1, NULL, NULL);
+	return strUTF8;
 }
 
-shared_ptr<char> UTF8StringA(IN LPCSTR pTextA, int& OUT nReturnLength)
+string UTF8StringA(IN LPCSTR pTextA, int& OUT nReturnLength)
 {
 	if (!pTextA)
 	{
 		nReturnLength = 0;
-		return shared_ptr<char>((char*)NULL);
+		return string((char*)NULL);
 	}
 
-	return UTF8StringW(A2WString(pTextA, nReturnLength).get(), nReturnLength);
+	return UTF8StringW(A2WString(pTextA, nReturnLength).c_str(), nReturnLength);
 }
 
-shared_ptr<char> UTF8StringA_(IN LPCSTR pTextA)
+string UTF8StringA_(IN LPCSTR pTextA)
 {
 	if (!pTextA)
 	{
-		return shared_ptr<char>((char*)NULL);
+		return string((char*)NULL);
 	}
 
-	return UTF8StringW_(A2WString_(pTextA).get());
+	return UTF8StringW_(A2WString_(pTextA).c_str());
 }
 
-shared_ptr<char> W2AString(IN LPCWSTR str, int& OUT nReturnLength)
+std::string W2AString(IN LPCWSTR str, int& OUT nReturnLength)
 {
 	int nLenW = wcslen(str);
 	int nNeedBuffSize = ::WideCharToMultiByte(CP_ACP, NULL, str, nLenW, NULL, 0, NULL, NULL);
-	char* pAnsi = new char[nNeedBuffSize + 1];
-	ZeroMemory(pAnsi, nNeedBuffSize + 1);
-	nReturnLength = WideCharToMultiByte(CP_ACP, NULL, str, nLenW, pAnsi, nNeedBuffSize + 1, NULL, NULL);
-	return shared_ptr<char>(pAnsi);
+	string strAnsi(nNeedBuffSize + 1, '\0');
+	
+	nReturnLength = WideCharToMultiByte(CP_ACP, NULL, str, nLenW, strAnsi.data(), nNeedBuffSize + 1, NULL, NULL);
+	return strAnsi;
 }
 
-shared_ptr<char> W2AString_(IN LPCWSTR str, UINT nCodePage)
+string W2AString_(IN LPCWSTR str, UINT nCodePage)
 {
 	int nLenW = wcslen(str);
 	int nNeedBuffSize = ::WideCharToMultiByte(nCodePage, NULL, str, nLenW, NULL, 0, NULL, NULL);
-	char* pAnsi = new char[nNeedBuffSize + 1];
-	ZeroMemory(pAnsi, nNeedBuffSize + 1);
-	WideCharToMultiByte(nCodePage, NULL, str, nLenW, pAnsi, nNeedBuffSize + 1, NULL, NULL);
-	return shared_ptr<char>(pAnsi);
+	string strAnsi = string(nNeedBuffSize + 1,'\0');
+
+	WideCharToMultiByte(nCodePage, NULL, str, nLenW, strAnsi.data(), nNeedBuffSize + 1, NULL, NULL);
+	return strAnsi;
 }
 
-shared_ptr<WCHAR> A2WString(IN LPCSTR str, int& OUT nReturnLength)
+wstring A2WString(IN LPCSTR str, int& OUT nReturnLength)
 {
 	int nLenA = strlen(str);
 	int nNeedBuffSize = ::MultiByteToWideChar(CP_ACP, NULL, str, nLenA, NULL, 0);
+	wstring strUnicode(nNeedBuffSize + 1, '\0');
 
-	WCHAR* pUnicode = new WCHAR[nNeedBuffSize + 1];
-	ZeroMemory(pUnicode, (nNeedBuffSize + 1) * sizeof(WCHAR));
-
-	nReturnLength = MultiByteToWideChar(CP_ACP, 0, str, nLenA, pUnicode, nNeedBuffSize + 1);
-	return shared_ptr<WCHAR>(pUnicode);
+	nReturnLength = MultiByteToWideChar(CP_ACP, 0, str, nLenA, strUnicode.data(), nNeedBuffSize + 1);
+	return strUnicode;
 }
 
-shared_ptr<WCHAR> A2WString_(IN LPCSTR str, UINT nCodePage)
+wstring A2WString_(IN LPCSTR str, UINT nCodePage)
 {
 	int nLenA = strlen(str);
 	int nNeedBuffSize = ::MultiByteToWideChar(nCodePage, NULL, str, nLenA, NULL, 0);
 
-	WCHAR* pUnicode = new WCHAR[nNeedBuffSize + 1];
-	ZeroMemory(pUnicode, (nNeedBuffSize + 1) * sizeof(WCHAR));
-
-	MultiByteToWideChar(nCodePage, 0, str, nLenA, pUnicode, nNeedBuffSize + 1);
-	return shared_ptr<WCHAR>(pUnicode);
+	wstring strUnicode(nNeedBuffSize + 1,'\0');
+	
+	MultiByteToWideChar(nCodePage, 0, str, nLenA, strUnicode.data(), nNeedBuffSize + 1);
+	return strUnicode;
 }
 
 const char* GetOsVersion()

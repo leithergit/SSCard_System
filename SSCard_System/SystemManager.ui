@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">font-family: &quot;思源黑体 CN Regular&quot;;
-font-size: 30px;
+font-size: 24px;
 font-weight: bold;
 line-height: 49px;
 letter-spacing: 1px;
@@ -45,8 +45,8 @@ color: 0
       <widget class="QPushButton" name="pushButton_Save">
        <property name="minimumSize">
         <size>
-         <width>240</width>
-         <height>80</height>
+         <width>200</width>
+         <height>60</height>
         </size>
        </property>
        <property name="text">
@@ -58,8 +58,8 @@ color: 0
       <widget class="QPushButton" name="pushButton_Close">
        <property name="minimumSize">
         <size>
-         <width>240</width>
-         <height>80</height>
+         <width>200</width>
+         <height>60</height>
         </size>
        </property>
        <property name="text">
@@ -71,8 +71,8 @@ color: 0
       <widget class="QPushButton" name="pushButton_Exit">
        <property name="minimumSize">
         <size>
-         <width>240</width>
-         <height>80</height>
+         <width>200</width>
+         <height>60</height>
         </size>
        </property>
        <property name="text">

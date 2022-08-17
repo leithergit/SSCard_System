@@ -178,8 +178,6 @@ void uc_Pay::ThreadReadIDCard()
 {
 	auto tLast = high_resolution_clock::now();
 	QString strError;
-	int nResult = 0;
-	PayResult nPayResult = PayResult::WaitforPay;
 	QString strMessage;
 	IDCardInfo* pIDCard = new IDCardInfo();
 	while (bThreadReadIDCard)

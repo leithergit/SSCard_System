@@ -705,7 +705,8 @@ int DataCenter::TestCard(QString& strMessage)
 			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
-		if (PrinterStatus.fwDevice != 0)
+		if (PrinterStatus.fwDevice != 1 &&
+			PrinterStatus.fwDevice != 0)
 		{
 			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
 			break;
@@ -760,9 +761,11 @@ int DataCenter::TestCard(QString& strMessage)
 			break;
 		}
 		case 6:
-		default:
+			strMessage = QString("堵卡,请联系相关技术人员处理!");
+			break;
+		case 7:		// 不支持卡状态检测
 		{
-			strMessage = QString("发生未知错误,请联系相关技术人员处理!");
+			bSucceed = true;
 			break;
 		}
 		}
@@ -989,54 +992,59 @@ int DataCenter::TestPrinter(QString& strMessage)
 			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
-		if (PrinterStatus.fwDevice != 0)
+		if (PrinterStatus.fwDevice != 1 &&
+			PrinterStatus.fwDevice != 0)
 		{
 			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
 			break;
 		}
-		// 0-无卡；2-卡在内部；3-卡在上电位，4-卡在闸门外 5-堵卡；6-卡片未知
 		bool bSucceed = false;
-		switch (PrinterStatus.fwMedia)
+		if (DevConfig.nPrinterType != ENTRUCT_CD809)
 		{
-		case 0:		// 机内无卡
-		{
-			bSucceed = true;
-			break;
-		}
-		case 1:			// 1-卡在门口:
-		{
-			strMessage = QString("打印机出卡口尚有未取走卡片,请先取走卡片后重新操作!");
-			nResult = 1;
-			break;
-		}
-		case 2:			// 2-卡在内部；
-		case 3:			// 3-卡在上电位
-		case 4:			// 4-卡在闸门外
-		{
-			if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
+			// 0-无卡；2-卡在内部；3-卡在上电位，4-卡在闸门外 5-堵卡；6-卡片未知			
+			switch (PrinterStatus.fwMedia)
 			{
-				strMessage = QString("打印机尚有未取走卡片,尝试将其移动到回收箱失败，错误代码:%1!").arg(szRCode);
+			case 0:		// 机内无卡
+			{
+				bSucceed = true;
 				break;
 			}
-			else
-				bSucceed = true;
-			break;
-		}
+			case 1:			// 1-卡在门口:
+			{
+				strMessage = QString("打印机出卡口尚有未取走卡片,请先取走卡片后重新操作!");
+				nResult = 1;
+				break;
+			}
+			case 2:			// 2-卡在内部；
+			case 3:			// 3-卡在上电位
+			case 4:			// 4-卡在闸门外
+			{
+				if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
+				{
+					strMessage = QString("打印机尚有未取走卡片,尝试将其移动到回收箱失败，错误代码:%1!").arg(szRCode);
+					break;
+				}
+				else
+					bSucceed = true;
+				break;
+			}
 
-		case 5:
-		{
-			strMessage = QString("打印机堵卡,请联系相关技术人员处理!");
-			break;
+			case 5:
+			{
+				strMessage = QString("打印机堵卡,请联系相关技术人员处理!");
+				break;
+			}
+			case 6:
+			default:
+			{
+				strMessage = QString("发生未知错误,请联系相关技术人员处理!");
+				break;
+			}
+			}
+			if (!bSucceed)
+				break;
 		}
-		case 6:
-		default:
-		{
-			strMessage = QString("发生未知错误,请联系相关技术人员处理!");
-			break;
-		}
-		}
-		if (!bSucceed)
-			break;
+		
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 		{
 			bSucceed = false;
@@ -1215,7 +1223,7 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 
 			sscanf_s(pSSCardInfo->strReleaseDate, "%04d%02d%02d", &nYear, &nMonth, &nDay);
 			char szReleaseDate[32] = { 0 };
-			sprintf_s(szReleaseDate, 32, "%d年%d月", nYear, nMonth);
+			sprintf_s(szReleaseDate,32, "%d年%d月", nYear, nMonth);
 			if (QFailed(m_pPrinter->Printer_AddText((char*)UTF8_GBK(szReleaseDate).c_str(), pFieldPos->nAngle, pFieldPos->fxPos, pFieldPos->fyPos, (char*)pCardForm->strFont.c_str(), pCardForm->nFontSize, 0, 0, szRCode)))
 				break;
 		}
@@ -1678,11 +1686,15 @@ bool DataCenter::IsVideoStart()
 {
 	return m_bVideoStarted;
 }
+
 bool DataCenter::OpenCamera()
 {
 	int nRet = -1;
 	do
 	{
+		if (!GetSysConfigure()->DevConfig.nEnableCamera)
+			return true;
+
 		if (m_hCamera)
 		{
 			nRet = LD_RET_OK;
@@ -1721,6 +1733,9 @@ bool DataCenter::StartVideo(HWND hWnd)
 	int nRet = -1;
 	do
 	{
+		if (!GetSysConfigure()->DevConfig.nEnableCamera)
+			return true;
+
 		if (!m_hCamera)
 			break;
 
@@ -1750,6 +1765,9 @@ bool DataCenter::StartVideo(HWND hWnd)
 
 void DataCenter::StopVideo()
 {
+	if (!GetSysConfigure()->DevConfig.nEnableCamera)
+		return ;
+
 	if (!m_hCamera)
 		return;
 

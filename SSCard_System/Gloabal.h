@@ -66,6 +66,7 @@
 #include "../utility/json/CJsonObject.hpp"
 #include "../Update/Update.h"
 #include "../SSCardService/SSCardService.h"
+#include "qpinkeybroad.h"
 
 //宏定义
 #define __STR2__(x) #x
@@ -198,6 +199,7 @@ struct DeviceConfig
 		strPrinter = pSettings->value("Printer").toString().toStdString();
 		strPrinterModule = pSettings->value("PrinterModule").toString().toStdString();
 		strPrinterType = pSettings->value("PrinterType").toString().toStdString();
+		strPinKeybroadModule = pSettings->value("PinKeybroadModule","XZ_F31_API.dll").toString().toStdString();
 		transform(strPrinterType.begin(), strPrinterType.end(), strPrinterType.begin(), ::toupper);
 
 		int nPrinterIndex = 0;
@@ -276,6 +278,7 @@ struct DeviceConfig
 
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
 		nCameraDrv = (CameraDriver)pSettings->value("CameraDriver", 1).toInt();
+		nEnableCamera = pSettings->value("EnableCamera", true).toBool();
 
 		// 		Info() << "Device Cofnigure:\n";
 		// 		Info() << "\t\Printer:" << strPrinter;
@@ -391,6 +394,7 @@ struct DeviceConfig
 	}
 	string		strPrinter;							   // 打印机名
 	string		strPrinterModule;					   // 打印机驱动模块名称，如KT_Printer.dll
+	string		strPinKeybroadModule;						   // 密码键盘模块名称，目前仅支付XZ_F10和XZ_F31
 	PrinterType nPrinterType;                          // 打印机型号代码
 	string      strPrinterType;                        // 打印机型号名
 	int			nDepenseBox;						   // 发卡箱号
@@ -414,6 +418,7 @@ struct DeviceConfig
 
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
 	string		strTerminalCode;					   // 终端唯一识别码	
+	bool		nEnableCamera;							// 是否启用摄像机
 	CameraDriver nCameraDrv = CameraDriver::Driver_DLL;
 public:
 };

@@ -163,6 +163,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;user32.lib;gdi32.lib;advapi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -205,7 +206,7 @@
     </QtUic>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath)  Z:\SSCard_System</Command>
+copy /y $(TargetPath)  Z:\SSCardSystem.Desktop</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>::@call updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>

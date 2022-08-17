@@ -14,6 +14,8 @@
 #define snprintf _snprintf_s
 #endif
 
+#define Unused(x)	 (void)x;
+
 namespace neb
 {
 
@@ -1416,6 +1418,7 @@ namespace neb
 
 	bool CJsonObject::Add(const std::string& strKey, bool bValue, bool bValueAgain)
 	{
+		Unused(bValueAgain);
 		cJSON* pFocusData = NULL;
 		if (m_pJsonData != NULL)
 		{
@@ -2047,6 +2050,7 @@ namespace neb
 
 	bool CJsonObject::Replace(const std::string& strKey, bool bValue, bool bValueAgain)
 	{
+		Unused(bValueAgain);
 		cJSON* pFocusData = NULL;
 		if (m_pJsonData == NULL)
 		{
@@ -2995,6 +2999,7 @@ namespace neb
 
 	bool CJsonObject::Add(int iAnywhere, bool bValue)
 	{
+		Unused(iAnywhere);
 		cJSON* pFocusData = NULL;
 		if (m_pJsonData != NULL)
 		{
@@ -3538,6 +3543,7 @@ namespace neb
 
 	bool CJsonObject::AddAsFirst(int iAnywhere, bool bValue)
 	{
+		Unused(iAnywhere);
 		cJSON* pFocusData = NULL;
 		if (m_pJsonData != NULL)
 		{
@@ -4135,6 +4141,7 @@ namespace neb
 
 	bool CJsonObject::Replace(int iWhich, bool bValue, bool bValueAgain)
 	{
+		Unused(bValueAgain);
 		cJSON* pFocusData = NULL;
 		if (m_pJsonData == NULL)
 		{

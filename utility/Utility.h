@@ -382,23 +382,14 @@ bool IsValidIPAddressW(LPCWSTR szAddress);
 bool IsValidSmsAddressA(CHAR* szSms);
 bool IsValidSmsAddressW(WCHAR* szSms);
 
-#ifdef MYSQL_CHARACTER_UTF8
-#	define MYSQL_CHARACTER_TO_CPLUSPLUS UTF8_TO_UNICODE
-#	define CPLUSPLUS_CHARACTER_TO_MYSQL UNICODE_TO_UTF8
-#else
-#	define MYSQL_CHARACTER_TO_CPLUSPLUS ANSI_TO_UNICODE
-#	define CPLUSPLUS_CHARACTER_TO_MYSQL UNICODE_TO_ANSI
-#endif
-
-
 
 // #define _UTF8(UnicodeText,nLength)		(UTF8StringW(UnicodeText,nLength).get())
 // #define _AnsiString(UnicodeText,nLength)	(W2AString(UnicodeText,nLength).get())
 // #define _UnicodeString(AnsiText,nLength)		(A2WString(AnsiText,nLength).get())
 
-#define _UTF8(UnicodeText)		(UTF8StringW_(UnicodeText).get())
-#define _AnsiString(UnicodeText,CP)	(W2AString_(UnicodeText,CP).get())
-#define _UnicodeString(AnsiText,CP)		(A2WString_(AnsiText,CP).get())
+#define _UTF8(UnicodeText)		(UTF8StringW_(UnicodeText).c_str())
+#define _AnsiString(UnicodeText,CP)	(W2AString_(UnicodeText,CP).c_str())
+#define _UnicodeString(AnsiText,CP)		(A2WString_(AnsiText,CP).c_str())
 
 #ifdef _UNICODE
 #define  _StringT(X)		_UnicodeString(X,CP_ACP)
@@ -407,16 +398,16 @@ bool IsValidSmsAddressW(WCHAR* szSms);
 #endif
 
 
-shared_ptr<char> UTF8StringW(IN LPCWSTR pText, int& OUT nReturnLength);
-shared_ptr<char> W2AString(IN LPCWSTR pText, int& OUT nReturnLength);
-shared_ptr<WCHAR> A2WString(IN LPCSTR pText, int& OUT nReturnLength);
+string UTF8StringW(IN LPCWSTR pText, int& OUT nReturnLength);
+string W2AString(IN LPCWSTR pText, int& OUT nReturnLength);
+wstring A2WString(IN LPCSTR pText, int& OUT nReturnLength);
 
-shared_ptr<char> UTF8StringW_(IN LPCWSTR pText);
-shared_ptr<char> W2AString_(IN LPCWSTR pText, UINT nCodePage = CP_ACP);
-shared_ptr<WCHAR> A2WString_(IN LPCSTR pText, UINT nCodePage = CP_ACP);
+string UTF8StringW_(IN LPCWSTR pText);
+string W2AString_(IN LPCWSTR pText, UINT nCodePage = CP_ACP);
+wstring A2WString_(IN LPCSTR pText, UINT nCodePage = CP_ACP);
 
-shared_ptr<char> UTF8StringA(IN LPCSTR pText, int& OUT nReturnLength);
-shared_ptr<char> UTF8StringA_(IN LPCSTR pText);
+string UTF8StringA(IN LPCSTR pText, int& OUT nReturnLength);
+string UTF8StringA_(IN LPCSTR pText);
 
 const char* GetOsVersion();
 const wchar_t* GetOsVersionW();

@@ -41,6 +41,20 @@ static void SetupExceptionHandler()
 
 }
 
+int TestPrinter(void* pParam)
+{
+	if (!pParam)
+		return -1;
+	int nResult = -1;
+	QString* pStrMessage = (QString*)pParam;
+	if (QFailed(nResult = g_pDataCenter->OpenPrinter(*pStrMessage)))
+	{
+		gInfo() << pStrMessage->toLocal8Bit().data();
+		return -1;
+	}
+	else
+		return 0;
+}
 const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
 int main(int argc, char* argv[])
@@ -139,7 +153,8 @@ int main(int argc, char* argv[])
 	ofs.close();
 
 	curl_global_init(CURL_GLOBAL_WIN32);
-
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	
 	g_pDataCenter = make_shared<DataCenter>();
 	QString strMessage;
 	int nResult = -1;
@@ -190,10 +205,11 @@ int main(int argc, char* argv[])
 	jsonT.Get("pwd", strpwd);
 	jsonT.Get("city", strcity);
 
-	WaitingProgress WaitingUI;
-	WaitingUI.show();
-	a.exec();
-	if (!WaitingUI.bPrinterReady)
+	WaitingProgress WaitingUI(TestPrinter,		// 执行回调
+		&strMessage,		// 参数
+		g_pDataCenter->GetSysConfigure()->nTimeWaitForPrinter,	// 超时
+		QString("正在初始化打印机:%1%"));	// 显示格式
+	if (WaitingUI.exec() == QDialog::Rejected)
 	{
 		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
 		return 0;
@@ -213,23 +229,23 @@ int main(int argc, char* argv[])
 
 	auto listScreens = QApplication::screens();
 	g_pCurScreen = listScreens.at(0);
-	if (listScreens.size() > 1)		// 若多块屏幕，只在1080p的屏幕上显示
-	{
-		for (auto Screen : listScreens)
-		{
-			if (Screen->size().height() == 1080 && Screen->size().width() == 1920)
-			{
-				g_pCurScreen = Screen;
-				break;
-			}
-		}
-	}
+	//if (listScreens.size() > 1)		// 若多块屏幕，只在1080p的屏幕上显示
+	//{
+	//	for (auto Screen : listScreens)
+	//	{
+	//		if (Screen->size().height() == 1080 && Screen->size().width() == 1920)
+	//		{
+	//			g_pCurScreen = Screen;
+	//			break;
+	//		}
+	//	}
+	//}
 
 	w.showFullScreen();
 	w.setGeometry(g_pCurScreen->geometry());
-	w.showMaximized();
-	QRect size(1, 1, 1918, 1078);
-	w.setGeometry(size);
+	//w.showMaximized();
+	//QRect size(1, 1, 1918, 1078);
+	//w.setGeometry(size);
 	w.show();
 	int nRes = a.exec();
 	QString strInfo = "系统正常关闭!";

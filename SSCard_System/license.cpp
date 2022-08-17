@@ -422,7 +422,7 @@ bool GetHardwareCode2(std::string& strMachineCode)
 		return false;
 	}
 	char szResult[1024] = { 0 };
-	if (g_pDataCenter->GetPrinter()->Printer_ExtraCommand("Rsn", szResult))
+	if (g_pDataCenter->GetPrinter()->Printer_ExtraCommand("getSN", szResult))
 	{
 		gInfo() << QString("发送命令Rsn失败:%1").arg(szResult).toLocal8Bit().data();
 		return false;
