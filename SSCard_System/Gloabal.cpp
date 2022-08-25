@@ -1514,6 +1514,7 @@ void DataCenter::ResetIDData()
 	strSSCardNewPassword = "";
 	strCardMakeProgress = "";
 	strPayCode = "";
+	strTransTime = "";
 	bWithoutIDCard = false;
 	pIDCard.reset();
 	//if (pSSCardInfo && pSSCardInfo->strPhoto)

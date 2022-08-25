@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include "Gloabal.h"
 #include "sys_sscardapitest.h"
+#include "uc_pay.h"
 #include <thread>
 #include "mainwindow.h"
 
@@ -25,8 +26,21 @@ SystemManager::SystemManager(QWidget* parent)
 	ui.tabWidget->addTab(new DeviceManager, "设备管理");
 	ui.tabWidget->addTab(new RegionConfigure, "区域设置");
 	//ui.tabWidget->addTab(new PageConfigure, "页面设置");	
+	
 	ui.tabWidget->addTab(new logManager, "日志管理");
 	ui.tabWidget->addTab(new OtherOptions, "其它选项");
+	uc_Pay* pPagePay = new uc_Pay(nullptr, "", Page_Payment, nullptr);
+	ui.tabWidget->addTab(pPagePay, "支付测试");
+	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	LoadTestIDData(pIDCard, pSSCardInfo);
+	LoadSSCardData(pSSCardInfo, "./Debug/Carddata_362331197612164214.ini");
+	g_pDataCenter->SetIDCardInfo(pIDCard);
+	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+	g_pDataCenter->strMobilePhone = "18017348763";
+	pPagePay->ProcessBussiness();
+	
+
 	//ui.tabWidget->addTab(new Sys_SSCardAPITest, "新卡测试");
 	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint));
 	showFullScreen();

@@ -87,16 +87,7 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 	}
 	QString strInfo = QString("queryPayment Succeed:%1.").arg(szStatus);
 	gInfo() << gQStr(strInfo);
-	// 	if ((szStatus[0] >= '0' && szStatus[0] <= '9') &&
-	// 		(szStatus[1] >= '0' && szStatus[1] <= '9'))
-	// 	{
-	// 		nStatus = strtolong(szStatus, 10, 2);
-	// 	}
-	// 	else
-	// 	{
-	// 		strMessage = szStatus;
-	// 		return -1;
-	// 	}
+
 	if (strcmp(_strupr(szStatus), "OK") == 0)
 	{
 		nStatus = Pay_Succeed;
@@ -105,6 +96,7 @@ int     QueryPayment(QString& strMessage, int& nStatus)
 		nStatus = Pay_Not;
 	return 0;
 }
+
 
 void	GBKStringtoUrlString(const char* szGBKString, string& strUrlString)
 {
@@ -203,6 +195,97 @@ int     RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& 
 	return -1;
 }
 
+int     RequestPaymentUrl2(QString& strPaymentUrl, QString& strPayCode, QString& strTransTime, QString& strMessage)
+{
+	Q_UNUSED(strMessage);
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	if (!pIDCard)
+	{
+		strMessage = "身份证信息无效!";
+		return -1;
+	}
+	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	if (!pSSCardInfo)
+	{
+		strMessage = "社保卡信息无效!";
+		return -1;
+	}
+	// GET http://ip:port/paymentbusiness/getPayCode?payerName={name}&payerTel={tel}&payerCard={cardID}&amount={amount}&orgCode={orgCode}&socialCard={socialCard}
+	PaymentOpt& PayOption = g_pDataCenter->GetSysConfigure()->PaymentConfig;
+	RegionInfo& RegInfo = g_pDataCenter->GetSysConfigure()->Region;
+	//std::string szUrl = "http://10.126.131.203:8080/paymentbusiness/getPayCode?payerName=胡杰&payerTel=13637281234&payerCard=410700199907110037&amount=16";
+	std::string strUrl = "http://";
+	strUrl += PayOption.strHost;				strUrl += ":";
+	strUrl += PayOption.strPort;
+	strUrl += "/paymentbusiness/getPayCode?payerName=";
+	string strNameUrl;
+	GBKStringtoUrlString((const char*)pIDCard->szName, strNameUrl);
+	strUrl += strNameUrl;						strUrl += "&";
+	strUrl += "payerTel=";
+	strUrl += g_pDataCenter->strMobilePhone;	strUrl += "&";
+	strUrl += "payerCard=";
+	strUrl += (char*)pIDCard->szIdentity;		strUrl += "&";
+	strUrl += "amount=";
+	strUrl += PayOption.strAmount;				strUrl += "&";
+	strUrl += "orgCode=";
+	strUrl += RegInfo.strAgency;				strUrl += "&";
+	strUrl +="socialCard=";
+	strUrl += pSSCardInfo->strCardNum;
+	gInfo() << "Payment request url = " << strUrl.c_str();
+
+	string strRespond, strMessage1;
+	int nRetry = 0;
+	do
+	{
+		if (SendHttpRequest("GET", strUrl, strRespond, strMessage1) == 0)
+		{
+			gInfo() << strRespond;
+			QString strRes = strRespond.c_str();
+			//QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
+			QJsonParseError jsonParseError;
+			QJsonDocument jsonDocument(QJsonDocument::fromJson(strRes.toLatin1(), &jsonParseError));
+			if (QJsonParseError::NoError != jsonParseError.error)
+			{
+				strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
+				gInfo() << gQStr(strMessage);
+				return -1;
+			}
+			QJsonObject rootObject = jsonDocument.object();
+			if (!rootObject.keys().contains("msg") ||
+				!rootObject.keys().contains("code") ||
+				!rootObject.keys().contains("payCode") ||
+				!rootObject.keys().contains("transTime"))
+			{
+				gInfo() << "There is no target value in the payment respond!";
+				return -1;
+			}
+			QJsonValue jsCode = rootObject.value("code");
+			QJsonValue jsMsg = rootObject.value("msg");
+			QJsonValue jsPayCode = rootObject.value("payCode");
+			QJsonValue jsTransTime = rootObject.value("transTime");
+			int nCode = jsCode.toInt();
+			if (nCode != 0)
+			{
+				strMessage = QString("查询结果,code = %1").arg(nCode);
+				gInfo() << gQStr(strMessage);
+				return -1;
+			}
+			strPayCode = jsPayCode.toString();
+			strPaymentUrl = jsMsg.toString();
+			strTransTime = jsTransTime.toString();
+			gInfo() << gQStr(strPaymentUrl);
+			return 0;
+		}
+		else
+		{
+			strMessage = strMessage1.c_str();
+			gError() << gQStr(strMessage);
+			nRetry++;
+		}
+	} while (nRetry < 3);
+	return -1;
+}
+
 // 查询支付结果
 // nStatus:0 - 待支付 1 - 待确认 2 - 支付完成 3 - 支付失败 4 - 订单不存在 5 - 订单取消
 int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
@@ -244,6 +327,94 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 		strMessage = rootObject.value("msg").toString();
 		nStatus = (PayResult)strMessage.toInt();
 		gInfo() << "code=" << (int)nStatus << gQStr(strMessage);
+		return 0;
+	}
+	else
+	{
+		strMessage = strMessage1.c_str();
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+}
+
+string string2Url(string strUrl)
+{
+	string strReturn;
+	char szBuffer[16] = { 0 };
+	for (auto var : strUrl)
+	{
+		if (('0' <= var && var <= '9') ||
+			('a' <= var && var <= 'z') ||
+			('A' <= var && var <= 'Z') ||
+			(var == '/' || var == '.'))
+			strReturn += var;
+		else
+		{
+			sprintf_s(szBuffer, 16, "%02X", (unsigned char)var);
+			strReturn += '%';
+			strReturn += szBuffer;
+			ZeroMemory(szBuffer, 16);
+		}
+	}
+	return strReturn;
+}
+
+int  queryPayResult2(string& strPayCode, string& strTransTime, QString& strMessage, PayResult& nStatus)
+{
+	// http://ip:port/paymentbusiness/pollForPayResult?payCode=code
+	PaymentOpt& PayOption = g_pDataCenter->GetSysConfigure()->PaymentConfig;
+	//std::string szUrl = "http://10.126.131.203:8080/paymentbusiness/getPayCode?payerName=胡杰&payerTel=13637281234&payerCard=410700199907110037&amount=16";
+	// http://10.125.40.244:8080/paymentbusiness/pollForPayResult?payCode=4100002110005553036m
+	std::string strUrl = "http://";
+	strUrl += PayOption.strHost;				strUrl += ":";
+	strUrl += PayOption.strPort;
+	strUrl += "/paymentbusiness/queryPayResult?payCode=";
+	strUrl += strPayCode;
+	strUrl += "&transTime=";
+	
+	strUrl += string2Url(strTransTime);
+
+	gInfo() << "PayResult request url = " << strUrl.c_str();
+	// 以下为测试用url已付费
+	// strUrl = "http://10.126.131.203:8080/paymentbusiness/queryPayResult?payCode=41000022100088855563&transTime=2022%2D08%2D01%2018%3A06%3A59";
+
+	string strRespond, strMessage1;
+	// http://10.126.131.203:8080/paymentbusiness/queryPayResult?payCode=4100002210008802544h&transTime=2022-07-25 15:23:39
+	if (QSucceed(SendHttpRequest("GET", strUrl, strRespond, strMessage1)))
+	{
+		gInfo() << strRespond;
+		QString strHttpRes = strRespond.c_str();
+		//QStringList strHttpRes = strRes.split("\r\n", Qt::SkipEmptyParts);
+		QJsonParseError jsonParseError;
+		QJsonDocument jsonDocument(QJsonDocument::fromJson(strHttpRes.toLatin1(), &jsonParseError));
+		if (QJsonParseError::NoError != jsonParseError.error)
+		{
+			strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
+			gInfo() << gQStr(strMessage);
+			return -1;
+		}
+		QJsonObject rootObject = jsonDocument.object();
+		if (!rootObject.keys().contains("msg") ||
+			!rootObject.keys().contains("code") ||
+			!rootObject.keys().contains("status"))
+		{
+			gInfo() << "There is no  No target value in the PayResult respond!";
+			return -1;
+		}
+		int nCode = rootObject.value("code").toInt();
+		if (nCode)
+		{
+			gError() << "pay code:" << nCode << ",返回代码非0";
+			return -1;
+		}
+		strMessage = rootObject.value("msg").toString();
+
+		jsonDocument = QJsonDocument::fromJson(strMessage.toLatin1(), &jsonParseError);
+		rootObject = jsonDocument.object();
+		QString strStatus = rootObject.value("stats").toString();
+		nStatus = (PayResult)strStatus.toUInt();
+
+		gInfo() << gQStr(strMessage);
 		return 0;
 	}
 	else
@@ -899,7 +1070,6 @@ void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
 		if (!pSSCardInfo)
 			return;
 
-		bool bLoaded = false;
 		QString strAppPath = QCoreApplication::applicationDirPath();
 		strAppPath += "/Debug";
 

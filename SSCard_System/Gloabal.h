@@ -611,6 +611,9 @@ struct PaymentOpt
 		strFieldCardID = pSettings->value("FieldCard", "").toString().toStdString();
 		strFiledamount = pSettings->value("Filedamount", "").toString().toStdString();
 		strPayResultUrl = pSettings->value("PayResultUrl", "").toString().toStdString();
+		strTransTime = pSettings->value("TransTime").toString().toStdString();
+		strAgentCode = pSettings->value("FieldAgent", "").toString().toStdString();
+		strSocialCard = pSettings->value("FieldSocialCard", "").toString().toStdString();
 		strAmount = pSettings->value("amount", "").toString().toStdString();
 		pSettings->endGroup();
 	}
@@ -632,6 +635,9 @@ struct PaymentOpt
 	string	strFiledamount;
 	string  strAmount;
 	string  strPayResultUrl;
+	string	strTransTime;
+	string	strAgentCode;
+	string	strSocialCard;
 };
 
 struct SysConfig
@@ -942,6 +948,7 @@ public:
 	string         strSSCardNewPassword;
 	string		   strCardMakeProgress;
 	string		   strPayCode;
+	string		   strTransTime;
 	string		   strCardVersion = "3.0";
 	string		   strTitle = "社保卡制卡系统";
 	bool		   bDebug;

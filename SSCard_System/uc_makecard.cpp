@@ -390,18 +390,24 @@ void uc_MakeCard::ThreadWork()
 
 void uc_MakeCard::on_pushButton_OK_clicked()
 {
+	if (m_pWorkThread)
+	{
+		m_bWorkThreadRunning = false;
+		if (m_pWorkThread->joinable())
+			m_pWorkThread->join();
+		delete m_pWorkThread;
+	}
+	
+	m_bWorkThreadRunning = true;
+	m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
 	if (!m_pWorkThread)
 	{
-		m_bWorkThreadRunning = true;
-		m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
-		if (!m_pWorkThread)
-		{
-			QString strError = QString("内存不足,创建制卡线程失败!");
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-		}
-		ui->pushButton_OK->setEnabled(false);
+		QString strError = QString("内存不足,创建制卡线程失败!");
+		gError() << strError.toLocal8Bit().data();
+		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 	}
+	ui->pushButton_OK->setEnabled(false);
+	
 }
 
 void uc_MakeCard::on_EnableButtonOK(bool bEnable)

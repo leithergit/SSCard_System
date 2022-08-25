@@ -27,8 +27,12 @@ int  QueryPayment(QString& strMessage, int& strPayStatus);
 
 int  RequestPaymentUrl(QString& strPaymentUrl, QString& strPayCode, QString& strMessage);
 
+int  RequestPaymentUrl2(QString& strPaymentUrl, QString& strPayCode, QString& strTransTime, QString& strMessage);
+
 // 0-待支付 1-待确认 2-支付完成 3-支付失败 4-订单不存在 5-订单取消
 int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus);
+
+int  queryPayResult2(string& strPayCode, string& strTransTime, QString& strMessage, PayResult& nStatus);
 
 // nStatus = 0,成功，1 已缴费
 int  ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);

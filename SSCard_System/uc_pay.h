@@ -22,6 +22,7 @@ public:
 	int     Pay(QString& strError);
 	void    ThreadWork();
 	int     uc_ReqestPaymentQR(QString& strMessage, QString& strPayCode, QImage& Image);
+	int     uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& Image);
 	int     uc_QueryPayment(QString& strMessage, int& nPayStatus);
 	int     GetQRCodeStorePath(QString& strFilePath);
 	// 	int     uc_ApplyCardReplacement(QString& strMessage, int nStatus);
@@ -42,6 +43,14 @@ public:
 	virtual void ShutDown() override
 	{
 		gInfo() << __FUNCTION__;
+		bThreadReadIDCard = false;
+		if (pThreadReadIDCard && pThreadReadIDCard->joinable())
+		{
+			pThreadReadIDCard->join();
+			delete pThreadReadIDCard;
+			pThreadReadIDCard = nullptr;
+		}
+
 		m_bWorkThreadRunning = false;
 		if (m_pWorkThread && m_pWorkThread->joinable())
 		{

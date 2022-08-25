@@ -30,6 +30,7 @@ NewCard::NewCard(QWidget* parent) :
 		AddPage(new uc_ReadIDCard(ui->label_step, "newcard1.png", Page_ReaderIDCard));				// step 0
 		AddPage(new uc_FaceCapture(ui->label_step, "newcard2.png", Page_FaceCapture));				// step 1
 		AddPage(new uc_InputIDCardInfo(ui->label_step, "newcard3.png", Page_InputIDCardInfo));		// step 1
+		//AddPage(new uc_(ui->label_step, "newcard3.png", Page_CommitNewInfo));		// step 1
 		AddPage(new uc_MakeCard(ui->label_step, "newcard4.png", Page_MakeCard));					// step 5
 		AddPage(new uc_AdforFinance(nullptr, "", Page_AdforFinance));									// step 6
 		AddPage(new OperatorSucceed(nullptr, "", Page_Succeed));

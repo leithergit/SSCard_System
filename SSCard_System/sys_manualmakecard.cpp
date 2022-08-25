@@ -757,7 +757,6 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 	int nResult = -1;
 	QString strMessage;
 
-	int nStatus = 0;
 	QString strInfo;
 	SSCardInfoPtr pSSCardInfo;
 
@@ -800,54 +799,54 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 		nResult = 0;
 	} while (0);
 
-//	if (QFailed(nResult))
-//	{
-//		gInfo() << gQStr(strMessage);
-//		do
-//		{
-//			gInfo() << "Try to CancelMarkCard";
-//			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
-//			{
-//				strMessage = QString("取消标注失败:%1").arg(strMessage);
-//				gInfo() << gQStr(strMessage);
-//				nResult = -1;
-//				break;
-//			}
-//
-//		} while (0);
-//
-//		gError() << strMessage.toLocal8Bit().data();
-//		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-//		return;
-//	}
-//	gInfo() << gQStr(QString("写卡，打印成功"));
-//	nResult = -1;
-//	do
-//	{
-//		// 数据回盘
-//		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
-//		{
-//			gError() << strMessage.toLocal8Bit().data();
-//			break;
-//		}
-//#pragma Warning("回盘失败如何处理？")
-//		if (nStatus != 0 && nStatus != 1)
-//			break;
-//
-//		// 启用
-//		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
-//		{
-//			gError() << strMessage.toLocal8Bit().data();
-//			break;
-//		}
-//		if (nStatus != 0 && nStatus != 1)
-//			break;
-//
-//		nResult = 0;
-//	} while (0);
-//
-//	char* szResCode[128] = { 0 };
-//	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
+	//	if (QFailed(nResult))
+	//	{
+	//		gInfo() << gQStr(strMessage);
+	//		do
+	//		{
+	//			gInfo() << "Try to CancelMarkCard";
+	//			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
+	//			{
+	//				strMessage = QString("取消标注失败:%1").arg(strMessage);
+	//				gInfo() << gQStr(strMessage);
+	//				nResult = -1;
+	//				break;
+	//			}
+	//
+	//		} while (0);
+	//
+	//		gError() << strMessage.toLocal8Bit().data();
+	//		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+	//		return;
+	//	}
+	//	gInfo() << gQStr(QString("写卡，打印成功"));
+	//	nResult = -1;
+	//	do
+	//	{
+	//		// 数据回盘
+	//		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+	//		{
+	//			gError() << strMessage.toLocal8Bit().data();
+	//			break;
+	//		}
+	//#pragma Warning("回盘失败如何处理？")
+	//		if (nStatus != 0 && nStatus != 1)
+	//			break;
+	//
+	//		// 启用
+	//		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+	//		{
+	//			gError() << strMessage.toLocal8Bit().data();
+	//			break;
+	//		}
+	//		if (nStatus != 0 && nStatus != 1)
+	//			break;
+	//
+	//		nResult = 0;
+	//	} while (0);
+	//
+	//	char* szResCode[128] = { 0 };
+	//	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
 
 	if (QFailed(nResult))
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);

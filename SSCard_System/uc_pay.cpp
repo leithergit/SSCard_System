@@ -51,11 +51,12 @@ int uc_Pay::ProcessBussiness()
 		return -1;
 	}
 	QString strPayCode;
+	QString strTransTime;
 	switch (m_nPayStatus)
 	{
 	case Pay_Not:
 	{
-		int nRespond = uc_ReqestPaymentQR(strMessage, strPayCode, QRImage);
+		int nRespond = uc_ReqestPaymentQR2(strMessage, strPayCode, strTransTime, QRImage);
 		if (QFailed(nRespond))
 		{
 			gError() << strMessage.toLocal8Bit().data();
@@ -72,6 +73,7 @@ int uc_Pay::ProcessBussiness()
 			return -1;
 		}
 		g_pDataCenter->strPayCode = strPayCode.toStdString();
+		g_pDataCenter->strTransTime = strTransTime.toStdString();
 		// 保存二维码图像，并显示
 		QRImage.save(strQRPath);
 		QString strQSS = QString("border-image: url(%1)").arg(strQRPath);
@@ -93,14 +95,14 @@ int uc_Pay::ProcessBussiness()
 	}
 	}
 
-	if (g_pDataCenter->GetAdminConfigure().size())
-	{
-		if (!m_pWorkThread)
-		{
-			bThreadReadIDCard = true;
-			pThreadReadIDCard = new std::thread(&uc_Pay::ThreadReadIDCard, this);
-		}
-	}
+	//if (g_pDataCenter->GetAdminConfigure().size())
+	//{
+	//	if (!pThreadReadIDCard)
+	//	{
+	//		bThreadReadIDCard = true;
+	//		pThreadReadIDCard = new std::thread(&uc_Pay::ThreadReadIDCard, this);
+	//	}
+	//}
 	if (!m_pWorkThread)
 	{
 		m_bWorkThreadRunning = true;
@@ -139,6 +141,28 @@ int  uc_Pay::uc_ReqestPaymentQR(QString& strMessage, QString& strPayCode, QImage
 	}
 }
 
+int uc_Pay::uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage)
+{
+	int nRespond = -1;
+	QString strPaymentUrl;
+
+	nRespond = RequestPaymentUrl2(strPaymentUrl, strPayCode, strTransTime, strMessage);
+	if (QSucceed(nRespond))
+	{
+		if (QFailed(QREnncodeImage(strPaymentUrl, 2, QRImage)))
+		{
+			return Failed_QREnocode;
+		}
+		else
+			return  0;
+	}
+	else
+	{
+		strMessage = QString("查询支付二维码失败:%1").arg(strMessage);
+		return -1;
+	}
+}
+
 bool Delay(bool& bFlag, int nDelay, int nStep = 100)
 {
 	if (nDelay <= nStep)
@@ -161,14 +185,8 @@ bool Delay(bool& bFlag, int nDelay, int nStep = 100)
 
 void uc_Pay::On_SkipPay()
 {
-	bThreadReadIDCard = false;
 	bSkipPay = true;
-	if (pThreadReadIDCard && pThreadReadIDCard->joinable())
-	{
-		pThreadReadIDCard->join();
-		delete pThreadReadIDCard;
-		pThreadReadIDCard = nullptr;
-	}
+
 	ShutDown();
 	QString strMessage = "跳过费用支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
 	emit ShowMaskWidget("操作成功", strMessage, Success, Switch_NextPage);
@@ -178,8 +196,7 @@ void uc_Pay::ThreadReadIDCard()
 {
 	auto tLast = high_resolution_clock::now();
 	QString strError;
-	int nResult = 0;
-	PayResult nPayResult = PayResult::WaitforPay;
+
 	QString strMessage;
 	IDCardInfo* pIDCard = new IDCardInfo();
 	while (bThreadReadIDCard)
@@ -256,7 +273,7 @@ void uc_Pay::ThreadWork()
 
 	while (m_bWorkThreadRunning)
 	{
-		nResult = queryPayResult(g_pDataCenter->strPayCode, strMessage, nPayResult);				// 查询支付结果
+		nResult = queryPayResult2(g_pDataCenter->strPayCode, g_pDataCenter->strTransTime, strMessage, nPayResult);				// 查询支付结果
 		if (QFailed(nResult))
 		{
 			if (!Delay(m_bWorkThreadRunning, pSysConfig->PaymentConfig.nQueryPayFailedInterval))
