@@ -279,6 +279,10 @@ struct DeviceConfig
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
 		nCameraDrv = (CameraDriver)pSettings->value("CameraDriver", 1).toInt();
 		nEnableCamera = pSettings->value("EnableCamera", true).toBool();
+		strTicketPrinter = pSettings->value("TicketPrinter", "").toString().toStdString();
+		strTicketTitle = pSettings->value("TicketTitle", "").toString().toStdString();
+		nTicketPrinterX = pSettings->value("TicketPrinterX", 50).toInt();
+		nTicketPrinterY = pSettings->value("TicketPrinterY", 160).toInt();
 
 		// 		Info() << "Device Cofnigure:\n";
 		// 		Info() << "\t\Printer:" << strPrinter;
@@ -420,6 +424,10 @@ struct DeviceConfig
 	string		strTerminalCode;					   // 终端唯一识别码	
 	bool		nEnableCamera;							// 是否启用摄像机
 	CameraDriver nCameraDrv = CameraDriver::Driver_DLL;
+	string		strTicketPrinter;						// 小票打印机
+	string		strTicketTitle;							// 小票标题
+	int			nTicketPrinterX = 50;
+	int			nTicketPrinterY = 160;
 public:
 };
 
@@ -992,12 +1000,12 @@ public:
 
 	int  OpenDevice(QString& strMessage);
 
-	int OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
+	int OpenCardPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 
+	int OpenCardPrinter(QString& strMessage);
+	
 	void CloseDevice();
-
-	int OpenPrinter(QString& strMessage);
-
+	
 	int OpenSSCardReader(QString& strMessage);
 
 	int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage);
@@ -1057,6 +1065,8 @@ public:
 	int	 QuerySSCardStatus(SSCardInfoPtr& pSSCardInfo, QString& strMessage);
 
 	bool LoadAdminConfigure();
+	
+	bool PrintTicket(QString& strMessage);
 
 	vector<IDCardInfoPtr>& GetAdminConfigure()
 	{

@@ -361,7 +361,7 @@ void Sys_ManualMakeCard::ProceBatchLock()
 	{
 		if (!g_pDataCenter->GetPrinter())
 		{
-			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+			if (QFailed(g_pDataCenter->OpenCardPrinter(strMessage)))
 				break;
 		}
 		if (!g_pDataCenter->GetSSCardReader())
@@ -494,7 +494,7 @@ void Sys_ManualMakeCard::PrintPhoto()
 
 		if (!g_pDataCenter->GetPrinter())
 		{
-			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+			if (QFailed(g_pDataCenter->OpenCardPrinter(strMessage)))
 				break;
 		}
 		if (!g_pDataCenter->GetSSCardReader())
@@ -550,7 +550,7 @@ void Sys_ManualMakeCard::EnableCard()
 
 		if (!g_pDataCenter->GetPrinter())
 		{
-			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+			if (QFailed(g_pDataCenter->OpenCardPrinter(strMessage)))
 				break;
 		}
 		if (!g_pDataCenter->GetSSCardReader())
@@ -659,7 +659,7 @@ void Sys_ManualMakeCard::PrintCardData()
 
 		if (!g_pDataCenter->GetPrinter())
 		{
-			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+			if (QFailed(g_pDataCenter->OpenCardPrinter(strMessage)))
 				break;
 		}
 		if (!g_pDataCenter->GetSSCardReader())
@@ -769,7 +769,7 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 
 		if (!g_pDataCenter->GetPrinter())
 		{
-			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+			if (QFailed(g_pDataCenter->OpenCardPrinter(strMessage)))
 				break;
 		}
 		if (!g_pDataCenter->GetSSCardReader())

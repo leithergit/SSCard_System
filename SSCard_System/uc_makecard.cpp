@@ -67,7 +67,7 @@ int uc_MakeCard::ProcessBussiness()
 	ui->pushButton_OK->setText("确定");
 	if (!g_pDataCenter->GetPrinter())
 	{
-		if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+		if (QFailed(g_pDataCenter->OpenCardPrinter(strMessage)))
 		{
 			gError() << gQStr(strMessage);
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
@@ -374,7 +374,7 @@ void uc_MakeCard::ThreadWork()
 	} while (0);
 
 	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
-
+	g_pDataCenter->PrintTicket(strMessage);
 	emit UpdateProgress(MP_RejectCard);
 	this_thread::sleep_for(chrono::milliseconds(2000));
 	if (QFailed(nResult))
@@ -384,24 +384,29 @@ void uc_MakeCard::ThreadWork()
 	}
 	else
 	{
-		emit ShowMaskWidget("提示", "制卡成功,请及时取走卡片", Success, Return_MainPage);
+		emit ShowMaskWidget("提示", "制卡成功,请及时取走卡片和小票", Success, Return_MainPage);
 	}
 }
 
 void uc_MakeCard::on_pushButton_OK_clicked()
 {
+	if (m_pWorkThread)
+	{
+		m_bWorkThreadRunning = false;
+		if (m_pWorkThread->joinable())
+			m_pWorkThread->join();
+		delete m_pWorkThread;
+	}
+
+	m_bWorkThreadRunning = true;
+	m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
 	if (!m_pWorkThread)
 	{
-		m_bWorkThreadRunning = true;
-		m_pWorkThread = new std::thread(&uc_MakeCard::ThreadWork, this);
-		if (!m_pWorkThread)
-		{
-			QString strError = QString("内存不足,创建制卡线程失败!");
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
-		}
-		ui->pushButton_OK->setEnabled(false);
+		QString strError = QString("内存不足,创建制卡线程失败!");
+		gError() << strError.toLocal8Bit().data();
+		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
 	}
+	ui->pushButton_OK->setEnabled(false);
 }
 
 void uc_MakeCard::on_EnableButtonOK(bool bEnable)

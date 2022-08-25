@@ -12,6 +12,7 @@
 #include "../update/Update.h"
 #include "qstackpage.h"
 #include "idcard_api.h"
+#include <winspool.h>
 
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -148,6 +149,67 @@ vector<NationaltyCode> g_vecNationCode = {
 			{ "90","外籍人士" },
 			{ "99","其他" }
 };
+
+
+BOOL GetPrinterStatus(HANDLE hPrinter, DWORD* pStatus)
+{
+	DWORD cByteNeeded = 0, cByteUsed;
+	PRINTER_INFO_2* pPrinterInfo = NULL;
+	BOOL bReturn = FALSE;
+	do
+	{
+		/* Get the buffer size needed. */
+		if (!GetPrinter(hPrinter, 2, NULL, 0, &cByteNeeded) && GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+			break;
+
+		pPrinterInfo = (PRINTER_INFO_2*)malloc(cByteNeeded);
+		if (!(pPrinterInfo))
+			break;
+
+		/* Get the printer information. */
+		if (!GetPrinter(hPrinter, 2, (LPBYTE)pPrinterInfo, cByteNeeded, &cByteUsed))
+			break;
+
+		*pStatus = pPrinterInfo->Status;
+		bReturn = TRUE;
+
+	} while (0);
+	if (pPrinterInfo)
+		free(pPrinterInfo);;
+	return bReturn;
+}
+
+BOOL CheckPrinterStatus(HANDLE hPrinter)
+{
+	if (NULL == hPrinter)
+		return FALSE;
+
+	DWORD		dwPrinterStatus;
+
+	if (!GetPrinterStatus(hPrinter, &dwPrinterStatus))
+	{
+		return FALSE;
+	}
+
+	if (dwPrinterStatus &
+		(PRINTER_STATUS_PAUSED |
+			PRINTER_STATUS_ERROR |//打印出错
+			PRINTER_STATUS_PAPER_JAM |//卡纸
+			PRINTER_STATUS_PAPER_OUT |
+			PRINTER_STATUS_PAPER_PROBLEM |//打印纸出现问题
+			PRINTER_STATUS_OUTPUT_BIN_FULL |//打印输出已满
+			PRINTER_STATUS_NOT_AVAILABLE |//打印机不可用
+			PRINTER_STATUS_NO_TONER |//没有墨粉
+			PRINTER_STATUS_OUT_OF_MEMORY |//打印内存出错
+			PRINTER_STATUS_OFFLINE |//未联机
+			PRINTER_STATUS_DOOR_OPEN))//打印机的门是开的
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+
 DataCenter::DataCenter()
 {
 	DVTGKLDCam_Init();
@@ -396,7 +458,7 @@ int  DataCenter::ReaderIDCard(IDCardInfo* pIDCard)
 int DataCenter::OpenDevice(QString& strMessage)
 {
 	int nResult = -1;
-	if (QFailed(nResult = OpenPrinter(strMessage)))
+	if (QFailed(nResult = OpenCardPrinter(strMessage)))
 	{
 		gError() << gQStr(strMessage);
 		return nResult;
@@ -410,7 +472,7 @@ int DataCenter::OpenDevice(QString& strMessage)
 	return 0;
 }
 
-int DataCenter::OpenPrinter(QString& strMessage)
+int DataCenter::OpenCardPrinter(QString& strMessage)
 {
 	int nResult = -1;
 	char szRCode[32] = { 0 };
@@ -472,7 +534,6 @@ int DataCenter::OpenPrinter(QString& strMessage)
 			m_pPrinter = nullptr;
 			return -1;
 		}
-
 		else
 			return 0;
 	}
@@ -484,7 +545,7 @@ int DataCenter::OpenPrinter(QString& strMessage)
 	}
 }
 
-int DataCenter::OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
+int DataCenter::OpenCardPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage)
 {
 	int nResult = -1;
 	char szRCode[32] = { 0 };
@@ -1273,6 +1334,127 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 
 	} while (0);
 	return nResult;
+}
+
+#define BreakMessage(m,x)	m=x;break;
+bool DataCenter::PrintTicket(QString& strMessage)
+{
+	DeviceConfig& DevConfig = pSysConfig->DevConfig;
+	RegionInfo& regInfo = pSysConfig->Region;
+	HDC hdcprint = nullptr; // 定义一个设备环境句柄
+	HANDLE hPrinter = nullptr;
+	bool bResult = false;
+	do 
+	{
+		if (!DevConfig.strTicketPrinter.size())
+		{
+			BreakMessage(strMessage, "未配置小票打印机!");
+		}
+		if (!pSSCardInfo)
+		{
+			BreakMessage(strMessage, "社保卡数据不可用!");
+		}
+		
+		//定义一个打印作业
+		DOCINFOA di = { sizeof(DOCINFO),"小票数据",NULL };
+		
+		PRINTER_DEFAULTSA pd;
+		ZeroMemory(&pd, sizeof(pd));
+		pd.DesiredAccess = PRINTER_ALL_ACCESS;
+
+		if (!OpenPrinterA((LPSTR)DevConfig.strTicketPrinter.c_str(), &hPrinter, &pd) || !hPrinter)
+		{
+			BreakMessage(strMessage, "打开小票打印机失败!");
+		}
+		if (!CheckPrinterStatus(hPrinter))
+		{
+			BreakMessage(strMessage, "小票打印机未就绪!");
+		}
+
+		// 创建一个打印机设备句柄
+		if ((hdcprint = CreateDCA("Printer", DevConfig.strTicketPrinter.c_str(), nullptr, nullptr)) == 0)
+		{
+			BreakMessage(strMessage, "在小票打印上调用CreateDC失败!");
+		}
+		
+		if (StartDocA(hdcprint, &di) > 0) //开始执行一个打印作业
+		{
+			StartPage(hdcprint); //打印机走纸,开始打印
+			SaveDC(hdcprint); //保存打印机设备句柄
+		
+			int nIndex = 0;
+			/*string strText[] = {
+				"金桥炜煜移动制卡系统",
+				"申领人:测试用户",
+				"身份证号码:371222198012134321",
+				"卡号:M1234567",
+				"发卡日期:2022年8月24日",
+				"支付费用:RMB16.00",
+				"支付代码:4100002210006106601c",
+				"制卡时间:2022.08.24 16:57:00",
+				"发卡银行:中国银行",
+				"",
+				"友情提示:小票不可用作报销凭证"
+			};*/
+			QDateTime	dtNow = QDateTime::currentDateTime();
+			char szText[128] = { 0 };
+			string strText = UTF8_GBK(DevConfig.strTicketTitle.c_str());
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50* nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText,128, "申领人:%s",GBK_UTF8(pSSCardInfo->strName).c_str());
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText, 128, "身份证:%s", pSSCardInfo->strCardID);
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText, 128, "卡号:%s", pSSCardInfo->strCardNum);
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText, 128, "发卡日期:%04d年%d月%d日", dtNow.date().year(), dtNow.date().month(), dtNow.date().day());
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText, 128, "支付费用:RMB16.00");
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText, 128, "支付代码:%s",strPayCode.c_str());
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			sprintf_s((char*)szText, 128, "制卡时间:%d.%d.%d  %d:%d:%d", dtNow.date().year(), dtNow.date().month(), dtNow.date().day(), 
+					dtNow.time().hour(), dtNow.time().minute(), dtNow.time().second());
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			string strBankName;
+			GetBankName(regInfo.strBankCode, strBankName);
+			sprintf_s((char*)szText, 128, "发卡银行:%s", strBankName.c_str());
+			strText = UTF8_GBK(szText);
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+
+			nIndex++;
+
+			strText = "友情提示:小票不可用作报销凭证";
+			strText = UTF8_GBK(strText.c_str());
+			TextOutA(hdcprint, DevConfig.nTicketPrinterX, DevConfig.nTicketPrinterY + 50 * nIndex++, strText.c_str(), strText.size());
+			
+			RestoreDC(hdcprint, -1); //恢复打印机设备句柄
+			EndPage(hdcprint); //打印机停纸,停止打印
+			EndDoc(hdcprint); //结束一个打印作业
+		}
+
+		bResult = true;
+	} while (0);
+	if (hdcprint)
+		DeleteDC(hdcprint);
+	
+	if (hPrinter)
+		ClosePrinter(hPrinter);
+	return bResult;
 }
 
 int DataCenter::MoveCard(QString& strMessage)

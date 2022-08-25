@@ -416,7 +416,7 @@ bool GetHardwareCode2(std::string& strMachineCode)
 	if (!g_pDataCenter)
 		return false;
 	QString strMessage;
-	if (g_pDataCenter->OpenPrinter(strMessage))
+	if (g_pDataCenter->OpenCardPrinter(strMessage))
 	{
 		gInfo() << gQStr(strMessage);
 		return false;

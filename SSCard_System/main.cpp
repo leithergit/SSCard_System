@@ -47,7 +47,7 @@ int TestPrinter(void* pParam)
 		return -1;
 	int nResult = -1;
 	QString* pStrMessage = (QString*)pParam;
-	if (QFailed(nResult = g_pDataCenter->OpenPrinter(*pStrMessage)))
+	if (QFailed(nResult = g_pDataCenter->OpenCardPrinter(*pStrMessage)))
 	{
 		gInfo() << pStrMessage->toLocal8Bit().data();
 		return -1;

@@ -170,6 +170,9 @@ DeviceManager::DeviceManager(QWidget* parent)
 	pItem = ui.tableWidget->item(1, 2);
 	pItem->setFlags(pItem->flags() & (Qt::ItemIsEditable));
 	g_pDataCenter->CloseDevice();
+    ui.lineEdit_TicketPrinter->setText(DevConfig.strTicketPrinter.c_str());
+    ui.lineEdit_TicketX->setText(QString("%1").arg(DevConfig.nTicketPrinterX));
+    ui.lineEdit_TicketY->setText(QString("%1").arg(DevConfig.nTicketPrinterY));
 }
 
 DeviceManager::~DeviceManager()
@@ -499,7 +502,7 @@ void DeviceManager::on_pushButton_PrinterTest_clicked()
 	}
 	QWaitCursor Wait;
 
-	if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+	if (g_pDataCenter->OpenCardPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 	{
 		Wait.RestoreCursor();
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -869,7 +872,7 @@ int DeviceManager::ReaderTest_clicked(bool bContinue)
 	do
 	{
 		
-		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		if (g_pDataCenter->OpenCardPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 			break;
 
 		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
@@ -1057,7 +1060,7 @@ void DeviceManager::on_pushButton_Excute_clicked()
 	QWaitCursor Wait;
 	if (!g_pDataCenter->GetPrinter())
 	{
-		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		if (g_pDataCenter->OpenCardPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 		{
 			Wait.RestoreCursor();
 			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -1066,7 +1069,7 @@ void DeviceManager::on_pushButton_Excute_clicked()
 	}
 	else
 	{
-		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
+		if (g_pDataCenter->OpenCardPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 		{
 			Wait.RestoreCursor();
 			QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -1131,3 +1134,22 @@ void DeviceManager::on_pushButton_Excute_clicked()
 	}
 	}
 }
+
+void DeviceManager::on_pushButton_PrintTicket_clicked()
+{
+    SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+    strcpy_s(pSSCardInfo->strName, UTF8_GBK("测试用户").c_str());
+    strcpy_s(pSSCardInfo->strCardID, "123456789012345678");
+    strcpy_s(pSSCardInfo->strCardNum, "PP123456N");
+    strcpy_s(pSSCardInfo->strValidDate, "20220101");
+    g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+	QString strMessage;
+	if (g_pDataCenter->PrintTicket(strMessage))
+	{
+		strMessage = tr("小票打印成功,请取走小票!");	
+	}
+	
+	QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
+
+}
+
