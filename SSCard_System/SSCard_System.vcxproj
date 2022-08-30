@@ -273,6 +273,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     <QtMoc Include="administer.h" />
     <ClInclude Include="aes.h" />
     <ClInclude Include="aestools.h" />
+    <ClInclude Include="CPinbroad.hpp" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="sys_manualmakecard.h" />
     <QtMoc Include="waitingprogress.h" />

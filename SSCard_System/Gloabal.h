@@ -57,7 +57,7 @@
 #include "SSCardHSM/KT_SSCardHSM.h"
 #include "SSCardInfo_Henan/KT_SSCardInfo.h"
 #include "IDCard/idcard_api.h"
-#include "PinKeybroad/XZ_F31_API.h"
+//#include "PinKeybroad/XZ_F31_API.h"
 #include "libcurl/curl.h"
 #include "7Z/include/bitarchiveinfo.hpp"
 #include "7Z/include/bitcompressor.hpp"
@@ -66,6 +66,7 @@
 #include "../utility/json/CJsonObject.hpp"
 #include "../Update/Update.h"
 #include "../SSCardService/SSCardService.h"
+#include "CPinbroad.hpp"
 
 //宏定义
 #define __STR2__(x) #x
@@ -212,6 +213,13 @@ struct DeviceConfig
 		}
 		// 打印机驱动模块名称，如KT_Printer.dll
 		strDPI = pSettings->value("PrinterDPI", "300*300").toString().toStdString();
+		string strPinBroadType = pSettings->value("PinKeyBroadType", "F31").toString().toStdString();
+		transform(strPinBroadType.begin(), strPinBroadType.end(), strPinBroadType.begin(), ::toupper);
+		if (strPinBroadType == "F10")
+			nPinBoardType = PinBoardType::PinBoard_F10;
+		else
+			nPinBoardType = PinBoardType::PinBoard_F31;
+
 		strPinBroadPort = pSettings->value("PinKeybroadPort").toString().toStdString();
 		strPinBroadBaudrate = pSettings->value("PinKeybroadBaudrate", "9600").toString().toStdString();
 		nDepenseBox = pSettings->value("DepenseBox", 0).toUInt();
@@ -414,6 +422,8 @@ struct DeviceConfig
 
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
 	string		strTerminalCode;					   // 终端唯一识别码	
+	PinBoardType	nPinBoardType = PinBoardType::PinBoard_F31;	// 密码键盘型号，默认F31
+	
 	CameraDriver nCameraDrv = CameraDriver::Driver_DLL;
 public:
 };
@@ -970,6 +980,15 @@ public:
 	string strFullCapture;
 	string strFaceCapture;
 	//int FaceCamera_EventCallback(int nEventID, int nFrameStatus);
+	CPinbroad* pBinBoard = nullptr;
+
+	int OpenCom(int nPort,int nBraud);
+
+	void CloseCom();
+
+	int UseEppPlainTextMode(unsigned char ucTextModeFormat,unsigned char AutoEnd, unsigned char* ReturnInfo);
+
+	int  ScanKeyPress(unsigned char* ucKeyValue);
 
 	bool IsVideoStart();
 
@@ -1009,7 +1028,7 @@ public:
 
 	int OpenSSCardReader(QString& strMessage);
 
-	int OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage);
+	int OpenSSCardReader(QString strLib,QString strPort, ReaderBrand nReaderType, QString& strMessage);
 
 	int TestPrinter(QString& strMessage);
 

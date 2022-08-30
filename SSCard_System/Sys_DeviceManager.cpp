@@ -64,7 +64,17 @@ DeviceManager::DeviceManager(QWidget* parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-
+	wchar_t szSerialPort[4096] = { 0 };
+	WORD nPort = 0;
+	EnumSerialPortW((WCHAR *)szSerialPort,4096, nPort);
+	if (nPort)
+	{
+		for (int i = 0; i < nPort; i++)
+		{
+			ui.comboBox_SSCardReaderPort->addItem(QString((QChar*)&szSerialPort[i * 8]));
+			ui.comboBox_DesktopSSCardReaderPort->addItem(QString((QChar*)&szSerialPort[i * 8]));
+		}
+	}
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
 	int nIndex = -1;
 	if (DevConfig.nPrinterType >= PRINTER_MIN && DevConfig.nPrinterType <= PRINTER_MAX)
@@ -217,7 +227,7 @@ bool DeviceManager::CheckPrinterModule(QString& strPrinterLib, PrinterType& nPri
 	return true;
 }
 
-bool DeviceManager::CheckReaderModule(QString& strReaderLib, ReaderBrand& nSSCardReaderType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage)
+bool DeviceManager::CheckReaderModule(QString& strReaderLib,QString &strPort, ReaderBrand& nSSCardReaderType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage)
 {
 	if (nUsage == DeviceManager::Usage_MakeCard)
 	{
@@ -229,6 +239,7 @@ bool DeviceManager::CheckReaderModule(QString& strReaderLib, ReaderBrand& nSSCar
 		}
 		nPowerType = (CardPowerType)(ui.comboBox_PoweronType->currentIndex() + 1);
 		nSSCardReaderType = (ReaderBrand)(ui.comboBox_SSCardReaderType->currentIndex() + 1);
+		strPort = ui.comboBox_SSCardReaderPort->currentText();
 	}
 	else
 	{
@@ -240,6 +251,7 @@ bool DeviceManager::CheckReaderModule(QString& strReaderLib, ReaderBrand& nSSCar
 		}
 		nPowerType = (CardPowerType)(ui.comboBox_DesktopPoweronType->currentIndex() + 1);
 		nSSCardReaderType = (ReaderBrand)(ui.comboBox_DesktopSSCardReaderType->currentIndex() + 1);
+		strPort = ui.comboBox_DesktopSSCardReaderPort->currentText();
 	}
 	return true;
 }
@@ -387,8 +399,9 @@ void DeviceManager::on_pushButton_DesktopReaderTest_clicked()
 	ReaderBrand nSSCardReaderType;
 	QString strSSCardReaderType;
 	QString strReaderLib;
+	QString strPort;
 
-	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
+	if (!CheckReaderModule(strReaderLib,strPort, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
 	{
 		QMessageBox_CN(QMessageBox::Critical, tr("提示"), strMessage, QMessageBox::Ok);
 		return;
@@ -404,7 +417,7 @@ void DeviceManager::on_pushButton_DesktopReaderTest_clicked()
 		char szCardATR[128] = { 0 };
 		char szRCode[128] = { 0 };
 		int nCardATRLen = 0;
-		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
+		if (g_pDataCenter->OpenSSCardReader(strReaderLib,strPort, nSSCardReaderType, strMessage))
 			break;
 		QString strPowerType = ui.comboBox_DesktopPoweronType->currentText();
 		if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(nPowerType, szCardATR, nCardATRLen, szRCode)))
@@ -427,7 +440,7 @@ void DeviceManager::fnThreadReadPin()
 	int nRet = 0;
 	while (bThreadReadPinRunning)
 	{
-		nRet = SUNSON_ScanKeyPress(szTemp);
+		nRet = g_pDataCenter->ScanKeyPress(szTemp);
 		if (nRet > 0)
 		{
 			emit InputPin(szTemp[0]);
@@ -625,7 +638,8 @@ void DeviceManager::on_InputPin(char ch)
 		}
 
 		EnableUI(this, true);
-		ui.pushButton_PinBroadTest->setText("停止测试");
+		g_pDataCenter->CloseCom();
+		ui.pushButton_PinBroadTest->setText("开始测试");
 		break;
 	}
 	case 0x08:		// update
@@ -650,7 +664,8 @@ void DeviceManager::on_InputPin(char ch)
 			pThreadReadPin = nullptr;
 		}
 		EnableUI(this, true);
-		ui.pushButton_PinBroadTest->setText("停止测试");
+		g_pDataCenter->CloseCom();
+		ui.pushButton_PinBroadTest->setText("开始测试");
 		break;
 	}
 	case 0x41:
@@ -686,17 +701,18 @@ bool DeviceManager::TryOpenPinKeyBroadPort(int nPort, int nBaudrate, bool bClose
 	bool bSucceed = false;
 	do
 	{
-		if (!SUNSON_OpenCom(nPort, nBaudrate))
+		
+		if (!g_pDataCenter->OpenCom(nPort, nBaudrate))
 			break;
 
 		unsigned char szRetInfo[255] = { 0 };
-		if (!SUNSON_UseEppPlainTextMode(0x06, 0, szRetInfo))
+		if (!g_pDataCenter->UseEppPlainTextMode(0x06, 0, szRetInfo))
 			break;
 
 		bSucceed = true;
 	} while (0);
 	if (bClose)
-		SUNSON_CloseCom();
+		g_pDataCenter->CloseCom();
 	return bSucceed;
 }
 
@@ -748,24 +764,25 @@ bool DeviceManager::Save(QString& strMessage)
 	ReaderBrand nSSCardReaderType;
 	QString strSSCardReaderType;
 	QString strReaderLib;
+	QString strPort;
 
-	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
+	if (!CheckReaderModule(strReaderLib,strPort, nSSCardReaderType, nPowerType, strMessage))
 		return false;
 
 	devconfig.strReaderModule = strReaderLib.toStdString();
 	devconfig.strSSCardReadType = szReaderTypeList[nSSCardReaderType + 1];
 	devconfig.nSSCardReaderType = nSSCardReaderType;
 	devconfig.nSSCardReaderPowerOnType = nPowerType;
-	devconfig.strSSCardReaderPort = ui.comboBox_SSCardReaderPort->currentText().toStdString();
+	devconfig.strSSCardReaderPort = strPort.toStdString();
 
-	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
+	if (!CheckReaderModule(strReaderLib, strPort, nSSCardReaderType, nPowerType, strMessage, Usage_Desktop))
 		return false;
 
 	devconfig.strDesktopReaderModule = strReaderLib.toStdString();
 	devconfig.strDesktopSSCardReadType = szReaderTypeList[nSSCardReaderType + 1];
 	devconfig.nDesktopSSCardReaderType = nSSCardReaderType;
 	devconfig.nDesktopSSCardReaderPowerOnType = nPowerType;
-	devconfig.strDesktopSSCardReaderPort = ui.comboBox_SSCardReaderPort->currentText().toStdString();
+	devconfig.strDesktopSSCardReaderPort = strPort.toStdString();
 
 	devconfig.strPinBroadPort = ui.lineEdit_PinBroadPort->text().toStdString();
 	if (devconfig.strPinBroadPort.size() <= 0)
@@ -812,8 +829,9 @@ int DeviceManager::ReaderTest_clicked(bool bContinue)
 	ReaderBrand nSSCardReaderType;
 	QString strSSCardReaderType;
 	QString strReaderLib;
+	QString strPort;
 
-	if (!CheckReaderModule(strReaderLib, nSSCardReaderType, nPowerType, strMessage))
+	if (!CheckReaderModule(strReaderLib,strPort, nSSCardReaderType, nPowerType, strMessage))
 	{
 		if (bContinue)
 			return 1;
@@ -840,7 +858,7 @@ int DeviceManager::ReaderTest_clicked(bool bContinue)
 		if (g_pDataCenter->OpenPrinter(strPrinterLib, nPrinterType, nDepenseBox, strDPI, strMessage))
 			break;
 
-		if (g_pDataCenter->OpenSSCardReader(strReaderLib, nSSCardReaderType, strMessage))
+		if (g_pDataCenter->OpenSSCardReader(strReaderLib,strPort, nSSCardReaderType, strMessage))
 			break;
 		int nDepensePos = 4;	// 1-读磁位；2-接触IC位;3-非接IC位;4-打印位， 默认为接触位
 		if (nPowerType == CardPowerType::READER_UNCONTACT)
@@ -963,7 +981,10 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 		ui.lineEdit_PinBroadPort->setEnabled(true);
 		ui.pushButton_PinBroadTest->setEnabled(true);
 		ui.pushButton_PinBroadTest->setText("停止测试");
+		ui.lineEdit_StringInput->setText("");
 		bThreadReadPinRunning = true;
+		nPinSize = 0;
+		ZeroMemory(szPin, 128);
 		pThreadReadPin = new std::thread(&DeviceManager::fnThreadReadPin, this);
 	}
 	else
@@ -977,7 +998,7 @@ void DeviceManager::on_pushButton_PinBroadTest_clicked()
 			delete pThreadReadPin;
 			pThreadReadPin = nullptr;
 		}
-		SUNSON_CloseCom();
+		g_pDataCenter->CloseCom();
 	}
 }
 

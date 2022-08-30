@@ -700,7 +700,19 @@ int DataCenter::OpenSSCardReader(QString& strMessage)
 					strMessage = QString("Reader_Create'%1'失败,错误代码:%2").arg(DevConfig.strSSCardReadType.c_str()).arg(szRCode);
 					break;
 				}
-				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
+				string &strSSCardReaderPort = DevConfig.strSSCardReaderPort;
+				int nIndex = 0;
+				int nPort = 0;
+				if (strSSCardReaderPort.find("USB") != string::npos)
+				{
+					nPort = 100;
+				}
+				else if (nIndex = strSSCardReaderPort.find("COM") != string::npos)
+				{
+					string strPortnum = strSSCardReaderPort.substr(nIndex + 3);
+					nPort = strtol(strPortnum.c_str(), nullptr, 10);
+				}
+				if (QFailed(nResult = m_pSSCardReader->Reader_Init(nPort,szRCode)))
 				{
 					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
 					break;
@@ -725,7 +737,7 @@ int DataCenter::OpenSSCardReader(QString& strMessage)
 	return 0;
 }
 
-int DataCenter::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QString& strMessage)
+int DataCenter::OpenSSCardReader(QString strLib,QString strPort, ReaderBrand nReaderType, QString& strMessage)
 {
 	int nResult = -1;
 	try
@@ -756,7 +768,19 @@ int DataCenter::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QStrin
 					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
 					break;
 				}
-				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
+				string strSSCardReaderPort = strPort.toStdString();
+				int nIndex = 0;
+				int nPort = 0;
+				if (strSSCardReaderPort.find("USB") != string::npos)
+					nPort = 100;
+				
+				else if ((nIndex = strSSCardReaderPort.find("COM")) != string::npos)
+				{
+					string strPortnum = strSSCardReaderPort.substr(nIndex + 3);
+					nPort = strtol(strPortnum.c_str(), nullptr, 10) - 1;
+				}
+
+				if (QFailed(nResult = m_pSSCardReader->Reader_Init(nPort,szRCode)))
 				{
 					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
 					break;
@@ -1148,6 +1172,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 		bSucceed = false;
 		switch (PrinterStatus.fwToner)
 		{
+		default:
 		case 0:
 		{
 			bSucceed = true;
@@ -1170,7 +1195,6 @@ int DataCenter::TestPrinter(QString& strMessage)
 			break;
 		}
 		case 4:
-		default:
 		{
 			strMessage = QString("发生未知错误!").arg(PrinterStatus.fwToner);
 			break;
@@ -1775,6 +1799,57 @@ done:
 		fclose(f);
 
 	return bRet;
+}
+
+int DataCenter::OpenCom(int nPort, int nBraud)
+{
+	if (pBinBoard)
+		return true;
+	else
+	{
+		QString strMessage;
+		try
+		{
+			DeviceConfig& devConfig = GetSysConfigure()->DevConfig;
+			pBinBoard = new CPinbroad(devConfig.nPinBoardType);
+			if (!pBinBoard)
+			{
+				strMessage = "内存不足，无法生成密码键盘类对象!";
+				gError()<< gQStr(strMessage);
+				return -1;
+			}
+			return pBinBoard->OpenCom(nPort, nBraud);
+		}
+		catch (std::exception &e)
+		{
+			strMessage = e.what();
+			gError() << "Catch a exception:" << e.what();
+			return -1;
+		}
+	}
+}
+
+void DataCenter::CloseCom()
+{
+	if (!pBinBoard)
+		return ;
+	pBinBoard->CloseCom();
+	delete pBinBoard;
+	pBinBoard = nullptr;
+}
+
+int DataCenter::UseEppPlainTextMode(unsigned char ucTextModeFormat, unsigned char AutoEnd, unsigned char* ReturnInfo)
+{
+	if (!pBinBoard)
+		return -1;
+	return pBinBoard->UseEppPlainTextMode(ucTextModeFormat, AutoEnd, ReturnInfo);
+}
+
+int  DataCenter::ScanKeyPress(unsigned char* ucKeyValue)
+{
+	if (!pBinBoard)
+		return -1;
+	return pBinBoard->ScanKeyPress(ucKeyValue);
 }
 
 bool DataCenter::IsVideoStart()

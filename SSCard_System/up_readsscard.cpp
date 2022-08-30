@@ -26,7 +26,10 @@ int up_ReadSSCard::ProcessBussiness()
 	QString strMessage;
 	char szRCode[1024] = { 0 };
 
-	if (QFailed(g_pDataCenter->OpenSSCardReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
+	if (QFailed(g_pDataCenter->OpenSSCardReader(DevConfig.strDesktopReaderModule.c_str(),
+												DevConfig.strDesktopSSCardReaderPort.c_str(), 
+												DevConfig.nDesktopSSCardReaderType, 
+												strMessage)))
 	{
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;

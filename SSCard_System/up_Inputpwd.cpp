@@ -60,7 +60,10 @@ int up_InputPWD::ProcessBussiness()
 	int nATRLen = 0;
 
 
-	if (QFailed(g_pDataCenter->OpenSSCardReader(DevConfig.strDesktopReaderModule.c_str(), DevConfig.nDesktopSSCardReaderType, strMessage)))
+	if (QFailed(g_pDataCenter->OpenSSCardReader(DevConfig.strDesktopReaderModule.c_str(), 
+												DevConfig.strDesktopSSCardReaderPort.c_str(), 
+												DevConfig.nDesktopSSCardReaderType, 
+												strMessage)))
 	{
 		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return -1;
@@ -254,7 +257,7 @@ void up_InputPWD::ThreadWork()
 
 	while (m_bWorkThreadRunning)
 	{
-		nRet = SUNSON_ScanKeyPress(szTemp);
+		nRet = g_pDataCenter->ScanKeyPress(szTemp);
 		if (nRet > 0)
 			emit InputPin(szTemp[0]);
 		this_thread::sleep_for(std::chrono::milliseconds(50));

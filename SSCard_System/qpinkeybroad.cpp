@@ -28,16 +28,16 @@ int  QPinKeybroad::OpenDevice(QString& strError)
 	int nPort = strNum.toInt();
 
 	gInfo() << "Try to Open Port " << nPort;
-	if (!SUNSON_OpenCom(nPort, m_nBaudreate))
+	if (!g_pDataCenter->OpenCom(nPort, m_nBaudreate))
 	{
 		strError = QString("打开密码键盘失败:%1,Baudrate:%2").arg(m_strDevPort).arg(m_nBaudreate);
 		return -1;
 	}
 	gInfo() << "Try to SUNSON_UseEppPlainTextMode";
 	unsigned char szRetInfo[255] = { 0 };
-	if (!SUNSON_UseEppPlainTextMode(0x06, 1, szRetInfo))
+	if (!g_pDataCenter->UseEppPlainTextMode(0x06, 1, szRetInfo))
 	{
-		SUNSON_CloseCom();
+		g_pDataCenter->CloseCom();
 		strError = QString("密码键盘设置输入模式失败!");
 		return -1;
 	}
@@ -53,12 +53,12 @@ int QPinKeybroad::CloseDevice(QString& strError)
 	{
 		gInfo() << "Try to SUNSON_CloseCom";
 		m_bDevOpened = false;
-		SUNSON_CloseCom();
+		g_pDataCenter->CloseCom();
 	}
 
 	return 0;
 }
 int  QPinKeybroad::ReadPin(uchar* pKeyValue)
 {
-	return SUNSON_ScanKeyPress(pKeyValue);
+	return g_pDataCenter->ScanKeyPress(pKeyValue);
 }

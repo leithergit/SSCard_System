@@ -31,7 +31,8 @@ public:
 		Usage_MakeCard,
 		Usage_Desktop
 	};
-	bool CheckReaderModule(QString& strReaderLib, ReaderBrand& nType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage = Usage_MakeCard);
+	
+	bool CheckReaderModule(QString& strReaderLib,QString &strPort, ReaderBrand& nType, CardPowerType& nPowerType, QString& strMessage, ReaderUsage nUsage = Usage_MakeCard);
 signals:
 	void ShowIDCardInfo(bool bSuccceed, QString strMessage);
 	void InputPin(char ch);
