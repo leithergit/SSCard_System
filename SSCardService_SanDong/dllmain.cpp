@@ -3,9 +3,9 @@
 #include "SSCardService_Sandong.h"
 #include "pch.h"
 #ifdef _DEBUG
-#pragma comment(lib,"../sdk/sscardinfo_sandong/SD_SSCardInfod.lib")
+#pragma comment(lib,"../sdk/SSCardinfo_Binzhou/SSCardInfo_BinZhoud.lib")
 #else
-#pragma comment(lib,"../sdk/sscardinfo_sandong/SD_SSCardInfo.lib")
+#pragma comment(lib,"../sdk/SSCardinfo_Binzhou/SSCardInfo_BinZhou.lib")
 #endif
 map<string, string>g_mapNationnaltyCode;
 struct NationaltyCode
@@ -116,7 +116,7 @@ extern "C" {
 		//	nServiceType > ServiceType::Service_RegisterLost)
 		//	return nullptr;
 
-		SSCardService_Sandong* pService = new SSCardService_Sandong();
+		SSCardService_BinZhou* pService = new SSCardService_BinZhou();
 		//pService->SetSerivdeType((ServiceType)nServiceType);
 		return (LPVOID)pService;
 	}
@@ -125,7 +125,7 @@ extern "C" {
 	{
 		if (!lpDev)
 			return;
-		delete (SSCardService_Sandong*)lpDev;
+		delete (SSCardService_BinZhou*)lpDev;
 	}
 
 #ifdef __cplusplus

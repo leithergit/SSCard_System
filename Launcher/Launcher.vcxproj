@@ -65,7 +65,7 @@
     </ClCompile>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath)  Z:\SSCard_System</Command>
+copy /y $(TargetPath)  Z:\SSCard_System.mvc</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,7 +75,7 @@ copy /y $(TargetPath)  Z:\SSCard_System</Command>
     </ClCompile>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-copy /y $(TargetPath)  Z:\SSCardSystem.MVC</Command>
+copy /y $(TargetPath)  Z:\SSCard_System.MVC</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">

@@ -965,12 +965,12 @@ color: rgb(0, 0, 0);</string>
        <property name="minimumSize">
         <size>
          <width>266</width>
-         <height>101</height>
+         <height>90</height>
         </size>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
+border-radius: 20px;
 font: 57 42px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;

@@ -195,6 +195,7 @@ int SendHttpRequest(string strMothod, string szUrl, string& strRespond, string& 
 	HttpBuffer hb;
 	do
 	{
+		gInfo() << "strMothod:" << strMothod << " Url:" << szUrl;
 		pCurl = curl_easy_init();
 		if (pCurl == NULL)
 			break;

@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,6
- PRODUCTVERSION 1,0,0,6
+ FILEVERSION 1,0,0,9
+ PRODUCTVERSION 1,0,0,9
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "金乔炜煜(上海)智能科技有限公司 "
             VALUE "FileDescription", "实现基于通用接口的卡管服务"
-            VALUE "FileVersion", "1.0.0.6"
+            VALUE "FileVersion", "1.0.0.9"
             VALUE "InternalName", "SSCardService_Sandong.dll"
             VALUE "LegalCopyright", "金乔炜煜(上海)智能科技有限公司 (C) 2022版权所有"
             VALUE "OriginalFilename", "SSCardService_Sandong.dll"
             VALUE "ProductName", "社保卡卡管服务模块-山东滨州"
-            VALUE "ProductVersion", "1.0.0.6"
+            VALUE "ProductVersion", "1.0.0.9"
         END
     END
     BLOCK "VarFileInfo"

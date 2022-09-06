@@ -227,7 +227,7 @@ color: 0
      </item>
      <item row="4" column="1">
       <property name="text">
-       <string>银行代码</string>
+       <string>所属银行</string>
       </property>
       <property name="flags">
        <set>ItemIsEnabled</set>

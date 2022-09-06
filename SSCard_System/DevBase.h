@@ -1,4 +1,4 @@
-ï»¿#ifndef DEVBASE_H
+#ifndef DEVBASE_H
 #define DEVBASE_H
 #include <string>
 #include <memory>
@@ -31,21 +31,21 @@ public:
 			pFreeInst = (pFreeInstance)GetProcAddress(hLibhandle, "FreeInstance");
 			if (!pCreateInst || !pFreeInst)
 			{
-				strError = QString("ä»åŠ¨æ€åº“%1ä¸­åŠ è½½'CreateInstance'æˆ–'FreeInstance'å‡½æ•°å¤±è´¥!").arg(strLibPath.c_str());
+				strError = QString("´Ó¶¯Ì¬¿â%1ÖĞ¼ÓÔØ'CreateInstance'»ò'FreeInstance'º¯ÊıÊ§°Ü!").arg(strLibPath.c_str());
 				throw std::exception(strError.toStdString().c_str());
 				return;
 			}
 			pInstance = (T*)pCreateInst(nullptr);
 			if (!pInstance)
 			{
-				strError = QString("åˆ›å»ºæ¨¡å—'%1'å®ä¾‹å¤±è´¥!").arg(strLibPath.c_str());
+				strError = QString("´´½¨Ä£¿é'%1'ÊµÀıÊ§°Ü!").arg(strLibPath.c_str());
 				throw std::exception(strError.toStdString().c_str());
 				return;
 			}
 		}
 		else
 		{
-			strError = QString("åŠ è½½åŠ¨æ€åº“'%1'å¤±è´¥ï¼Œé”™è¯¯ç :%1").arg(strLibPath.c_str()).arg(errno);
+			strError = QString("¼ÓÔØ¶¯Ì¬¿â'%1'Ê§°Ü£¬´íÎóÂë:%1").arg(strLibPath.c_str()).arg(errno);
 			throw std::exception(strError.toStdString().c_str());
 		}
 	}

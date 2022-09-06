@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWidget</class>
+ <widget class="QWidget" name="MainWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1002</width>
+    <height>539</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>MainWidget</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>571</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>打印机</string>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>446</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="minimumSize">
+        <size>
+         <width>60</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>复位</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_3">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>0</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>GetSN</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterDepense_2">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinteEject_2">
+       <property name="text">
+        <string>退卡</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterRetract_2">
+       <property name="text">
+        <string>回收</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>447</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="minimumSize">
+        <size>
+         <width>60</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>型号</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maxVisibleItems">
+        <number>32</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>Evolis_KC200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Evolis_Zenius</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Evolis_ELYPSO</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Evolis_Primacy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Evolis_Aansia</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hiti_CS200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hiti_CS220</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hiti_CS290</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KT81_EM1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KT81_EM2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KT81_DS1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KT81_DS2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>KT81_DS3</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ENTRUST_CD809</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterOpen">
+       <property name="text">
+        <string>打开</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterClose">
+       <property name="text">
+        <string>关闭</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterVersion">
+       <property name="text">
+        <string>版本</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>446</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="minimumSize">
+        <size>
+         <width>60</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>发卡位置</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_2">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>0</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>打印位</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>接触位</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>非接触位</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterDepense">
+       <property name="text">
+        <string>发卡</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinteEject">
+       <property name="text">
+        <string>退卡</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_PrinterRetract">
+       <property name="text">
+        <string>回收</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

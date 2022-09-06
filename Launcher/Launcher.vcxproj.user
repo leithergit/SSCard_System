@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <RemoteDebuggerCommand>D:\SSCard_System\Launcher.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>D:\SSCard_System</RemoteDebuggerWorkingDirectory>
-    <RemoteDebuggerServerName>192.168.0.12</RemoteDebuggerServerName>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>D:\SSCard_System.mvc\Launcher.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\SSCard_System.mvc</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.0.0.139</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-    <RemoteDebuggerCommand>D:\SSCardSystem.MVC\Launcher.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>D:\SSCardSystem.MVC</RemoteDebuggerWorkingDirectory>
-    <RemoteDebuggerServerName>192.168.0.12</RemoteDebuggerServerName>
+    <RemoteDebuggerCommand>D:\SSCard_System.MVC\Launcher.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\SSCard_System.MVC</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.0.0.139</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

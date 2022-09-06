@@ -32,7 +32,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <OutputDirectory>debug\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <ConfigurationType>Application</ConfigurationType>
     <IntermediateDirectory>debug\</IntermediateDirectory>
     <PrimaryOutput>SSCard_System</PrimaryOutput>
@@ -304,6 +304,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     <QtMoc Include="qi_information.h" />
     <QtMoc Include="dialogconfigbank.h" />
     <QtMoc Include="sscardreport.h" />
+    <ClInclude Include="SimpleIni.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
     <QtMoc Include="CheckPassword.h">

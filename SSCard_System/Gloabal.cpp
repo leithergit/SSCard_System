@@ -1,14 +1,14 @@
 ﻿#pragma execution_character_set("utf-8")
-#include <QSettings>
 #include <QDir>
 #include <QApplication>
 #include <QCoreApplication>
-#include <QSettings>
 #include <QFileInfo>
 #include <QTextCodec>
 #include "Gloabal.h"
 #include "Payment.h"
 #include "qstackpage.h"
+#include "SimpleIni.h"
+#include <QSqlError>
 
 
 #pragma comment(lib,"user32.lib")
@@ -251,7 +251,14 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			strError = QString("加载配置文件失败:%1!").arg(strConfigPath);
 			return -1;
 		}
-		QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
+		CSimpleIniA ConfigIni;
+		if (ConfigIni.LoadFile(strConfigPath.toLocal8Bit().data()) != SI_OK)
+		{
+			strError = QString("加载配置文件失败:%1!").arg(strConfigPath);
+			return -1;
+		}
+		string strPrinter = ConfigIni.GetValue("Device", "Printer");
+		//QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
 		pSysConfig = make_shared<SysConfig>(&ConfigIni);
 		if (!pSysConfig)
 		{
@@ -289,7 +296,8 @@ int DataCenter::LoadCardForm(QString& strError)
 			strError = QString("加载卡版打印版式失败:%1!").arg(strConfigPath);
 			return -1;
 		}
-		QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
+		CSimpleIniA ConfigIni;
+		ConfigIni.LoadFile(strConfigPath.toStdString().c_str());
 		pCardForm = make_shared<CardForm>(&ConfigIni);
 		if (!pCardForm)
 		{
@@ -2204,8 +2212,7 @@ bool DataCenter::SaveFaceImage(string strPhotoFile, bool bFull)
 			return false;
 		ofstream ofs(strPhotoFile, ios::out | ios::binary);
 		//WriteBMPFile(strPhotoFile.c_str(), pImageBuffer, m_nWidth, m_nHeight);
-		string strBuffer((char*)pImageBuffer, nDataLen);
-		ofs << strBuffer;
+		ofs << string((char*)pImageBuffer, nDataLen);
 		ofs.flush();
 		bSucceed = true;
 	}
@@ -2496,32 +2503,43 @@ int  DataCenter::PremakeCard(QString& strMessage)
 	return nResult;
 }
 
-int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage)
+int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage, PhotoType nType)
 {
-	if (strSSCardPhotoFile.empty() ||
-		strSSCardPhotoFile.find((char*)pIDCard->szIdentity) == string::npos)
+	string stPhotoFile = "";
+	if (nType == PhotoType::Photo_CardID)
 	{
-		gInfo() << "用户照片为空或照片文本名与当前用户身份证号码不符,准备下载照片!";
-		return DownloadPhoto(strBase64Photo, strMessage);
+		if (strSSCardPhotoFile.empty() ||
+			strSSCardPhotoFile.find((char*)pIDCard->szIdentity) == string::npos)
+		{
+			gInfo() << "用户照片为空或照片文本名与当前用户身份证号码不符,准备下载照片!";
+			return DownloadPhoto(strBase64Photo, strMessage);
+		}
+		else
+			stPhotoFile = strSSCardPhotoFile;
 	}
+	else if (nType == PhotoType::Photo_Guardian)
+		stPhotoFile = strGuardianPhotoFile;
 	else
+		return -1;
+
+	if (stPhotoFile.empty() || !fs::exists(stPhotoFile))
+		return -1;
+
+	try
 	{
-		try
-		{
-			ifstream ifs(strSSCardPhotoFile, ios::in | ios::binary);
-			stringstream ss;
-			ss << ifs.rdbuf();
-			// 读取jpg图片并转base64
-			QByteArray ba(ss.str().c_str(), ss.str().size());
-			QByteArray baBase64 = ba.toBase64();
-			strBase64Photo = string(baBase64.data(), baBase64.size());
-			return 0;
-		}
-		catch (std::exception& e)
-		{
-			gInfo() << e.what();
-			return -1;
-		}
+		ifstream ifs(strSSCardPhotoFile, ios::in | ios::binary);
+		stringstream ss;
+		ss << ifs.rdbuf();
+		// 读取jpg图片并转base64
+		QByteArray ba(ss.str().c_str(), ss.str().size());
+		QByteArray baBase64 = ba.toBase64();
+		strBase64Photo = string(baBase64.data(), baBase64.size());
+		return 0;
+	}
+	catch (std::exception& e)
+	{
+		gInfo() << e.what();
+		return -1;
 	}
 }
 
@@ -2675,16 +2693,25 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		jsonIn.Add("Address", pSSCardInfo->strAddress);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("Occupation", pSSCardInfo->strOccupType);
+		jsonIn.Add("AuthorizeType", "01");		// 验证授权方式，01 人脸识别，02电子签名 03上传纸质授权 04读取身份证 05上传身份证正反面，06短信验证 07 授权文字声明勾选
+		CJsonObject jsonAuthorize;
+		jsonAuthorize.AddEmptySubArray("AuthorizeData");
 		if (g_pDataCenter->bGuardian)
 		{
 			jsonIn.Add("ByGuardian", 1);	// 启用监护人信息
 			jsonIn.Add("Guardian", pSSCardInfo->strGuardianName);
 			jsonIn.Add("GuardianShip", pSSCardInfo->strGuardianShip);
 			jsonIn.Add("GuardianCardID", pSSCardInfo->strGuardianIDentity);
+			string strGuaidianBase64;
+			if QFailed(LoadPhoto(strGuaidianBase64, strMessage, PhotoType::Photo_Guardian))
+				break;
+			jsonAuthorize["AuthorizeData"].Add(strGuaidianBase64);
 		}
 
 		if QFailed(LoadPhoto(pSSCardInfo->strPhoto, strMessage))
 			break;
+
+		jsonAuthorize["AuthorizeData"].Add(pSSCardInfo->strPhoto);
 
 		gInfo() << "JsonIn(without photo) = " << jsonIn.ToFormattedString();
 		jsonIn.Add("Photo", pSSCardInfo->strPhoto);
@@ -2995,6 +3022,9 @@ bool  DataCenter::InitializeDB(QString& strMessage)
 	}
 	if (!SQLiteDB.open())
 	{
+		gInfo() << "SQL Driver:" << SQLiteDB.lastError().driverText().toStdString();
+		gInfo() << "SQL Database:" << SQLiteDB.lastError().databaseText().toStdString();
+		gInfo() << "SQL ErrorText:" << SQLiteDB.lastError().text().toStdString();
 		strMessage = "打开地址数据库失败,请检查地址数据库!";
 		return false;
 	}

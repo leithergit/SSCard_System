@@ -10,7 +10,7 @@
 //#include <conio.h>
 //#include <direct.h>
 
-DialogCameraTest::DialogCameraTest(QWidget* parent) :
+DialogCameraTest::DialogCameraTest(bool bShowGuardian, QWidget* parent) :
 	QDialog(parent),
 	ui(new Ui::DialogCameraTest)
 {
@@ -21,6 +21,18 @@ DialogCameraTest::DialogCameraTest(QWidget* parent) :
 	ui->pushButton_TakePhoto->setIconSize(QSize(48, 48));*/
 	QString strQSS = QString("border-image: url(./Image/FaceCaptureSample.jpg);");
 	ui->label_FaceCapture->setStyleSheet(strQSS);
+	pButtonGrp = new QButtonGroup(this);
+	pButtonGrp->addButton(ui->radioButton_Oneself, 0);
+	pButtonGrp->addButton(ui->radioButton_Guardian, 1);
+	pButtonGrp->setExclusive(true);
+	ui->radioButton_Oneself->setChecked(true);
+
+	if (!bShowGuardian)
+	{
+		ui->radioButton_Oneself->hide();
+		ui->radioButton_Guardian->hide();
+	}
+
 	QTimer::singleShot(50, this, [=]()
 		{
 			QString strError;
@@ -34,37 +46,6 @@ DialogCameraTest::~DialogCameraTest()
 	QString strError;
 	CloseCamera(strError);
 	delete ui;
-}
-
-void DialogCameraTest::on_pushButton_clicked()
-{
-	QWaitCursor Wait;
-	QString strAppPath = QApplication::applicationDirPath();
-	QString strPhotoPath1 = strAppPath + "/PhotoProcess/1.jpg";
-	QString strPhotoPath2 = strAppPath + "/PhotoProcess/2.jpg";
-	try
-	{
-		if (fs::exists(strPhotoPath1.toStdString()))
-			fs::remove(strPhotoPath1.toStdString());
-
-		if (fs::exists(strPhotoPath2.toStdString()))
-		{
-			string strSSCardPhoto;
-			if (QSucceed(GetImageStorePath(strSSCardPhoto, 1)))
-			{
-				if (fs::exists(strSSCardPhoto))
-					fs::remove(strSSCardPhoto);
-				fs::copy(strPhotoPath2.toStdString(), strSSCardPhoto);
-				g_pDataCenter->strSSCardPhotoFile = strSSCardPhoto;
-			}
-			fs::remove(strPhotoPath2.toStdString());
-		}
-	}
-	catch (std::exception& e)
-	{
-		gInfo() << "发生异常" << e.what();
-	}
-	QDialog::accept();
 }
 
 int DialogCameraTest::OpenCamara(QString& strError)
@@ -229,21 +210,78 @@ void DialogCameraTest::on_pushButton_TakePhoto_clicked()
 	QString strMessage;
 	QString strAppPath = QApplication::applicationDirPath();
 	QString strPhotoPath1 = strAppPath + "/PhotoProcess/1.jpg";
-
-	if (fs::exists(strPhotoPath1.toStdString()))
-		fs::remove(strPhotoPath1.toStdString());
-
-	if (!g_pDataCenter->SaveFaceImage(strPhotoPath1.toStdString(), true))
+	try
 	{
-		QMessageBox(QMessageBox::Critical, "提示", "无法成图,可能摄像机故障!", QMessageBox::Ok, this);
-		return;
+		if (fs::exists(strPhotoPath1.toStdString()))
+			fs::remove(strPhotoPath1.toStdString());
+
+		if (!g_pDataCenter->SaveFaceImage(strPhotoPath1.toStdString(), true))
+		{
+			QMessageBox(QMessageBox::Critical, "提示", "无法成图,可能摄像机故障!", QMessageBox::Ok, this);
+			return;
+		}
+		ui->label_FaceCapture->setStyleSheet("border-image: url();");
+		if (QFailed(ProcessHeaderImage(strHeaderPhoto, strMessage)))
+		{
+			QMessageBox(QMessageBox::Critical, "提示", strMessage, QMessageBox::Ok, this);
+			return;
+		}
+		QString strDestPhoto = strAppPath + "/PhotoProcess/Oneself.jpg";
+		if (pButtonGrp->checkedId() == 1)
+			strDestPhoto = strAppPath + "/PhotoProcess/Guardian.jpg";
+		fs::rename(strHeaderPhoto.toStdString(), strDestPhoto.toStdString());
+
+		QString strQSS = QString("border-image: url(%1);").arg(strDestPhoto);
+		ui->label_FaceCapture->setStyleSheet(strQSS);
 	}
-	ui->label_FaceCapture->setStyleSheet("border-image: url();");
-	if (QFailed(ProcessHeaderImage(strHeaderPhoto, strMessage)))
+	catch (std::exception& e)
 	{
-		QMessageBox(QMessageBox::Critical, "提示", strMessage, QMessageBox::Ok, this);
-		return;
+		gInfo() << "发生异常" << e.what();
 	}
-	QString strQSS = QString("border-image: url(%1);").arg(strHeaderPhoto);
-	ui->label_FaceCapture->setStyleSheet(strQSS);
+}
+
+void DialogCameraTest::on_pushButton_OK_clicked()
+{
+	QWaitCursor Wait;
+	QString strAppPath = QApplication::applicationDirPath();
+	QString strPhotoPath1 = strAppPath + "/PhotoProcess/1.jpg";
+
+	QString strPhotoOneSelf = strAppPath + "/PhotoProcess/Oneself.jpg";
+	QString strPhotoGuardian = strAppPath + "/PhotoProcess/Guardian.jpg";
+
+	try
+	{
+		if (fs::exists(strPhotoPath1.toStdString()))
+			fs::remove(strPhotoPath1.toStdString());
+
+		if (fs::exists(strPhotoOneSelf.toStdString()))
+		{
+			string strSSCardPhoto;
+			if (QSucceed(GetImageStorePath(strSSCardPhoto, PhotoType::Photo_SSCard)))
+			{
+				if (fs::exists(strSSCardPhoto))
+					fs::remove(strSSCardPhoto);
+				fs::copy(strPhotoOneSelf.toStdString(), strSSCardPhoto);
+				g_pDataCenter->strSSCardPhotoFile = strSSCardPhoto;
+			}
+			fs::remove(strPhotoOneSelf.toStdString());
+		}
+		if (pButtonGrp->checkedId() == 1 && fs::exists(strPhotoGuardian.toStdString()))
+		{
+			string strGuaidianPhoto;
+			if (QSucceed(GetImageStorePath(strGuaidianPhoto, PhotoType::Photo_Guardian)))
+			{
+				if (fs::exists(strGuaidianPhoto))
+					fs::remove(strGuaidianPhoto);
+				fs::copy(strPhotoGuardian.toStdString(), strGuaidianPhoto);
+				g_pDataCenter->strGuardianPhotoFile = strGuaidianPhoto;
+			}
+			fs::remove(strPhotoGuardian.toStdString());
+		}
+	}
+	catch (std::exception& e)
+	{
+		gInfo() << "发生异常" << e.what();
+	}
+	QDialog::accept();
 }

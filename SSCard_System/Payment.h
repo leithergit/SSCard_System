@@ -51,8 +51,9 @@ int  queryPayResult(string& strPayCode, QString& strMessage, PayResult& nStatus)
 //
 //int QueryCardProgress(QString& strMessage, int& nStatus, SSCardBaseInfoPtr& pSSCardInfo);
 
-// nType，0为保存身份证照片，1为保存社保卡照片,2为原始base64数据
-int GetImageStorePath(string& strFilePath, int nType = 0, char* szCardID = nullptr);
+// nType，0为保存身份证照片，1为保存社保卡照片,2为原始base64数据,3为保存监护人照片
+
+int GetImageStorePath(string& strFilePath, PhotoType nType = PhotoType::Photo_CardID, char* szCardID = nullptr);
 
 int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardBaseInfoPtr& pSSCardInfo);
 

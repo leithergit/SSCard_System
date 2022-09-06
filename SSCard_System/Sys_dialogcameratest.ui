@@ -132,6 +132,118 @@
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButton_Oneself">
+           <property name="minimumSize">
+            <size>
+             <width>170</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+           </property>
+           <property name="text">
+            <string>被监护人</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButton_Guardian">
+           <property name="minimumSize">
+            <size>
+             <width>170</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+           </property>
+           <property name="text">
+            <string>监护人</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -168,7 +280,7 @@
         </size>
        </property>
        <property name="text">
-        <string>提示:拍照片时请正视镜头</string>
+        <string>提示:未成年人需要本人和监护人分别拍照</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -176,7 +288,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="pushButton_OK">
        <property name="minimumSize">
         <size>
          <width>200</width>

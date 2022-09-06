@@ -109,7 +109,7 @@ int SSCardReport::LoadCardProgress()
 			else
 				continue;
 
-			// 已经完成数据解析，接下来做把数据填入表格,并生成xlxs文件和发送邮件 2022/07/01
+#pragma Warning("已经完成数据解析,接下来做把数据填入表格, 并生成xlxs文件和发送邮件 2022/07/01")
 			nCount++;
 		}
 		catch (std::exception& e)
@@ -117,6 +117,10 @@ int SSCardReport::LoadCardProgress()
 			gInfo() << "Catch a exception:" << e.what();
 		}
 	}
+	if (vecCardProgress.size())
+		return 0;
+	else
+		return 1;
 }
 
 

@@ -3,6 +3,8 @@
 
 #include <windows.h>
 #include <string>
+#include <list>
+using namespace std;
 
 enum SSCardProvince
 {
@@ -83,7 +85,7 @@ struct HSMInfo
 //河南卡信息
 struct SSCardInfo
 {
-	char strOrganID[21] = {0};			//经办机构
+	char strOrganID[21] = { 0 };			//经办机构
 	char strCardNum[10] = { 0 };		//社保卡号
 	char strCardID[19] = { 0 };			//身份证号
 	char strBirthday[9] = { 0 };		//出生日期
@@ -121,51 +123,77 @@ struct SSCardInfo
 	char* strPhoto = NULL;				//相片
 };
 
-//山东卡信息
+//山东滨州卡信息
 struct SD_SSCardInfo
 {
-	std::string strCardNum;			//社保卡号
-	std::string strCardID;			//身份证号
-	std::string strBirthday;		//出生日期
-	std::string strName;			//姓名
-	std::string strSex;				//性别
-	std::string strNation;			//民族
-	std::string strMobile;			//手机号
-	std::string strAdress;			//通讯地址
-	std::string strPostalCode;		//邮政编码
-	std::string strEmail;			//电子邮箱
-	std::string strGuardianName;	//监护人姓名
-	std::string strCity;			//所属城市
-	std::string strSSQX;			//所属区县
-	std::string strBankCode;		//银行代码
-	std::string strReleaseDate;		//发卡日期
-	std::string strValidDate;		//有效日期
-	std::string strIdentifyNum;		//卡识别码
-	std::string strCardATR;			//卡复位信息
-	std::string strBankNum;			//银行卡号
-	std::string strCardType;		//证件类型
-	std::string strOperator;		//经办人
-	std::string strOccupType;		//职业类别
-	std::string strDealType;		//办卡类型
-	std::string strChipNum;			//卡芯片账号
-	std::string strMagNum;			//卡磁条账号
-	std::string strCardVersion;		//卡规范版本
-	std::string strChipType;		//芯片类型
-	std::string strCardUnit;		//发证机关
-	std::string strBirthPlace;		//出生地
-	std::string strPerAddr;			//户籍所在地
-	std::string strRegAttr;			//户口性质
-	std::string strEducation;		//文化程度
-	std::string strMarital;			//婚姻状况
-	std::string strContactsName;	//联系人姓名
-	std::string strContactsMobile;	//联系人电话
-	std::string strReason;			//补换原因
-	std::string strGuardianCardType;//监护人证件类型
-	std::string strGuardianCardID;	//监护人证件号
-	std::string strGuardianType;	//监护人关系
-	std::string strPhoto;			//相片
+	string strCardNum;			//社保卡号
+	string strCardID;			//身份证号
+	string strBirthday;		//出生日期
+	string strName;			//姓名
+	string strSex;				//性别
+	string strNation;			//民族
+	string strMobile;			//手机号
+	string strAdress;			//通讯地址
+	string strPostalCode;		//邮政编码
+	string strEmail;			//电子邮箱
+	string strGuardianName;	//监护人姓名
+	string strCity;			//所属城市
+	string strSSQX;			//所属区县
+	string strBankCode;		//银行代码
+	string strReleaseDate;		//发卡日期
+	string strValidDate;		//有效日期
+	string strIdentifyNum;		//卡识别码
+	string strCardATR;			//卡复位信息
+	string strBankNum;			//银行卡号
+	string strCardType;		//证件类型
+	string strOperator;		//经办人
+	string strOccupType;		//职业类别
+	string strDealType;		//办卡类型
+	string strChipNum;			//卡芯片账号
+	string strMagNum;			//卡磁条账号
+	string strCardVersion;		//卡规范版本
+	string strChipType;		//芯片类型
+	string strCardUnit;		//发证机关
+	string strBirthPlace;		//出生地
+	string strPerAddr;			//户籍所在地
+	string strRegAttr;			//户口性质
+	string strEducation;		//文化程度
+	string strMarital;			//婚姻状况
+	string strContactsName;	//联系人姓名
+	string strContactsMobile;	//联系人电话
+	string strReason;			//补换原因
+	string strGuardianCardType;//监护人证件类型
+	string strGuardianCardID;	//监护人证件号
+	string strGuardianType;	//监护人关系
+	string strPhoto;			//相片
+	string strAuthorizeTime;	//授权时间
+	string strAuthorizeType;	//授权类型
+	list<string> listAuthorizeData;	//授权数据
 };
-struct CAInfo 
+//山东济宁卡信息
+struct SSCardInfo_JiNing :public SD_SSCardInfo
+{
+	string strOldCardNum;		// 旧卡号
+	string strOldBankNum;		// 
+	string strOldBankCode;		// 旧卡银行代码
+	string strOldChipestNum;	// 旧卡芯片号
+	string strIssuedSite;		// 领取地点
+	string strMakeCardFlag;		// 即制卡标识,需要即时制卡则传递1，否则为0
+	string strCardFront;		// 身份证正面
+	string strCardBack;			// 身份证反面
+	string strUKey;				// Ukey
+	string strServiceType;		// 制卡类别,0新制卡,1补换卡
+	string strPrinterID;		// 打卡机设备代码
+	string strPsamCard;			// psam卡
+	string strAgent;			// 经办人编号,读Ukey获得
+	string strDisability;		// 是否残疾人,0为正常人，1为残疾人
+	string strDisabilityType;	// 残疾人类型
+	string strDisabilityLevel;	// 残疾人等级
+	string strDisabilityIdentify;// 残疾人编号
+	string strTradeCode;		// 交易代码
+};
+
+struct CAInfo
 {
 	char QMZS[1024];		//签名证书
 	char JMZS[1024];		//加密证书

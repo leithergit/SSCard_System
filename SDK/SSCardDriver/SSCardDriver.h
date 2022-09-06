@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <windows.h>
 #include <iostream>
 
@@ -9,122 +9,140 @@ EXTERN_C_START
 #endif
 typedef struct CardInfo
 {
-	std::string bankNumber;//ÒøĞĞ¿¨ºÅ
-	std::string regionCode;//ÇøÓò´úÂë
-	std::string ATR;//¸´Î»ĞÅÏ¢
-	std::string algoCode = "03";//Ëã·¨±êÊ¶
-	std::string identifyNum;//¿¨Ê¶±ğÂë
-	std::string cardVersion;//¿¨Æ¬°æ±¾
-	std::string cardReleaseDate;//·¢¿¨ÈÕÆÚ
-	std::string cardValidDate;//¿¨ÓĞĞ§ÆÚ
-	std::string cardNumber;//¿¨ºÅ
-	std::string cardID;//Éí·İÖ¤ºÅ
-	std::string name;//ĞÕÃû
-	std::string nameExtend;//ĞÕÃûÍØÕ¹
-	std::string sex;//ĞÔ±ğ
-	std::string nation;//Ãû×å
-	std::string birthday;//³öÉúÈÕÆÚ
+	std::string bankNumber;//é“¶è¡Œå¡å·
+	std::string regionCode;//åŒºåŸŸä»£ç 
+	std::string ATR;//å¤ä½ä¿¡æ¯
+	std::string algoCode = "03";//ç®—æ³•æ ‡è¯†
+	std::string identifyNum;//å¡è¯†åˆ«ç 
+	std::string cardVersion;//å¡ç‰‡ç‰ˆæœ¬
+	std::string cardReleaseDate;//å‘å¡æ—¥æœŸ
+	std::string cardValidDate;//å¡æœ‰æ•ˆæœŸ
+	std::string cardNumber;//å¡å·
+	std::string cardID;//èº«ä»½è¯å·
+	std::string name;//å§“å
+	std::string nameExtend;//å§“åæ‹“å±•
+	std::string sex;//æ€§åˆ«
+	std::string nation;//åæ—
+	std::string birthday;//å‡ºç”Ÿæ—¥æœŸ
+	void reset()
+	{
+		bankNumber = "";
+		regionCode = "";
+		ATR = "";
+		algoCode = "";//ç®—æ³•æ ‡è¯†
+		identifyNum = "";
+		cardVersion = "";
+		cardReleaseDate = "";
+		cardValidDate = "";
+		cardNumber = "";
+		cardID = "";
+		name = "";
+		nameExtend = "";
+		sex = "";
+		nation = "";
+		birthday = "";
+	}
 }CARDINFO;
 
 /**
- * @brief Éç±£Ä£¿é³õÊ¼»¯¶Á¿¨Æ÷
- * @param[in] ReaderHandle ¶Á¿¨Æ÷¾ä±ú
- * @param[out] pOutInfo ·µ»Ø²ÎÊı"0000"³É¹¦,ÆäËûÊ§°Ü
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief ç¤¾ä¿æ¨¡å—åˆå§‹åŒ–è¯»å¡å™¨
+ * @param[in] ReaderHandle è¯»å¡å™¨å¥æŸ„
+ * @param[out] pOutInfo è¿”å›å‚æ•°"0000"æˆåŠŸ,å…¶ä»–å¤±è´¥
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
-DLL_PUBLIC long DriverInit(HANDLE ReaderHandle, char *regionCode, char* OLDPIN, char* OLDZKMY,char* pOutInfo);
+DLL_PUBLIC long DriverInit(HANDLE ReaderHandle, char* regionCode, char* OLDPIN, char* OLDZKMY, char* pOutInfo);
 /**
- * @brief ¶Á»ù±¾ĞÅÏ¢
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[in] cardAtr ¿¨ÉÏµç·µ»ØµÄATR
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief è¯»åŸºæœ¬ä¿¡æ¯
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[in] cardAtr å¡ä¸Šç”µè¿”å›çš„ATR
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC long iReadCardBas(int iType, char* pOutInfo);
 /**
- * @brief Ğ´»ù±¾ĞÅÏ¢
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[out] pOutInfo ´«³öĞÅÏ¢ 
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief å†™åŸºæœ¬ä¿¡æ¯
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC long iWriteCardBas(int iType, char* pOutInfo);
 /**
- * @brief Ğ´»ù±¾ĞÅÏ¢¼ÓÃÜ»úµÚÒ»²½
- * @param[in] pKey Íâ²¿ÈÏÖ¤MAC
- * @param[in] pWriteInfo ¿¨Ê¶±ğÂë|³õÊ¼»¯»ú¹¹±àÂë|·¢¿¨ÈÕÆÚ|¿¨ÓĞĞ§ÆÚ|¿¨ºÅ|Éç»á±£ÕÏºÅÂë|ĞÕÃû|ĞÕÃûÍØÕ¹|ĞÔ±ğ|Ãñ×å|³öÉúÈÕÆÚ|
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief å†™åŸºæœ¬ä¿¡æ¯åŠ å¯†æœºç¬¬ä¸€æ­¥
+ * @param[in] pKey å¤–éƒ¨è®¤è¯MAC
+ * @param[in] pWriteInfo å¡è¯†åˆ«ç |åˆå§‹åŒ–æœºæ„ç¼–ç |å‘å¡æ—¥æœŸ|å¡æœ‰æ•ˆæœŸ|å¡å·|ç¤¾ä¼šä¿éšœå·ç |å§“å|å§“åæ‹“å±•|æ€§åˆ«|æ°‘æ—|å‡ºç”Ÿæ—¥æœŸ|
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
-DLL_PUBLIC int iWriteCardBas_HSM_Step1(char *pKey,char* pWriteInfo, char* pOutInfo);
+DLL_PUBLIC int iWriteCardBas_HSM_Step1(char* pKey, char* pWriteInfo, char* pOutInfo);
 /**
- * @brief »ùÓÚ¼ÓÃÜ»úµÄ¶Á»ù±¾ĞÅÏ¢ ²½Öè1
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief åŸºäºåŠ å¯†æœºçš„è¯»åŸºæœ¬ä¿¡æ¯ æ­¥éª¤1
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC long iReadCardBas_HSM_Step1(char* pOutInfo);
 /**
- * @brief »ùÓÚ¼ÓÃÜ»úµÄ¶Á»ù±¾ĞÅÏ¢ ²½Öè2
- * @param[in] pKey ¼ÓÃÜ»ú·µ»ØµÄÄÚ²¿ÈÏÖ¤ºÍÍâ²¿ÈÏÖ¤Êı¾İ
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief åŸºäºåŠ å¯†æœºçš„è¯»åŸºæœ¬ä¿¡æ¯ æ­¥éª¤2
+ * @param[in] pKey åŠ å¯†æœºè¿”å›çš„å†…éƒ¨è®¤è¯å’Œå¤–éƒ¨è®¤è¯æ•°æ®
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC long iReadCardBas_HSM_Step2(char* pKey, char* pOutInfo);
 /**
- * @brief ¶ÁCA¹«Ô¿
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief è¯»CAå…¬é’¥
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC long iReadSignatureKey(int iType, char* pOutInfo);
 /**
- * @brief Ğ´CAĞÅÏ¢
- * @param[in] QMZS£ºÇ©ÃûÖ¤Êé
- * @param[in] JMZS£º¼ÓÃÜÖ¤Êé
- * @param[in] JMMY£º¼ÓÃÜÃÜÔ¿
- * @param[in] GLYPIN£º¹ÜÀíÔ±pin
- * @param[in] ZKMY£ºÖ÷¿ØÃÜÔ¿
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief å†™CAä¿¡æ¯
+ * @param[in] QMZSï¼šç­¾åè¯ä¹¦
+ * @param[in] JMZSï¼šåŠ å¯†è¯ä¹¦
+ * @param[in] JMMYï¼šåŠ å¯†å¯†é’¥
+ * @param[in] GLYPINï¼šç®¡ç†å‘˜pin
+ * @param[in] ZKMYï¼šä¸»æ§å¯†é’¥
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
-DLL_PUBLIC long iWriteCA(int iType, char* QMZS, char* JMZS, char* JMMY, char* GLYPIN, char* ZKMY,char* pOutInfo);
+DLL_PUBLIC long iWriteCA(int iType, char* QMZS, char* JMZS, char* JMMY, char* GLYPIN, char* ZKMY, char* pOutInfo);
 /**
- * @brief ¶ÁÈ¡ÒøĞĞ¿¨ºÅ
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief è¯»å–é“¶è¡Œå¡å·
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
-DLL_PUBLIC int iReadBankNumber(int iType,char* pOutInfo);
+DLL_PUBLIC int iReadBankNumber(int iType, char* pOutInfo);
 /**
- * @brief ÑéÖ¤ÓÃ»§pin
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[in] pin ÓÃ»§pin£¨ÓÃ»§ÃÜÂë£©
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief éªŒè¯ç”¨æˆ·pin
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[in] pin ç”¨æˆ·pinï¼ˆç”¨æˆ·å¯†ç ï¼‰
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC int iVerifyPin(int iType, char* pin, char* pOutInfo);
 /**
- * @brief ĞŞ¸ÄÓÃ»§pin
- * @param[in] iType ¿¨²Ù×÷ÀàĞÍ	1-½Ó´¥ 2-·Ç½Ó 3-×Ô¶¯Ñ°¿¨(½Ó´¥ÓÅÏÈ) 4-×Ô¶¯Ñ°¿¨(·Ç½ÓÓÅÏÈ)
- * @param[in] oldPin ÀÏÓÃ»§pin£¨ÓÃ»§ÃÜÂë£©
- * @param[in] newPin:ĞÂÓÃ»§pin£¨ÓÃ»§ĞÂpin£©
- * @param[out] pOutInfo ´«³öĞÅÏ¢
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief ä¿®æ”¹ç”¨æˆ·pin
+ * @param[in] iType å¡æ“ä½œç±»å‹	1-æ¥è§¦ 2-éæ¥ 3-è‡ªåŠ¨å¯»å¡(æ¥è§¦ä¼˜å…ˆ) 4-è‡ªåŠ¨å¯»å¡(éæ¥ä¼˜å…ˆ)
+ * @param[in] oldPin è€ç”¨æˆ·pinï¼ˆç”¨æˆ·å¯†ç ï¼‰
+ * @param[in] newPin:æ–°ç”¨æˆ·pinï¼ˆç”¨æˆ·æ–°pinï¼‰
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC int iChangePin(int iType, char* oldPin, char* newPin, char* pOutInfo);
 /**
- * @brief »ñÈ¡Ò½±£¿¨ºÅµÚÒ»²½»ñÈ¡Á½¸öËæ»úÊı
- * @param[out] pOutInfo ´«³öĞÅÏ¢ random1|random2
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief è·å–åŒ»ä¿å¡å·ç¬¬ä¸€æ­¥è·å–ä¸¤ä¸ªéšæœºæ•°
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯ random1|random2
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
 DLL_PUBLIC int iGetMedicalNum_Step1(char* pOutInfo);
 /**
- * @brief »ñÈ¡Ò½±£¿¨ºÅ
- * @param[in] Key ´«ÈëµÄMACÖµ
- * @param[out] pOutInfo ´«³öĞÅÏ¢,³É¹¦Ê±ÎªÒ½±£ÕËºÅ,Ê§°ÜÊ±Îª´íÎóÂë
- * @return 0-³É¹¦ 1-Ê§°Ü
+ * @brief è·å–åŒ»ä¿å¡å·
+ * @param[in] Key ä¼ å…¥çš„MACå€¼
+ * @param[out] pOutInfo ä¼ å‡ºä¿¡æ¯,æˆåŠŸæ—¶ä¸ºåŒ»ä¿è´¦å·,å¤±è´¥æ—¶ä¸ºé”™è¯¯ç 
+ * @return 0-æˆåŠŸ 1-å¤±è´¥
  */
-DLL_PUBLIC int iGetMedicalNum_Step2(const char *Key, char* pOutInfo);
+DLL_PUBLIC int iGetMedicalNum_Step2(const char* Key, char* pOutInfo);
 
 #ifdef __cplusplus
 EXTERN_C_END

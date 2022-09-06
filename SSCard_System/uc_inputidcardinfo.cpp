@@ -278,6 +278,14 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 				json.Get("GuardianCardID", pSSCardInfo->strGuardianIDentity);
 				ui->lineEdit_GuardianCardID->setText(pSSCardInfo->strGuardianIDentity.c_str());
 			}
+
+			string strPhotoGuardian;
+			if (json.KeyExist("PhotoGuardian"))
+			{
+				json.Get("PhotoGuardian", strPhotoGuardian);
+				if (fs::exists((strPhotoGuardian)))
+					g_pDataCenter->strGuardianPhotoFile = strPhotoGuardian;
+			}
 		}
 		else
 		{
@@ -332,19 +340,20 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	//json.Add("County", strCounty.toLocal8Bit().data());
 	json.Add("Address", strAddress.toLocal8Bit().data());
 
-	if (ui->checkBox_Agency->isChecked())
-	{
-		json.Add("Guardian", pSSCardInfo->strGuardianName);
-		json.Add("GuardianShip", pSSCardInfo->strGuardianShip);
-		json.Add("GuardianCardID", pSSCardInfo->strGuardianIDentity);
-	}
-	QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
-	if (fi.isFile())
-	{
-		json.Add("Photo", g_pDataCenter->strSSCardPhotoFile);
-	}
 	try
 	{
+		if (fs::exists(g_pDataCenter->strSSCardPhotoFile))
+			json.Add("Photo", g_pDataCenter->strSSCardPhotoFile);
+
+		if (ui->checkBox_Agency->isChecked())
+		{
+			json.Add("Guardian", pSSCardInfo->strGuardianName);
+			json.Add("GuardianShip", pSSCardInfo->strGuardianShip);
+			json.Add("GuardianCardID", pSSCardInfo->strGuardianIDentity);
+			if (fs::exists(g_pDataCenter->strSSCardPhotoFile))
+				json.Add("GuardianPhoto", g_pDataCenter->strSSCardPhotoFile);
+		}
+
 		QString strAppPath = QApplication::applicationDirPath();
 		QString strJsonPath = QString("%1/data/Person_%2.json").arg(strAppPath).arg(pSSCardInfo->strIdentity.c_str());
 		ofstream ofs(strJsonPath.toLocal8Bit().data(), ios::out | ios::binary);
@@ -1090,13 +1099,11 @@ void uc_InputIDCardInfo::on_pushButton_TakePhoto_clicked()
 	do
 	{
 		if (QFailed(nResult = GetCardInfo(strMessage)))
-		{
 			break;
-		}
+
 		if (QFailed(nResult = GetSSCardInfo(strMessage)))
-		{
 			break;
-		}
+
 		SavePersonInfo();
 		nResult = 0;
 	} while (0);
@@ -1106,7 +1113,10 @@ void uc_InputIDCardInfo::on_pushButton_TakePhoto_clicked()
 		emit ShowMaskWidget("提示", strMessage, Fetal, Stay_CurrentPage);
 		return;
 	}
-	DialogCameraTest dialog;
+	bool bGuardian = false;
+	if (GetAge(string((char*)g_pDataCenter->GetIDCardInfo()->szBirthday)) < 16)
+		bGuardian = true;
+	DialogCameraTest dialog(bGuardian);
 	if (dialog.exec() == QDialog::Accepted)
 	{
 		QString strQSS = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
@@ -1160,7 +1170,7 @@ void uc_InputIDCardInfo::on_pushButton_SelectPhoto_clicked()
 			if (fs::exists(strPhotoPath2.toLocal8Bit().data()))
 			{
 				string strSSCardPhoto;
-				if (QSucceed(GetImageStorePath(strSSCardPhoto, 1)))
+				if (QSucceed(GetImageStorePath(strSSCardPhoto, PhotoType::Photo_SSCard)))
 				{
 					if (fs::exists(strSSCardPhoto))
 						fs::remove(strSSCardPhoto);
@@ -1223,6 +1233,13 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 				strMessage = "照片尺寸不符要求,请重新采集或上传照片!";
 				break;
 			}
+		}
+
+		if (GetAge(string((char*)g_pDataCenter->GetIDCardInfo()->szBirthday)) < 16 &&
+			!fs::exists(g_pDataCenter->strGuardianPhotoFile))
+		{
+			strMessage = "未成年人办卡时,需要同时上传本人和监护人的照片!";
+			break;
 		}
 
 		SavePersonInfo();

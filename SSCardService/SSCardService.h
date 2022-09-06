@@ -7,7 +7,8 @@ enum class ServiceType
 	Service_Unknown = -1,
 	Service_NewCard = 0,
 	Service_ReplaceCard,
-	Service_RegisterLost
+	Service_RegisterLost,
+	Service_QueryInformation,
 };
 
 enum class PayResult

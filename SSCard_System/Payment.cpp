@@ -491,7 +491,7 @@ int LoadJsonCardData(SSCardBaseInfoPtr& pSSCardInfoOut, string strJsonFile)
 	}
 }
 
-int  GetImageStorePath(string& strFilePath, int nType, char* szCardID)
+int  GetImageStorePath(string& strFilePath, PhotoType nType , char* szCardID)
 {
 	QString strStorePath = QCoreApplication::applicationDirPath();
 	strStorePath += "/IDImage/";
@@ -514,22 +514,30 @@ int  GetImageStorePath(string& strFilePath, int nType, char* szCardID)
 		return -1;
 	QString strTempPath;
 	char* szIdentity = pIDCard ? (char*)pIDCard->szIdentity : szCardID;
-	if (nType == 0)
-		strTempPath = strStorePath + QString("ID_%1.jpg").arg(szIdentity);
-	else if (nType == 1)
-	{
-		if (g_pDataCenter->GetSSCardInfo() &&
-			g_pDataCenter->GetSSCardInfo()->strCardNum.size() == 9)
-			strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg(szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
-		else
-			strTempPath = strStorePath + QString("ID_%1_SSCard.jpg").arg(szIdentity);
-	}
-	else if (nType == 2)		// 原始base64 文本
-	{
-		strTempPath = strStorePath + QString("ID_%1_SSCard.base64").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
-	}
-	else
-		return -1;
+    switch (nType) {
+
+    case PhotoType::Photo_CardID:
+        strTempPath = strStorePath + QString("ID_%1.jpg").arg(szIdentity);
+        break;
+    case PhotoType::Photo_SSCard:
+    {
+        if (g_pDataCenter->GetSSCardInfo() &&
+            g_pDataCenter->GetSSCardInfo()->strCardNum.size() == 9)
+            strTempPath = strStorePath + QString("ID_%1_%2.jpg").arg(szIdentity).arg((const char*)g_pDataCenter->GetSSCardInfo()->strCardNum.c_str());
+        else
+            strTempPath = strStorePath + QString("ID_%1_SSCard.jpg").arg(szIdentity);
+        break;
+    }
+    case PhotoType::Photo_Base64:
+        strTempPath = strStorePath + QString("ID_%1_SSCard.base64").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+        break;
+
+    case PhotoType::Photo_Guardian:
+        strTempPath = strStorePath + QString("ID_%1_Guardian.jpg").arg((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity);
+        break;
+    default:
+        return -1;
+    }
 
 	strFilePath = strTempPath.toStdString();
 	return 0;
@@ -547,7 +555,7 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64, char* szCardI
 	Base64Decode(szPhotoBase64, strlen(szPhotoBase64), (BYTE*)g_szPhotoBuffer, &nPhotoSize);
 	QImage photo = QImage::fromData((const uchar*)g_szPhotoBuffer, nPhotoSize);
 	string strPhotoPath;
-	GetImageStorePath(strPhotoPath, 1, szCardID);
+    GetImageStorePath(strPhotoPath, PhotoType::Photo_SSCard, szCardID);
 	photo.save(strPhotoPath.c_str(), "jpg", 90);
 	g_pDataCenter->strSSCardPhotoFile = strPhotoPath.c_str();
 	return 0;
@@ -561,7 +569,7 @@ int SaveSSCardPhotoBase64(QString strMessage, const char* szPhotoBase64)
 	}
 
 	string strPhotoPath;
-	GetImageStorePath(strPhotoPath, 2);	// 取base64编码的文件路径
+    GetImageStorePath(strPhotoPath, PhotoType::Photo_Base64);	// 取base64编码的文件路径
 	//photo.save(strPhotoPath.c_str(), "JPG", 90);
 	try
 	{

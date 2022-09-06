@@ -63,13 +63,12 @@ void WaitingProgress::ThreadFunction()
 		int nResult = pFunction(pParam);
 		if (QSucceed(nResult))
 		{
-			emit TheadFinished();
 			break;
 		}
 
 		this_thread::sleep_for(milliseconds(100));
 	} while (bLoop);
-
+	emit TheadFinished();
 }
 
 void WaitingProgress::On_TheadFinished()
