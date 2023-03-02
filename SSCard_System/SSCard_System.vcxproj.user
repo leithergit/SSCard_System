@@ -1,23 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <RemoteDebuggerCommand>D:\SSCard_System\SSCard_System.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>D:\SSCard_System</RemoteDebuggerWorkingDirectory>
-    <RemoteDebuggerServerName>10.0.0.101</RemoteDebuggerServerName>
-    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
-    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
-    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>Z:\SSCard_System\SSCard_System.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments />
-    <LocalDebuggerWorkingDirectory>Z:\SSCard_System\</LocalDebuggerWorkingDirectory>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-  </PropertyGroup>
-  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2022-07-11T05:24:21.5111407Z</QtLastBackgroundBuild>
+    <LocalDebuggerCommand>D:\Work\SSCard_System.main\MainProject\Debug\SSCard_System.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>D:\Work\SSCard_System.main\MainProject\Debug</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2022-07-11T05:24:21.1913885Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-03-02T05:35:49.1187339Z</QtLastBackgroundBuild>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <QtLastBackgroundBuild>2023-03-02T05:35:49.2828424Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

@@ -400,12 +400,12 @@ QRadioButton::indicator::checked {
                </property>
                <property name="dateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>2000</year>
                  <month>12</month>
-                 <day>31</day>
+                 <day>30</day>
                 </datetime>
                </property>
               </widget>
@@ -445,12 +445,12 @@ QRadioButton::indicator::checked {
                </property>
                <property name="dateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>8</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>2022</year>
                  <month>12</month>
-                 <day>31</day>
+                 <day>30</day>
                 </datetime>
                </property>
               </widget>
@@ -690,6 +690,31 @@ QRadioButton::indicator::checked {
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="label_Address_2">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>城市</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_City"/>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_10">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -746,6 +771,31 @@ QRadioButton::indicator::checked {
               <bool>false</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_Address_3">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>区县</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_Country"/>
            </item>
            <item>
             <spacer name="horizontalSpacer_9">
@@ -806,6 +856,31 @@ QRadioButton::indicator::checked {
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="label_Agent">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>机构</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_Agency"/>
+           </item>
+           <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -838,6 +913,106 @@ QRadioButton::indicator::checked {
       </spacer>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_12">
+       <item>
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>188</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_Department_2">
+         <property name="minimumSize">
+          <size>
+           <width>220</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>220</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>卡号</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_CardNum">
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_Department_3">
+         <property name="minimumSize">
+          <size>
+           <width>220</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>220</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>卡状态</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_Status">
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_13">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
         <spacer name="horizontalSpacer_2">
@@ -856,7 +1031,7 @@ QRadioButton::indicator::checked {
         <widget class="QComboBox" name="comboBox_Function">
          <property name="minimumSize">
           <size>
-           <width>300</width>
+           <width>400</width>
            <height>0</height>
           </size>
          </property>
@@ -877,7 +1052,47 @@ QRadioButton::indicator::checked {
          </item>
          <item>
           <property name="text">
+           <string>查询制卡状态</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>加载制卡数据</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>挂失</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>注册缴费</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>即制卡标注</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>即制卡申请</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>获取制卡数据</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>写卡</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>打印</string>
           </property>
          </item>
          <item>
@@ -900,7 +1115,7 @@ QRadioButton::indicator::checked {
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
+border-radius: 15px;
 font: 57 42px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;
@@ -928,7 +1143,7 @@ QPushButton:!enabled{background:#cacaca;}
          </property>
          <property name="styleSheet">
           <string notr="true">QPushButton{background-color: #298cf0;
-border-radius: 25px;
+border-radius: 15px;
 font: 57 42px &quot;思源黑体 CN Medium&quot;;
 font-weight: normal;
 line-height: 49px;

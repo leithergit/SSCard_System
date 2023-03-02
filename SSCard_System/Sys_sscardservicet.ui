@@ -31,8 +31,10 @@
            <widget class="QRadioButton" name="radioButton_New">
             <property name="font">
              <font>
-              <family>思源黑体 CN Medium</family>
-              <pointsize>28</pointsize>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+              <italic>false</italic>
+              <bold>false</bold>
              </font>
             </property>
             <property name="text">
@@ -44,8 +46,10 @@
            <widget class="QRadioButton" name="radioButton_ReplaceCard">
             <property name="font">
              <font>
-              <family>思源黑体 CN Medium</family>
-              <pointsize>28</pointsize>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+              <italic>false</italic>
+              <bold>false</bold>
              </font>
             </property>
             <property name="text">
@@ -66,8 +70,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -85,8 +91,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -104,8 +112,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -123,8 +133,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -142,8 +154,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -161,8 +175,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -180,12 +196,35 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
           <string>UnRegisterLost</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_QueryPayUrl">
+         <property name="minimumSize">
+          <size>
+           <width>320</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>QueryPayUrl</string>
          </property>
         </widget>
        </item>
@@ -216,8 +255,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -235,8 +276,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -254,8 +297,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -273,8 +318,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -292,8 +339,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -311,8 +360,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -330,8 +381,10 @@
          </property>
          <property name="font">
           <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>10</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -368,8 +421,10 @@
        </property>
        <property name="font">
         <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -387,8 +442,10 @@
        </property>
        <property name="font">
         <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -409,8 +466,10 @@
        </property>
        <property name="font">
         <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -448,8 +507,10 @@
        </property>
        <property name="font">
         <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -467,8 +528,10 @@
        </property>
        <property name="font">
         <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -486,8 +549,10 @@
        </property>
        <property name="font">
         <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -520,8 +585,10 @@
      </property>
      <property name="font">
       <font>
-       <family>思源黑体 CN Normal</family>
-       <pointsize>28</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">

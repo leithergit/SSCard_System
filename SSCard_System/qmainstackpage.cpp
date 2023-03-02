@@ -59,7 +59,7 @@ bool QMainStackPage::eventFilter(QObject* object, QEvent* event)
 	{
 		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 
-		if (g_pDataCenter->bDebug)
+		if (g_pDataCenter->bDebug || g_pDataCenter->bSkipFaceCapture)
 		{
 			if (keyEvent->key() == Qt::Key_Return)
 			{

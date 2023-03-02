@@ -32,6 +32,10 @@ public:
 	void EnableCard();
     void TestApplyNewCard();
 
+    void TestQueryPayUrl();
+
+    int uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage);
+
 	int LoadPersonSSCardData(QString& strMesssage);
 
 signals:

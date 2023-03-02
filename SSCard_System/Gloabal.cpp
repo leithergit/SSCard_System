@@ -179,6 +179,7 @@ int DataCenter::LoadSysConfigure(QString& strError)
 			return -1;
 		}
 		bDebug = GetSysConfigure()->bDebug;
+		bSkipFaceCapture = GetSysConfigure()->bSkipFaceCapture;
 		bEnableUpdate = GetSysConfigure()->bEnableUpdate;
 		nSkipPayTime = GetSysConfigure()->nSkipPayTime;
 		bTestCard = GetSysConfigure()->bTestCard;
@@ -712,7 +713,7 @@ int DataCenter::OpenSSCardReader(QString& strMessage)
 					string strPortnum = strSSCardReaderPort.substr(nIndex + 3);
 					nPort = strtol(strPortnum.c_str(), nullptr, 10);
 				}
-				if (QFailed(nResult = m_pSSCardReader->Reader_Init(nPort,szRCode)))
+				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
 				{
 					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
 					break;
@@ -780,7 +781,7 @@ int DataCenter::OpenSSCardReader(QString strLib,QString strPort, ReaderBrand nRe
 					nPort = strtol(strPortnum.c_str(), nullptr, 10) - 1;
 				}
 
-				if (QFailed(nResult = m_pSSCardReader->Reader_Init(nPort,szRCode)))
+				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
 				{
 					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
 					break;
@@ -1887,6 +1888,7 @@ bool DataCenter::OpenCamera()
 		nRet = DVTGKLDCam_SetFrameCallback(m_hCamera, 1, LDCam_NIR_FrameCallback, this);
 		if (nRet != LD_RET_OK)
 			break;
+
 	} while (0);
 	if (nRet != LD_RET_OK)
 		return false;
@@ -1907,6 +1909,11 @@ bool DataCenter::StartVideo(HWND hWnd)
 
 		if (!IsWindow(hWnd))
 			break;
+
+		nRet = DVTGKLDCam_SetCamFormat(m_hCamera, 0, LD_FMT_MJPG, m_nWidth, m_nHeight);
+		if (nRet != LD_RET_OK)
+			break;
+
 		nRet = DVTGKLDCam_SetCamFormat(m_hCamera, 1, LD_FMT_MJPG, m_nWidth, m_nHeight);
 		if (nRet != LD_RET_OK)
 			break;

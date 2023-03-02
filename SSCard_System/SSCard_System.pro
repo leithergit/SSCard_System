@@ -25,7 +25,6 @@ SOURCES += \
     MaskWidget.cpp \
     OperatorSucceed.cpp \
     Payment.cpp \
-    SDK/dvtldcamocx/dvtldcamocxlib.cpp \
     Sys_DeviceManager.cpp \
     Sys_cardmanger.cpp \
     Sys_dialogcameratest.cpp \
@@ -44,7 +43,6 @@ SOURCES += \
     main.cpp \
     mainpage.cpp \
     mainwindow.cpp \
-    nc_commitPersonInfo.cpp \
     newcard.cpp \
     openssl-1.0.1g/include/openssl/applink.c \
     qmainstackpage.cpp \
@@ -220,10 +218,8 @@ FORMS += \
     Sys_sscardservicet.ui \
     SystemManager.ui \
     administer.ui \
-    license.ui \
     mainpage.ui \
     mainwindow.ui \
-    nc_commitpersoninfo.ui \
     registerlost.ui \
     showlicense.ui \
     sys_dialogreadidcard.ui \

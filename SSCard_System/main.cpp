@@ -25,7 +25,7 @@ const char* g_szPageOperation[4] =
 	Str(Return_MainPage),
 	Str(Stay_CurrentPage),
 	Str(Switch_NextPage),
-	Str(Skip_NextPage)
+	//Str(Skip_NextPage)
 	Str(Retry_CurrentPage)
 };
 
@@ -45,6 +45,41 @@ const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
 int main(int argc, char* argv[])
 {
+// 	QFile jsfile("D:/Work/SSCard_System.main/MainProject/现场日志/Testoriginal.json");
+// 	if (jsfile.open(QIODevice::ReadOnly))
+// 	{
+// 		QByteArray baJson = jsfile.readAll();
+// 		QJsonParseError jsonParseError;
+// 		QJsonDocument jsonDocument(QJsonDocument::fromJson(baJson.data(), &jsonParseError));
+// 		if (QJsonParseError::NoError != jsonParseError.error)
+// 		{
+// 			QString strMessage = QString("JsonParseError: %1").arg(jsonParseError.errorString());
+// 			gInfo() << gQStr(strMessage);
+// 			return -1;
+// 		}
+// 		QJsonObject rootObject = jsonDocument.object();
+// 
+// 		if (!rootObject.keys().contains("msg") ||
+// 			!rootObject.keys().contains("code"))
+// 		{
+// 			gInfo() << "There is no msg or code field in the respond!";
+// 			return -1;
+// 		}
+// 		
+// 
+// 		QString strCode = rootObject.value("code").toString();
+// 		int nCode = strCode.toInt();
+// 		QString strMsg = rootObject.value("msg").toString();
+// 		qDebug() << "jsCode = " << strCode;
+// 		qDebug() << "jsMsg = " << strMsg;
+// 		
+// 		if (nCode == -1 &&
+// 			strMsg.contains("一个月内有补卡缴费成功记录,不能获取缴款码"))
+// 		{
+// 			return 1;
+// 		}
+// 	}
+	
 	SetupExceptionHandler();
 	QMutex t;
 	if (OpenMutexW(MUTEX_ALL_ACCESS, FALSE, g_pUniqueID))
@@ -98,6 +133,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	FLAGS_max_log_size = 256;
+	FLAGS_logbufsecs = 0;
 	google::SetLogDestination(google::GLOG_INFO, strLogDatePath.toLocal8Bit().data());	// 使用该设定时，默认情况下，所有级别日志都用同一的文件名
 	google::SetStderrLogging(google::GLOG_INFO);	// 大于该级别的日志输出到stderr
 	google::SetLogFilenameExtension(".log");

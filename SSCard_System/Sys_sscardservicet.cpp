@@ -732,3 +732,68 @@ void SSCardServiceT::on_pushButton_QueryPersonInfo_clicked()
     } while (0);
 }
 
+#include "Payment.h"
+
+int SSCardServiceT::uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage)
+{
+    int nRespond = -1;
+    QString strPaymentUrl;
+
+    nRespond = RequestPaymentUrl2(strPaymentUrl, strPayCode, strTransTime, strMessage);
+    if (QSucceed(nRespond))
+    {
+        if (QFailed(QREnncodeImage(strPaymentUrl, 2, QRImage)))
+        {
+            return Failed_QREnocode;
+        }
+        else
+            return  0;
+    }
+    else
+    {
+        strMessage = QString("查询支付二维码失败:%1").arg(strMessage);
+        return -1;
+    }
+}
+
+void SSCardServiceT::on_pushButton_QueryPayUrl_clicked()
+{
+    // 这里可能是个耗时的过程，应该需要一个等待画面
+    QString strMessage;
+    // 获取二维码，并生成图像
+    QImage QRImage;
+    QString strTitle;
+    int m_nPayStatus = -1;
+    if (QFailed(QueryPayment(strMessage, m_nPayStatus)))
+    {
+        gError() << gQStr(strMessage);
+        QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok, this);
+        return ;
+    }
+    QString strPayCode;
+    QString strTransTime;
+
+    int nRespond = uc_ReqestPaymentQR2(strMessage, strPayCode, strTransTime, QRImage);	//新支付系统
+    //int nRespond = uc_ReqestPaymentQR(strMessage, strPayCode, QRImage);
+    if (QFailed(nRespond))
+    {//
+        qDebug() << __FUNCTION__ << "Payed failed:" << strMessage;
+        QString strTempMsg = "一个月内有补卡缴费成功记录,不能获取缴款码";
+        qDebug() << __FUNCTION__ << "Temp message=" << strTempMsg;
+        if (strMessage.contains("一个月内有补卡缴费成功记录,不能获取缴款码"))
+        {
+            gInfo() << strMessage.toLocal8Bit().data() << "\t视为已经缴款，继续制卡!";
+            QMessageBox_CN(QMessageBox::Information, "操作成功", "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片",  QMessageBox::Ok, this);
+        }
+        else
+        {
+            gError() << strMessage.toLocal8Bit().data();
+            QMessageBox_CN(QMessageBox::Information, "操作失败", strMessage,  QMessageBox::Ok, this);
+        }
+    }
+    else
+    {
+        QMessageBox_CN(QMessageBox::Information, "提示", "查询成功",  QMessageBox::Ok, this);
+    }
+}
+

@@ -65,6 +65,11 @@ int uc_FaceCapture::ProcessBussiness()
 	//		return -1;
 	//	}
 	//}
+	if (g_pDataCenter->GetSysConfigure()->bSkipFaceCapture)
+	{
+		emit ShowMaskWidget("操作成功", "人脸识别成功!", Success, Switch_NextPage);
+		return 0;
+	}
 	if (QFailed(OpenCamara(strError)))
 	{
 		gError() << strError.toLocal8Bit().data();

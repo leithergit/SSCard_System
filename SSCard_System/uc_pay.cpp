@@ -56,12 +56,26 @@ int uc_Pay::ProcessBussiness()
 	{
 	case Pay_Not:
 	{
-		int nRespond = uc_ReqestPaymentQR2(strMessage, strPayCode, strTransTime, QRImage);
+		int nRespond = uc_ReqestPaymentQR2(strMessage, strPayCode, strTransTime, QRImage);	//新支付系统
+		//int nRespond = uc_ReqestPaymentQR(strMessage, strPayCode, QRImage);
 		if (QFailed(nRespond))
-		{
-			gError() << strMessage.toLocal8Bit().data();
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-			return -1;
+		{// 
+			qDebug() << __FUNCTION__ << "Payed failed:" << strMessage;
+			QString strTempMsg = "一个月内有补卡缴费成功记录,不能获取缴款码";
+			qDebug() << __FUNCTION__ << "Temp message=" << strTempMsg;
+			if (strMessage.contains("一个月内有补卡缴费成功记录,不能获取缴款码"))
+			{
+				gInfo() << strMessage.toLocal8Bit().data() << "\t视为已经缴款，继续制卡!";
+				emit ShowMaskWidget("操作成功", "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片", Success, Switch_NextPage);
+				return 0;
+			}
+			else
+			{
+				gError() << strMessage.toLocal8Bit().data();
+				emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+				return -1;
+			}
+			
 		}
 		gInfo() << strMessage.toLocal8Bit().data();
 		// 获取二维码保存路径
@@ -274,6 +288,7 @@ void uc_Pay::ThreadWork()
 	while (m_bWorkThreadRunning)
 	{
 		nResult = queryPayResult2(g_pDataCenter->strPayCode, g_pDataCenter->strTransTime, strMessage, nPayResult);				// 查询支付结果
+		//nResult = queryPayResult(g_pDataCenter->strPayCode, strMessage, nPayResult);				// 查询支付结果
 		if (QFailed(nResult))
 		{
 			if (!Delay(m_bWorkThreadRunning, pSysConfig->PaymentConfig.nQueryPayFailedInterval))

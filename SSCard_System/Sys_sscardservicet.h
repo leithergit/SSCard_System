@@ -18,7 +18,7 @@ public:
 	~SSCardServiceT();
 
 	QButtonGroup* pBtnGroup = nullptr;
-
+    int uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage);
 private slots:
 	void on_pushButton_LoadCardID_clicked();
 
@@ -47,6 +47,8 @@ private slots:
     void on_pushButton_ReadBankNum_clicked();
 
     void on_pushButton_QueryPersonInfo_clicked();
+
+    void on_pushButton_QueryPayUrl_clicked();
 
 private:
 	Ui::Sys_SSCardServiceT* ui;

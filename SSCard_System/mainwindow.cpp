@@ -329,11 +329,11 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		return;
 	}
 
-	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	/*if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 	{
 		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
-	}
+	}*/
 	g_pDataCenter->ResetIDData();
 	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
 	m_pNewCard->StartBusiness();
@@ -380,11 +380,11 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		return;
 	}
 
-	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	/*if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 	{
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
-	}
+	}*/
 	g_pDataCenter->ResetIDData();
 	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;
 	m_pUpdateCard->StartBusiness();

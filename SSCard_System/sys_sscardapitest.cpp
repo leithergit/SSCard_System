@@ -999,18 +999,28 @@ void Sys_SSCardAPITest::on_pushButton_ResetPage_clicked()
 void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 {
 	int nSelect = ui->comboBox_Function->currentIndex();
+    g_pDataCenter->GetSysConfigure()->Region.strCityCode = ui->lineEdit_City->text().toStdString();
+    g_pDataCenter->GetSysConfigure()->Region.strCountry = ui->lineEdit_Country->text().toStdString();
+    g_pDataCenter->GetSysConfigure()->Region.strAgency = ui->lineEdit_Agency->text().toStdString();
+	QString strMessage;
+	string strCardID;
+	string strName;
+	strName = ui->lineEdit_Name->text().toLocal8Bit().data();
+	if (!pSSCardInfo)
+		pSSCardInfo = make_shared<SSCardInfo>();
+	if (QFailed(GetCardID(strCardID, strMessage)))
+	{
+		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		return ;
+	}
+	int nStatus = 0;
+	int nResult = -1;
+	QString strCardProgress;
 	switch (nSelect)
 	{
-	case 0:
+	case 0:		// 移除制卡数据
 	default:
 	{
-		QString strMessage;
-		string strCardID;
-		if (QFailed(GetCardID(strCardID, strMessage)))
-		{
-			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
-			break;
-		}
 
 		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 		strcpy(pSSCardInfo->strCardID, strCardID.c_str());
@@ -1018,22 +1028,14 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 		break;
 	}
 
-	case 1:
+	case 1:	// 照片采集
 		on_pushButton_TakePhoto_clicked();
 		break;
-	case 2:
+	case 2:	// 自选照片
 		on_pushButton_SelectPhoto_clicked();
 		break;
-	case 3:
+	case 4:	// 加载制止数据
 	{
-		QString strMessage;
-		string strCardID;
-		if (QFailed(GetCardID(strCardID, strMessage)))
-		{
-			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
-			break;
-		}
-
 		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 		QString strAppPath = QCoreApplication::applicationDirPath();
 		strAppPath += "/Debug";
@@ -1062,7 +1064,122 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 		}
 		break;
 	}
-	case 4:
+	case 3:	// 查询制卡状态
+	{
+		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
+		strcpy((char*)pTempSSCardInfo->strName, (const char*)strName.c_str());
+		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)strCardID.c_str());
+		strcpy((char*)pSSCardInfo->strName, (const char*)strName.c_str());
+		strcpy((char*)pSSCardInfo->strCardID, (const char*)strCardID.c_str());
+		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
+		{
+			break;
+		}
+
+		g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pTempSSCardInfo->strCardStatus).toStdString();
+		if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard &&
+			g_pDataCenter->strCardMakeProgress == "制卡中")
+		{
+			// 可以获取新的社保卡一些数据
+			if (QFailed(nResult = g_pDataCenter->ReadSSCardInfo(pSSCardInfo, nStatus, strMessage)))
+				break;
+			if (nStatus != 0 && nStatus != 1)
+				break;
+			nResult = 0;
+			break;
+		}
+		ui->lineEdit_Status->setText(g_pDataCenter->strCardMakeProgress.c_str());
+		// 可取旧社保卡号
+		if (QFailed(nResult = g_pDataCenter->ReadSSCardInfo(pSSCardInfo, nStatus, strMessage)))
+			break;
+
+		if (nStatus != 0 && nStatus != 1)
+			break;
+
+		if (QFailed(nResult = g_pDataCenter->QuerySSCardStatus(pSSCardInfo, strMessage)))
+			break;
+
+		if (nStatus != 0)
+		{
+			break;
+		}
+		ui->lineEdit_Status->setText(pSSCardInfo->strCardStatus);
+		break;
+	}
+	case 5:	// 挂失
+	{
+		if (g_pDataCenter->strCardMakeProgress == "制卡中")
+		{
+			QMessageBox_CN(QMessageBox::Information, "提示", "制卡中,无须挂失!",QMessageBox::Ok);
+		}
+		break;
+	}
+	case 6:// 注册缴费
+	{
+		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+		if (QFailed(nResult))
+			strMessage = QString("缴费登记失败,Result:%1!").arg(nResult);
+		else if (nStatus != 0 && nStatus != 1)
+			strMessage = QString("缴费登记失败,Status:%1!").arg(nStatus);
+		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		break;
+	}
+		
+	case 7:
+	{
+		nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
+		if (QFailed(nResult))
+		{
+			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		}
+		break;
+	}
+	case 8:// 即制卡标注
+	{
+		int nStatus = 0;
+		int nResult = 0;
+		SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+		QString strCardProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus);
+
+		if (QFailed(nResult = MarkCard(strMessage, nStatus, pSSCardInfo)))
+			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		break;
+	}
+	case 9:// 获取制卡数据
+	{
+		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
+		{
+			if (strMessage.contains("已经有批次号"))
+			{
+				QString strText = strMessage;
+				strText += "\n请转到后台以写卡失败选项手动制卡!";
+				strMessage = strText;
+				break;
+			}
+			if (strMessage.contains("批次"))
+			{
+				strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
+			}
+			
+		}
+
+		if (nStatus != 0 && nStatus != 1)
+		{
+			strMessage = QString("GetCardData Status = %d,should be 1 or 0.").arg(nStatus);
+			break;
+		}
+		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		break;
+	}
+	case 10:	// 写卡
+	{
+		break;
+	}
+	case 11: // 打印
+	{
+
+	}
+	case 12:// 回盘启用
 	{
 		QString strMessage;
 		int nResult = -1;

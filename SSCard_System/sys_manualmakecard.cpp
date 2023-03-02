@@ -635,9 +635,74 @@ void Sys_ManualMakeCard::EnableCard()
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), "启用成功,请及时取走您的卡片", QMessageBox::Ok, this);
 }
 
+#include "Payment.h"
+
+int Sys_ManualMakeCard::uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage)
+{
+    int nRespond = -1;
+    QString strPaymentUrl;
+
+    nRespond = RequestPaymentUrl2(strPaymentUrl, strPayCode, strTransTime, strMessage);
+    if (QSucceed(nRespond))
+    {
+        if (QFailed(QREnncodeImage(strPaymentUrl, 2, QRImage)))
+        {
+            return Failed_QREnocode;
+        }
+        else
+            return  0;
+    }
+    else
+    {
+        strMessage = QString("查询支付二维码失败:%1").arg(strMessage);
+        return -1;
+    }
+}
+
 void Sys_ManualMakeCard::TestApplyNewCard()
 {
 
+}
+
+void Sys_ManualMakeCard::TestQueryPayUrl()
+{
+    QString strMessage;
+    // 获取二维码，并生成图像
+    QImage QRImage;
+    QString strTitle;
+    int m_nPayStatus = -1;
+    if (QFailed(QueryPayment(strMessage, m_nPayStatus)))
+    {
+        gError() << gQStr(strMessage);
+        QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok, this);
+        return ;
+    }
+    QString strPayCode;
+    QString strTransTime;
+
+    int nRespond = uc_ReqestPaymentQR2(strMessage, strPayCode, strTransTime, QRImage);	//新支付系统
+    //int nRespond = uc_ReqestPaymentQR(strMessage, strPayCode, QRImage);
+    if (QFailed(nRespond))
+    {//
+        qDebug() << __FUNCTION__ << "Payed failed:" << strMessage;
+        QString strTempMsg = "一个月内有补卡缴费成功记录,不能获取缴款码";
+        qDebug() << __FUNCTION__ << "Temp message=" << strTempMsg;
+        if (strMessage.contains("一个月内有补卡缴费成功记录,不能获取缴款码"))
+        {
+			strMessage += ",视为已经缴款，继续制卡!";
+            gInfo() << strMessage.toLocal8Bit().data();
+            QMessageBox_CN(QMessageBox::Information, "操作成功", strMessage,  QMessageBox::Ok, this);
+        }
+        else
+        {
+            gError() << strMessage.toLocal8Bit().data();
+            QMessageBox_CN(QMessageBox::Information, "操作失败", strMessage,  QMessageBox::Ok, this);
+        }
+    }
+    else
+    {
+        QMessageBox_CN(QMessageBox::Information, "提示", "查询成功",  QMessageBox::Ok, this);
+    }
 }
 
 void Sys_ManualMakeCard::PrintCardData()
@@ -909,6 +974,11 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 		TestApplyNewCard();
 		break;
 	}
+    case 6:
+    {
+        TestQueryPayUrl();
+		break;
+    }
 
 	}
 }

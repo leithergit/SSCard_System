@@ -458,6 +458,7 @@ struct RegionInfo
 		strCM_CA_Password = pSettings->value("CM_CA_Password", "").toString().toStdString();
 
 		strCardVendor = pSettings->value("CardVendor", "1").toString().toStdString();
+		strUniqueID = pSettings->value("UniqueID", "").toString().toStdString();
 		/*
 		SSCardDefaulutPin=123456
 		PrimaryKey = 00112233445566778899AABBCCDDEEFF
@@ -521,6 +522,7 @@ struct RegionInfo
 	string		strPrimaryKey;							// 主控密钥
 	string		strBankCode;							// 银行代码
 	string		strCardVendor;							// 所属卡商
+	string		strUniqueID;							// 唯一支付ID
 	SSCardProvince	nProvinceCode;						// 省市代码
 };
 
@@ -741,22 +743,24 @@ struct SysConfig
 			return;
 		pSettings->beginGroup("Other");
 		//nBatchMode = pSettings->value("BATCHMODE").toInt();
-		strDBPath = pSettings->value("DBPATH").toString().toStdString();
-		dfFaceSimilarity = pSettings->value("FaceSimilarity").toDouble();
-		nMobilePhoneSize = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
-		nSSCardPasswordSize = pSettings->value("SSCardPasswordLength", 6).toUInt();
-		bDebug = pSettings->value("EnableDebug", false).toBool();
-		nSkipPayTime = pSettings->value("SkipPayTime", 0).toInt();
-		bTestCard = pSettings->value("EnalbeCardTest", false).toBool();
-		nNetTimeout = pSettings->value("NetTimeout", 1500).toInt();
+		strDBPath			 = pSettings->value("DBPATH").toString().toStdString();
+		dfFaceSimilarity	 = pSettings->value("FaceSimilarity").toDouble();
+		//bSkipFaceCompare	 = pSettings->value("SkipFaceCompare").toBool();
+		nMobilePhoneSize	 = pSettings->value("MobilePhoneNumberLength", 11).toUInt();
+		nSSCardPasswordSize	 = pSettings->value("SSCardPasswordLength", 6).toUInt();
+		bDebug				 = pSettings->value("EnableDebug", false).toBool();
+		bSkipFaceCapture	 = pSettings->value("SkipFaceCapture", false).toBool();
+		nSkipPayTime		 = pSettings->value("SkipPayTime", 0).toInt();
+		bTestCard			 = pSettings->value("EnalbeCardTest", false).toBool();
+		nNetTimeout			 = pSettings->value("NetTimeout", 1500).toInt();
 
-		bUpoadlog = pSettings->value("logUpload", false).toBool();;
-		bDeletelogUploaded = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
-		nDiskFreeSpace = pSettings->value("DiskFreeSpace", 10).toInt();;                  // 保留磁盘空间，超过时，删除最早一天的日志
-		strLogServer = pSettings->value("logServer", "").toString().toStdString();   // 日志服务器
-		nLogServerPort = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
-		nLogSavePeroid = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
-		nTimeWaitForPrinter = pSettings->value("TimeWaitForPrinter", 300).toInt();
+		bUpoadlog			 = pSettings->value("logUpload", false).toBool();;
+		bDeletelogUploaded	 = pSettings->value("DeltelogUploaded", false).toBool();;     // 上传成功后删除日志
+		nDiskFreeSpace		 = pSettings->value("DiskFreeSpace", 10).toInt();;            // 保留磁盘空间，超过时，删除最早一天的日志
+		strLogServer		 = pSettings->value("logServer", "").toString().toStdString();// 日志服务器
+		nLogServerPort		 = pSettings->value("logServerPort", 80).toBool();;            // 日志服务器端口
+		nLogSavePeroid		 = pSettings->value("logSavePeroid", 30).toBool();;            // 日志保存天数
+		nTimeWaitForPrinter	 = pSettings->value("TimeWaitForPrinter", 300).toInt();
 		strTitle = pSettings->value("Title", "社保卡制卡系统").toString().toStdString();
 
 		pSettings->endGroup();
@@ -817,6 +821,7 @@ struct SysConfig
 	int				nBatchMode = 0;						// 批量制卡 开启：0    关闭：1
 	string			strDBPath;							// 数据存储路径
 	double          dfFaceSimilarity;					// 人脸认别最低相似度
+	bool			bSkipFaceCompare = false;
 	int             nMobilePhoneSize = 11;				// 手机号码长度
 	int             nSSCardPasswordSize = 6;			// 社保卡密码长度
 	int				nMaskTimeout[5];					// 各种遮罩层的逗留时间，单位毫秒
@@ -833,6 +838,7 @@ struct SysConfig
 	bool			bDebug = false;
 	bool			bEnableUpdate = true;
 	bool			nSkipPayTime = false;
+	bool			bSkipFaceCapture = false;
 	bool			bTestCard = false;
 	int				nNetTimeout = 1500;
 	std::map<string, string> strMapBank;
@@ -864,7 +870,6 @@ struct NationaltyCode
 	string strCode;
 	string strNationalty;
 };
-
 
 class DataCenter
 {
@@ -962,6 +967,7 @@ public:
 	string		   strCardVersion = "3.0";
 	string		   strTitle = "社保卡制卡系统";
 	bool		   bDebug;
+	bool		   bSkipFaceCapture = false;
 	bool		   bEnableUpdate = true;
 	int			   nSkipPayTime = 0;
 	bool		   bTestCard = false;

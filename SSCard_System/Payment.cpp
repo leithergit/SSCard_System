@@ -229,8 +229,10 @@ int     RequestPaymentUrl2(QString& strPaymentUrl, QString& strPayCode, QString&
 	strUrl += PayOption.strAmount;				strUrl += "&";
 	strUrl += "orgCode=";
 	strUrl += RegInfo.strAgency;				strUrl += "&";
-	strUrl +="socialCard=";
-	strUrl += pSSCardInfo->strCardNum;
+	strUrl +="socialCard=";	
+	strUrl += pSSCardInfo->strCardNum;			strUrl += "&";
+	strUrl += "uniqueId=";
+	strUrl += RegInfo.strUniqueID;
 	gInfo() << "Payment request url = " << strUrl.c_str();
 
 	string strRespond, strMessage1;
@@ -252,18 +254,30 @@ int     RequestPaymentUrl2(QString& strPaymentUrl, QString& strPayCode, QString&
 			}
 			QJsonObject rootObject = jsonDocument.object();
 			if (!rootObject.keys().contains("msg") ||
-				!rootObject.keys().contains("code") ||
-				!rootObject.keys().contains("payCode") ||
-				!rootObject.keys().contains("transTime"))
+				!rootObject.keys().contains("code"))
 			{
-				gInfo() << "There is no target value in the payment respond!";
+				gInfo() << "There is no msg or code field in the respond!";
 				return -1;
 			}
-			QJsonValue jsCode = rootObject.value("code");
-			QJsonValue jsMsg = rootObject.value("msg");
+			QString strCode = rootObject.value("code").toString();
+            QString strMsg = rootObject.value("msg").toString();
+			gInfo() << "Payment message:" << strMsg.toStdString();
+			int nCode = strCode.toInt();
+			if (nCode == -1)
+			{
+				strMessage = strMsg;
+				gInfo() << "returned Payment message:" << strMessage.toStdString();
+				return -1;
+			}
+			if (!rootObject.keys().contains("payCode") ||
+				!rootObject.keys().contains("transTime"))
+			{
+				gInfo() << "There is no payCode or transTime field in the respond!";
+				return -1;
+			}
 			QJsonValue jsPayCode = rootObject.value("payCode");
 			QJsonValue jsTransTime = rootObject.value("transTime");
-			int nCode = jsCode.toInt();
+			
 			if (nCode != 0)
 			{
 				strMessage = QString("查询结果,code = %1").arg(nCode);
@@ -271,7 +285,7 @@ int     RequestPaymentUrl2(QString& strPaymentUrl, QString& strPayCode, QString&
 				return -1;
 			}
 			strPayCode = jsPayCode.toString();
-			strPaymentUrl = jsMsg.toString();
+			strPaymentUrl = strMsg;
 			strTransTime = jsTransTime.toString();
 			gInfo() << gQStr(strPaymentUrl);
 			return 0;
