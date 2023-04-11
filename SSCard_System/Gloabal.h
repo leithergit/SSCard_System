@@ -871,6 +871,16 @@ struct NationaltyCode
 	string strNationalty;
 };
 
+enum RibbonStatus
+{
+	Ribbon_Full,				// 满
+	Ribbon_LOW,					// 余量低
+	Ribbon_OUT,					// 耗尽
+	Ribbon_NOTSUPP,				// 不兼容
+	Ribbon_UNKNOWN,				// 未知
+	Ribbon_Losed,				// 未安装
+	Ribbon_Max = Ribbon_Losed
+};
 class DataCenter
 {
 public:
@@ -974,6 +984,7 @@ public:
 	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
 	bool		   bWithoutIDCard = false;
 	int			   nNetTimeout = 1500;
+	PRINTERSTATUS	PrinterStatus;
 public:
 	bool m_bDetectStarted = false;
 	bool m_bVideoStarted = false;
@@ -1021,6 +1032,8 @@ public:
 	int  ReaderIDCard(IDCardInfo* pIDCard);
 
 	int  OpenDevice(QString& strMessage);
+
+	int  UpdatePrinterStatus(QString& strMessage);
 
 	int  OpenPrinter(QString strPrinterLib, PrinterType nPrinterType, int& nDepenseBox, QString& strDPI, QString& strMessage);
 

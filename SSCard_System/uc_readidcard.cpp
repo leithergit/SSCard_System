@@ -161,12 +161,17 @@ void uc_ReadIDCard::ThreadWork()
 					switch (g_pDataCenter->nCardServiceType)
 					{
 					case ServiceType::Service_NewCard:
-						//nNewPage = Page_CommitNewInfo;
+					{
 						nNewPage = Page_InputIDCardInfo;
 						break;
+					}
+						
 					case ServiceType::Service_ReplaceCard:
+					{
 						nNewPage = Page_EnsureInformation;
 						break;
+					}
+						
 					default:
 						nOperation = Switch_NextPage;
 						nNewPage = 0;

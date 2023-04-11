@@ -54,12 +54,18 @@ public:
 
 	void On_LoadSystemManager();
 
+	void UpdateRibbonStatus(int nRibbonStatus);
+
 	int m_nDateTimer = 0;
 	int m_nTimerTestHost = 0;
+	int m_nTimerRibbonStatus = 0;
+	uint32_t nRibbonStatusWarningCount = 0;
 	int m_nNetworkFailedCount = 0;
 	int m_nTimerNetWarning = 0;
 	bool bDisconnect = false;
+	RibbonStatus nRibbonStatus = Ribbon_Full;
 	std::thread* pThreadAsync = nullptr;
+	std::chrono::steady_clock::time_point tLastTick;
 	virtual void timerEvent(QTimerEvent* event) override;
 	virtual void closeEvent(QCloseEvent* event) override;
 	int LoadConfigure(QString& strError);

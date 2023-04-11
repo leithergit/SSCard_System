@@ -3,7 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>D:\Work\SSCard_System.main\MainProject\Debug\SSCard_System.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>D:\Work\SSCard_System.main\MainProject\Debug</LocalDebuggerWorkingDirectory>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>D:\SSCard_System\SSCard_System.EXE</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\SSCard_System</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>KT-M1</RemoteDebuggerServerName>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtLastBackgroundBuild>2023-03-02T05:35:49.1187339Z</QtLastBackgroundBuild>

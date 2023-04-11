@@ -69,8 +69,8 @@
     </Link>
     <PostBuildEvent>
       <Command>@echo copy $(TargetPath) to remote device
-::copy /y $(TargetPath)  Z:\SSCard_System
-copy /y $(TargetPath)  D:\Work\SSCard_System.main\MainProject\Debug</Command>
+copy /y $(TargetPath)  Z:\
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

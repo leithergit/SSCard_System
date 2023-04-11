@@ -176,7 +176,7 @@ color: #ffffff;
 }</string>
         </property>
         <property name="text">
-         <string>当前版本:1.0.0.1</string>
+         <string>版本:1.0.0.1</string>
         </property>
        </widget>
       </item>
@@ -269,6 +269,56 @@ color: rgb(255, 0, 0);
         </property>
         <property name="text">
          <string>调试</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_Ribbon">
+        <property name="styleSheet">
+         <string notr="true">#label_Ribbon{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;
+}</string>
+        </property>
+        <property name="text">
+         <string>色余量带</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_RibbonStatus">
+        <property name="styleSheet">
+         <string notr="true">#label_RibbonStatus{
+font-family: &quot;思源黑体 CN Regular&quot;;
+font-size: 25px;
+font-weight: bold;
+line-height: 49px;
+letter-spacing: 1px;
+color: rgb(255, 255, 0);
+}</string>
+        </property>
+        <property name="text">
+         <string>低</string>
         </property>
        </widget>
       </item>

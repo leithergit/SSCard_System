@@ -158,6 +158,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->stackedWidget->addWidget(m_pRegiserLost);
 	ui->stackedWidget->setCurrentWidget(m_pMainpage);
 	ui->checkBox_Debug->setVisible(g_pDataCenter->bDebug);
+	//ui->label_Ribbon->hide();
+	//ui->label_RibbonStatus->hide();
 	m_pMainpage->show();
 	QString strError;
 	LoadConfigure(strError);		// 加载配置时会自动关闭已经打开的打印和读卡器
@@ -194,7 +196,7 @@ MainWindow::MainWindow(QWidget* parent)
 	{
 		gWarning() << GBKStr("警告:自动升级功能被关闭!");
 	}
-
+	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 	m_nTimerTestHost = startTimer(5000);
 	QString strMessage;
 	string strBankName;
@@ -213,6 +215,18 @@ MainWindow::MainWindow(QWidget* parent)
 		QString strVersion = QString("当前版本:%1.%2.%3.%4").arg(nMajorVer).arg(nMinorVer).arg(nBuildNum).arg(nRevsion);
 		ui->label_Version->setText(strVersion);
 	}
+}
+// 0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
+void MainWindow::UpdateRibbonStatus(int nRibbonStatus)
+{
+	if (!m_nTimerRibbonStatus)
+	{
+		nRibbonStatusWarningCount = 0;
+		tLastTick = std::chrono::steady_clock::now();
+		m_nTimerRibbonStatus = startTimer(400, Qt::PreciseTimer);
+	}
+		
+	this->nRibbonStatus = (RibbonStatus)nRibbonStatus;
 }
 
 void MainWindow::On_LoadSystemManager()
@@ -315,15 +329,18 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	}
 
 	QString strMessage;
+	
 	m_pNewCard->ResetAllPages();
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
 		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 		return;
 	}
-
-	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	nResult = g_pDataCenter->TestPrinter(/*PrinterStatus,*/ strMessage);
+	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
+	if (QFailed(nResult))
 	{
 		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
@@ -366,17 +383,21 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	}
 
 	QString strMessage;
+	PRINTERSTATUS PrinterStatus;
 	m_pUpdateCard->ResetAllPages();
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 		return;
 	}
 
-	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	nResult = g_pDataCenter->TestPrinter(strMessage);
+	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
+	if (QFailed(nResult))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
 
@@ -649,6 +670,47 @@ void MainWindow::timerEvent(QTimerEvent* event)
 		}
 		ui->label_NetWarning->setStyleSheet(strQSS);
 	}
+	else if (event->timerId() == m_nTimerRibbonStatus)
+	{
+		auto tNow = std::chrono::steady_clock::now();
+		auto tDuration = std::chrono::duration_cast<std::chrono::milliseconds>(tNow - tLastTick);
+		tLastTick = tNow;
+		qDebug("Timespan of TimerRibbonStatus = %d.\n",tDuration.count());
+		// 0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
+#define BlankText	(Ribbon_Max + 1)
+		static QString strText[] = {"充足","告警","耗尽","不兼容","未知","未安装",""};
+		QString strQSS = "font-family: \"思源黑体 CN Regular\";font-size: 25px;font-weight: bold;line-height: 49px;letter-spacing: 1px;";
+		switch (nRibbonStatus)
+		{
+		case Ribbon_Full:
+		{
+			killTimer(m_nTimerRibbonStatus);
+			nRibbonStatusWarningCount = 0;
+			strQSS += "color:rgb(0, 255, 0);";
+			break;
+		}
+		case Ribbon_LOW:
+		{
+			strQSS += "color:rgb(255, 255, 0);";
+			break;
+		}
+		default:
+		case Ribbon_OUT:		
+		case Ribbon_NOTSUPP:		
+		case Ribbon_UNKNOWN:
+		case Ribbon_Losed:
+		{
+			strQSS += "color:rgb(255, 0, 0);";
+			break;
+		}
+		}
+		if (nRibbonStatusWarningCount %2 == 0)
+			ui->label_RibbonStatus->setText(strText[nRibbonStatus]);
+		else
+			ui->label_RibbonStatus->setText(strText[BlankText]);
+		ui->label_RibbonStatus->setStyleSheet(strQSS);
+		nRibbonStatusWarningCount++;
+	}
 }
 void MainWindow::closeEvent(QCloseEvent* event)
 {
@@ -713,6 +775,6 @@ void MainWindow::ThreadUpdateLauncher()
 			} while (true);*/
 			tStart = chrono::high_resolution_clock::now();
 		}
-		this_thread::sleep_for(chrono::milliseconds(100));
+		this_thread::sleep_for(chrono::milliseconds(200));
 	}
 }

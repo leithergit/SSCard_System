@@ -16,6 +16,7 @@
 #include "../utility/json/CJsonObject.hpp"
 #pragma comment(lib,"BugTrapU.lib")
 extern QScreen* g_pCurScreen;
+extern MainWindow* g_pMainWnd;
 
 DataCenterPtr g_pDataCenter;
 using namespace neb;
@@ -41,8 +42,30 @@ static void SetupExceptionHandler()
 
 }
 
+int TestPrinter(void* pParam)
+{
+	if (!pParam)
+		return -1;
+	int nResult = -1;
+	QString* pStrMessage = (QString*)pParam;
+	if (QFailed(nResult = g_pDataCenter->OpenPrinter(*pStrMessage)))
+	{
+		gInfo() << pStrMessage->toLocal8Bit().data();
+		return -1;
+	}
+	if (QFailed(g_pDataCenter->UpdatePrinterStatus(*pStrMessage)))
+	{
+		gInfo() << pStrMessage->toLocal8Bit().data();
+		return -1;
+	}
+	return 0;
+}
+
 const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
+
+bool g_bSkipLicense = false;
+
 int main(int argc, char* argv[])
 {
 // 	QFile jsfile("D:/Work/SSCard_System.main/MainProject/现场日志/Testoriginal.json");
@@ -90,6 +113,17 @@ int main(int argc, char* argv[])
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication a(argc, argv);
+#ifdef _DEBUG
+	QStringList strArgList = a.arguments();
+	for (auto var : strArgList)
+	{
+		if (var.compare("/SkipLicense", Qt::CaseInsensitive) == 0)
+		{
+			g_bSkipLicense = true;
+			break;
+		}
+	}
+#endif // DEBUG
 
 	//    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
 	//    qDebug()<<"fi.absoluteDir()="<<fi.absoluteDir();
@@ -217,30 +251,50 @@ int main(int argc, char* argv[])
 	jsonReg.Add("pwd", Reg.strCMPassword);
 	jsonReg.Add("city", Reg.strCityCode);
 	string strJson = jsonReg.ToString();
-	CJsonObject jsonT(strJson);
-	qDebug() << strJson.c_str();
-	int nProvince;
-	string struser, strpwd, strcity;
-	jsonT.Get("province", nProvince);
-	jsonT.Get("user", struser);
-	jsonT.Get("pwd", strpwd);
-	jsonT.Get("city", strcity);
 
-	WaitingProgress WaitingUI;
-	WaitingUI.show();
-	a.exec();
-	if (!WaitingUI.bPrinterReady)
-	{
-		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
-		return 0;
-	}
+	//////////////////////////////////////////////////////////////////////////
+	// 引入山东授权管理代码
 
-	if (!CheckLocalLicense(Code_License))
+	if (!g_bSkipLicense)
 	{
-		ShowLicense s;
-		s.show();
-		return a.exec();
+		WaitingProgress WaitingUI(TestPrinter,		// 执行回调
+			&strMessage,		// 参数
+			g_pDataCenter->GetSysConfigure()->nTimeWaitForPrinter,	// 超时
+			QString("正在初始化打印机:%1%"));	// 显示格式
+
+
+		if (WaitingUI.exec() == QDialog::Rejected)
+		{
+			QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+			return 0;
+		}
+		if (!CheckLocalLicense(Code_License))
+		{
+			ShowLicense s;
+			s.show();
+			return a.exec();
+		}
 	}
+	//////////////////////////////////////////////////////////////////////////
+	// 引入山东授权管理代码结束
+
+	// 原河南授权管理代码
+	//WaitingProgress WaitingUI;
+	//WaitingUI.show();
+	//a.exec();
+	//if (!WaitingUI.bPrinterReady)
+	//{
+	//	QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+	//	return 0;
+	//}
+
+	//if (!CheckLocalLicense(Code_License))
+	//{
+	//	ShowLicense s;
+	//	s.show();
+	//	return a.exec();
+	//}
+	// 原河南授权管理代码结束
 
 	initCardInfo(jsonReg.ToString().c_str(), szOutInfo);
 	MainWindow w;
@@ -264,6 +318,7 @@ int main(int argc, char* argv[])
 	w.showFullScreen();
 	w.setGeometry(g_pCurScreen->geometry());
 	//w.showMaximized();	// 会导致窗口无法覆盖任务栏
+	g_pMainWnd = &w;
 	int nRes = a.exec();
 	QString strInfo = "系统正常关闭!";
 	gInfo() << gQStr(strInfo);

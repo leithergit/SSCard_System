@@ -68,7 +68,7 @@ void ImageViewLabel::initControl()
 	m_switchBtnLayout->setContentsMargins(0, 0, 0, 0);*/
 
 	m_imageTimer = new QTimer(this);
-	m_imageTimer->setInterval(2000);
+	m_imageTimer->setInterval(5000);
 	connect(m_imageTimer, &QTimer::timeout, this, &ImageViewLabel::onImageShowTimeOut);
 	m_imageTimer->start();
 }
@@ -132,13 +132,15 @@ void ImageViewLabel::onbuttonClicked(int index)
 	m_btnExpAnimation->setStartValue(btn_shrik_width);
 	m_btnExpAnimation->setEndValue(btn_expand_width);
 
-	m_imageTimer->start(2000);
+	m_imageTimer->start(5000);
 	m_btnParalGroup->start();
 }
 
 void ImageViewLabel::paintEvent(QPaintEvent* event)
 {
 	QLabel::paintEvent(event);
+	if (!m_imagepathpairlst.size())
+		return;
 	QPainter painter(this);
 	painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
 

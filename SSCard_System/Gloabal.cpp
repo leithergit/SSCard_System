@@ -12,6 +12,7 @@
 #include "../update/Update.h"
 #include "qstackpage.h"
 #include "idcard_api.h"
+#include "mainwindow.h"
 
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -85,6 +86,7 @@ QWaitCursor::~QWaitCursor()
 
 
 extern DataCenterPtr g_pDataCenter;
+MainWindow* g_pMainWnd = nullptr;
 QScreen* g_pCurScreen = nullptr;
 const char* szAesKey = "581386C9F1514F6B92170BF457D8B065";
 vector<NationaltyCode> g_vecNationCode = {
@@ -206,7 +208,7 @@ int DataCenter::LoadCardForm(QString& strError)
 		QFileInfo fi(strConfigPath);
 		if (!fi.isFile())
 		{
-			strError = QString("加载卡版打印版式失败:%1!").arg(strConfigPath);
+			strError = QString("加载卡片打印版式失败:%1!").arg(strConfigPath);
 			return -1;
 		}
 		QSettings ConfigIni(strConfigPath, QSettings::IniFormat);
@@ -396,22 +398,32 @@ int  DataCenter::ReaderIDCard(IDCardInfo* pIDCard)
 }
 
 int DataCenter::OpenDevice(QString& strMessage)
-{
-	int nResult = -1;
-	if (QFailed(nResult = OpenPrinter(strMessage)))
+{	
+	if (QFailed(OpenPrinter(strMessage)))
 	{
 		gError() << gQStr(strMessage);
-		return nResult;
+		return -1;
 	}
-
-	if (QFailed(nResult = OpenSSCardReader(strMessage)))
+	
+	if (QFailed(OpenSSCardReader(strMessage)))
 	{
 		gError() << gQStr(strMessage);
-		return nResult;
+		return -1;
 	}
 	return 0;
 }
 
+int  DataCenter::UpdatePrinterStatus(QString& strMessage)
+{
+	char szRCode[128] = { 0 };
+	if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
+	{
+		strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
+		gError() << gQStr(strMessage);
+		return -1;
+	}
+	return 0;
+}
 int DataCenter::OpenPrinter(QString& strMessage)
 {
 	int nResult = -1;
@@ -457,11 +469,22 @@ int DataCenter::OpenPrinter(QString& strMessage)
 				if (QFailed(nResult = m_pPrinter->Printer_Open(szRCode)))
 				{
 					if (strcmp(szRCode, "0010") == 0)
+					{
 						strMessage = QString("打开打印机‘%1’失败,未安装色带!").arg(DevConfig.strPrinterType.c_str());
+						PrinterStatus.fwToner = Ribbon_Losed;
+					}
+						
 					else if (strcmp(szRCode, "0011") == 0)
+					{
 						strMessage = QString("打开打印机‘%1’失败,色带与打印不兼容!").arg(DevConfig.strPrinterType.c_str());
+						PrinterStatus.fwToner = Ribbon_NOTSUPP;
+					}
 					else
+					{
 						strMessage = QString("打开打印机‘%1’失败,错误代码:%2").arg(DevConfig.strPrinterType.c_str()).arg(szRCode);
+						PrinterStatus.fwToner = Ribbon_UNKNOWN;
+					}
+						
 					break;
 				}
 			}
@@ -1089,7 +1112,6 @@ bool DataCenter::SetProgress(string strProcess, int nStatus)
 
 int DataCenter::TestPrinter(QString& strMessage)
 {
-	PRINTERSTATUS PrinterStatus;
 	DeviceConfig& DevConfig = pSysConfig->DevConfig;
 	int& nDepenseBox = DevConfig.nDepenseBox;
 
@@ -1116,6 +1138,7 @@ int DataCenter::TestPrinter(QString& strMessage)
 			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
+		
 		if (PrinterStatus.fwDevice != 0)
 		{
 			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
@@ -1171,18 +1194,20 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		// 0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
 		bSucceed = false;
+		
 		switch (PrinterStatus.fwToner)
 		{
 		default:
 		case 0:
 		{
 			bSucceed = true;
+			
 			break;
 		}
 		case 1:
 		{
-			bSucceed = true;
-			strMessage = QString("打印机色带余量低,请注意检查或更换色带!");
+			//bSucceed = true;
+			strMessage = QString("打印机色带余量低,请检查或更换色带!");
 			break;
 		}
 		case 2:
@@ -1606,7 +1631,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 		if (QFailed(nResult = iReadCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseRead)))
 		{
-			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,Result:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
 			break;
 		}
 		/*
@@ -1634,7 +1659,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 		if (QFailed(nResult = iWriteCardBas(DevConfig.nSSCardReaderPowerOnType, szCardBaseWrite)))
 		{
-			strMessage = QString("读取卡片基本信息失败,PowerOnType:%1,resCode:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(szRCode);
+			strMessage = QString("写卡片基本信息失败,PowerOnType:%1,Result:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
 			break;
 		}
 		// szCardBaseWrite输出结果为两个随机数
@@ -1665,7 +1690,7 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
 		{
-			strMessage = QString("卡版外部信息认证失败,Result:%1").arg(nResult);
+			strMessage = QString("卡片外部信息认证失败,Result:%1").arg(nResult);
 			break;
 		}
 		gInfo() << "szExAuthData = " << szExAuthData;

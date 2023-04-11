@@ -813,32 +813,32 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bSkipPreStep)
 {
 	bool bLoaded = false;
-	QString strAppPath = QCoreApplication::applicationDirPath();
-	strAppPath += "/Debug";
-	QFileInfo fdir(strAppPath);
+	QString strCofigurePath = QCoreApplication::applicationDirPath();
+	strCofigurePath += "/Debug";
+	QFileInfo fdir(strCofigurePath);
 	if (fdir.exists())
 	{
 		if (!fdir.isDir())
 		{
-			QFile f(strAppPath);
+			QFile f(strCofigurePath);
 			f.remove();
 		}
 	}
 	else
 	{
 		QDir dir;
-		dir.mkdir(strAppPath);
+		dir.mkdir(strCofigurePath);
 	}
 
-	strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
+	strCofigurePath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
 	if (g_pDataCenter->bDebug)
 	{
-		QFileInfo ffile(strAppPath);
+		QFileInfo ffile(strCofigurePath);
 		if (ffile.isFile())
 		{
 #pragma Warning("使用预存制卡数据")
 			SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-			LoadSSCardData(pSSCardTemp, strAppPath);
+			LoadSSCardData(pSSCardTemp, strCofigurePath);
 			strcpy(pSSCardInfo->strPCH, pSSCardTemp->strPCH);
 			strcpy(pSSCardInfo->strCardNum, pSSCardTemp->strCardNum);		// 新的卡号
 			strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
@@ -872,11 +872,11 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 			using LPCHAR = char*;
 			strFnName = "获取批次号";
 
-			if (QFailed(GetCardDataField("strPCH", (char*)pSSCardInfo->strPCH, strAppPath)))
+			if (QFailed(GetCardDataField("strPCH", (char*)pSSCardInfo->strPCH, strCofigurePath)))
 			{
 				if (QFailed(nResult = getHQPCH(*pSSCardInfo, szStatus)))
 					break;
-				SaveCardDataField("strPCH", pSSCardInfo->strPCH, strAppPath);
+				SaveCardDataField("strPCH", pSSCardInfo->strPCH, strCofigurePath);
 			}
 			else
 			{
@@ -885,7 +885,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 			}
 
 			strFnName = "即制卡批次";
-			if (QFailed(GetCardDataField("strCardNum", (char*)pSSCardInfo->strCardNum, strAppPath)))
+			if (QFailed(GetCardDataField("strCardNum", (char*)pSSCardInfo->strCardNum, strCofigurePath)))
 			{
 				if (QFailed(nResult = getJZKPC(*pSSCardInfo, szStatus)))
 				{
@@ -893,7 +893,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 					if (!strMessage.contains("已经有批次号") || !strMessage.contains("批次号已经被使用"))
 						break;
 				}
-				SaveCardDataField("strCardNum", pSSCardInfo->strCardNum, strAppPath);
+				SaveCardDataField("strCardNum", pSSCardInfo->strCardNum, strCofigurePath);
 			}
 			else
 			{
@@ -903,7 +903,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 
 			strFnName = "获取制卡数据";
 			string strPhoto;
-			if (QFailed(GetCardDataFieldp("strPhoto", strPhoto, strAppPath)))
+			if (QFailed(GetCardDataFieldp("strPhoto", strPhoto, strCofigurePath)))
 			{
 				// 可返回照片信息
 				nResult = getCardData(*pSSCardInfo, szStatus);
@@ -931,7 +931,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 					nStatus = strtolong(szDigit, 10);
 					if (nStatus == 0)
 					{
-						SaveCardData(pSSCardInfo, strAppPath);
+						SaveCardData(pSSCardInfo, strCofigurePath);
 						SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 					}
 					return 0;
@@ -942,7 +942,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 			else
 			{
 				SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-				LoadSSCardData(pSSCardTemp, strAppPath);
+				LoadSSCardData(pSSCardTemp, strCofigurePath);
 				strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
 				strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
 				strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
@@ -1084,24 +1084,24 @@ void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
 		if (!pSSCardInfo)
 			return;
 
-		QString strAppPath = QCoreApplication::applicationDirPath();
-		strAppPath += "/Debug";
+		QString strCardDataPath = QCoreApplication::applicationDirPath();
+		strCardDataPath += "/Debug";
 
-		QFileInfo fdir(strAppPath);
+		QFileInfo fdir(strCardDataPath);
 		if (fdir.exists())
 		{
 			if (!fdir.isDir())
 			{
-				QFile f(strAppPath);
+				QFile f(strCardDataPath);
 				f.remove();
 			}
 		}
 		else
 		{
 			QDir dir;
-			dir.mkdir(strAppPath);
+			dir.mkdir(strCardDataPath);
 		}
-		QString strFinishPath = strAppPath + "/Finished";
+		QString strFinishPath = strCardDataPath + "/Finished";
 		QFileInfo ffdir(strFinishPath);
 		if (ffdir.exists())
 		{
@@ -1117,17 +1117,17 @@ void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
 			dir.mkdir(strFinishPath);
 		}
 
-		strAppPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
+		strCardDataPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
 		strFinishPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
-		if (!fs::exists(strAppPath.toStdString()))
+		if (!fs::exists(strCardDataPath.toStdString()))
 			return;
 
 		if (fs::exists(strFinishPath.toStdString()))
 			fs::remove(strFinishPath.toStdString());
 
 		string strBaseFile = strFinishPath.toLocal8Bit().data();
-		fs::copy_file(strAppPath.toStdString(), strFinishPath.toStdString());
-		fs::remove(strAppPath.toStdString());
+		fs::copy_file(strCardDataPath.toStdString(), strFinishPath.toStdString());
+		fs::remove(strCardDataPath.toStdString());
 	}
 	catch (std::exception& e)
 	{

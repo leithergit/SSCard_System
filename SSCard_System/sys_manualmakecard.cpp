@@ -302,23 +302,28 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardStatus_clicked()
 
 }
 
-int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage)
+int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage,bool bDefault)
 {
 	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-	QString strAppPath = QCoreApplication::applicationDirPath();
-	strAppPath += "/Debug";
-	strAppPath += QString("/Carddata_%1.ini").arg((const char*)pIDCard->szIdentity);
+	
+	QString strCardDataPath = QCoreApplication::applicationDirPath();
+	if (bDefault)
+		strCardDataPath += "/Debug";
+	else
+		strCardDataPath += "/Finished";
+
+	strCardDataPath += QString("/Carddata_%1.ini").arg((const char*)pIDCard->szIdentity);
 	QString strMessage;
 
-	QFileInfo ffile(strAppPath);
+	QFileInfo ffile(strCardDataPath);
 	if (!ffile.isFile())
-	{
-		strMesssage = "制卡数据不存在，可能制卡流程尚未开始!";
+	{		
+		strMesssage = "制卡数据不存在,可能制卡流程尚未开始!";
 		return -1;
 	}
 
-	LoadSSCardData(pSSCardInfo, strAppPath);
+	LoadSSCardData(pSSCardInfo, strCardDataPath);
 	strcpy(pSSCardInfo->strName, (const char*)pIDCard->szName);
 	GetImageStorePath(g_pDataCenter->strSSCardPhotoFile, 1);
 	//SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
@@ -332,6 +337,7 @@ void Sys_ManualMakeCard::on_pushButton_LoadCardData_clicked()
 
 	if (QFailed(LoadPersonSSCardData(strMessage)))
 	{
+		if ()
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
@@ -376,7 +382,7 @@ void Sys_ManualMakeCard::ProceBatchLock()
 		}
 		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 		{
-			if (strMessage == "批次确认加锁失败(保存失败)")
+			if (strMessage.contains("批次确认加锁失败(保存失败)"))
 				strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
 
 			break;

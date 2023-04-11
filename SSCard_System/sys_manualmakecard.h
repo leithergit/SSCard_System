@@ -36,7 +36,7 @@ public:
 
     int uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage);
 
-	int LoadPersonSSCardData(QString& strMesssage);
+	int LoadPersonSSCardData(QString& strMesssage,bool bDefault = true);
 
 signals:
 	void ShowIDCardInfo(bool bSuccceed, QString strMessage);
