@@ -73,6 +73,9 @@
     <Filter Include="Page\form">
       <UniqueIdentifier>{a77bbd4a-048c-42a3-95b8-7ac29af630e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SystemManager\Form">
+      <UniqueIdentifier>{d315c00a-5747-4007-b666-062ba863f4b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckPassword.cpp">
@@ -366,47 +369,8 @@
     <QtUic Include="registerlost.ui">
       <Filter>MainPage</Filter>
     </QtUic>
-    <QtUic Include="Sys_cardmanger.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_DeviceManager.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_dialogcameratest.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_dialogidcardinfo.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_logmanager.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_otheroptions.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_pageconfigure.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_qwidgetreadidcard.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_regionconfigure.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="SystemManager.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="Sys_sscardservicet.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
-    <QtUic Include="sys_manualmakecard.ui">
-      <Filter>SystemManager</Filter>
-    </QtUic>
     <QtUic Include="waitingprogress.ui">
       <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="sys_dialogreadidcard.ui">
-      <Filter>SystemManager</Filter>
     </QtUic>
     <QtUic Include="nc_commitpersoninfo.ui">
       <Filter>Page\form</Filter>
@@ -458,6 +422,45 @@
     </QtUic>
     <QtUic Include="sscardreport.ui">
       <Filter>MainPage</Filter>
+    </QtUic>
+    <QtUic Include="Sys_cardmanger.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_DeviceManager.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_dialogcameratest.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_dialogidcardinfo.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="sys_dialogreadidcard.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_logmanager.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="sys_manualmakecard.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_otheroptions.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_pageconfigure.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_qwidgetreadidcard.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_regionconfigure.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="Sys_sscardservicet.ui">
+      <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="SystemManager.ui">
+      <Filter>SystemManager\Form</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>

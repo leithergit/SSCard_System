@@ -11,6 +11,8 @@
 #include "../utility/Markup.h"
 #include "../utility/json/CJsonObject.hpp"
 #include "SimpleIni.h"
+#include "../SDK/QREncode/qrencode.h"
+#pragma comment(lib, "../SDK/QREncode/qrencoded")
 using namespace std;
 using namespace neb;
 using namespace std::filesystem;
@@ -56,6 +58,11 @@ bool IsDigitString(const char* szStr)
 			return false;
 	}
 	return true;
+}
+
+void QREncode()
+{
+	QRcode* qr = QRcode_encodeString("1234567890abcdefgh", 1, QR_ECLEVEL_Q, QR_MODE_KANJI, 1);
 }
 
 bool TestDigit(char ch)
@@ -542,6 +549,7 @@ void TestStrok()
 
 int main()
 {
+	QREncode();
 	/*TestSimpleINI();
 	TestStrok();
 	int A = 1;

@@ -18,7 +18,7 @@ public:
 	~SSCardServiceT();
 
 	QButtonGroup* pBtnGroup = nullptr;
-
+	void OutputMsg(const char* pFormat, ...);
 private slots:
 	void on_pushButton_LoadCardID_clicked();
 

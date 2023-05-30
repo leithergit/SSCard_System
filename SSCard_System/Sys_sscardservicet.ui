@@ -6,81 +6,182 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1398</width>
-    <height>710</height>
+    <width>1233</width>
+    <height>876</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <widget class="QFrame" name="frame">
+     <property name="minimumSize">
+      <size>
+       <width>60</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QRadioButton" name="radioButton_New">
+        <property name="font">
+         <font>
+          <family>思源黑体 CN Medium</family>
+          <pointsize>28</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>新办卡</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton_ReplaceCard">
+        <property name="font">
+         <font>
+          <family>思源黑体 CN Medium</family>
+          <pointsize>28</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>补换卡</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton_QueryCard">
+        <property name="font">
+         <font>
+          <family>思源黑体 CN Medium</family>
+          <pointsize>28</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>查询</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_Bank">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>思源黑体 CN Normal</family>
+          <pointsize>28</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>银行</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox_Bank">
+        <property name="maximumSize">
+         <size>
+          <width>280</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>思源黑体 CN Medium</family>
+          <pointsize>24</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QFrame" name="frame">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QRadioButton" name="radioButton_New">
-            <property name="font">
-             <font>
-              <family>思源黑体 CN Medium</family>
-              <pointsize>28</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>新办卡</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_ReplaceCard">
-            <property name="font">
-             <font>
-              <family>思源黑体 CN Medium</family>
-              <pointsize>28</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>补换卡</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_LoadCardID">
-         <property name="minimumSize">
-          <size>
-           <width>320</width>
-           <height>60</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Load Data</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="pushButton_LoadCardID">
+           <property name="minimumSize">
+            <size>
+             <width>320</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">text-align:left</string>
+           </property>
+           <property name="text">
+            <string>Load Data</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_OpenPrinter">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \&quot;思源黑体 CN Medium\&quot;;border-radius: 24px;}</string>
+           </property>
+           <property name="text">
+            <string>Printer</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_OpenReader">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QCheckBox::indicator {width: 32px;height: 32px;}
+QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \&quot;思源黑体 CN Medium\&quot;;border-radius: 24px;}</string>
+           </property>
+           <property name="text">
+            <string>Reader</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_LoadPreMakeCard">
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -88,6 +189,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>Load User Card</string>
@@ -99,7 +203,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -107,6 +211,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>CreateService</string>
@@ -118,7 +225,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -126,6 +233,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>Query CardStatus</string>
@@ -133,30 +243,94 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_QueryCardInfo">
-         <property name="minimumSize">
-          <size>
-           <width>320</width>
-           <height>60</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>思源黑体 CN Normal</family>
-           <pointsize>28</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Query CardInfo</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+         <item>
+          <widget class="QPushButton" name="pushButton_QueryCardInfo">
+           <property name="minimumSize">
+            <size>
+             <width>320</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">text-align:left</string>
+           </property>
+           <property name="text">
+            <string>Query CardInfo</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_CardStatus">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Medium</family>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <item>
+            <property name="text">
+             <string>放号</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>正常</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>挂失</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>临时挂失</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>挂失后注销</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>注销</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>未启用</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_QueryPersonInfo">
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -164,6 +338,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>Query PersionInfo</string>
@@ -175,7 +352,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -184,23 +361,13 @@
            <pointsize>28</pointsize>
           </font>
          </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
+         </property>
          <property name="text">
           <string>UnRegisterLost</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
@@ -211,7 +378,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -219,6 +386,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>Get Photo</string>
@@ -230,7 +400,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -238,6 +408,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>CommitInfo</string>
@@ -249,7 +422,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -257,6 +430,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>Premake Card</string>
@@ -268,7 +444,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -276,6 +452,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>WriteCard</string>
@@ -287,7 +466,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -295,6 +474,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>Return Data</string>
@@ -306,7 +488,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -314,6 +496,9 @@
            <family>思源黑体 CN Normal</family>
            <pointsize>28</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
          </property>
          <property name="text">
           <string>ActieCard</string>
@@ -325,7 +510,7 @@
          <property name="minimumSize">
           <size>
            <width>320</width>
-           <height>60</height>
+           <height>48</height>
           </size>
          </property>
          <property name="font">
@@ -334,200 +519,212 @@
            <pointsize>28</pointsize>
           </font>
          </property>
+         <property name="styleSheet">
+          <string notr="true">text-align:left</string>
+         </property>
          <property name="text">
           <string>ReadBankNum</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
-      <widget class="QLabel" name="label">
-       <property name="minimumSize">
-        <size>
-         <width>160</width>
-         <height>48</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Identity</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="minimumSize">
+            <size>
+             <width>240</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Identity</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_Identity">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="minimumSize">
+            <size>
+             <width>240</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_Name">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="minimumSize">
+            <size>
+             <width>240</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>BankNumber</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_BankNumber">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="minimumSize">
+            <size>
+             <width>240</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ChipNumber</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_ChipNum">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_Photo">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>160</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>240</width>
+             <height>320</height>
+            </size>
+           </property>
+           <property name="sizeIncrement">
+            <size>
+             <width>240</width>
+             <height>2</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Normal</family>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QLabel" name="label_Identity">
-       <property name="minimumSize">
-        <size>
-         <width>600</width>
-         <height>48</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>N/A</string>
+      <widget class="QTextEdit" name="textEdit">
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_BankNum">
-       <property name="minimumSize">
-        <size>
-         <width>600</width>
-         <height>48</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>N/A</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="minimumSize">
-        <size>
-         <width>160</width>
-         <height>48</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_Name">
-       <property name="minimumSize">
-        <size>
-         <width>600</width>
-         <height>48</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>N/A</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_ChipNum">
-       <property name="minimumSize">
-        <size>
-         <width>600</width>
-         <height>48</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>思源黑体 CN Normal</family>
-         <pointsize>28</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>N/A</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_3">
-     <property name="minimumSize">
-      <size>
-       <width>800</width>
-       <height>48</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>思源黑体 CN Normal</family>
-       <pointsize>28</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>N/A</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

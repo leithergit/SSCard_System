@@ -62,6 +62,10 @@ int TestPrinter(void* pParam)
 #define WSA_VERSION MAKEWORD(2,2)
 const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
+
+bool g_bSkipLicense = false;
+
+
 int main(int argc, char* argv[])
 {
 	SetupExceptionHandler();
@@ -76,6 +80,19 @@ int main(int argc, char* argv[])
 	//QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 	QApplication a(argc, argv);
+#ifdef _DEBUG
+	QStringList strArgList = a.arguments();
+	for (auto var : strArgList)
+	{
+		if (var.compare("/SkipLicense", Qt::CaseInsensitive) == 0)
+		{
+			g_bSkipLicense = true;
+			break;
+		}
+	}
+#endif // DEBUG
+
+
 	//google::InitGoogleLogging(argv[0]);
 	//font.setStyleStrategy(QFont::PreferAntialias);
 //    QFileInfo fi("D:\\Work\\SSCard_System\\MainProject\\SSCard_System\\debug\\log\\2021_12_31\\20211231-102058.13112.log");
@@ -210,20 +227,26 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	QString strMessage;
-	WaitingProgress WaitingUI(TestPrinter,		// 执行回调
-		&strMessage,		// 参数
-		g_pDataCenter->GetSysConfigure()->nTimeWaitForPrinter,	// 超时
-		QString("正在初始化打印机:%1%"));	// 显示格式
-	if (WaitingUI.exec() == QDialog::Rejected)
+
+	if (!g_bSkipLicense)
 	{
-		QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
-		return 0;
-	}
-	if (!CheckLocalLicense(Code_License))
-	{
-		ShowLicense s;
-		s.show();
-		return a.exec();
+		WaitingProgress WaitingUI(TestPrinter,		// 执行回调
+			&strMessage,		// 参数
+			g_pDataCenter->GetSysConfigure()->nTimeWaitForPrinter,	// 超时
+			QString("正在初始化打印机:%1%"));	// 显示格式
+
+		
+		if (WaitingUI.exec() == QDialog::Rejected)
+		{
+			QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
+			return 0;
+		}
+		if (!CheckLocalLicense(Code_License))
+		{
+			ShowLicense s;
+			s.show();
+			return a.exec();
+		}
 	}
 
 	string strBankName;

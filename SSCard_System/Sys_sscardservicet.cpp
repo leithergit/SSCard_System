@@ -3,7 +3,30 @@
 #include "Gloabal.h"
 #include "Payment.h"
 #include <memory>
+#include <QTextCursor>
+#include <QTime>
 using namespace std;
+
+#define __countof(array) (sizeof(array)/sizeof(array[0]))
+void SSCardServiceT::OutputMsg(const char* pFormat, ...)
+{
+	va_list args;
+	va_start(args, pFormat);
+	int nBuff;
+	CHAR szBuffer[8192] = { 0 };
+	nBuff = vsnprintf(szBuffer, __countof(szBuffer), pFormat, args);
+	qDebug() << szBuffer;
+	QTime tNow = QTime::currentTime();
+	QString strText = tNow.toString();
+	strText += ' ';
+	strText += szBuffer;
+	va_end(args);
+	ui->textEdit->append(strText);
+	QTextCursor cursor = ui->textEdit->textCursor();
+	cursor.movePosition(QTextCursor::End);
+	ui->textEdit->setTextCursor(cursor);
+}
+
 
 SSCardServiceT::SSCardServiceT(QWidget* parent) :
 	QWidget(parent),
@@ -13,6 +36,16 @@ SSCardServiceT::SSCardServiceT(QWidget* parent) :
 	pBtnGroup = new QButtonGroup(this);
 	pBtnGroup->addButton(ui->radioButton_New, 0);
 	pBtnGroup->addButton(ui->radioButton_ReplaceCard, 1);
+	pBtnGroup->addButton(ui->radioButton_QueryCard, 3);
+	for (auto var : g_pDataCenter->GetSysConfigure()->MapBankSupported)
+	{
+		ui->comboBox_Bank->addItem(var.second.c_str(),var.first.c_str());
+	}
+	string strBankCode = g_pDataCenter->GetSysConfigure()->Region.strBankCode;
+	
+	int nIndex = ui->comboBox_Bank->findData(strBankCode.c_str());
+	if (nIndex >= 0)
+		ui->comboBox_Bank->setCurrentIndex(nIndex);
 }
 
 SSCardServiceT::~SSCardServiceT()
@@ -32,12 +65,16 @@ void SSCardServiceT::on_pushButton_LoadCardID_clicked()
 		return;
 	}
 	g_pDataCenter->bDebug = false;
-	ui->label_Identity->setText((char*)pIDCard->szIdentity);
-	ui->label_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
+	ui->lineEdit_Identity->setText((char*)pIDCard->szIdentity);
+	ui->lineEdit_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	g_pDataCenter->SetIDCardInfo(pIDCard);
-	g_pDataCenter->OpenSSCardReader(strMessage);
-	g_pDataCenter->OpenPrinter(strMessage);
+	
+	if (ui->checkBox_OpenPrinter->checkState() == Qt::Checked)
+		g_pDataCenter->OpenSSCardReader(strMessage);
+
+	if (ui->checkBox_OpenReader->checkState() == Qt::Checked)
+		g_pDataCenter->OpenPrinter(strMessage);
 }
 
 
@@ -71,22 +108,17 @@ void SSCardServiceT::on_pushButton_QueryCardStatus_clicked()
 			CJsonObject jsonOut(strJsonOut);
 			jsonOut.Get("Result", nResult);
 			jsonOut.Get("Message", strText);
-
-			//strMessage = QString("查询制卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
-		CJsonObject jsonOut(strJsonOut);
-
-
-		if (!jsonOut.Get("Result", nResult) ||
-			!jsonOut.Get("Message", strText))
-		{
-			gInfo() << strJsonOut;
-			break;
-		}
-
+		
 	} while (0);
-	QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
+	CJsonObject jsonOut(strJsonOut);
+	int nErrCode = 0;
+	jsonOut.Get("Result", nResult);
+	jsonOut.Get("Message", strText);
+	jsonOut.Get("errcode", nErrCode);
+	OutputMsg("\n\t\tResult:%d\n\t\terrcode:%d\n\t\tMessage:%s", nResult,nErrCode, QString::fromLocal8Bit(strText.c_str()).toStdString().c_str());
+
 }
 
 
@@ -236,48 +268,57 @@ void SSCardServiceT::on_pushButton_QueryCardInfo_clicked()
 		CJsonObject jsonIn;
 		nResult = -1;
 		strJsonIn = jsonIn.ToString();
-		auto BankList = { "96588","95566","95533","95559","95580","95599","95588","96288","95555","95558","96688","96699" };
-		for (auto var : BankList)
+		//auto BankList = { "96588","95566","95533","95559","95580","95599","95588","96288","95555","95558","96688","96699" };
+		string strBankCode = ui->comboBox_Bank->currentData().toString().toStdString();
+		string StatusRange[] = {"0","1","2","B","3","4","A"};
+		//for (auto var : BankList)
 		{
 			jsonIn.Clear();
 			jsonIn.Add("Name", (char*)pIDCardInfo->szName);
 			jsonIn.Add("CardID", (char*)pIDCardInfo->szIdentity);
 			jsonIn.Add("City", Reginfo.strCityCode);
-			jsonIn.Add("BankCode", var);
+			jsonIn.Add("BankCode", strBankCode);
+			int nIndex = ui->comboBox_CardStatus->currentIndex();
+			if (nIndex < 0)
+				nIndex = 1;
+			jsonIn.Add("StatustoQuery", StatusRange[nIndex]);
 			strJsonIn = jsonIn.ToString();
 			if (QSucceed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
 				//if (QSucceed(pService->SetExtraInterface("QueryPersonInfo", strJsonIn, strJsonOut)))
 			{
 				nResult = 0;
+				
 				break;
 			}
 		}
-		if (QFailed(nResult))
-		{
-			string strText;
-			CJsonObject jsonOut(strJsonOut);
-			jsonOut.Get("Result", nResult);
-			jsonOut.Get("Message", strText);
-			QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
-			break;
-		}
-
-		CJsonObject jsonOut(strJsonOut);
-		if (!jsonOut.KeyExist("CardNum"))
-		{
-			QMessageBox::information(nullptr, "information", "Failed in get carddata!");
-			break;
-		}
-		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
+		
 
 	} while (0);
+	if (QFailed(nResult))
+	{
+		string strText;
+		CJsonObject jsonOut(strJsonOut);
+		jsonOut.Get("Result", nResult);
+		jsonOut.Get("Message", strText);
+		//QMessageBox_CN(QMessageBox::Information, "提示", QString::fromLocal8Bit(strText.c_str()), QMessageBox::Ok, this);
+		OutputMsg("\n\t\tResult:%d\n\t\tMessage:%s", nResult, QString::fromLocal8Bit(strText.c_str()).toStdString().c_str());
+	}
+	else
+	{
+		CJsonObject jsonOut(strJsonOut);
+		string strCardNum;
+		int nStatus;
+		jsonOut.Get("Result", nResult);
+		jsonOut.Get("CardNum", strCardNum);
+		jsonOut.Get("CardStatus", nStatus);
+		OutputMsg("\n\t\tResult:%d\n\t\tCardNum:%s\n\t\tCardStatus:%d", nResult, strCardNum.c_str(),nStatus);
+	}
+	
 }
 
 void SSCardServiceT::on_pushButton_PremakeCard_clicked()
 {
-
 	QString strMessage;
-
 	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	IDCardInfoPtr& pIDCardInfo = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
@@ -289,7 +330,6 @@ void SSCardServiceT::on_pushButton_PremakeCard_clicked()
 	pSSCardInfo->strSSQX = Reginfo.strCountry;
 	pSSCardInfo->strCardVender = Reginfo.strCardVendor;
 	pSSCardInfo->strBankCode = Reginfo.strBankCode;
-
 
 	QString strInfo;
 	SSCardService* pService = g_pDataCenter->GetSSCardService();
@@ -315,11 +355,13 @@ void SSCardServiceT::on_pushButton_PremakeCard_clicked()
 			break;
 		}
 		string strPhoto;
-		string strSSCardNum;
 		jsonOut.Get("CardNum", pSSCardInfo->strCardNum);
 		jsonOut.Get("Photo", pSSCardInfo->strPhoto);
 		QString strMessage;
 		SaveSSCardPhoto(strMessage, strPhoto.c_str());
+		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+		ui->label_Photo->setStyleSheet(strStyle);
+		OutputMsg("\n\t\tCardNum:%s", pSSCardInfo->strCardNum.c_str());
 
 	} while (0);
 }
@@ -466,7 +508,7 @@ void SSCardServiceT::on_pushButton_ReturnCard_clicked()
 
 		if (QFailed(pService->ReturnData(strJsonIn, strJsonOut)))
 			break;
-		QMessageBox::information(nullptr, "提示", "回盘成功!");
+		OutputMsg("回盘成功!");
 	} while (0);
 }
 
@@ -524,7 +566,8 @@ void SSCardServiceT::on_pushButton_ActiveCard_clicked()
 
 		if (QFailed(pService->ActiveCard(strJsonIn, strJsonOut)))
 			break;
-		QMessageBox::information(nullptr, "提示", "激活成功!");
+		//QMessageBox::information(nullptr, "提示", "激活成功!");
+		OutputMsg("激活成功!");
 	} while (0);
 }
 
@@ -587,8 +630,13 @@ void SSCardServiceT::on_pushButton_LoadPreMakeCard_clicked()
 			pSSCardInfo->strCity = Reginfo.strCityCode;
 			pSSCardInfo->strSSQX = Reginfo.strCountry;
 			pSSCardInfo->strCardVender = Reginfo.strCardVendor;
-			pSSCardInfo->strBankCode = Reginfo.strBankCode;
+			
 		}
+		OutputMsg("\n\t\tOrgID:%s!\t\tBankCode:%s\t\tTransType:5\t\tCity:%s\t\tSSQX:%s", 
+			Reginfo.strAgency.c_str(),
+			Reginfo.strBankCode.c_str(),
+			Reginfo.strCityCode.c_str(),
+			Reginfo.strCountry.c_str());
 
 		fs.close();
 	}
@@ -630,9 +678,14 @@ void SSCardServiceT::on_pushButton_GetPhoto_clicked()
 		if (jsonOut.Get("Photo", strPhoto))
 		{
 			SaveSSCardPhoto(strMessage, strPhoto.c_str());
+			QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+			ui->label_Photo->setStyleSheet(strStyle);
+			OutputMsg("照片取得成功!");
 		}
+		else
+			OutputMsg("获取照片失败!");
 
-		QMessageBox::information(nullptr, "提示", "照片取得成功!");
+		
 	} while (0);
 }
 
@@ -659,9 +712,8 @@ void SSCardServiceT::on_pushButton_UnRegisterLost_clicked()
 
 		strJsonIn = jsonIn.ToString();
 		string strJsonout;
-		string strCommand = "QueryPersonPhoto";
 
-		if (QFailed(pService->RegisterLost(strJsonIn, strJsonOut)))
+		if (QFailed(pService->RegisterLost(strJsonIn, strJsonOut,1)))
 		{
 			break;
 		}
@@ -672,7 +724,7 @@ void SSCardServiceT::on_pushButton_UnRegisterLost_clicked()
 			SaveSSCardPhoto(strMessage, strPhoto.c_str());
 		}
 
-		QMessageBox::information(nullptr, "提示", "照片取得成功!");
+		OutputMsg("解除挂失成功!");
 	} while (0);
 }
 
@@ -689,8 +741,8 @@ void SSCardServiceT::on_pushButton_ReadBankNum_clicked()
 	}
 	else
 	{
-        ui->label_BankNum->setText(pSSCardInfo->strBankNum.c_str());
-        ui->label_ChipNum->setText(pSSCardInfo->strChipNum.c_str());
+        ui->lineEdit_BankNumber->setText(pSSCardInfo->strBankNum.c_str());
+        ui->lineEdit_ChipNum->setText(pSSCardInfo->strChipNum.c_str());
 	}
 }
 
@@ -726,9 +778,7 @@ void SSCardServiceT::on_pushButton_QueryPersonInfo_clicked()
         string strOccupation;
         jsonOut.Get("CardNum", strCardNum);
         jsonOut.Get("Occupation", strOccupation);
-        strMessage = QString("社保卡号:%1,职业代码:%2").arg(strCardNum.c_str()).arg(strOccupation.c_str());
-
-        QMessageBox::information(nullptr, "提示", strMessage);
+		OutputMsg("社保卡号:%s,职业代码:%s", strCardNum.c_str(), strOccupation.c_str());
     } while (0);
 }
 

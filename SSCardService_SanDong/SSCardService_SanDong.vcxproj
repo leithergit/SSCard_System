@@ -14,7 +14,7 @@
     <ProjectGuid>{02F650B8-B868-4752-B4F7-850675B688A4}</ProjectGuid>
     <RootNamespace>SSCardService_Sandong</RootNamespace>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
     <ProjectName>SSCardService_BinZhou</ProjectName>
@@ -58,6 +58,7 @@
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>SSCardService_Binzhou</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)</OutDir>

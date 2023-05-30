@@ -459,6 +459,28 @@ void uc_InputIDCardInfo::HideItem()
 	ui->line->setVisible(false);
 	ui->dateEdit_Expired->setVisible(false);
 	ui->label_Career->setVisible(false);
+	//ui->label_Career->setText("查询范围");
+	//struct QueryRange
+	//{
+	//	QString strValue;
+	//	QString strName;
+	//};
+	//QueryRange strRange[] = {
+	//	{"0","放号"},
+	//	{"1","正常"},
+	//	{"2","挂失"},
+	//	{"B","临时挂失"},
+	//	{"3","挂失后注销"},
+	//	{"4","注销"},
+	//	{"A","未启用"}
+	//};
+	//ui->comboBox_Career->clear();
+	//for (auto var : strRange)
+	//{
+	//	ui->comboBox_Career->addItem(var.strName, var.strValue);
+	//}
+	//ui->comboBox_Career->setCurrentIndex(1);
+	ui->comboBox_Career->setVisible(false);
 	ui->comboBox_Career->setVisible(false);
 	ui->label_Address->setVisible(false);
 	ui->plainTextEdit_Address->setVisible(false);

@@ -10,9 +10,9 @@
 #include "Utility.h"
 #include "CJsonObject.hpp"
 #include "Markup.h"
-#include <QSettings>
-#include <QFileInfo>
-#include <QDebug>
+//#include <QSettings>
+//#include <QFileInfo>
+//#include <QDebug>
 #include <map>
 #include <vector>
 #include <filesystem>
@@ -797,6 +797,7 @@ public:
 		string strErrcode = "0";
 		string strKey = "";
 		string strDatagram = "";
+		string strCardStatusToQuery = "1";
 		do
 		{
 			if (!jsonIn.Parse(strJsonIn))
@@ -808,6 +809,7 @@ public:
 			jsonIn.Get("Name", pCardInfo->strName);
 			jsonIn.Get("City", pCardInfo->strCity);
 			jsonIn.Get("BankCode", pCardInfo->strBankCode);
+			jsonIn.Get("StatustoQuery", strCardStatusToQuery);
 			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
 			if (pCardInfo->strCardID.empty() ||
@@ -827,7 +829,7 @@ public:
 				nServiceType == ServiceType::Service_QueryInformation)
 			{
 				string strFunction = "查询社保卡信息(queryCardInfoBySfzhm)";
-				if (QFailed(nSSResult = queryCardInfoBySfzhm(*pCardInfo, strOutInfo)))
+				if (QFailed(nSSResult = queryCardInfoBySfzhm(*pCardInfo, strOutInfo, strCardStatusToQuery)))
 				{
 					strMessage = strFunction + "失败:";
 					strMessage += strOutInfo;
@@ -838,9 +840,10 @@ public:
 					break;
 
 				UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+				outJson.Parse(strOutInfo);
 			}
 			/*else
-				outJson.Parse(strDatagram);*/
+				;*/
 
 			CJsonObject ds = outJson["ds"];
 			if (ds.IsEmpty())
@@ -946,6 +949,7 @@ public:
 		default:
 		{
 			CJsonObject jsonOut;
+			jsonOut.Add("Result", 1);
 			jsonOut.Add("Message", "Invalid Service Type!");
 			return -1;
 			break;
@@ -2067,7 +2071,7 @@ public:
 				break;
 			}
 			CJsonObject tmpJson;
-			if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+			if (QFailed(CheckOutJson(strJsonOut, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
 				break;
 
 			CJsonObject ds = tmpJson["ds"];

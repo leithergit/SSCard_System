@@ -3,13 +3,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <RemoteDebuggerCommand>D:\SSCard_System.mvc.d\SSCard_System.exe</RemoteDebuggerCommand>
     <RemoteDebuggerWorkingDirectory>D:\SSCard_System.mvc.d</RemoteDebuggerWorkingDirectory>
-    <RemoteDebuggerServerName>10.0.0.135</RemoteDebuggerServerName>
+    <RemoteDebuggerServerName>10.0.0.106</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
-    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>Z:\SSCard_System.MVC.d\SSCard_System.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments />
-    <LocalDebuggerWorkingDirectory>Z:\SSCard_System.MVC.d</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommand>D:\Work\SSCard_System.MVC\MainProject\Debug\SSCard_System.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>/SkipLicense</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>D:\Work\SSCard_System.MVC\MainProject\Debug</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <RemoteDebuggerCommand>D:\SSCard_System.mvc\SSCard_System.exe</RemoteDebuggerCommand>
@@ -23,9 +23,9 @@
     <LocalDebuggerWorkingDirectory>Z:\SSCard_System.MVC</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2022-07-01T08:24:56.1944303Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-10-26T10:16:29.6667685Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2022-07-01T08:24:55.9032014Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2022-10-26T10:16:29.5710784Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>
