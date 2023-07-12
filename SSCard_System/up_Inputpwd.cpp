@@ -42,14 +42,14 @@ int up_InputPWD::ProcessBussiness()
 	{
 		strError = QString("内存不足,初始化密码键盘对象失败!");
 		gError() << strError.toLocal8Bit().data();
-		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+		emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 		return -1;
 	}
 
 	if (QFailed(m_pPinKeybroad->OpenDevice(strError)))
 	{
 		gError() << strError.toLocal8Bit().data();
-		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+		emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 		return -1;
 	}
 	QString strMessage;
@@ -65,20 +65,20 @@ int up_InputPWD::ProcessBussiness()
 												DevConfig.nDesktopSSCardReaderType, 
 												strMessage)))
 	{
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return -1;
 	}
 
 	if (QFailed(g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nDesktopSSCardReaderPowerOnType, szATR, nATRLen, szRCode)))
 	{
-		emit ShowMaskWidget("操作失败", "卡片上电失败!", Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", "卡片上电失败!", Fatal, Return_MainPage);
 		return -1;
 	}
 
 	if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
 	{
 		strMessage = QString("DriverInit失败:%1").arg(szRCode);
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return -1;
 	}
 
@@ -89,7 +89,7 @@ int up_InputPWD::ProcessBussiness()
 	{
 		strError = QString("内存不足,创建密码键盘线程失败!");
 		gError() << strError.toLocal8Bit().data();
-		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+		emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 		return -1;
 	}
 	return 0;

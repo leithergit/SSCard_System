@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,66
- PRODUCTVERSION 1,0,1,66
+ FILEVERSION 1,0,1,67
+ PRODUCTVERSION 1,0,1,67
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "金乔炜煜(上海)智能科技有限公司"
             VALUE "FileDescription", "便携式社保卡制卡系统"
-            VALUE "FileVersion", "1.0.1.66"
+            VALUE "FileVersion", "1.0.1.67"
             VALUE "InternalName", "SSCard_System.exe"
             VALUE "LegalCopyright", "金乔炜煜(上海)智能科技有限公司 (C) 2021版权所有"
             VALUE "OriginalFilename", "SSCard_System.exe"
             VALUE "ProductName", "便携式社保卡制卡系统"
-            VALUE "ProductVersion", "1.0.1.66"
+            VALUE "ProductVersion", "1.0.1.67"
         END
     END
     BLOCK "VarFileInfo"

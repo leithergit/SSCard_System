@@ -73,7 +73,7 @@ int GetImageStorePath(string& strFilePath, int nType = 0);
 
 int LoadTestData(string& strName, string& strCardID, string& strMobile);
 
-int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile);
+//int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile);
 
 int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64);
 

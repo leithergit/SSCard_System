@@ -234,7 +234,7 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardStatus_clicked()
 		strcpy((char*)pSSCardInfo->strTransType, "5");
 		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
 		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+		strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
@@ -313,7 +313,7 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage,bool bDefault)
 	else
 		strCardDataPath += "/Finished";
 
-	strCardDataPath += QString("/Carddata_%1.ini").arg((const char*)pIDCard->szIdentity);
+	strCardDataPath += QString("/Progress_%1.json").arg((const char*)pIDCard->szIdentity);
 	QString strMessage;
 
 	QFileInfo ffile(strCardDataPath);
@@ -323,7 +323,7 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage,bool bDefault)
 		return -1;
 	}
 
-	LoadSSCardData(pSSCardInfo, strCardDataPath);
+	g_pDataCenter->LoadSSCardData(strCardDataPath.toStdString(),pSSCardInfo);
 	strcpy(pSSCardInfo->strName, (const char*)pIDCard->szName);
 	GetImageStorePath(g_pDataCenter->strSSCardPhotoFile, 1);
 	//SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
@@ -337,7 +337,6 @@ void Sys_ManualMakeCard::on_pushButton_LoadCardData_clicked()
 
 	if (QFailed(LoadPersonSSCardData(strMessage)))
 	{
-		if ()
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
@@ -938,7 +937,7 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 	strcpy((char*)pSSCardInfo->strTransType, "5");
 	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
 	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
 	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 	int nIndex = ui->comboBox_Failure->currentIndex();
 	switch (nIndex)

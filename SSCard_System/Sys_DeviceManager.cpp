@@ -1023,7 +1023,7 @@ void DeviceManager::on_pushButton_MakePhoto_clicked()
 		return;
 	}
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-	if (LoadSSCardData(pSSCardInfo, strFile) == 0)
+	if (g_pDataCenter->LoadSSCardData(strFile.toStdString(),pSSCardInfo))
 	{
 		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 		g_pDataCenter->SetIDCardInfo(pIDCard);

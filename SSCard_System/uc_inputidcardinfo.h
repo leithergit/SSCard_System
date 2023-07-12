@@ -79,9 +79,12 @@ public slots:
 
 	// UI编辑事件和程序编辑事件都会触发
 	void on_Name_textChanged(const QString& arg1);
+	
+	void on_lineEdit_CardID_textChanged(const QString &arg1);
 
 	// 只有UI编辑事件会触发
 	// void on_lineEdit_Name_textEdited(const QString& arg1);
+	
 
 private:
 	Ui::uc_InputIDCardInfo* ui;

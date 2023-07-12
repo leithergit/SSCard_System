@@ -70,7 +70,7 @@ int uc_MakeCard::ProcessBussiness()
 		if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
 		{
 			gError() << gQStr(strMessage);
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 			return nResult;
 		}
 	}
@@ -79,7 +79,7 @@ int uc_MakeCard::ProcessBussiness()
 		if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
 		{
 			gError() << gQStr(strMessage);
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 			return nResult;
 		}
 	}
@@ -92,7 +92,7 @@ int uc_MakeCard::ProcessBussiness()
 	strcpy((char*)pSSCardInfo->strTransType, "5");
 	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
 	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
 	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 	ZeroMemory(StepStatus, sizeof(StepStatus));
 	int nStatus = 0;
@@ -101,7 +101,7 @@ int uc_MakeCard::ProcessBussiness()
 	{
 		if (QFailed(PrecessCardInMaking(strMessage)))
 		{
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 			return -1;
 		}
 		StepStatus[Step_Mark] = true;
@@ -110,7 +110,7 @@ int uc_MakeCard::ProcessBussiness()
 	{
 		if (QFailed(PrepareMakeCard(strMessage)))
 		{
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 			return -1;
 		}
 		StepStatus[Step_PreMake] = true;
@@ -147,56 +147,67 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	QString strCardProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus);
 
+	int nCardProgress = 0;
 	do
 	{
-		if (QFailed(nResult = MarkCard(strMessage, nStatus, pSSCardInfo)))
+		if (!g_pDataCenter->GetProgressStatus("Mark"))		// 未标注
 		{
-			if (strMessage == "已经开始制卡")
+			if (QFailed(nResult = MarkCard(strMessage, nStatus, pSSCardInfo)))
 			{
-				if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
+				if (strMessage == "已经开始制卡")
 				{
-					if (strMessage.contains("已经有批次号"))
+					if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 					{
-						strMessage += "\n请转到后台以写卡失败选项手动制卡!";
+						if (strMessage.contains("已经有批次号"))
+						{
+							strMessage += "\n请转到后台以写卡失败选项手动制卡!";
+							break;
+						}
+						if (strMessage.contains("批次确认加锁失败"))
+						{
+							strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
+						}
+						break;
+						/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
+							break;*/
+					}
+
+					if (nStatus != 0 && nStatus != 1)
+					{
+						nResult = -1;
 						break;
 					}
-					if (strMessage.contains("批次确认加锁失败"))
-					{
-						strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
-					}
-					break;
-					/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
-						break;*/
-				}
-
-				if (nStatus != 0 && nStatus != 1)
-				{
-					nResult = -1;
 					break;
 				}
+				else
+					break;
+			}
+			if (nStatus != 0 && nStatus != 1)
+			{
+				nResult = -1;
 				break;
 			}
-			else
+			g_pDataCenter->SetProgressStatus("Mark", 1);
+		}
+		else
+			nResult = 0;
+		if (!g_pDataCenter->GetProgressStatus("GetCardData"))		// 未取得卡数据
+		{
+			if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
+			{
 				break;
-		}
-		if (nStatus != 0 && nStatus != 1)
-		{
-			nResult = -1;
-			break;
-		}
+			}
 
-		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
-		{
-			break;
-			/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
-				break;*/
+			if (nStatus != 0 && nStatus != 1)
+			{
+				nResult = -1;
+				break;
+			}
+			g_pDataCenter->SetProgressStatus("GetCardData", 1);
 		}
-
-		if (nStatus != 0 && nStatus != 1)
-		{
-			nResult = -1;
-			break;
-		}
+		else
+			nResult = 0;
+		
 	} while (0);
 	return nResult;
 }
@@ -208,6 +219,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	do
 	{
+		string strProgress = "";
 		if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
 		{
 			if (!pSSCardInfo->strPhoto)
@@ -225,54 +237,80 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 					}
 				}
 			}
-
-			nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
+			if (!g_pDataCenter->GetProgressStatus("AppNewCard"))		// 未取得卡数据
+			{
+				strProgress = "ApplyNewCard";
+				nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
+			}
+			else
+				nResult = 0;
 		}
 		else
 		{
-			nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
-		}
-		if (QFailed(nResult))
-			break;
-		if (nStatus != 0 && nStatus != 1)
-		{
-			nResult = -1;
-			break;
-		}
-
-		nResult = MarkCard(strMessage, nStatus, pSSCardInfo);
-		if (QFailed(nResult))
-		{
-			break;
-		}
-		if (nStatus != 0 && nStatus != 1)
-		{
-			strMessage = QString("即制卡标注失败:%1!").arg(nStatus);
-			nResult = -1;
-			break;
-		}
-
-		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
-		{
-			if (strMessage.contains("批次"))
+			if (!g_pDataCenter->GetProgressStatus("ApplyCardReplacement"))		// 未取得卡数据
 			{
-				strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
+				strProgress = "ApplyCardReplacement";
+				nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
+			}
+			else
+				nResult = 0;
+			
+		}
+		if (QFailed(nResult))
+			break;
+
+		if (nStatus != 0 && nStatus != 1)
+		{
+			nResult = -1;
+			break;
+		}
+		g_pDataCenter->SetProgressStatus(strProgress, 1);
+		if (!g_pDataCenter->GetProgressStatus("MarkCard"))
+		{
+			nResult = MarkCard(strMessage, nStatus, pSSCardInfo);
+			if (QFailed(nResult))
+			{
 				break;
 			}
-
 			if (nStatus != 0 && nStatus != 1)
 			{
-				strMessage = QString("因获取制卡数据失败:%1!").arg(strMessage);
+				strMessage = QString("即制卡标注失败:%1!").arg(nStatus);
 				nResult = -1;
 				break;
 			}
-			nResult = -1;
+			g_pDataCenter->SetProgressStatus("MarkCard", 1);
 		}
-		if (nStatus != 0 && nStatus != 1)
+		else
+			nResult = 0;
+
+		if (!g_pDataCenter->GetProgressStatus("GetCardData"))
 		{
-			nResult = -1;
-			break;
+			if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
+			{
+				if (strMessage.contains("批次"))
+				{
+					strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
+					break;
+				}
+
+				if (nStatus != 0 && nStatus != 1)
+				{
+					strMessage = QString("因获取制卡数据失败:%1!").arg(strMessage);
+					nResult = -1;
+					break;
+				}
+				nResult = -1;
+			}
+			if (nStatus != 0 && nStatus != 1)
+			{
+				nResult = -1;
+				break;
+			}
+			g_pDataCenter->SetProgressStatus("GetCardData", 1);
 		}
+		else
+			nResult = 0;
+
 	} while (0);
 	return nResult;
 }
@@ -293,7 +331,8 @@ void uc_MakeCard::ThreadWork()
 	do
 	{
 		nResult = -1;
-		if (!StepStatus[Step_WriteCard])
+		if (!g_pDataCenter->GetProgressStatus("WriteCard"))
+		//if (!StepStatus[Step_WriteCard])
 		{
 			if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
 			{
@@ -302,26 +341,30 @@ void uc_MakeCard::ThreadWork()
 				break;
 			}
 			StepStatus[Step_WriteCard] = true;
+			g_pDataCenter->SetProgressStatus("WriteCard", 1);
 		}
 		else
 			gInfo() << GBKString("写卡成功")
 
 			emit UpdateProgress(MP_WriteCard);
-		if (!StepStatus[Step_PrintCard])
+		if (!g_pDataCenter->GetProgressStatus("PrintCard"))
+		//if (!StepStatus[Step_PrintCard])
 		{
 			if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
 			{
 				strMessage = "%1,请检查制卡机后,然后点击重试以继续完成卡片制作!";
 				return;
 			}
-			StepStatus[Step_PrintCard] = true;
+			g_pDataCenter->SetProgressStatus("WriteCard", 1);
+			//StepStatus[Step_PrintCard] = true;
 		}
 
 		emit UpdateProgress(MP_PrintCard);
 		strInfo = "卡片打印成功";
 		gInfo() << gQStr(strInfo);
 
-		if (!StepStatus[Step_ReturnData])
+		//if (!StepStatus[Step_ReturnData])
+		if (!g_pDataCenter->GetProgressStatus("ReturnData"))
 		{
 			// 数据回盘
 			if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
@@ -329,14 +372,18 @@ void uc_MakeCard::ThreadWork()
 				gError() << gQStr(strMessage);
 				break;
 			}
-			
+
 #pragma Warning("回盘失败如何处理？")
 			if (nStatus != 0 && nStatus != 1)
 				break;
+			g_pDataCenter->SetProgressStatus("ReturnData", 1);
 			StepStatus[Step_ReturnData] = true;
 		}
+		else
+			nResult = 0;
 
-		if (!StepStatus[Step_EnableCard])
+		if (!g_pDataCenter->GetProgressStatus("EnableCard"))
+			//if (!StepStatus[Step_EnableCard])
 		{
 			// 启用
 			if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
@@ -345,11 +392,14 @@ void uc_MakeCard::ThreadWork()
 				break;
 			}
 			StepStatus[Step_EnableCard] = true;
+			g_pDataCenter->SetProgressStatus("EnableCard", 1);
 			gInfo() << "关闭制卡进度";
 			g_pDataCenter->CloseProgress();
 			gInfo() << "移除制卡数据文件";
 			RemoveCardData(pSSCardInfo);
 		}
+		else
+			nResult = 0;
 
 		if (nStatus != 0 && nStatus != 1)
 			break;
@@ -369,7 +419,7 @@ void uc_MakeCard::ThreadWork()
 	this_thread::sleep_for(chrono::milliseconds(2000));
 	if (QFailed(nResult))
 	{
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Stay_CurrentPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Stay_CurrentPage);
 		emit EnableButtonOK(true);
 	}
 	else
@@ -392,14 +442,14 @@ void uc_MakeCard::on_pushButton_OK_clicked()
 	{
 		strMessage = "打印机异常,请检查打印机!";
 		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("严重错误", strMessage, Fetal, Stay_CurrentPage);
+		emit ShowMaskWidget("严重错误", strMessage, Fatal, Stay_CurrentPage);
 		return;
 	}
 			
 	if (QFailed(g_pDataCenter->UpdatePrinterStatus(strMessage)))
 	{
 		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("严重错误", strMessage, Fetal, Stay_CurrentPage);
+		emit ShowMaskWidget("严重错误", strMessage, Fatal, Stay_CurrentPage);
 		return;
 	}
 	if (g_pDataCenter->PrinterStatus.fwToner != Ribbon_Full &&
@@ -407,7 +457,7 @@ void uc_MakeCard::on_pushButton_OK_clicked()
 	{
 		strMessage = "色带异常,请更换色带!";
 		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("严重错误", strMessage, Fetal, Stay_CurrentPage);
+		emit ShowMaskWidget("严重错误", strMessage, Fatal, Stay_CurrentPage);
 		return;
 	}
 
@@ -425,7 +475,7 @@ void uc_MakeCard::on_pushButton_OK_clicked()
 	{
 		QString strError = QString("内存不足,创建制卡线程失败!");
 		gError() << strError.toLocal8Bit().data();
-		emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+		emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 	}
 	ui->pushButton_OK->setEnabled(false);
 	

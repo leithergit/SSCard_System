@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <fstream>
 #include <filesystem>
+#include <optional>
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <string>
 #include <QObject>
@@ -27,6 +28,7 @@
 #include <winreg.h>
 #include <string>
 #include <map>
+#include <tuple>
 #include <algorithm>
 #include <QCoreApplication>
 #include <QDir>
@@ -115,6 +117,13 @@ enum MakeCard_Progress
 	MP_RejectCard
 };
 
+enum class ProgrerssType
+{
+	Progress_UnStart,		// 开未始
+	Progress_Making,		// 制作中
+	Progress_Finished		// 已完成
+};
+
 enum Step_Index
 {
 	Step_Mark = 0,
@@ -137,7 +146,7 @@ enum MaskStatus
 	Information,
 	Error,
 	Failed,
-	Fetal,
+	Fatal,
 	Nop
 };
 
@@ -281,6 +290,7 @@ struct DeviceConfig
 		strDesktopSSCardReaderPort = pSettings->value("DesktopSSCardReaderPort", "USB").toString().toStdString();
 
 		strTerminalCode = pSettings->value("TerminalCode", "").toString().toStdString();
+		strOperatorID = pSettings->value("OperatorID", "").toString().toStdString();
 
 		strIDCardReaderPort = pSettings->value("IDCardReaderPort", "USB").toString().toStdString();
 		nCameraDrv = (CameraDriver)pSettings->value("CameraDriver", 1).toInt();
@@ -422,6 +432,7 @@ struct DeviceConfig
 
 	string		strIDCardReaderPort;				   // 身份证读卡器配置:USB, COM1, COM2...
 	string		strTerminalCode;					   // 终端唯一识别码	
+	string		strOperatorID;
 	PinBoardType	nPinBoardType = PinBoardType::PinBoard_F31;	// 密码键盘型号，默认F31
 	
 	CameraDriver nCameraDrv = CameraDriver::Driver_DLL;
@@ -700,7 +711,7 @@ struct SysConfig
 		pSettings->setValue("Information", nMaskTimeout[Information]);
 		pSettings->setValue("Error", nMaskTimeout[Error]);
 		pSettings->setValue("Failed", nMaskTimeout[Failed]);
-		pSettings->setValue("Fetal", nMaskTimeout[Fetal]);
+		pSettings->setValue("Fetal", nMaskTimeout[Fatal]);
 		pSettings->endGroup();
 	}
 
@@ -795,7 +806,7 @@ struct SysConfig
 		nMaskTimeout[Information] = pSettings->value("Information", 1000).toUInt();
 		nMaskTimeout[Error] = pSettings->value("Error", 2000).toUInt();
 		nMaskTimeout[Failed] = pSettings->value("Failed", 5000).toUInt();
-		nMaskTimeout[Fetal] = pSettings->value("Fetal", 10000).toUInt();
+		nMaskTimeout[Fatal] = pSettings->value("Fetal", 10000).toUInt();
 		pSettings->endGroup();
 	}
 
@@ -881,6 +892,8 @@ enum RibbonStatus
 	Ribbon_Losed,				// 未安装
 	Ribbon_Max = Ribbon_Losed
 };
+
+using CJsonObjectPtr = shared_ptr<CJsonObject>;
 class DataCenter
 {
 public:
@@ -982,6 +995,7 @@ public:
 	int			   nSkipPayTime = 0;
 	bool		   bTestCard = false;
 	ServiceType	   nCardServiceType = ServiceType::Service_Unknown;
+	ProgrerssType  nProgressType = ProgrerssType::Progress_UnStart;
 	bool		   bWithoutIDCard = false;
 	int			   nNetTimeout = 1500;
 	PRINTERSTATUS	PrinterStatus;
@@ -1051,15 +1065,42 @@ public:
 
 	int TestPrinter(QString& strMessage);
 
-	bool OpenProgress();
+	optional<CJsonObjectPtr> OpenProgress(string&strProgressFile,bool bCreate = false);
+	optional<CJsonObjectPtr> OpenProgress(string&& strProgressFile, bool bCreate = false);
+
+	bool SetProgress(tuple<ProgrerssType, string, CJsonObjectPtr>& tpl);
+
+	bool SetProgress(IDCardInfoPtr& pIDCard, CJsonObjectPtr pJson = nullptr,bool bSave = true);
+
+	bool SetProgress(SSCardInfoPtr& pSSCard, CJsonObjectPtr pJson = nullptr,bool bSave = true);
+
+	bool GetProgress(IDCardInfoPtr& pIDCard, CJsonObjectPtr pJson = nullptr);
+
+	bool GetProgress(SSCardInfoPtr& pSSCard, CJsonObjectPtr pJson = nullptr);
+
+	optional<string> GetProgressFile(IDCardInfoPtr pIDCard = nullptr);
 
 	void CloseProgress();
 
-	bool UpdateProgress();
+	//bool SaveProgress();
 
-	bool GetProgress(string strProcess, int& nStatus);
+	bool SaveProgress(CJsonObjectPtr &pJson, string &strProgressFile);
 
-	bool SetProgress(string strProcess, int nStatus);
+	bool SaveProgress(CJsonObjectPtr &pJson, string&& strProgressFile);
+
+	optional<CJsonObjectPtr> LoadSSCardData(string strProgressFile,SSCardInfoPtr& pSSCardInfo);
+
+	bool SetProgressField(const char *szKey,char *szVal);
+
+	bool GetProgressField(const char* szKey,char *szVal);
+
+	bool GetProgressField(const char* szKey, string &szVal);
+
+	// 获取指定流程的状态
+	// 没有或未完成流程时返回0，否则返回1
+	int  GetProgressStatus(string strProcessName);
+
+	bool SetProgressStatus(string strProcessName, int nStatus);
 
 	int TestCard(QString& strMessage);
 
@@ -1124,6 +1165,11 @@ public:
 		else
 			return false;
 	}
+
+	ProgrerssType GetProgressType()
+	{
+		return nProgressType;
+	}
 private:
 	IDCardInfoPtr	pIDCard = nullptr;
 	SysConfigPtr	pSysConfig = nullptr;
@@ -1135,13 +1181,77 @@ private:
 	KT_Reader* m_pSSCardReader = nullptr;
 	vector<IDCardInfoPtr> vecAdminister;
 	Manager_Level	nManagerLevel = Manager_Level::Manager;
-	CJsonObject* pJsonProgress = nullptr;
+	CJsonObjectPtr pJsonProgress = nullptr;
 };
+
+#define	JsSetValueP(json,field,value)	if (json->KeyExist(field)) \
+											json->Replace(field, (char *)value);\
+										else\
+											json->Add(field, (char *)value);
+
+// 赋值给数据组型变量
+#define JsGetValueP(json,Key,Value) {\
+		string strTemp;\
+		if (json->KeyExist(Key)){\
+			json->Get(Key, strTemp);\
+			qDebug("%s = %s", Key, strTemp.c_str());\
+			strcpy((char*)Value, strTemp.c_str());\
+			}\
+		}
+// 赋值给指针型变量，同时会检查指针
+#define JsGetValuePP(json,Key,Value) {\
+		string strTemp;\
+		if (json->KeyExist(Key)){\
+			json->Get(Key, strTemp);\
+			qDebug("%s = %s", Key, strTemp.c_str());\
+			if (!Value)\
+				Value = new char[strTemp.size() + 1];\
+			strcpy((char*)Value, strTemp.c_str());\
+			}\
+		}
+//#define JsGetValueP(json,Key,Value)	{string strTemp;json->Get(Key, strTemp);qDebug("%s = %s",Key,strTemp.c_str()); strcpy_s((char *)Value,sizeof(Value),strTemp.c_str());}
+
+
+#define JsGetValue(json,Key,Value)	{\
+		string strTemp;\
+		if (json.KeyExist(Key)){\
+			json.Get(Key, strTemp);\
+			qDebug("%s = %s", Key, strTemp.c_str());\
+			strcpy((char*)Value, strTemp.c_str());\
+			}\
+		}
+
+//
+//#define JsGetValue(json,Key,Value)	{\
+//		string strTemp;\
+//		if (json.KeyExist(Key)){\
+//			json.Get(Key, strTemp);\
+//			qDebug("%s = %s", Key, strTemp.c_str());\
+//			if (!Value)\
+//				Value = new char[strTemp.size() + 1];\
+//			strcpy((char*)Value, strTemp.c_str());\
+//			}\
+//		}
+
+#define	JsSetValue(json,field,value)	if (json.KeyExist(field)) \
+											json.Replace(field, value);\
+										else\
+											json.Add(field, value);
+
+#define	UpdateSSCard(json,key,val)	if (strlen(val))\
+							{\
+								if (json.KeyExist(key))\
+									json.Replace(key,val);\
+								else\
+									json.Add(key,val);\
+							}
 
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
 
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
+
+tuple<ProgrerssType,string,CJsonObjectPtr> FindCardData(const char *szIDentify,SSCardInfoPtr &pSSCardInfo);
 
 class QWaitCursor
 {
@@ -1155,7 +1265,9 @@ public:
 };
 
 int GetAge(string strBirthday);
+
 char VerifyCardID(const char* pszSrc);
+
 void EnableWidgets(QWidget* pUIObj, bool bEnable = true);
 // 需提前把要处理的图片放在./PhotoProcess目录下，并命名为1.jpg
 int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage);

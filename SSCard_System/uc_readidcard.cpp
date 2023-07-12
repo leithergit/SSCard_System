@@ -58,7 +58,7 @@ void uc_ReadIDCard::StartDetect()
 		{
 			QString strError = QString("内存不足,创建读卡线程失败!");
 			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+			emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 			return;
 		}
 	}
@@ -80,7 +80,7 @@ int uc_ReadIDCard::ProcessBussiness()
 	if (!g_pDataCenter->OpenCamera())
 	{
 		gInfo() << "Failed in OpenCamera";
-		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
+		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fatal, Return_MainPage);
 		return -1;
 	}
 
@@ -136,6 +136,7 @@ void uc_ReadIDCard::ThreadWork()
 	QString strMessage;
 	while (m_bWorkThreadRunning)
 	{
+		this_thread::sleep_for(chrono::milliseconds(200));
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
 		if (tDuration.count() >= 1000)
 		{
@@ -153,46 +154,52 @@ void uc_ReadIDCard::ThreadWork()
 
 				int nNewPage = Page_FaceCapture;
 				int nOperation = Goto_Page;
-
-				QString strProgressFile = QString("%1/data/Progress_%2.json").arg(QCoreApplication::applicationDirPath()).arg((char*)m_pIDCard->szIdentity);
-				if (fs::exists(strProgressFile.toStdString()))
+				SSCardInfoPtr pSSCardInfo = nullptr;
+				QString strMessage = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
+				// 近回文件类型，文件名和json指针(若文件存在)
+				auto tpProgressInfo = FindCardData((const char*)m_pIDCard->szIdentity, pSSCardInfo);
+				switch (std::get<0>(tpProgressInfo))
 				{
-					strMessage = "读取身份证成功,业务流程已开始!";
+				default:
+				case ProgrerssType::Progress_UnStart:
+				{
+					// 开启新流程					
 					switch (g_pDataCenter->nCardServiceType)
 					{
 					case ServiceType::Service_NewCard:
-					{
-						nNewPage = Page_InputIDCardInfo;
-						break;
-					}
-						
 					case ServiceType::Service_ReplaceCard:
-					{
-						nNewPage = Page_EnsureInformation;
+					{// 创建新的流程
+						auto optProgressFile = g_pDataCenter->GetProgressFile(m_pIDCard);
+						auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value());
+						if (optProgressJson)
+						{
+							std::get<1>(tpProgressInfo) = optProgressFile.value();
+							std::get<2>(tpProgressInfo) = optProgressJson.value();
+							g_pDataCenter->SetProgress(tpProgressInfo);
+						}
+							
 						break;
 					}
-						
 					default:
 						nOperation = Switch_NextPage;
 						nNewPage = 0;
 						strMessage = "读取身份证成功,稍后请进行挂失/解挂操作!";
 						break;
 					}
+					break;
 				}
-				else
-				{
-					strMessage = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
-					switch (g_pDataCenter->nCardServiceType)
-					{
-					case ServiceType::Service_NewCard:
-					case ServiceType::Service_ReplaceCard:
-						break;
-					default:
-						nOperation = Switch_NextPage;
-						nNewPage = 0;
-						strMessage = "读取身份证成功,稍后请进行挂失/解挂操作!";
-						break;
-					}
+					
+				case ProgrerssType::Progress_Making:
+				case ProgrerssType::Progress_Finished:
+				{// 使用现有流程
+					g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+					g_pDataCenter->SetProgress(tpProgressInfo);
+					//strMessage = QString("\t\t姓名:%1\n\t\t身份证:%2\n\t\t社保卡号:%3\n\t\t日期:%4").arg((char*)m_pIDCard->szName).arg((char*)m_pIDCard->szIdentity).arg(pSSCardInfo->strCardNum).arg(pSSCardInfo->strReleaseDate);
+					//strMessage = QString("发现当前用户未完成制卡数据\n\%1,现将转入制卡页面").arg(strUserInfo);
+					nOperation = Switch_NextPage;
+					nResult = 0;
+					break;
+				}
 				}
 
 				gInfo() << gQStr(strMessage);
@@ -209,10 +216,7 @@ void uc_ReadIDCard::ThreadWork()
 				emit ErrorMessage(strMessage);
 			}
 		}
-		else
-		{
-			this_thread::sleep_for(chrono::milliseconds(200));
-		}
+		
 	}
 }
 

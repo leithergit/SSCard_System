@@ -472,7 +472,7 @@ int  ApplyNewCard(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 		return -1;
 }
 
-int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+int  ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
 	char szStatus[1024] = { 0 };
 	int nResult = applyCardReplacement(*pSSCardInfo, (char*)szStatus);
@@ -497,7 +497,7 @@ int     ApplyCardReplacement(QString& strMessage, int& nStatus, SSCardInfoPtr& p
 }
 
 // 目前在河南无权限 
-int     CancelCardReplacement(QString& strMessage, int& nStatus)
+int  CancelCardReplacement(QString& strMessage, int& nStatus)
 {
 	return 0;
 	// 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
@@ -531,7 +531,7 @@ int     CancelCardReplacement(QString& strMessage, int& nStatus)
 	// 	}
 }
 
-int     ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
+int  ResgisterPayment(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
 	char szStatus[1024] = { 0 };
 	int nResult = registerPayment(*pSSCardInfo, (char*)szStatus);
@@ -671,6 +671,7 @@ int GetCardDataFieldp(const char* szField, string& strValue, QString strINIFile)
 	return 0;
 }
 
+/*
 int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 #define AddCardFiled(x,s)	x.setValue(#s,pSSCardInfoOut->s);
@@ -684,7 +685,7 @@ int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	AddCardFiled(CardIni, strSex);
 	AddCardFiled(CardIni, strNation);
 	AddCardFiled(CardIni, strMobile);
-	AddCardFiled(CardIni, strAdress);
+	AddCardFiled(CardIni, strAddress);
 	AddCardFiled(CardIni, strPostalCode);
 	AddCardFiled(CardIni, strEmail);
 	AddCardFiled(CardIni, strCommunity);
@@ -709,7 +710,9 @@ int SaveCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	CardIni.endGroup();
 	return 0;
 }
+*/
 
+/*
 int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 {
 	QFileInfo fi(strINIFile);
@@ -728,7 +731,7 @@ int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	GetCardField(CardIni, pSSCardInfoOut, strSex);
 	GetCardField(CardIni, pSSCardInfoOut, strNation);
 	GetCardField(CardIni, pSSCardInfoOut, strMobile);
-	GetCardField(CardIni, pSSCardInfoOut, strAdress);
+	GetCardField(CardIni, pSSCardInfoOut, strAddress);
 	GetCardField(CardIni, pSSCardInfoOut, strPostalCode);
 	GetCardField(CardIni, pSSCardInfoOut, strEmail);
 	GetCardField(CardIni, pSSCardInfoOut, strCommunity);
@@ -754,7 +757,7 @@ int LoadSSCardData(SSCardInfoPtr& pSSCardInfoOut, QString strINIFile)
 	CardIni.endGroup();
 	return 0;
 }
-
+*/
 int  GetImageStorePath(string& strFilePath, int nType)
 {
 	QString strStorePath = QCoreApplication::applicationDirPath();
@@ -813,32 +816,44 @@ int SaveSSCardPhoto(QString strMessage, const char* szPhotoBase64)
 int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, bool bSkipPreStep)
 {
 	bool bLoaded = false;
-	QString strCofigurePath = QCoreApplication::applicationDirPath();
-	strCofigurePath += "/Debug";
-	QFileInfo fdir(strCofigurePath);
+	QString strDebugCardData = QCoreApplication::applicationDirPath();
+	strDebugCardData += "/Debug";
+	QFileInfo fdir(strDebugCardData);
 	if (fdir.exists())
 	{
 		if (!fdir.isDir())
 		{
-			QFile f(strCofigurePath);
+			QFile f(strDebugCardData);
 			f.remove();
 		}
 	}
 	else
 	{
 		QDir dir;
-		dir.mkdir(strCofigurePath);
+		dir.mkdir(strDebugCardData);
 	}
-
-	strCofigurePath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
+	
+	strDebugCardData += QString("/TestPersonData_%1.json").arg(pSSCardInfo->strCardID);
+	string strStdDebugCardData = strDebugCardData.toLocal8Bit().data();
 	if (g_pDataCenter->bDebug)
 	{
-		QFileInfo ffile(strCofigurePath);
+		QFileInfo ffile(strDebugCardData);
 		if (ffile.isFile())
 		{
 #pragma Warning("使用预存制卡数据")
 			SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-			LoadSSCardData(pSSCardTemp, strCofigurePath);
+			auto optJson = g_pDataCenter->OpenProgress(strStdDebugCardData);
+			if (!optJson)
+			{
+				gError() << "Failed in open progress file " << strStdDebugCardData;
+				return -1;
+			}
+			if (g_pDataCenter->GetProgress(pSSCardTemp, optJson.value()))
+			{
+				gError() << "Failed in GetProgress from file " << strStdDebugCardData;
+				return -1;
+			}
+			//LoadSSCardData(pSSCardTemp, strDebugCardData);
 			strcpy(pSSCardInfo->strPCH, pSSCardTemp->strPCH);
 			strcpy(pSSCardInfo->strCardNum, pSSCardTemp->strCardNum);		// 新的卡号
 			strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
@@ -871,12 +886,11 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 				break;
 			using LPCHAR = char*;
 			strFnName = "获取批次号";
-
-			if (QFailed(GetCardDataField("strPCH", (char*)pSSCardInfo->strPCH, strCofigurePath)))
+			if (!g_pDataCenter->GetProgressField("strPCH",(char*)pSSCardInfo->strPCH))
 			{
 				if (QFailed(nResult = getHQPCH(*pSSCardInfo, szStatus)))
 					break;
-				SaveCardDataField("strPCH", pSSCardInfo->strPCH, strCofigurePath);
+				g_pDataCenter->SetProgressField("strPCH", pSSCardInfo->strPCH);
 			}
 			else
 			{
@@ -885,7 +899,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 			}
 
 			strFnName = "即制卡批次";
-			if (QFailed(GetCardDataField("strCardNum", (char*)pSSCardInfo->strCardNum, strCofigurePath)))
+			if (!g_pDataCenter->GetProgressField("strCardNum", (char*)pSSCardInfo->strCardNum))
 			{
 				if (QFailed(nResult = getJZKPC(*pSSCardInfo, szStatus)))
 				{
@@ -893,7 +907,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 					if (!strMessage.contains("已经有批次号") || !strMessage.contains("批次号已经被使用"))
 						break;
 				}
-				SaveCardDataField("strCardNum", pSSCardInfo->strCardNum, strCofigurePath);
+				g_pDataCenter->SetProgressField("strCardNum", pSSCardInfo->strCardNum);
 			}
 			else
 			{
@@ -903,7 +917,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 
 			strFnName = "获取制卡数据";
 			string strPhoto;
-			if (QFailed(GetCardDataFieldp("strPhoto", strPhoto, strCofigurePath)))
+			if (!g_pDataCenter->GetProgressField("strPhoto", strPhoto))
 			{
 				// 可返回照片信息
 				nResult = getCardData(*pSSCardInfo, szStatus);
@@ -931,7 +945,7 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 					nStatus = strtolong(szDigit, 10);
 					if (nStatus == 0)
 					{
-						SaveCardData(pSSCardInfo, strCofigurePath);
+						g_pDataCenter->SetProgress(pSSCardInfo);
 						SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 					}
 					return 0;
@@ -942,7 +956,18 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 			else
 			{
 				SSCardInfoPtr pSSCardTemp = make_shared<SSCardInfo>();
-				LoadSSCardData(pSSCardTemp, strCofigurePath);
+				auto optJson = g_pDataCenter->OpenProgress(strStdDebugCardData);
+				if (!optJson)
+				{
+					gError() << "Failed in open progress file " << strStdDebugCardData;
+					return -1;
+				}
+				if (g_pDataCenter->GetProgress(pSSCardTemp, optJson.value()))
+				{
+					gError() << "Failed in GetProgress from file " << strStdDebugCardData;
+					return -1;
+				}
+				//LoadSSCardData(pSSCardTemp, strCardDataPath);
 				strcpy(pSSCardInfo->strNation, pSSCardTemp->strNation);
 				strcpy(pSSCardInfo->strSex, pSSCardTemp->strSex);
 				strcpy(pSSCardInfo->strBirthday, pSSCardTemp->strBirthday);
@@ -1171,7 +1196,6 @@ int GetCA(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, const c
 		return -1;
 }
 
-
 int QueryCardProgress(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo)
 {
 	int nResult = -1;
@@ -1257,7 +1281,6 @@ int LoadTestData(string& strName, string& strCardID, string& strMobile)
 	return 0;
 }
 
-
 int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo)
 {
 	if (g_pDataCenter->bDebug)
@@ -1282,10 +1305,12 @@ int LoadTestIDData(IDCardInfoPtr& pIDCard, SSCardInfoPtr& pSSCardInfo)
 		strcpy((char*)pIDCard->szExpirationDate2, UTF8_GBK(PersonSetting.value("ExpireDate").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pIDCard->szAddress, UTF8_GBK(PersonSetting.value("Address").toString().toStdString().c_str()).c_str());
 		strcpy((char*)pSSCardInfo->strName, (char*)pIDCard->szName);
+		strcpy((char*)pSSCardInfo->strIDCardIssuedDate, (char*)pIDCard->szExpirationDate1);
+		
 		strcpy((char*)pSSCardInfo->strCardID, (char*)pIDCard->szIdentity);
 		strcpy((char*)pSSCardInfo->strSex, (char*)pIDCard->szGender);
 		strcpy((char*)pSSCardInfo->strBirthday, (char*)pIDCard->szBirthday);
-		strcpy((char*)pSSCardInfo->strAdress, (char*)pIDCard->szAddress);
+		strcpy((char*)pSSCardInfo->strAddress, (char*)pIDCard->szAddress);
 		strcpy((char*)pSSCardInfo->strCardATR, PersonSetting.value("CardATR").toString().toStdString().c_str());
 		strcpy((char*)pSSCardInfo->strIdentifyNum, PersonSetting.value("CardIdentityNum").toString().toStdString().c_str());
 		strcpy((char*)pSSCardInfo->strBankNum, PersonSetting.value("BankNum").toString().toStdString().c_str());

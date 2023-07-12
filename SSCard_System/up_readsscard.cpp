@@ -31,14 +31,14 @@ int up_ReadSSCard::ProcessBussiness()
 												DevConfig.nDesktopSSCardReaderType, 
 												strMessage)))
 	{
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return -1;
 	}
 
 	if (DriverInit((HANDLE)g_pDataCenter->GetSSCardReader(), (char*)reginfo.strCityCode.c_str(), (char*)reginfo.strSSCardDefaulutPin.c_str(), (char*)reginfo.strPrimaryKey.c_str(), szRCode))
 	{
 		strMessage = QString("DriverInit失败:%1").arg(szRCode);
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return -1;
 	}
 
@@ -50,7 +50,7 @@ int up_ReadSSCard::ProcessBussiness()
 		{
 			QString strError = QString("内存不足,创建读卡线程失败!");
 			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+			emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 			return -1;
 		}
 	}

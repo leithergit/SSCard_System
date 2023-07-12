@@ -46,7 +46,7 @@ void MaskWidget::Popup(QString strTitle, QString strDesc, int nStatus, int nOper
 		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "failed.png";
 		break;
-	case Fetal:
+	case Fatal:
 		strQSS = QString("color: #c12a46;font: 57 42px \"思源黑体 CN Medium\";font-weight: normal;line-height: 49px;letter-spacing: 1px;");
 		strImage = "exclamation.png";
 		break;

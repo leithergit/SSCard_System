@@ -55,12 +55,13 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
+		strcpy((char*)pSSCardInfo->strIDCardIssuedDate, (const char*)pIDCard->szExpirationDate1);
 		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 		strcpy((char*)pSSCardInfo->strTransType, "5");
 		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
 		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-		strcpy((char*)pSSCardInfo->strCard, Reginfo.strCardVendor.c_str());
+		strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 
 		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
@@ -120,7 +121,7 @@ int uc_EnsureInformation::ProcessBussiness()
 	if (QFailed(nResult))
 	{
 		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return nResult;
 	}
 	QString strCardStatus = pSSCardInfo->strCardStatus;
@@ -333,7 +334,8 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 				{
 					strError = "社保卡挂失成功,稍后请输入常用手机号码!";
 					gInfo() << gQStr(strError);
-					bSucceed = true;
+					bSucceed = true;					
+					g_pDataCenter->SetProgressStatus("EnsureInformation", 1);
 					emit ShowMaskWidget("操作成功", strError, Success, Switch_NextPage);
 				}
 

@@ -66,8 +66,48 @@ HANDLE g_hAppMutex = nullptr;
 
 bool g_bSkipLicense = false;
 
+void TestJson()
+{
+	// Test Saving json
+	CJsonObjectPtr pJson = make_shared<CJsonObject>();
+	CJsonObjectPtr pSubJson = make_shared<CJsonObject>();
+	pSubJson->Add("First", 1);
+	pSubJson->Add("Second", 2);
+	pSubJson->Add("Third", 15);
+	pJson->Add("Progress", *pSubJson);
+	qDebug() << pJson->ToFormattedString().c_str();
+	if (pJson->KeyExist("Progress"))
+	{
+		CJsonObject pSubJson = (*pJson)["Progress"];
+		int nFirst, nSecond, nThird;
+		pSubJson.Get("First", nFirst);
+		pSubJson.Get("Second", nSecond);
+		pSubJson.Get("Third", nThird);
+	}
+	g_pDataCenter->SaveProgress(pJson, "d:/SSCard_System/data/t.json");
+}
+#include <QTextCodec>
+void InitCodec()
+{
+#if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
+#if _MSC_VER
+	QTextCodec* codec = QTextCodec::codecForName("GBK");
+#else
+	QTextCodec* codec = QTextCodec::codecForName("UTF-8");
+#endif
+	QTextCodec::setCodecForLocale(codec);
+	QTextCodec::setCodecForCStrings(codec);
+	QTextCodec::setCodecForTr(codec);
+#else
+	QTextCodec* codec = QTextCodec::codecForName("GBK");
+	QTextCodec::setCodecForLocale(codec);
+#endif
+}
+#include <mbctype.h>
+
 int main(int argc, char* argv[])
 {
+	//TestJson();
 // 	QFile jsfile("D:/Work/SSCard_System.main/MainProject/现场日志/Testoriginal.json");
 // 	if (jsfile.open(QIODevice::ReadOnly))
 // 	{
@@ -113,6 +153,14 @@ int main(int argc, char* argv[])
 	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication a(argc, argv);
+	/*int nR =_setmbcp(CP_ACP)
+
+	char* pResult = setlocale(LC_ALL, "chinese-simplified");
+	SetThreadLocale(MAKELCID(MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED), SORT_DEFAULT));
+	char szError[1024] = { 0 };
+	SetConsoleOutputCP(936);
+	int len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, 10060, MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED), (LPSTR)szError, 1024, NULL);*/
+	InitCodec();
 #ifdef _DEBUG
 	QStringList strArgList = a.arguments();
 	for (auto var : strArgList)
@@ -167,7 +215,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	FLAGS_max_log_size = 256;
-	FLAGS_logbufsecs = 0;
+	FLAGS_logbufsecs = 0;	// 无迟延写入
 	google::SetLogDestination(google::GLOG_INFO, strLogDatePath.toLocal8Bit().data());	// 使用该设定时，默认情况下，所有级别日志都用同一的文件名
 	google::SetStderrLogging(google::GLOG_INFO);	// 大于该级别的日志输出到stderr
 	google::SetLogFilenameExtension(".log");
@@ -199,7 +247,7 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
-
+	
 	ofstream ofs("./AppRuning.json");
 	CJsonObject RunJson;
 	QString strRunTime = Now.toString("yyyy-MM-dd hh:mm:ss");
@@ -243,6 +291,7 @@ int main(int argc, char* argv[])
 		return nResult;
 	}
 
+	DeviceConfig& devInfo = g_pDataCenter->GetSysConfigure()->DevConfig;
 	RegionInfo& Reg = g_pDataCenter->GetSysConfigure()->Region;
 	char szOutInfo[1024] = { 0 };
 	CJsonObject jsonReg;
@@ -250,6 +299,8 @@ int main(int argc, char* argv[])
 	jsonReg.Add("user", Reg.strCMAccount);
 	jsonReg.Add("pwd", Reg.strCMPassword);
 	jsonReg.Add("city", Reg.strCityCode);
+	jsonReg.Add("TerminatorID", devInfo.strTerminalCode);
+	jsonReg.Add("OperatorID", devInfo.strOperatorID);
 	string strJson = jsonReg.ToString();
 
 	//////////////////////////////////////////////////////////////////////////

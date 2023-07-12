@@ -91,7 +91,7 @@ struct SSCardInfo
 	char strSex[2] = { 0 };				//性别
 	char strNation[3] = { 0 };			//民族
 	char strMobile[21] = { 0 };			//手机号
-	char strAdress[101] = { 0 };		//通讯地址
+	char strAddress[101] = { 0 };		//通讯地址
 	char strPostalCode[7] = { 0 };		//邮政编码
 	char strEmail[31] = { 0 };			//电子邮箱
 	char strCommunity[21] = { 0 };		//所在社区
@@ -104,7 +104,7 @@ struct SSCardInfo
 	char strCityAccTime[15] = { 0 };	//市接收时间
 	char strCityInfo[101] = { 0 };		//领卡地信息
 	char strCardStatus[101] = { 0 };	//制卡中(或制卡完成(待分发)待领卡或卡已领取)
-	char strCard[2] = { 0 };			//卡商
+	char strCardVender[2] = { 0 };			//卡商
 	char strReleaseDate[9] = { 0 };		//发卡日期
 	char strValidDate[9] = { 0 };		//有效日期
 	char strIdentifyNum[33] = { 0 };	//卡识别码
@@ -118,6 +118,7 @@ struct SSCardInfo
 	char strDepartmentName[50] = { 0 };	//所在院系名称
 	char strFailType[10] = { 0 };		//失败类型(银行,制卡)
 	char strFailReason[101] = { 0 };	//失败原因
+	char strIDCardIssuedDate[16] = {0};		//身份证发证日期
 	char* strPhoto = NULL;				//相片
 };
 
@@ -131,7 +132,7 @@ struct SD_SSCardInfo
 	std::string strSex;				//性别
 	std::string strNation;			//民族
 	std::string strMobile;			//手机号
-	std::string strAdress;			//通讯地址
+	std::string strAddress;			//通讯地址
 	std::string strPostalCode;		//邮政编码
 	std::string strEmail;			//电子邮箱
 	std::string strGuardianName;	//监护人姓名

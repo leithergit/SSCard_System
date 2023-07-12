@@ -47,7 +47,7 @@ int uc_Pay::ProcessBussiness()
 	if (QFailed(QueryPayment(strMessage, m_nPayStatus)))
 	{
 		gError() << gQStr(strMessage);
-		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return -1;
 	}
 	QString strPayCode;
@@ -65,6 +65,7 @@ int uc_Pay::ProcessBussiness()
 			qDebug() << __FUNCTION__ << "Temp message=" << strTempMsg;
 			if (strMessage.contains("一个月内有补卡缴费成功记录,不能获取缴款码"))
 			{
+				g_pDataCenter->SetProgressStatus("Payment", 1);
 				gInfo() << strMessage.toLocal8Bit().data() << "\t视为已经缴款，继续制卡!";
 				emit ShowMaskWidget("操作成功", "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片", Success, Switch_NextPage);
 				return 0;
@@ -72,7 +73,7 @@ int uc_Pay::ProcessBussiness()
 			else
 			{
 				gError() << strMessage.toLocal8Bit().data();
-				emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+				emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 				return -1;
 			}
 			
@@ -83,7 +84,7 @@ int uc_Pay::ProcessBussiness()
 		if (GetQRCodeStorePath(strQRPath))
 		{
 			gError() << strMessage.toLocal8Bit().data();
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 			return -1;
 		}
 		g_pDataCenter->strPayCode = strPayCode.toStdString();
@@ -97,6 +98,7 @@ int uc_Pay::ProcessBussiness()
 	}
 	case Pay_Succeed:
 	{
+		g_pDataCenter->SetProgressStatus("Payment", 1);
 		gInfo() << strMessage.toLocal8Bit().data();
 		emit ShowMaskWidget("操作成功", "费用已支付,现将进入制卡流程,请确认进卡口已放入空白社保卡片", Success, Switch_NextPage);
 		return 0;
@@ -104,7 +106,7 @@ int uc_Pay::ProcessBussiness()
 	default:
 	{
 		gError() << strMessage.toLocal8Bit().data();
-		emit ShowMaskWidget("严重错误", strMessage, Fetal, Return_MainPage);
+		emit ShowMaskWidget("严重错误", strMessage, Fatal, Return_MainPage);
 		return -1;
 	}
 	}
@@ -125,7 +127,7 @@ int uc_Pay::ProcessBussiness()
 		{
 			QString strError = QString("内存不足,创建支付查询线程失败!");
 			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("严重错误", strError, Fetal, Return_MainPage);
+			emit ShowMaskWidget("严重错误", strError, Fatal, Return_MainPage);
 			return -1;
 		}
 	}

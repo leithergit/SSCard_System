@@ -34,7 +34,7 @@ SystemManager::SystemManager(QWidget* parent)
 	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 	LoadTestIDData(pIDCard, pSSCardInfo);
-	LoadSSCardData(pSSCardInfo, "./Debug/Carddata_41232519431206002X.ini");
+	g_pDataCenter->LoadSSCardData("./Debug/Progress_41232519431206002X.json",pSSCardInfo);
 	g_pDataCenter->SetIDCardInfo(pIDCard);
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	g_pDataCenter->strMobilePhone = "18017348763";

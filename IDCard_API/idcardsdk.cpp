@@ -1,4 +1,5 @@
-﻿#include "idcardsdk.h"
+﻿#pragma execution_character_set("utf-8")
+#include "idcardsdk.h"
 #include <Shlwapi.h>
 
 IDCardSDK::IDCardSDK()
@@ -301,63 +302,63 @@ int IDCardSDK::GetErorrMessage(IDCard_Status nCode, char* szMessage, int nBuffer
 	{
 	case IDCard_Succeed:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"操作成功");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"操作成功");
 		break;
 	}
 	case IDCard_Invalid_Port:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"读卡器端口无效");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"读卡器端口无效");
 		break;
 	}
 	case IDCard_Invalid_Parameter:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"输入参数无效");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"输入参数无效");
 		break;
 	}
 	case IDCard_Reader_NotOpen:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"未打开身份证读卡器");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"未打开身份证读卡器");
 		break;
 	}
 	case IDCard_Library_Notload:
 	{
 		//strcpy_s(szMessage,nBufferSize,"The library is not loaded");
-		strcpy_s(szMessage, nBufferSize, u8"读卡器动态库或相关依赖库未加载");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"读卡器动态库或相关依赖库未加载");
 		break;
 	}
 	case IDCard_Reader_NotConnected:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"读卡器未连接");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"读卡器未连接");
 		break;
 	}
 	case IDCard_Failed_OpenPort:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"读卡器打开端口失败");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"读卡器打开端口失败");
 		break;
 	}
 	case IDCard_Failed_Find:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"未检测到身份证");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"未检测到身份证");
 		break;
 	}
 	case IDCard_Failed_Select:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"身份证选卡失败");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"身份证选卡失败");
 		break;
 	}
 	case IDCard_Failed_Read:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"读取身份证失败");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"读取身份证失败");
 		break;
 	}
 	case IDCard_Error_InsufficentMemory:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"内存不足");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"内存不足");
 		break;
 	}
 	case IDCard_Error_Unknow:
 	{
-		strcpy_s(szMessage, nBufferSize, u8"未知错误");
+		strcpy_s(szMessage, nBufferSize, (char*)u8"未知错误");
 		break;
 	}
 	}

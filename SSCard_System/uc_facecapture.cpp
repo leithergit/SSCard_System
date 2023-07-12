@@ -74,7 +74,7 @@ int uc_FaceCapture::ProcessBussiness()
 	{
 		gError() << strError.toLocal8Bit().data();
 		///QMessageBox::critical(this,tr("打开摄像机失败"),strError,QMessageBox::Ok);
-		emit ShowMaskWidget("操作失败", strError, Fetal, Return_MainPage);
+		emit ShowMaskWidget("操作失败", strError, Fatal, Return_MainPage);
 		return -1;
 	}
 	return 0;
@@ -91,55 +91,6 @@ int uc_FaceCapture::OpenCamara(QString& strError)
 	int nResult = 0;
 	do
 	{
-		//if (!m_pFaceDetectOcx)
-		//{
-		//	m_pFaceDetectOcx = new DVTLDCamOCXLib::DVTLDCamOCX(ui->label_FaceDetect);
-		//	if (!m_pFaceDetectOcx)
-		//	{
-		//		strError = "人脸检测组件初始化失败!";
-		//		nResult = -1;
-		//		break;
-		//	}
-		//	if (!m_bOuputProductInfo)
-		//	{
-		//		QString strProduct = "人脸检测组件产品信息:." + m_pFaceDetectOcx->GetProduct();
-		//		QString strVersion = "人脸检测组件版本:" + m_pFaceDetectOcx->GetVersion();
-		//		gInfo() << strProduct.toLocal8Bit().data();
-		//		gInfo() << strVersion.toLocal8Bit().data();
-		//		m_bOuputProductInfo = true;
-		//	}
-
-		//	m_pFaceDetectOcx->setObjectName(QString::fromUtf8("axWidget_FaceDetect"));
-		//	m_pFaceDetectOcx->setMinimumSize(ui->label_FaceDetect->size());
-		//	m_pFaceDetectOcx->setMaximumSize(ui->label_FaceDetect->size());
-		//	m_pFaceDetectOcx->show();
-		//	connect(m_pFaceDetectOcx, SIGNAL(LiveDetectStatusEvent(int, int)), this, SLOT(OnLiveDetectStatusEvent(int, int)));
-
-		//	//QString strDoc = m_pFaceDetectOcx->generateDocumentation();//导出所有ocx控件的所有信号、函数、属性等，可供开发参考
-		//	//QString strFaceDetectDoc = QDir::currentPath() +  "/axHelp.html";
-		//	//QFile file(strFaceDetectDoc);
-		//	//file.open(QIODevice::WriteOnly);
-		//	//file.write(strDoc.toLatin1(),strDoc.size());
-		//	//file.close();
-		//	int nResult = m_pFaceDetectOcx->OpenCamera();
-		//	if (nResult)
-		//	{
-		//		strError = QString("打开摄像机失败,错误代码:%1,请检查设备连接!").arg(nResult);
-		//		nResult = -1;
-		//		break;
-		//	}
-		//}
-		//if (!m_bDetectionStart)
-		//{
-		//	nResult = m_pFaceDetectOcx->StartLiveDetection(m_nTimeout);
-		//	if (nResult)
-		//	{
-		//		strError = QString("启动人脸检测失败,错误代码:%1,请检查设备连接!").arg(nResult);
-		//		nResult = -1;
-		//		break;
-		//	}
-		//	m_bDetectionStart = true;
-		//}
 		g_pDataCenter->StopFaceDetect();
 		if (g_pDataCenter->IsVideoStart())
 		{
@@ -175,28 +126,7 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 {
 	int nResult = 0;
 	do
-	{
-		//if (!m_pFaceDetectOcx)
-		//	break;
-		//nResult = m_pFaceDetectOcx->EndLiveDectection();
-		//if (nResult)
-		//{
-		//	strError = QString("停止人脸检测失败,错误代码:%1!").arg(nResult);
-		//	break;
-		//}
-		//nResult = m_pFaceDetectOcx->CloseCamera();
-		//if (nResult)
-		//{
-		//	strError = QString("关闭摄像机失败,错误代码:%1!").arg(nResult);
-		//	break;
-		//}
-		///*if (m_pImageFaceDetected)
-		//{
-		//	delete m_pImageFaceDetected;
-		//	m_pImageFaceDetected = nullptr;
-		//}*/
-		//delete m_pFaceDetectOcx;
-		//m_pFaceDetectOcx = nullptr;
+	{;
 		g_pDataCenter->StopVideo();
 		g_pDataCenter->StopFaceDetect();
 
@@ -207,13 +137,53 @@ int uc_FaceCapture::CloseCamera(QString& strError)
 void  uc_FaceCapture::OnFaceCaptureSucceed()
 {
 	QString strError;
-	//m_pFaceDetectOcx->EndLiveDectection();
 	g_pDataCenter->StopFaceDetect();
 
-	//m_bDetectionStart = false;
 	gInfo() << "OnFaceCaptureSucceed!";
-	emit ShowMaskWidget("操作成功", "人脸识别成功,稍后请确认卡信息!", Success, Switch_NextPage);
-	//emit SwitchNextPage();
+	QString strMessage;
+	int nNewPage = Page_FaceCapture;
+	int nOperation = Switch_NextPage;
+	switch (g_pDataCenter->GetProgressType())
+	{
+	default:
+	case ProgrerssType::Progress_UnStart:
+	{
+		strMessage = "人脸识别成功,稍后请确认卡信息!";
+	}
+		break;
+	
+	case ProgrerssType::Progress_Making:
+	{
+		if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
+		{
+			if (g_pDataCenter->GetProgressStatus("Payment"))
+			{
+				nOperation = Goto_Page;
+				nNewPage = Page_MakeCard;
+				strMessage = "发现尚未完成的制卡数据,现将转入制卡页面!";
+			}
+		}
+		else if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+		{
+			if (g_pDataCenter->GetProgressStatus("EnsureInformation"))
+			{
+				nOperation = Goto_Page;
+				nNewPage = Page_MakeCard;
+				strMessage = "发现尚未完成的制卡数据,现将转入制卡页面!";
+			}
+		}
+		
+		break;
+	}
+	case ProgrerssType::Progress_Finished:
+	{
+		nOperation = Goto_Page;
+		nNewPage = Page_MakeCard;
+		strMessage = "发现已经完成的制卡数据,现将转入制卡页面,你可以进行相关的操作!";
+		break;
+	}
+	}
+	emit ShowMaskWidget("操作成功", strMessage, Success, nOperation,nNewPage);
 }
 
 void uc_FaceCapture::OnFaceCaptureFailed()
@@ -237,22 +207,6 @@ int  uc_FaceCapture::SaveImage(QString& strFaceImageFile, QString& strMessage, b
 	gInfo() << gQStr(strMessage);
 	g_pDataCenter->SaveFaceImage(strFaceImageFile.toStdString(), bFull);
 
-	//LONG iDataClass：0 -- 全景数据 1 -- 人脸数据
-	//QString strPhotoBase64 = m_pFaceDetectOcx->GetImageData(nFull);
-	//if (!strPhotoBase64.size())
-	//{
-	//	gError() << QString("获取人脸数据失败!").toLocal8Bit().data();
-	//	return -1;
-	//}
-	//int nDataLen = 0;
-	//const byte* pBuffer = g_pDataCenter->GetFaceImage(nDataLen);
-	//if (pBuffer)
-	//{
-	//	WriteBMPFile(strFaceImageFile.toStdString().c_str(),)
-	//}
-
-	//QImage ImageFace = QImage::fromData(QByteArray::fromBase64(strPhotoBase64.toLatin1()));
-	//ImageFace.save(strFaceImageFile);
 	return 0;
 }
 
@@ -331,7 +285,7 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 					gInfo() << QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
 					if (!m_bFaceDetectSucceed)
 					{
-						gInfo() << QString("切换到下一页面!").toStdString().c_str();
+						gInfo() << QString("切换到下一页面!").toLocal8Bit().data();
 						emit FaceCaptureSucceed();
 						m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
 					}

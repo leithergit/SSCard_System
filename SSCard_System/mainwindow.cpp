@@ -208,9 +208,10 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->label_BankName->setText(strBankName.c_str());
 	ui->label_Title->setText(g_pDataCenter->strTitle.c_str());
 
-	QString strAppPath = QApplication::applicationFilePath();
+	QString strAppPath = QApplication::applicationDirPath();
+
 	short nMajorVer = 0, nMinorVer = 0, nBuildNum = 0, nRevsion = 0;
-	if (GetModuleVersion(QApplication::applicationFilePath().toStdString(), nMajorVer, nMinorVer, nBuildNum, nRevsion))
+	if (GetModuleVersion(qApp->applicationFilePath().toStdString(), nMajorVer, nMinorVer, nBuildNum, nRevsion))
 	{
 		QString strVersion = QString("当前版本:%1.%2.%3.%4").arg(nMajorVer).arg(nMinorVer).arg(nBuildNum).arg(nRevsion);
 		ui->label_Version->setText(strVersion);
@@ -334,7 +335,7 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
-		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 		return;
 	}
@@ -342,7 +343,7 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 	if (QFailed(nResult))
 	{
-		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return;
 	}
 
@@ -388,7 +389,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 		return;
 	}
@@ -397,7 +398,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 	if (QFailed(nResult))
 	{
-		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
 		return;
 	}
 
@@ -545,8 +546,8 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	case Failed:
 		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Failed];
 		break;
-	case Fetal:
-		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Fetal];
+	case Fatal:
+		nTimeout = g_pDataCenter->GetSysConfigure()->nMaskTimeout[Fatal];
 		break;
 	case Nop:
 		break;
@@ -704,10 +705,14 @@ void MainWindow::timerEvent(QTimerEvent* event)
 			break;
 		}
 		}
-		if (nRibbonStatusWarningCount %2 == 0)
-			ui->label_RibbonStatus->setText(strText[nRibbonStatus]);
-		else
-			ui->label_RibbonStatus->setText(strText[BlankText]);
+		if (nRibbonStatus < Ribbon_Losed)
+		{
+			if (nRibbonStatusWarningCount % 2 == 0)
+				ui->label_RibbonStatus->setText(strText[nRibbonStatus]);
+			else
+				ui->label_RibbonStatus->setText(strText[BlankText]);
+		}
+		
 		ui->label_RibbonStatus->setStyleSheet(strQSS);
 		nRibbonStatusWarningCount++;
 	}
