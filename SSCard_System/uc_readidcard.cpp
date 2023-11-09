@@ -34,6 +34,11 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
 		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
 		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
+	ui->checkBox_SwitchBank->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
+		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
+		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
+		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
+	//ui->checkBox_SwitchBank->show();
 	/*ui->checkBox_Agency->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
 		QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
 		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
@@ -77,12 +82,13 @@ void uc_ReadIDCard::StopDetect()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
-	if (!g_pDataCenter->OpenCamera())
+	//桌面版暂时注释
+	/*if (!g_pDataCenter->OpenCamera())
 	{
 		gInfo() << "Failed in OpenCamera";
 		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
 		return -1;
-	}
+	}*/
 
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
@@ -102,11 +108,31 @@ int uc_ReadIDCard::ProcessBussiness()
 	//ShowReadCardID();
 	disconnect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
 	if (g_pDataCenter->nCardServiceType == ServiceType::Service_RegisterLost)
+	{
 		ui->checkBox_WithoutIDCard->hide();
+	}
 	else
+	{
 		ui->checkBox_WithoutIDCard->show();
+	}
+	
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+	{
+		ui->checkBox_SwitchBank->show();
+	}
+	else
+	{
+		ui->checkBox_SwitchBank->hide();
+		
+	}
+
 	StartDetect();
 	ui->checkBox_WithoutIDCard->setChecked(false);
+	if (!(g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard))
+	{
+		ui->checkBox_SwitchBank->setChecked(false);
+	}
+	
 	m_bAgency = false;
 	connect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
 	return 0;
@@ -229,3 +255,16 @@ void uc_ReadIDCard::On_WithoutIDCard(int arg1)
 		pMainWind->pLastStackPage->emit SwitchPage(Switch_NextPage);
 	}
 }
+
+void uc_ReadIDCard::on_checkBox_SwitchBank_stateChanged(int arg1)
+{
+	g_pDataCenter->bSwitchBank = ui->checkBox_SwitchBank->isChecked();
+	//if (g_pDataCenter->bSwitchBank)
+	//{
+	//	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCardSwitchBank;
+	//}
+	//else {
+	//	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
+	//}
+}
+

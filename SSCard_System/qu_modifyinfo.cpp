@@ -1,6 +1,5 @@
-ï»¿#include "uc_inputidcardinfo.h"
-#include "ui_uc_inputidcardinfo.h"
-#include "Gloabal.h"
+#include "qu_modifyinfo.h"
+#include "ui_qu_modifyinfo.h"
 //#include "qnationwidget.h"
 #include "uc_readidcard.h"
 #include "Payment.h"
@@ -11,46 +10,21 @@
 
 #include <ctime>
 
-int GetAge(string strBirthday)
-{
-	if (strBirthday.empty())
-		return -1;
+extern int GetAge(string strBirthday);
 
-	int nBirthYear, nBirthMonth, nBirthDay;
-	int nCount = sscanf_s(strBirthday.c_str(), "%04d%02d%02d", &nBirthYear, &nBirthMonth, &nBirthDay);
-	if (nCount != 3)
-		return -1;
 
-	time_t tNow = time(nullptr);
-	tm* tmNow = localtime(&tNow);
-	tmNow->tm_year += 1900;
-	tmNow->tm_mon += 1;
-
-	int nAge = tmNow->tm_year - nBirthYear;
-	if (tmNow->tm_mon < nBirthMonth)
-	{
-		nAge--;
-	}
-	else if (tmNow->tm_mon == nBirthMonth)
-	{
-		if (tmNow->tm_mday < nBirthDay)
-			nAge--;
-	}
-	return nAge;
-}
-
-uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
+qu_ModifyInfo::qu_ModifyInfo(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
 	QStackPage(pTitle, strStepImage, nIndex, parent),
-	ui(new Ui::uc_InputIDCardInfo)
+	ui(new Ui::qu_ModifyInfo)
 {
 	ui->setupUi(this);
 
 	ShowGuardianWidget(false);
-	ui->pushButton_GetCardID->setVisible(false);
-	ui->lineEdit_CardID->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")));   //åªèƒ½è¾“å…¥æ•°å­—
+	//ui->pushButton_GetCardID->setVisible(false);
+	ui->lineEdit_CardID->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")));   //Ö»ÄÜÊäÈëÊı×Ö
 	ui->lineEdit_Name->setValidator(new QRegExpValidator(QRegExp("[\u4e00-\u9fa5]{2,10}")));
 
-	ui->lineEdit_GuardianMobile->setValidator(new QRegExpValidator(QRegExp("0?(13|15|16|17|18|19)[0-9]{9}")));   //åªèƒ½è¾“å…¥æ•°å­—
+	ui->lineEdit_GuardianMobile->setValidator(new QRegExpValidator(QRegExp("0?(13|15|16|17|18|19)[0-9]{9}")));   //Ö»ÄÜÊäÈëÊı×Ö
 	//ui->lineEdit_ExpiredDate->setValidator(new QRegExpValidator(QRegExp("((\\d{3}[1-9]|\\d{2}[1-9]\\d|\\d[1-9]\\d{2}|[1-9]\\d{3})(((0[13578]|1[02])(0[1-9]|[12]\\d|3[01]))|((0[469]|11)(0[1-9]|[12]\\d|30))|(02(0[1-9]|[1]\\d|2[0-8]))))|(((\\d{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)")));
 	//ui->lineEdit_IssuedDate->setValidator(new QRegExpValidator(QRegExp("((\\d{3}[1-9]|\\d{2}[1-9]\\d|\\d[1-9]\\d{2}|[1-9]\\d{3})(((0[13578]|1[02])(0[1-9]|[12]\\d|3[01]))|((0[469]|11)(0[1-9]|[12]\\d|30))|(02(0[1-9]|[1]\\d|2[0-8]))))|(((\\d{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)")));
 	for (auto var : g_vecNationCode)
@@ -62,6 +36,10 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	pButtonGrp->addButton(ui->radioButton_Male, 0);
 	pButtonGrp->addButton(ui->radioButton_Female, 1);
 	pButtonGrp->setExclusive(true);
+	pButtonGrp2 = new QButtonGroup(this);
+	pButtonGrp2->addButton(ui->radioButton_Male_2, 0);
+	pButtonGrp2->addButton(ui->radioButton_Female_2, 1);
+	pButtonGrp2->setExclusive(true);
 	if (g_pDataCenter->bDebug)
 	{
 		SSCardBaseInfoPtr pSSCardInfo = make_shared<SSCardBaseInfo>();
@@ -75,7 +53,7 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 			QDateTime ExpireDate = QDateTime::fromString((char*)pIDCard->szExpirationDate2, "yyyyMMdd");
 			ui->dateEdit_Issued->setDateTime(IssuedDate);
 			ui->dateEdit_Expired->setDateTime(ExpireDate);
-			if (QString::fromLocal8Bit((char*)pIDCard->szGender) == "ç”·")
+			if (QString::fromLocal8Bit((char*)pIDCard->szGender) == "ÄĞ")
 				ui->radioButton_Male->setChecked(true);
 			else
 				ui->radioButton_Female->setChecked(true);
@@ -85,7 +63,7 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	ui->checkBox_Agency->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
             QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
             QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
-            QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"æ€æºé»‘ä½“ CN Medium\";border-radius: 24px;}");
+            QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"Ë¼Ô´ºÚÌå CN Medium\";border-radius: 24px;}");
 	ui->comboBox_Career->clear();
 	for (auto& var : vecCareer)
 	{
@@ -99,7 +77,7 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	{
 		QAbstractItemView* popup = pCompleter->popup();
 		if (popup)
-			popup->setStyleSheet("font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"æ€æºé»‘ä½“ CN Medium\";");
+			popup->setStyleSheet("font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"Ë¼Ô´ºÚÌå CN Medium\";");
 	}
 	ui->lineEdit_Name->setCompleter(pCompleter);
 	//ui->comboBox_Nationality->setCurrentIndex(0);
@@ -121,18 +99,20 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	//ui->comboBox_County->setStyleSheet(strQSS);
 	/*ui->comboBox_Town->setStyleSheet(strQSS);
 	ui->comboBox_Street->setStyleSheet(strQSS);*/
-	ui->comboBox_Guardianship->setStyleSheet(strQSS);
+	//ui->comboBox_Guardianship->setStyleSheet(strQSS);
 	ui->comboBox_Nationality->setStyleSheet(strQSS);
 	ui->comboBox_Career->setStyleSheet(strQSS);
 	//InitializeDB(strMessage);
-	connect(this, &uc_InputIDCardInfo::AddNewIDCard, this, &uc_InputIDCardInfo::on_AddNewIDCard, Qt::QueuedConnection);
-	connect(this, &uc_InputIDCardInfo::CheckPersonInfo, this, &uc_InputIDCardInfo::on_CheckPersonInfo);
-	//connect(ui->lineEdit_Name, &QLineEdit::editingFinished, this, &uc_InputIDCardInfo::on_Name_EditingFinished);
-	connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+	connect(this, &qu_ModifyInfo::AddNewIDCard, this, &qu_ModifyInfo::on_AddNewIDCard, Qt::QueuedConnection);
+	connect(this, &qu_ModifyInfo::CheckPersonInfo, this, &qu_ModifyInfo::on_CheckPersonInfo);
+	//connect(ui->lineEdit_Name, &QLineEdit::editingFinished, this, &qu_ModifyInfo::on_Name_EditingFinished);
+	connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &qu_ModifyInfo::on_Name_textChanged);
+	//»ñÈ¡ÈËÔ±ĞÅÏ¢
+	on_CheckPersonInfo();
 }
 
 /*
-bool  uc_InputIDCardInfo::InitializeDB(QString& strMessage)
+bool  qu_ModifyInfo::InitializeDB(QString& strMessage)
 {
 	QSqlQuery query = g_pDataCenter->SQLiteDB.exec("SELECT ID,Name FROM Area_2022 as t where t.LevelType=1 ORDER BY ID");
 	while (query.next())
@@ -175,12 +155,12 @@ bool  uc_InputIDCardInfo::InitializeDB(QString& strMessage)
 }
 */
 
-uc_InputIDCardInfo::~uc_InputIDCardInfo()
+qu_ModifyInfo::~qu_ModifyInfo()
 {
 	delete ui;
 }
 
-bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
+bool qu_ModifyInfo::LoadPersonInfo(QString strJson)
 {
 	try
 	{
@@ -234,9 +214,9 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 		ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
 
 		QString strGender = QString::fromLocal8Bit(pSSCardInfo->strGender.c_str());
-		if (strGender == "ç”·")
+		if (strGender == "ÄĞ")
 			ui->radioButton_Male->setChecked(true);
-		else if (strGender == "å¥³")
+		else if (strGender == "Å®")
 			ui->radioButton_Female->setChecked(true);
 
 		ui->dateEdit_Issued->setDateTime(QDateTime::fromString(pSSCardInfo->strReleaseDate.c_str(), "yyyyMMdd"));
@@ -267,8 +247,8 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 				json.Get("GuardianShip", pSSCardInfo->strGuardianShip);
 				QString strGuardianShip = pSSCardInfo->strGuardianShip.c_str();
 				int nIndex = strGuardianShip.toInt();
-				if (nIndex >= 1 && nIndex <= ui->comboBox_Guardianship->count())
-					ui->comboBox_Guardianship->setCurrentIndex(nIndex - 1);
+				/*if (nIndex >= 1 && nIndex <= ui->comboBox_Guardianship->count())
+					ui->comboBox_Guardianship->setCurrentIndex(nIndex - 1);*/
 				/*int nIndex = ui->comboBox_Guardianship->findText(QString::fromLocal8Bit(pSSCardInfo->strGuardianShip.c_str()));
 				if (nIndex != -1)*/
 			}
@@ -312,7 +292,7 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 	}
 }
 
-void uc_InputIDCardInfo::SavePersonInfo()
+void qu_ModifyInfo::SavePersonInfo()
 {
 	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	if (!pSSCardInfo)
@@ -348,7 +328,7 @@ void uc_InputIDCardInfo::SavePersonInfo()
 		if (ui->checkBox_Agency->isChecked())
 		{
 			json.Add("Guardian", pSSCardInfo->strGuardianName);
-			json.Add("GuardianShip", pSSCardInfo->strGuardianShip);
+			//json.Add("GuardianShip", pSSCardInfo->strGuardianShip);
 			json.Add("GuardianCardID", pSSCardInfo->strGuardianIDentity);
 			if (fs::exists(g_pDataCenter->strSSCardPhotoFile))
 				json.Add("GuardianPhoto", g_pDataCenter->strSSCardPhotoFile);
@@ -367,7 +347,7 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	}
 }
 
-int uc_InputIDCardInfo::ProcessBussiness()
+int qu_ModifyInfo::ProcessBussiness()
 {
 	MainWindow* pMainWind = (MainWindow*)qApp->activeWindow();
 	if (pMainWind && pMainWind->pLastStackPage)
@@ -382,7 +362,7 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
 		ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
 		QString strGender = QString::fromLocal8Bit((char*)pIDCard->szGender);
-		if (strGender == "ç”·")
+		if (strGender == "ÄĞ")
 			ui->radioButton_Male->setChecked(true);
 		else
 			ui->radioButton_Female->setChecked(true);
@@ -391,7 +371,7 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		ui->dateEdit_Issued->setDateTime(QDateTime::fromString((char*)pIDCard->szExpirationDate1, "yyyyMMdd"));
 		ui->dateEdit_Expired->setDateTime(QDateTime::fromString((char*)pIDCard->szExpirationDate2, "yyyyMMdd"));
 
-		QString strNationalty = QString::fromLocal8Bit((char*)pIDCard->szNationalty) + "æ—";
+		QString strNationalty = QString::fromLocal8Bit((char*)pIDCard->szNationalty) + "×å";
 		int nIndex = ui->comboBox_Nationality->findText(strNationalty);
 		if (nIndex != -1)
 			ui->comboBox_Nationality->setCurrentIndex(nIndex);
@@ -403,8 +383,8 @@ int uc_InputIDCardInfo::ProcessBussiness()
 	while (iter.hasNext())
 	{
 		iter.next();
-		qDebug() << "fileName:" << iter.fileName();  // åªæœ‰æ–‡ä»¶å
-		qDebug() << "filePath:" << iter.filePath();  //åŒ…å«æ–‡ä»¶åçš„æ–‡ä»¶çš„å…¨è·¯å¾„
+		qDebug() << "fileName:" << iter.fileName();  // Ö»ÓĞÎÄ¼şÃû
+		qDebug() << "filePath:" << iter.filePath();  //°üº¬ÎÄ¼şÃûµÄÎÄ¼şµÄÈ«Â·¾¶
 
 		QString strAbsoluteFilePath = iter.filePath();
 		QString strName;
@@ -418,7 +398,7 @@ int uc_InputIDCardInfo::ProcessBussiness()
 	return 0;
 }
 
-bool uc_InputIDCardInfo::GetPersonName(QString strPersonFile, QString& strName)
+bool qu_ModifyInfo::GetPersonName(QString strPersonFile, QString& strName)
 {
 	try
 	{
@@ -446,61 +426,61 @@ bool uc_InputIDCardInfo::GetPersonName(QString strPersonFile, QString& strName)
 	}
 }
 
-void uc_InputIDCardInfo::HideItem()
-{
-	ui->checkBox_Agency->setVisible(false);
-	ui->label_Gender->setVisible(false);
-	ui->radioButton_Male->setVisible(false);
-	ui->radioButton_Female->setVisible(false);
-	ui->label_Nation->setVisible(false);
-	ui->comboBox_Nationality->setVisible(false);
-	ui->label_ExpireDate->setVisible(false);
-	ui->dateEdit_Issued->setVisible(false);
-	ui->line->setVisible(false);
-	ui->dateEdit_Expired->setVisible(false);
-	ui->label_Career->setVisible(false);
-	//ui->label_Career->setText("æŸ¥è¯¢èŒƒå›´");
-	//struct QueryRange
-	//{
-	//	QString strValue;
-	//	QString strName;
-	//};
-	//QueryRange strRange[] = {
-	//	{"0","æ”¾å·"},
-	//	{"1","æ­£å¸¸"},
-	//	{"2","æŒ‚å¤±"},
-	//	{"B","ä¸´æ—¶æŒ‚å¤±"},
-	//	{"3","æŒ‚å¤±åæ³¨é”€"},
-	//	{"4","æ³¨é”€"},
-	//	{"A","æœªå¯ç”¨"}
-	//};
-	//ui->comboBox_Career->clear();
-	//for (auto var : strRange)
-	//{
-	//	ui->comboBox_Career->addItem(var.strName, var.strValue);
-	//}
-	//ui->comboBox_Career->setCurrentIndex(1);
-	ui->comboBox_Career->setVisible(false);
-	ui->comboBox_Career->setVisible(false);
-	ui->label_Address->setVisible(false);
-	ui->plainTextEdit_Address->setVisible(false);
-	ui->label_Guardian->setVisible(false);
-	ui->lineEdit_Guardian->setVisible(false);
-	ui->label_GuardianMobile->setVisible(false);
-	ui->lineEdit_GuardianMobile->setVisible(false);
-	ui->label_GuardianIDCard->setVisible(false);
-	ui->lineEdit_GuardianCardID->setVisible(false);
-	ui->label_Guardianship->setVisible(false);
-	ui->comboBox_Guardianship->setVisible(false);
-	ui->label_Photo->setVisible(false);
-	ui->pushButton_TakePhoto->setVisible(false);
-	ui->pushButton_SelectPhoto->setVisible(false);
-	ui->pushButton_OK->setVisible(false);
-	ui->pushButton_GetCardID->setVisible(true);
+//void qu_ModifyInfo::HideItem()
+//{
+//	ui->checkBox_Agency->setVisible(false);
+//	ui->label_Gender->setVisible(false);
+//	ui->radioButton_Male->setVisible(false);
+//	ui->radioButton_Female->setVisible(false);
+//	ui->label_Nation->setVisible(false);
+//	ui->comboBox_Nationality->setVisible(false);
+//	ui->label_ExpireDate->setVisible(false);
+//	ui->dateEdit_Issued->setVisible(false);
+//	ui->line->setVisible(false);
+//	ui->dateEdit_Expired->setVisible(false);
+//	ui->label_Career->setVisible(false);
+//	//ui->label_Career->setText("²éÑ¯·¶Î§");
+//	//struct QueryRange
+//	//{
+//	//	QString strValue;
+//	//	QString strName;
+//	//};
+//	//QueryRange strRange[] = {
+//	//	{"0","·ÅºÅ"},
+//	//	{"1","Õı³£"},
+//	//	{"2","¹ÒÊ§"},
+//	//	{"B","ÁÙÊ±¹ÒÊ§"},
+//	//	{"3","¹ÒÊ§ºó×¢Ïú"},
+//	//	{"4","×¢Ïú"},
+//	//	{"A","Î´ÆôÓÃ"}
+//	//};
+//	//ui->comboBox_Career->clear();
+//	//for (auto var : strRange)
+//	//{
+//	//	ui->comboBox_Career->addItem(var.strName, var.strValue);
+//	//}
+//	//ui->comboBox_Career->setCurrentIndex(1);
+//	ui->comboBox_Career->setVisible(false);
+//	ui->comboBox_Career->setVisible(false);
+//	ui->label_Address->setVisible(false);
+//	ui->plainTextEdit_Address->setVisible(false);
+//	ui->label_Guardian->setVisible(false);
+//	ui->lineEdit_Guardian->setVisible(false);
+//	ui->label_GuardianMobile->setVisible(false);
+//	ui->lineEdit_GuardianMobile->setVisible(false);
+//	ui->label_GuardianIDCard->setVisible(false);
+//	ui->lineEdit_GuardianCardID->setVisible(false);
+//	ui->label_Guardianship->setVisible(false);
+//	ui->comboBox_Guardianship->setVisible(false);
+//	ui->label_Photo->setVisible(false);
+//	//ui->pushButton_TakePhoto->setVisible(false);
+//	//ui->pushButton_SelectPhoto->setVisible(false);
+//	ui->pushButton_OK->setVisible(false);
+//	//ui->pushButton_GetCardID->setVisible(true);
+//
+//}
 
-}
-
-bool uc_InputIDCardInfo::eventFilter(QObject* watched, QEvent* event)
+bool qu_ModifyInfo::eventFilter(QObject* watched, QEvent* event)
 {
 	if (watched == ui->lineEdit_Name)
 	{
@@ -512,13 +492,13 @@ bool uc_InputIDCardInfo::eventFilter(QObject* watched, QEvent* event)
 	return QWidget::eventFilter(watched, event);
 }
 
-void uc_InputIDCardInfo::OnTimeout()
+void qu_ModifyInfo::OnTimeout()
 {
 	gInfo() << __FUNCTION__;
 	ShutDown();
 }
 
-void  uc_InputIDCardInfo::ShutDown()
+void  qu_ModifyInfo::ShutDown()
 {
 	gInfo() << __FUNCTION__;
 	if (pDialogReadIDCard)
@@ -528,16 +508,16 @@ void  uc_InputIDCardInfo::ShutDown()
 		pDialogReadIDCard = nullptr;
 	}
 
-	StopDetect();
+	//StopDetect();
 }
 
-void uc_InputIDCardInfo::timerEvent(QTimerEvent* event)
+void qu_ModifyInfo::timerEvent(QTimerEvent* event)
 {
 
 }
 
 /*
-void uc_InputIDCardInfo::on_comboBox_Province_currentIndexChanged(int index)
+void qu_ModifyInfo::on_comboBox_Province_currentIndexChanged(int index)
 {
 	if (!bInitialized)
 		return;
@@ -555,7 +535,7 @@ void uc_InputIDCardInfo::on_comboBox_Province_currentIndexChanged(int index)
 	}
 }
 
-void uc_InputIDCardInfo::on_comboBox_City_currentIndexChanged(int index)
+void qu_ModifyInfo::on_comboBox_City_currentIndexChanged(int index)
 {
 	if (!bInitialized)
 		return;
@@ -573,7 +553,7 @@ void uc_InputIDCardInfo::on_comboBox_City_currentIndexChanged(int index)
 	}
 }
 
-void uc_InputIDCardInfo::on_comboBox_County_currentIndexChanged(int index)
+void qu_ModifyInfo::on_comboBox_County_currentIndexChanged(int index)
 {
 	if (!bInitialized)
 		return;
@@ -591,7 +571,7 @@ void uc_InputIDCardInfo::on_comboBox_County_currentIndexChanged(int index)
 	}
 }
 
-void uc_InputIDCardInfo::on_comboBox_Town_currentIndexChanged(int index)
+void qu_ModifyInfo::on_comboBox_Town_currentIndexChanged(int index)
 {
 	gInfo() << __FUNCTION__;
 	if (!bInitialized)
@@ -611,7 +591,7 @@ void uc_InputIDCardInfo::on_comboBox_Town_currentIndexChanged(int index)
 }
 */
 
-void uc_InputIDCardInfo::ClearInfo()
+void qu_ModifyInfo::ClearInfo()
 {
 	ui->lineEdit_Name->setText("");
 	ui->lineEdit_CardID->setText("");
@@ -625,10 +605,10 @@ void uc_InputIDCardInfo::ClearInfo()
 	pIDCard = nullptr;
 	pSSCardInfo = nullptr;
 	ui->label_Photo->setStyleSheet("border-image: url();");
-	ui->label_Photo->setText("ç…§ç‰‡");
+	ui->label_Photo->setText("ÕÕÆ¬");
 }
 
-void uc_InputIDCardInfo::ResetPage()
+void qu_ModifyInfo::ResetPage()
 {
 	gInfo() << __FUNCTION__;
 	ClearInfo();
@@ -636,23 +616,23 @@ void uc_InputIDCardInfo::ResetPage()
 	mapPersonFile.clear();
 	ShowGuardianWidget(false);
 	ClearGuardianInfo();
-	ui->plainTextEdit_Address->setPlainText("å±±ä¸œçœæ»¨å·å¸‚");
+	ui->plainTextEdit_Address->setPlainText("É½¶«Ê¡±õÖİÊĞ");
 }
 
-int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMessage)
+int	qu_ModifyInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMessage)
 {
 	gInfo() << __FUNCTION__;
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	if (!pIDCard)
 	{
-		strMessage = "èº«ä»½è¯ä¿¡æ¯æ— æ•ˆ!";
+		strMessage = "Éí·İÖ¤ĞÅÏ¢ÎŞĞ§!";
 		return -1;
 	}
 	QString strMobile = ui->lineEdit_GuardianMobile->text();
 	if (strMobile.size() < 11)
 	{
-		strMessage = "æ‰‹æœºå·ç è¾“å…¥æœ‰è¯¯,å¿…é¡»ä¸º11ä½æ•°å­—!";
+		strMessage = "ÊÖ»úºÅÂëÊäÈëÓĞÎó,±ØĞëÎª11Î»Êı×Ö!";
 		return -1;
 	}
 
@@ -678,26 +658,26 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 		QString strGuardianCardID = ui->lineEdit_GuardianCardID->text();
 		if (strGuardian.isEmpty() || strGuardianCardID.isEmpty())
 		{
-			strMessage = "ç›‘æŠ¤äººæˆ–ç›‘æŠ¤äººè¯ä»¶ä¸èƒ½ä¸ºç©º!";
+			strMessage = "¼à»¤ÈË»ò¼à»¤ÈËÖ¤¼ş²»ÄÜÎª¿Õ!";
 			return -1;
 		}
 
 		if (strGuardianCardID.size() < 18)
 		{
-			strMessage = "ç›‘æŠ¤äººè¯ä»¶å·ç ä½æ•°ä¸è¶³,å¿…é¡»ä¸º18ä½çš„æ•°å­—!";
+			strMessage = "¼à»¤ÈËÖ¤¼şºÅÂëÎ»Êı²»×ã,±ØĞëÎª18Î»µÄÊı×Ö!";
 			return -1;
 		}
 		char nX = VerifyCardID(strGuardianCardID.toStdString().c_str());
 		if (nX != strGuardianCardID.toStdString().at(17))
 		{
-			strMessage = "ç›‘æŠ¤äººè¯ä»¶å·ç æœ‰è¯¯ï¼Œè¯·æ£€æŸ¥åé‡æ–°è¾“å…¥!";
+			strMessage = "¼à»¤ÈËÖ¤¼şºÅÂëÓĞÎó£¬Çë¼ì²éºóÖØĞÂÊäÈë!";
 			return -1;
 		}
 
-		int nGuandianShip = ui->comboBox_Guardianship->currentIndex() + 1;
+		//int nGuandianShip = ui->comboBox_Guardianship->currentIndex() + 1;
 		pSSCardInfo->strGuardianName = strGuardian.toLocal8Bit().data();
 		pSSCardInfo->strGuardianIDentity = strGuardianCardID.toStdString();
-		pSSCardInfo->strGuardianShip = QString("%1").arg(nGuandianShip).toStdString();
+		//pSSCardInfo->strGuardianShip = QString("%1").arg(nGuandianShip).toStdString();
 	}
 	g_pDataCenter->strCardVersion = "3.00";
 
@@ -705,8 +685,8 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	return 0;
 }
 
-// åªå–å§“åå’Œèº«ä»½è¯å·
-int uc_InputIDCardInfo::GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage)
+// Ö»È¡ĞÕÃûºÍÉí·İÖ¤ºÅ
+int qu_ModifyInfo::GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage)
 {
 	gInfo() << __FUNCTION__;
 	QString strName = ui->lineEdit_Name->text();
@@ -717,24 +697,24 @@ int uc_InputIDCardInfo::GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage)
 		strCardID.isEmpty())
 
 	{
-		strMessage = "å§“åã€èº«ä»½è¯å·ç ä¸èƒ½ä¸ºç©º!";
+		strMessage = "ĞÕÃû¡¢Éí·İÖ¤ºÅÂë²»ÄÜÎª¿Õ!";
 		return -1;
 	}
 	if (strName.contains(" "))
 	{
-		strMessage = "å§“åä¸­ä¸èƒ½å«æœ‰ç©ºæ ¼!";
+		strMessage = "ĞÕÃûÖĞ²»ÄÜº¬ÓĞ¿Õ¸ñ!";
 		return -1;
 	}
 	if (strCardID.size() < 18)
 	{
-		strMessage = "èº«ä»½è¯å·ç ä½æ•°ä¸è¶³18ä½ï¼Œè¯·æ£€æŸ¥åé‡æ–°è¾“å…¥!";
+		strMessage = "Éí·İÖ¤ºÅÂëÎ»Êı²»×ã18Î»£¬Çë¼ì²éºóÖØĞÂÊäÈë!";
 		return -1;
 	}
 
 	char nX = VerifyCardID(strCardID.toStdString().c_str());
 	if (nX != strCardID.toStdString().at(17))
 	{
-		strMessage = "èº«ä»½è¯å·ç æœ‰è¯¯ï¼Œè¯·æ£€æŸ¥åé‡æ–°è¾“å…¥!";
+		strMessage = "Éí·İÖ¤ºÅÂëÓĞÎó£¬Çë¼ì²éºóÖØĞÂÊäÈë!";
 		return -1;
 	}
 
@@ -743,7 +723,7 @@ int uc_InputIDCardInfo::GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage)
 	return 0;
 }
 
-int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMessage)
+int qu_ModifyInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMessage)
 {
 	gInfo() << __FUNCTION__;
 	QString strName = ui->lineEdit_Name->text();
@@ -762,9 +742,9 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	int nGender = pButtonGrp->checkedId();
 	QString strGender = "";
 	if (nGender == 0)
-		strGender = "ç”·";
+		strGender = "ÄĞ";
 	else if (nGender == 1)
-		strGender = "å¥³";
+		strGender = "Å®";
 
 	if (strName.isEmpty() ||
 		strCardID.isEmpty() ||
@@ -772,24 +752,24 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 		strGender.isEmpty() ||
 		strAddress.isEmpty())
 	{
-		strMessage = "å§“åã€æ°‘æ—ã€æ€§åˆ«ã€èº«ä»½è¯å·ç ,ä½å€ç­‰ä¿¡æ¯ä¸èƒ½ä¸ºç©º!";
+		strMessage = "ĞÕÃû¡¢Ãñ×å¡¢ĞÔ±ğ¡¢Éí·İÖ¤ºÅÂë,×¡Ö·µÈĞÅÏ¢²»ÄÜÎª¿Õ!";
 		return -1;
 	}
 	if (strName.contains(" "))
 	{
-		strMessage = "å§“åä¸­ä¸èƒ½å«æœ‰ç©ºæ ¼!";
+		strMessage = "ĞÕÃûÖĞ²»ÄÜº¬ÓĞ¿Õ¸ñ!";
 		return -1;
 	}
 	if (strCardID.size() < 18)
 	{
-		strMessage = "èº«ä»½è¯å·ç ä½æ•°ä¸è¶³18ä½ï¼Œè¯·æ£€æŸ¥åé‡æ–°è¾“å…¥!";
+		strMessage = "Éí·İÖ¤ºÅÂëÎ»Êı²»×ã18Î»£¬Çë¼ì²éºóÖØĞÂÊäÈë!";
 		return -1;
 	}
 
 	char nX = VerifyCardID(strCardID.toStdString().c_str());
 	if (nX != strCardID.toStdString().at(17))
 	{
-		strMessage = "èº«ä»½è¯å·ç æœ‰è¯¯ï¼Œè¯·æ£€æŸ¥åé‡æ–°è¾“å…¥!";
+		strMessage = "Éí·İÖ¤ºÅÂëÓĞÎó£¬Çë¼ì²éºóÖØĞÂÊäÈë!";
 		return -1;
 	}
 	QString strBirthday = strCardID.mid(6, 8);
@@ -799,7 +779,7 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 		if (strIssuedate.isEmpty() ||
 			strExpireDate.isEmpty())
 		{
-			strMessage = "16å‘¨å²ä»¥ä¸Šçš„äººå‘˜å¿…é¡»è¾“å…¥è¯ä»¶æœ‰æ•ˆæœŸ!";
+			strMessage = "16ÖÜËêÒÔÉÏµÄÈËÔ±±ØĞëÊäÈëÖ¤¼şÓĞĞ§ÆÚ!";
 			return -1;
 		}
 	}
@@ -812,7 +792,7 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	pIDCard = make_shared<IDCardInfo>();
 	if (!pIDCard)
 	{
-		strMessage = "å†…å­˜ä¸è¶³,æ— æ³•ç”Ÿæˆèº«ä»½è¯ä¿¡æ¯!";
+		strMessage = "ÄÚ´æ²»×ã,ÎŞ·¨Éú³ÉÉí·İÖ¤ĞÅÏ¢!";
 		return -1;
 	}
 	strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
@@ -830,7 +810,7 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	return 0;
 }
 
-void uc_InputIDCardInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
+void qu_ModifyInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 {
 	gInfo() << __FUNCTION__;
 	shared_ptr<IDCardInfo> IDCardPtr(pIDCard);
@@ -842,7 +822,7 @@ void uc_InputIDCardInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 	}
 }
 
-//void uc_InputIDCardInfo::showEvent(QShowEvent* event)
+//void qu_ModifyInfo::showEvent(QShowEvent* event)
 //{
 //	bool bShowWideget = false;
 //	if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
@@ -864,7 +844,7 @@ void uc_InputIDCardInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 //
 //}
 
-int uc_InputIDCardInfo::QueryPersonInfo(void* p)
+int qu_ModifyInfo::QueryPersonInfo(void* p)
 {
 	QWaitCursor W;
 	QString strMessage;
@@ -888,7 +868,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 
 		if (!pService)
 		{
-			strMessage = "ç¤¾ä¿å¡å¡ç®¡æœåŠ¡æ¨¡å—ä¸å¯ç”¨!";
+			strMessage = "Éç±£¿¨¿¨¹Ü·şÎñÄ£¿é²»¿ÉÓÃ!";
 			break;
 		}
 
@@ -906,7 +886,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 			string strText;
 			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
-			strMessage = QString("æŸ¥è¯¢åˆ¶å¡ä¿¡æ¯å¤±è´¥:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			strMessage = QString("²éÑ¯ÖÆ¿¨ĞÅÏ¢Ê§°Ü:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
 
@@ -917,7 +897,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 			string strText;
 			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
-			strMessage = QString("æŸ¥è¯¢åˆ¶å¡ä¿¡æ¯å¤±è´¥:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			strMessage = QString("²éÑ¯ÖÆ¿¨ĞÅÏ¢Ê§°Ü:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
 		string strSSCardNum, strBankName;
@@ -942,7 +922,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 			int nErrCode = -1;
 			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
-			strMessage = QString("è·å–ä¸ªäººç…§ç‰‡å¤±è´¥:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			strMessage = QString("»ñÈ¡¸öÈËÕÕÆ¬Ê§°Ü:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
 		CJsonObject jsonOut(strJsonOut);
@@ -952,13 +932,13 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 			SaveSSCardPhoto(strMessage, strPhoto.c_str(), (char*)pIDCard->szIdentity);
 			if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
 			{
-				strMessage = QString("ä¿å­˜ç…§ç‰‡æ•°æ®å¤±è´¥!");
+				strMessage = QString("±£´æÕÕÆ¬Êı¾İÊ§°Ü!");
 				break;
 			}
 		}
 		else
 		{
-			strMessage = QString("ç¤¾ä¿åå°æœªè¿”å›ä¸ªäººç…§ç‰‡!");
+			strMessage = QString("Éç±£ºóÌ¨Î´·µ»Ø¸öÈËÕÕÆ¬!");
 			break;
 		}
 
@@ -970,7 +950,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 			int nErrCode = -1;
 			jsonOut.Get("Result", nErrCode);
 			jsonOut.Get("Message", strText);
-			strMessage = QString("è·å–ä¸ªäººä¿¡æ¯å¤±è´¥:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			strMessage = QString("»ñÈ¡¸öÈËĞÅÏ¢Ê§°Ü:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 			break;
 		}
 		jsonOut.Parse(strJsonOut);
@@ -988,15 +968,22 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 	return nResult;
 }
 
-void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
+void qu_ModifyInfo::ShowGuardianWidget(bool bShow)
 {
 	gInfo() << __FUNCTION__;
 	ui->label_Guardian->setVisible(bShow);
-	ui->label_Guardianship->setVisible(bShow);
+	//ui->label_Guardianship->setVisible(bShow);
 	ui->label_GuardianIDCard->setVisible(bShow);
 	ui->lineEdit_Guardian->setVisible(bShow);
-	ui->comboBox_Guardianship->setVisible(bShow);
+	//ui->comboBox_Guardianship->setVisible(bShow);
 	ui->lineEdit_GuardianCardID->setVisible(bShow);
+	ui->radioButton_Female_2->setVisible(bShow);
+	ui->radioButton_Male_2->setVisible(bShow);
+	ui->label_Gender_2->setVisible(bShow);
+	ui->line_2->setVisible(bShow);
+	ui->dateEdit_Expired_2->setVisible(bShow);
+	ui->dateEdit_Issued_2->setVisible(bShow);
+	ui->label_ExpireDate_2->setVisible(bShow);
 	if (bShow)
 	{
 		ui->label_GuardianMobile->setMinimumSize(QSize(200, 60));
@@ -1034,38 +1021,38 @@ void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
 	//}
 }
 
-void	uc_InputIDCardInfo::ClearGuardianInfo()
+void	qu_ModifyInfo::ClearGuardianInfo()
 {
 	gInfo() << __FUNCTION__;
 	ui->lineEdit_Guardian->setText("");
-	ui->comboBox_Guardianship->setCurrentIndex(0);
+	//ui->comboBox_Guardianship->setCurrentIndex(0);
 	ui->lineEdit_GuardianCardID->setText("");
 }
 
-void uc_InputIDCardInfo::on_checkBox_Agency_stateChanged(int arg1)
+void qu_ModifyInfo::on_checkBox_Agency_stateChanged(int arg1)
 {
 	qDebug() << __FUNCTION__ << "arg1 =" << arg1;
 
 }
 
-void uc_InputIDCardInfo::StartDetect()
-{
-	gInfo() << __FUNCTION__;
-	if (!m_pWorkThread)
-	{
-		m_bWorkThreadRunning = true;
-		m_pWorkThread = new std::thread(&uc_InputIDCardInfo::ThreadWork, this);
-		if (!m_pWorkThread)
-		{
-			QString strError = QString("å†…å­˜ä¸è¶³,åˆ›å»ºè¯»å¡çº¿ç¨‹å¤±è´¥!");
-			gError() << strError.toLocal8Bit().data();
-			emit ShowMaskWidget("ä¸¥é‡é”™è¯¯", strError, Fetal, Return_MainPage);
-			return;
-		}
-	}
-}
+//void qu_ModifyInfo::StartDetect()
+//{
+//	gInfo() << __FUNCTION__;
+//	if (!m_pWorkThread)
+//	{
+//		m_bWorkThreadRunning = true;
+//		m_pWorkThread = new std::thread(&qu_ModifyInfo::ThreadWork, this);
+//		if (!m_pWorkThread)
+//		{
+//			QString strError = QString("ÄÚ´æ²»×ã,´´½¨¶Á¿¨Ïß³ÌÊ§°Ü!");
+//			gError() << strError.toLocal8Bit().data();
+//			emit ShowMaskWidget("ÑÏÖØ´íÎó", strError, Fetal, Return_MainPage);
+//			return;
+//		}
+//	}
+//}
 
-void uc_InputIDCardInfo::ThreadWork()
+void qu_ModifyInfo::ThreadWork()
 {
 	gInfo() << __FUNCTION__;
 	auto tLast = high_resolution_clock::now();
@@ -1088,7 +1075,7 @@ void uc_InputIDCardInfo::ThreadWork()
 			{
 				char szText[256] = { 0 };
 				GetErrorMessage((IDCard_Status)nResult, szText, sizeof(szText));
-				strError = QString("è¯»å–èº«ä»½è¯å¤±è´¥:%1").arg(szText);
+				strError = QString("¶ÁÈ¡Éí·İÖ¤Ê§°Ü:%1").arg(szText);
 				gInfo() << gQStr(strError);
 			}
 		}
@@ -1101,127 +1088,127 @@ void uc_InputIDCardInfo::ThreadWork()
 		delete pIDCard;
 }
 
-void uc_InputIDCardInfo::StopDetect()
-{
-	m_bWorkThreadRunning = false;
-	if (m_pWorkThread && m_pWorkThread->joinable())
-	{
-		m_pWorkThread->join();
-		m_pWorkThread = nullptr;
-	}
-	CloseReader();
-}
+//void qu_ModifyInfo::StopDetect()
+//{
+//	m_bWorkThreadRunning = false;
+//	if (m_pWorkThread && m_pWorkThread->joinable())
+//	{
+//		m_pWorkThread->join();
+//		m_pWorkThread = nullptr;
+//	}
+//	CloseReader();
+//}
 
-void uc_InputIDCardInfo::on_pushButton_TakePhoto_clicked()
-{
-	gInfo() << __FUNCTION__;
-	QString strMessage;
-	int nResult = -1;
-	do
-	{
-		if (QFailed(nResult = GetCardInfo(strMessage)))
-			break;
+//void qu_ModifyInfo::on_pushButton_TakePhoto_clicked()
+//{
+//	gInfo() << __FUNCTION__;
+//	QString strMessage;
+//	int nResult = -1;
+//	do
+//	{
+//		if (QFailed(nResult = GetCardInfo(strMessage)))
+//			break;
+//
+//		if (QFailed(nResult = GetSSCardInfo(strMessage)))
+//			break;
+//
+//		SavePersonInfo();
+//		nResult = 0;
+//	} while (0);
+//	if (QFailed(nResult))
+//	{
+//		//QMessageBox_CN(QMessageBox::Critical, "ÌáÊ¾", strMessage, QMessageBox::Ok, this);
+//		emit ShowMaskWidget("ÌáÊ¾", strMessage, Fetal, Stay_CurrentPage);
+//		return;
+//	}
+//	bool bGuardian = false;
+//	if (GetAge(string((char*)g_pDataCenter->GetIDCardInfo()->szBirthday)) < 16)
+//		bGuardian = true;
+//	DialogCameraTest dialog(bGuardian);
+//	if (dialog.exec() == QDialog::Accepted)
+//	{
+//		QString strQSS = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+//		ui->label_Photo->setStyleSheet(strQSS);
+//		ui->label_Photo->setText("");
+//	}
+//}
+//
+//void qu_ModifyInfo::on_pushButton_SelectPhoto_clicked()
+//{
+//	gInfo() << __FUNCTION__;
+//	QString strMessage;
+//	int nResult = -1;
+//
+//	try
+//	{
+//		do
+//		{
+//			if (QFailed(nResult = GetCardInfo(strMessage)))
+//			{
+//				break;
+//			}
+//			if (QFailed(nResult = GetSSCardInfo(strMessage)))
+//			{
+//				break;
+//			}
+//
+//			QString strPhoto = QFileDialog::getOpenFileName(this, tr("ÇëÑ¡ÔñÕÕÆ¬(±ØĞë°üº¬ÍêÕûµÄÍ·Ïñ,³ß´ç´óÓÚ»òµÈÓÚ384x441ÏñËØ)"), ".", tr("Í¼ÏñÎÄ¼ş(*.jpg)"));
+//			if (strPhoto.isEmpty())
+//				return;
+//			if (!fs::exists(strPhoto.toLocal8Bit().data()))
+//				return;
+//			//QImage  ImageRead(strPhoto);
+//			QString strAppPath = QApplication::applicationDirPath();
+//			QString strPhotoPath1 = strAppPath + "/PhotoProcess/1.jpg";
+//			QString strPhotoPath2 = strAppPath + "/PhotoProcess/2.jpg";
+//
+//			if (fs::exists(strPhotoPath1.toLocal8Bit().data()))
+//				fs::remove(strPhotoPath1.toLocal8Bit().data());
+//
+//			if (fs::exists(strPhotoPath2.toLocal8Bit().data()))
+//				fs::remove(strPhotoPath2.toLocal8Bit().data());
+//
+//			fs::copy(strPhoto.toLocal8Bit().data(), strPhotoPath1.toLocal8Bit().data());
+//			//ImageRead.save(strPhotoPath1, "jpg", 95);
+//
+//			QString strHeaderImage;
+//			if (QFailed(ProcessHeaderImage(strHeaderImage, strMessage)))
+//				break;
+//
+//			if (fs::exists(strPhotoPath2.toLocal8Bit().data()))
+//			{
+//				string strSSCardPhoto;
+//				if (QSucceed(GetImageStorePath(strSSCardPhoto, PhotoType::Photo_SSCard)))
+//				{
+//					if (fs::exists(strSSCardPhoto))
+//						fs::remove(strSSCardPhoto);
+//					fs::copy(strPhotoPath2.toLocal8Bit().data(), strSSCardPhoto);
+//					g_pDataCenter->strSSCardPhotoFile = strSSCardPhoto;
+//				}
+//				fs::remove(strPhotoPath2.toLocal8Bit().data());
+//			}
+//
+//			QString strQSS = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+//			ui->label_Photo->setStyleSheet(strQSS);
+//			ui->label_Photo->setText("");
+//
+//			nResult = 0;
+//		} while (0);
+//		if (QFailed(nResult))
+//		{
+//			emit ShowMaskWidget("ÌáÊ¾", strMessage, Fetal, Stay_CurrentPage);
+//			//QMessageBox_CN(QMessageBox::Critical, "ÌáÊ¾", strMessage, QMessageBox::Ok, this);
+//			return;
+//		}
+//	}
+//	catch (std::exception& e)
+//	{
+//		//QMessageBox_CN(QMessageBox::Critical, "ÌáÊ¾", QString::fromLocal8Bit(e.what()), QMessageBox::Ok, this);
+//		emit ShowMaskWidget("ÌáÊ¾", QString::fromLocal8Bit(e.what()), Fetal, Stay_CurrentPage);
+//	}
+//}
 
-		if (QFailed(nResult = GetSSCardInfo(strMessage)))
-			break;
-
-		SavePersonInfo();
-		nResult = 0;
-	} while (0);
-	if (QFailed(nResult))
-	{
-		//QMessageBox_CN(QMessageBox::Critical, "æç¤º", strMessage, QMessageBox::Ok, this);
-		emit ShowMaskWidget("æç¤º", strMessage, Fetal, Stay_CurrentPage);
-		return;
-	}
-	bool bGuardian = false;
-	if (GetAge(string((char*)g_pDataCenter->GetIDCardInfo()->szBirthday)) < 16)
-		bGuardian = true;
-	DialogCameraTest dialog(bGuardian);
-	if (dialog.exec() == QDialog::Accepted)
-	{
-		QString strQSS = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
-		ui->label_Photo->setStyleSheet(strQSS);
-		ui->label_Photo->setText("");
-	}
-}
-
-void uc_InputIDCardInfo::on_pushButton_SelectPhoto_clicked()
-{
-	gInfo() << __FUNCTION__;
-	QString strMessage;
-	int nResult = -1;
-
-	try
-	{
-		do
-		{
-			if (QFailed(nResult = GetCardInfo(strMessage)))
-			{
-				break;
-			}
-			if (QFailed(nResult = GetSSCardInfo(strMessage)))
-			{
-				break;
-			}
-
-			QString strPhoto = QFileDialog::getOpenFileName(this, tr("è¯·é€‰æ‹©ç…§ç‰‡(å¿…é¡»åŒ…å«å®Œæ•´çš„å¤´åƒ,å°ºå¯¸å¤§äºæˆ–ç­‰äº384x441åƒç´ )"), ".", tr("å›¾åƒæ–‡ä»¶(*.jpg)"));
-			if (strPhoto.isEmpty())
-				return;
-			if (!fs::exists(strPhoto.toLocal8Bit().data()))
-				return;
-			//QImage  ImageRead(strPhoto);
-			QString strAppPath = QApplication::applicationDirPath();
-			QString strPhotoPath1 = strAppPath + "/PhotoProcess/1.jpg";
-			QString strPhotoPath2 = strAppPath + "/PhotoProcess/2.jpg";
-
-			if (fs::exists(strPhotoPath1.toLocal8Bit().data()))
-				fs::remove(strPhotoPath1.toLocal8Bit().data());
-
-			if (fs::exists(strPhotoPath2.toLocal8Bit().data()))
-				fs::remove(strPhotoPath2.toLocal8Bit().data());
-
-			fs::copy(strPhoto.toLocal8Bit().data(), strPhotoPath1.toLocal8Bit().data());
-			//ImageRead.save(strPhotoPath1, "jpg", 95);
-
-			QString strHeaderImage;
-			if (QFailed(ProcessHeaderImage(strHeaderImage, strMessage)))
-				break;
-
-			if (fs::exists(strPhotoPath2.toLocal8Bit().data()))
-			{
-				string strSSCardPhoto;
-				if (QSucceed(GetImageStorePath(strSSCardPhoto, PhotoType::Photo_SSCard)))
-				{
-					if (fs::exists(strSSCardPhoto))
-						fs::remove(strSSCardPhoto);
-					fs::copy(strPhotoPath2.toLocal8Bit().data(), strSSCardPhoto);
-					g_pDataCenter->strSSCardPhotoFile = strSSCardPhoto;
-				}
-				fs::remove(strPhotoPath2.toLocal8Bit().data());
-			}
-
-			QString strQSS = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
-			ui->label_Photo->setStyleSheet(strQSS);
-			ui->label_Photo->setText("");
-
-			nResult = 0;
-		} while (0);
-		if (QFailed(nResult))
-		{
-			emit ShowMaskWidget("æç¤º", strMessage, Fetal, Stay_CurrentPage);
-			//QMessageBox_CN(QMessageBox::Critical, "æç¤º", strMessage, QMessageBox::Ok, this);
-			return;
-		}
-	}
-	catch (std::exception& e)
-	{
-		//QMessageBox_CN(QMessageBox::Critical, "æç¤º", QString::fromLocal8Bit(e.what()), QMessageBox::Ok, this);
-		emit ShowMaskWidget("æç¤º", QString::fromLocal8Bit(e.what()), Fetal, Stay_CurrentPage);
-	}
-}
-
-void uc_InputIDCardInfo::on_pushButton_OK_clicked()
+void qu_ModifyInfo::on_pushButton_OK_clicked()
 {
 	gInfo() << __FUNCTION__;
 	WaitCursor();
@@ -1230,7 +1217,15 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 	int nOperation = -1;
 	int nPage = 0;
 	MaskStatus nStatus = Success;
-	QString strTips = "æ“ä½œæˆåŠŸ";
+	QString strTips = "²Ù×÷³É¹¦";
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	/*if (QFailed(GetCardInfo(pIDCard, strMessage)))
+	{
+		return;
+	}*/
+
+	SSCardBaseInfoPtr  pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	//RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	SSCardService* pService = nullptr;
 	do
 	{
@@ -1240,79 +1235,107 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 		if (QFailed(GetSSCardInfo(strMessage)))
 			break;
 
-		// å›¾åƒæ–‡ä»¶å†…å®¹éç©ºï¼Œä½†ä¸æ˜¯å½“å‰äººå‘˜çš„ç…§ç‰‡
+		// Í¼ÏñÎÄ¼şÄÚÈİ·Ç¿Õ£¬µ«²»ÊÇµ±Ç°ÈËÔ±µÄÕÕÆ¬
 		if (!g_pDataCenter->strSSCardPhotoFile.empty())
 		{
 			QImage Photo(g_pDataCenter->strSSCardPhotoFile.c_str());
 			if (Photo.isNull())
 			{
-				strMessage = "ç…§ç‰‡è¯»å–å¤±è´¥,è¯·é‡æ–°é‡‡é›†æˆ–ä¸Šä¼ ç…§ç‰‡!";
+				strMessage = "ÕÕÆ¬¶ÁÈ¡Ê§°Ü,ÇëÖØĞÂ²É¼¯»òÉÏ´«ÕÕÆ¬!";
 				break;
 			}
 			if (Photo.width() != 358 || Photo.height() != 441)
 			{
-				strMessage = "ç…§ç‰‡å°ºå¯¸ä¸ç¬¦è¦æ±‚,è¯·é‡æ–°é‡‡é›†æˆ–ä¸Šä¼ ç…§ç‰‡!";
+				strMessage = "ÕÕÆ¬³ß´ç²»·ûÒªÇó,ÇëÖØĞÂ²É¼¯»òÉÏ´«ÕÕÆ¬!";
 				break;
 			}
 		}
 
-		/*if (GetAge(string((char*)g_pDataCenter->GetIDCardInfo()->szBirthday)) < 16 &&
-			!fs::exists(g_pDataCenter->strGuardianPhotoFile))
-		{
-			strMessage = "æœªæˆå¹´äººåŠå¡æ—¶,éœ€è¦åŒæ—¶ä¸Šä¼ æœ¬äººå’Œç›‘æŠ¤äººçš„ç…§ç‰‡!";
-			break;
-		}*/
-
-		SavePersonInfo();
-
-		if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+		if (g_pDataCenter->nCardServiceType == ServiceType::Service_QueryInformation)
 		{
 			if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
 				break;
-
 			if (!pService)
 				break;
-
+			gInfo() << __FUNCTION__ << __LINE__;
 			CJsonObject jsonIn;
-			jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
-			jsonIn.Add("Name", (const char*)pIDCard->szName);
+			jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+			jsonIn.Add("Name", pSSCardInfo->strName);
 			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
-			jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
 			string strJsonIn = jsonIn.ToString();
 			string strJsonOut;
-			if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))
+			string strCommand = "QueryPersonInfo";
+			if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
 			{
 				CJsonObject jsonOut(strJsonOut);
-				string strText, strErrcode;
+				string strText;
 				int nErrCode = -1;
-				//jsonOut.Get("Result", nErrCode);
+				jsonOut.Get("Result", nErrCode);
 				jsonOut.Get("Message", strText);
-				jsonOut.Get("errcode", strErrcode);
-				nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-				QString qstrText = QString::fromLocal8Bit(strText.c_str());
-				if ((nErrCode == 3) || (nErrCode == 4 && qstrText.contains("æ”¾å·")))	// å·²ç»ç”³è¯·è¿‡,åˆ™ç»§ç»­åˆ¶å¡
-				{
-					strMessage = qstrText;
-					//emit ShowMaskWidget("æ“ä½œæˆåŠŸ", strMessage, Success, Goto_Page, Page_MakeCard);
-				}
-				else
-				{
-					nStatus = Fetal;
-					strMessage = QString("æŸ¥è¯¢åˆ¶å¡çŠ¶æ€å¤±è´¥:%1").arg(QString::fromLocal8Bit(strText.c_str()));
-					break;
-				}
+				strMessage = QString("»ñÈ¡ĞÅÏ¢Ê§°Ü:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+				break;
+			}
+			string releaseDate = ui->dateEdit_Issued->dateTime().toString("yyyyMMdd").toStdString();
+			string validDate = ui->dateEdit_Expired->dateTime().toString("yyyyMMdd").toStdString();
+			jsonIn.Clear();
+			jsonIn(strJsonOut);
+			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+			//ĞŞ¸ÄÖ¤¼şÓĞĞ§ÆÚ
+			jsonIn.Add("ReleaseDate", releaseDate.c_str());
+			jsonIn.Add("ValidDate", validDate.c_str());
+
+			//ĞŞ¸Äµç»°
+			jsonIn.Add("Mobile", ui->lineEdit_GuardianMobile->text().toStdString());
+			//ĞŞ¸ÄµØÖ·
+			jsonIn.Add("Address", ui->plainTextEdit_Address->toPlainText().toStdString());
+			if (g_pDataCenter->bGuardian)
+			{
+				string guardianReleaseDate = ui->dateEdit_Issued_2->dateTime().toString("yyyyMMdd").toStdString();
+				string guardianValidDate = ui->dateEdit_Expired_2->dateTime().toString("yyyyMMdd").toStdString();
+				jsonIn.Add("GuardianReleaseDate", guardianReleaseDate.c_str());
+				jsonIn.Add("GuardianValidDate", guardianValidDate.c_str());
 			}
 
-			nOperation = Goto_Page;
-			nPage = Page_MakeCard;
-			strMessage = "äººå‘˜èº«ä»½ä¿¡æ¯å·²ç»ç¡®è®¤,ç¨åå¼€å§‹åˆ¶å¡!";
+			strJsonIn = jsonIn.ToString();
+			LOG(INFO) << "strJsonIn" << strJsonIn;
+
+			strCommand = "ModifyPersonInfo";
+			if(g_pDataCenter->bGuardian)
+			{
+				strCommand = "ModifyPersonInfoByGuardian";
+			}
+			if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+			{
+				CJsonObject jsonOut(strJsonOut);
+				string strText;
+				int nErrCode = -1;
+				jsonOut.Get("Result", nErrCode);
+				jsonOut.Get("Message", strText);
+				strMessage = QString("ĞŞ¸ÄĞÅÏ¢Ê§°Ü:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+				break;
+			}
+			CJsonObject jsonOut(strJsonOut);
+			//string strPhoto;
+			//if (jsonOut.Get("Photo", strPhoto))
+			//{
+			//	SaveSSCardPhoto(strMessage, strPhoto.c_str(), (char*)pIDCard->szIdentity);
+			//	if (QFailed(SaveSSCardPhotoBase64(strMessage, strPhoto.c_str())))
+			//	{
+			//		strMessage = QString("±£´æÕÕÆ¬Êı¾İÊ§°Ü!");
+			//		break;
+			//	}
+			//}
+			//else
+			//{
+			//	strMessage = QString("Éç±£ºóÌ¨Î´·µ»Ø¸öÈËÕÕÆ¬!");
+			//	break;
+			//}
+
+			nOperation = Return_MainPage;
+			//nPage = Page_MakeCard;
+			strMessage = "ĞÅÏ¢ĞŞ¸ÄÒÑÌá½»";
 		}
-		else
-		{
-			nOperation = Goto_Page;
-			nPage = Page_EnsureInformation;
-			strMessage = "äººå‘˜èº«ä»½ä¿¡æ¯å·²ç»ç¡®è®¤,ç¨åè¯·ç¡®è®¤ç¤¾ä¿å¡ä¿¡æ¯!";
-		}
+
 
 		nResult = 0;
 	} while (0);
@@ -1321,57 +1344,56 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 	{
 		nStatus = Failed;
 		nOperation = Stay_CurrentPage;
-		strTips = "æ“ä½œå¤±è´¥";
+		strTips = "²Ù×÷Ê§°Ü";
 	}
 
 	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
 }
 
-void uc_InputIDCardInfo::on_pushButton_GetCardID_clicked()
-{
-	gInfo() << __FUNCTION__;
-	WaitCursor();
-	QString strMessage;
-	int nResult = -1;
-	int nOperation = -1;
-	int nPage = 0;
-	MaskStatus nStatus = Success;
-	QString strTips = "æ“ä½œæˆåŠŸ";
-	do
-	{
-		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
-		if (QFailed(GetCardInfo(pIDCard, strMessage)))
-		{
-			break;
-		}
-		g_pDataCenter->SetIDCardInfo(pIDCard);
-		nOperation = Goto_Page;
-		nPage = Page_QueryInformation;
-		strMessage = "è¯·ç¨å€™,æ­£åœ¨æŸ¥è¯¢!";
-		nResult = 0;
-	} while (0);
-	if (QFailed(nResult))
-	{
-		nStatus = Failed;
-		nOperation = Stay_CurrentPage;
-		strTips = "æ“ä½œå¤±è´¥";
-	}
+//void qu_ModifyInfo::on_pushButton_GetCardID_clicked()
+//{
+//	gInfo() << __FUNCTION__;
+//	WaitCursor();
+//	QString strMessage;
+//	int nResult = -1;
+//	int nOperation = -1;
+//	int nPage = 0;
+//	MaskStatus nStatus = Success;
+//	QString strTips = "²Ù×÷³É¹¦";
+//	do
+//	{
+//		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+//		if (QFailed(GetCardInfo(pIDCard, strMessage)))
+//		{
+//			break;
+//		}
+//		g_pDataCenter->SetIDCardInfo(pIDCard);
+//		nOperation = Goto_Page;
+//		nPage = Page_QueryInformation;
+//		strMessage = "ÇëÉÔºò,ÕıÔÚ²éÑ¯!";
+//		nResult = 0;
+//	} while (0);
+//	if (QFailed(nResult))
+//	{
+//		nStatus = Failed;
+//		nOperation = Stay_CurrentPage;
+//		strTips = "²Ù×÷Ê§°Ü";
+//	}
+//
+//	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
+//}
 
-	emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, nPage);
-}
-
-void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
+void qu_ModifyInfo::on_checkBox_Agency_clicked()
 {
 	bool bChecked = ui->checkBox_Agency->isChecked();
 	ShowGuardianWidget(bChecked);
 	g_pDataCenter->bGuardian = bChecked;
-	//æ¡Œé¢ç‰ˆæ³¨é‡Š
-
+	//×ÀÃæ°æ×¢ÊÍ
 	/*if (bChecked)
 	{
 
 		StartDetect();
-		pDialogReadIDCard = new Sys_DialogReadIDCard("è¯·åˆ·ç›‘æŠ¤äººèº«ä»½è¯");
+		pDialogReadIDCard = new Sys_DialogReadIDCard("ÇëË¢¼à»¤ÈËÉí·İÖ¤");
 		if (pDialogReadIDCard->exec() != QDialog::Accepted)
 		{
 			ui->checkBox_Agency->setChecked(false);
@@ -1384,19 +1406,19 @@ void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
 	}*/
 }
 
-void uc_InputIDCardInfo::on_Name_textChanged(const QString& arg1)
+void qu_ModifyInfo::on_Name_textChanged(const QString& arg1)
 {
 	auto itfind = mapPersonFile.find(arg1);
 	if (itfind != mapPersonFile.end())
 	{
-		disconnect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+		disconnect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &qu_ModifyInfo::on_Name_textChanged);
 		ClearInfo();
 		LoadPersonInfo(itfind->second);
-		connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+		connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &qu_ModifyInfo::on_Name_textChanged);
 	}
 }
 
-void uc_InputIDCardInfo::on_Name_EditingFinished()
+void qu_ModifyInfo::on_Name_EditingFinished()
 {
 	//QString arg1 = ui->lineEdit_Name->text();
 	//auto itfind = mapPersonFile.find(arg1);
@@ -1407,7 +1429,7 @@ void uc_InputIDCardInfo::on_Name_EditingFinished()
 	//}
 }
 
-void uc_InputIDCardInfo::on_CheckPersonInfo()
+void qu_ModifyInfo::on_CheckPersonInfo()
 {
 	if (g_pDataCenter->nCardServiceType == ServiceType::Service_QueryInformation)
 		return;
@@ -1424,10 +1446,10 @@ void uc_InputIDCardInfo::on_CheckPersonInfo()
 	pSSCardInfo->strName = (const char*)pIDCard->szName;
 
 	int nResult = -1;
-	WaitingProgress WaitingUI(uc_InputIDCardInfo::QueryPersonInfo,
+	WaitingProgress WaitingUI(qu_ModifyInfo::QueryPersonInfo,
 		pSSCardInfo.get(),
 		30,
-		QString("æ­£åœ¨æŸ¥è¯¢äººå‘˜ä¿¡æ¯:%1%"),
+		QString("ÕıÔÚ²éÑ¯ÈËÔ±ĞÅÏ¢:%1%"),
 		false);
 	if (WaitingUI.exec() == QDialog::Accepted)
 	{
@@ -1449,7 +1471,7 @@ void uc_InputIDCardInfo::on_CheckPersonInfo()
 	}
 }
 
-void uc_InputIDCardInfo::on_lineEdit_Name_textEdited(const QString& arg1)
+void qu_ModifyInfo::on_lineEdit_Name_textEdited(const QString& arg1)
 {
 	if (arg1.size() < 2)
 		return;
@@ -1464,7 +1486,7 @@ void uc_InputIDCardInfo::on_lineEdit_Name_textEdited(const QString& arg1)
 	emit CheckPersonInfo();
 }
 
-void uc_InputIDCardInfo::on_lineEdit_CardID_textEdited(const QString& arg1)
+void qu_ModifyInfo::on_lineEdit_CardID_textEdited(const QString& arg1)
 {
 	QString strCardID = arg1;
 	if (strCardID.size() < 18)

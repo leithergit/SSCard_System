@@ -14,7 +14,7 @@
     <ProjectGuid>{BC6D4351-6EBD-302D-B02A-B487AFA02B95}</ProjectGuid>
     <RootNamespace>SSCard_System</RootNamespace>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
@@ -53,12 +53,14 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>debug\</OutDir>
-    <IntDir>debug\</IntDir>
+    <OutDir>$(projectDir)..\..\SSCardSystem_for_debug</OutDir>
+    <IntDir>$(projectDir)..\..\SSCardSystem_for_debug</IntDir>
     <TargetName>SSCard_System</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\proc\main_project;C:\Qt\5.15.2\msvc2019\include\QtXlsx;D:\proc\main_project\SSCard_System\glog;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtCore;.\;.\..\SDK;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\5.15.2\msvc2019\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>release\</OutDir>
@@ -66,21 +68,25 @@
     <TargetName>SSCard_System</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <QtModules>core;sql;network;gui;widgets;xlsx</QtModules>
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;sql;network;gui;widgets;xlsx;</QtModules>
+    <QtPlugin>true</QtPlugin>
+    <QtQMakeTemplate>app</QtQMakeTemplate>
+    <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
-    <QtModules>core;sql;network;gui;widgets;xlsx;</QtModules>
+    <QtModules>core;sql;network;gui;widgets;xlsx</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK/SSCardInfo_Henan;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK;../SDK/SSCardInfo_Henan;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -144,8 +150,8 @@
     </QtUic>
     <PostBuildEvent>
       <Command>::@call updatesdk.bat $(Configuration)
-@echo update $(TargetPath) to remote device...
-copy /y $(TargetPath) Z:\SSCard_System.mvc</Command>
+@echo copy $(TargetPath) D:\npfworkspace\proc\SSCardSystem_for_test
+copy /y  $(TargetPath) D:\npfworkspace\proc\SSCardSystem_for_test</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -154,7 +160,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;../SDK/IDCard;../SDK/glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\5.15.2\msvc2019\include;.;../SDK/IDCard;../SDK/glog;../SDK/QREncode;../SDK/Printer;../SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -171,7 +177,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
       <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
@@ -214,9 +220,9 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc</Command>
       <QtUicFileName>ui_%(Filename).h</QtUicFileName>
     </QtUic>
     <PostBuildEvent>
-      <Command>::@call updatesdk.bat $(Configuration)
-@echo update $(TargetPath) to remote device...
-copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
+      <Command>@echo copy $(TargetPath) $(projectDir)..\..\SSCardSystem_for_debug
+copy/y $(TargetPath) $(projectDir)..\..\SSCardSystem_for_debug
+copy/y $(TargetDir)$(TargetName).pdb $(projectDir)..\..\SSCardSystem_for_debug</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>::@call updatesdk.bat $(Configuration)
@@ -242,6 +248,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     <ClCompile Include="qclickablelineedit.cpp" />
     <ClCompile Include="qi_information.cpp" />
     <ClCompile Include="queryinfo.cpp" />
+    <ClCompile Include="qu_ModifyInfo.cpp" />
     <ClCompile Include="showlicense.cpp" />
     <ClCompile Include="sscardreport.cpp" />
     <ClCompile Include="Sys_batchmakecard.cpp" />
@@ -285,6 +292,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     <ClCompile Include="WMIQuery.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\SDK\KT_Define.h" />
     <ClInclude Include="..\SSCardService\SSCardService.h" />
     <ClInclude Include="..\utility\AutoLock.h" />
     <QtMoc Include="showlicense.h" />
@@ -307,6 +315,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     <QtMoc Include="qi_information.h" />
     <QtMoc Include="dialogconfigbank.h" />
     <QtMoc Include="sscardreport.h" />
+    <QtMoc Include="qu_ModifyInfo.h" />
     <ClInclude Include="SimpleIni.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
@@ -317,7 +326,6 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     <ClInclude Include="DevBase.h" />
     <ClInclude Include="Gloabal.h" />
     <ClInclude Include="license.h" />
-    <ClInclude Include="SDK\KT_Define.h" />
     <QtMoc Include="MaskWidget.h">
     </QtMoc>
     <QtMoc Include="OperatorSucceed.h">
@@ -416,6 +424,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     </QtUic>
     <QtUic Include="qi_information.ui" />
     <QtUic Include="queryinfo.ui" />
+    <QtUic Include="qu_modifyinfo.ui" />
     <QtUic Include="showlicense.ui" />
     <QtUic Include="sscardreport.ui" />
     <QtUic Include="Sys_batchmakecard.ui" />
@@ -473,6 +482,7 @@ copy /y $(TargetPath) Z:\SSCard_System.mvc.d</Command>
     <QtUic Include="updatepassword.ui">
     </QtUic>
     <QtUic Include="waitingprogress.ui" />
+    <QtUic Include="Widget1.ui" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png" />

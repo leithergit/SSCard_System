@@ -993,7 +993,6 @@ void Sys_ManualMakeCard::on_pushButton_PremakeCard_clicked()
 			return;
 		}
 	}
-
 	if (QFailed(g_pDataCenter->GetCardStatus(strMessage)))
 	{
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -1005,7 +1004,6 @@ void Sys_ManualMakeCard::on_pushButton_PremakeCard_clicked()
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
 		return;
 	}
-
 	if (QFailed(g_pDataCenter->PremakeCard(strMessage)))
 	{
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);

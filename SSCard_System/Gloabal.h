@@ -49,6 +49,8 @@
 #include <QHBoxLayout>
 #include <QDirIterator>
 #include <QSqlDatabase>
+#include <QString>
+#include <QTextCodec>
 #include <QtXlsx/QtXlsx>
 #include "DevBase.h"
 #include "SimpleIni.h"
@@ -150,7 +152,8 @@ enum Page_Index
 	Page_CommitNewInfo,				// 提交新办卡信息
 	Page_QueryInformation,			// 信息查询
 	Page_AdforFinance,				// 开通金融页面
-	Page_Succeed					// 操作成功
+	Page_Succeed,					// 操作成功
+	Page_ModifyInfo					// 修改个人信息
 };
 
 #define  Switch2Page(x)	(x - Page_ReaderIDCard + Switch_NextPage - 1)
@@ -439,6 +442,21 @@ struct RegionInfo
 	}
 	bool Load(CSimpleIniA* pSettings)
 	{
+		auto convertToUtf8 = [](const QString& gbkstr)
+		{
+			QTextCodec* gbkCodec = QTextCodec::codecForName("GBK");
+			QTextCodec* utf8Codec = QTextCodec::codecForName("UTF-8");
+
+			QByteArray gbkData = gbkCodec->fromUnicode(gbkstr);
+			QByteArray utf8Data = utf8Codec->fromUnicode(gbkstr);
+
+			return utf8Codec->toUnicode(utf8Data);
+		};
+		auto utf8ToGbk = [](const std::string& utf8String)
+		{
+			QString qstr = QString::fromStdString(utf8String);
+			return QTextCodec::codecForName("GBK")->fromUnicode(qstr).toStdString();
+		};
 		if (!pSettings)
 			return false;
 		gInfo() << "Try to read Region configure";
@@ -460,6 +478,17 @@ struct RegionInfo
 		strCM_CA_Password= pSettings->GetValue("Region", "CM_CA_Password", "");
 
 		strCardVendor	 = pSettings->GetValue("Region", "CardVendor", "1");
+
+		strJJRName		 = pSettings->GetValue("Region", "JJR_Name");
+		strJJRName		 = utf8ToGbk(strJJRName);
+		//strJJRName		 = QString(strJJRName.c_str()).toUtf8();
+		strJJRMobile	 = pSettings->GetValue("Region", "JJR_Mobile");
+		strJJRId		 = pSettings->GetValue("Region", "JJR_ID");
+
+		strBankNodeName	 = pSettings->GetValue("Region", "BankNodeName");
+		//
+		strBankNodeName = utf8ToGbk(strBankNodeName);
+		//strBankNodeName = QString(strBankNodeName.c_str()).toUtf8();
 		/*
 		SSCardDefaulutPin=123456
 		PrimaryKey = 00112233445566778899AABBCCDDEEFF
@@ -475,6 +504,7 @@ struct RegionInfo
 	}
 	bool Save(CSimpleIniA* pSettings, bool bSupervisor = false)
 	{
+
 		if (!pSettings)
 			return false;
 		gInfo() << "Try to read Region configure";
@@ -505,7 +535,13 @@ struct RegionInfo
 			pSettings->SetValue("Region", "SSCardDefaulutPin", strSSCardDefaulutPin.c_str());
 			pSettings->SetValue("Region", "PrimaryKey", strPrimaryKey.c_str());
 		}
+		pSettings->SetValue("Region", "JJR_Name", strJJRName.c_str());
 
+		pSettings->SetValue("Region", "JJR_Mobile", strJJRMobile.c_str());
+		pSettings->SetValue("Region", "JJR_ID", strJJRId.c_str());
+		
+		strBankNodeName = pSettings->SetValue("Region", "BankNodeName", strBankNodeName.c_str());
+		
 		return true;
 	}
 	string		strCityCode;						    // 地市编码 410700
@@ -528,6 +564,10 @@ struct RegionInfo
 	string		strSSCardSeriveModule;					// 社保卡服务模块
 	string		strSSCardServiceDescription;			// 社保卡服务描述文件，用于服务初始化
 	string		strOperator;							// 操作人员
+	string		strJJRName;								// 经办人名称
+	string		strJJRMobile;							// 经办人联系方式
+	string		strJJRId;								// 经办人身份证号
+	string		strBankNodeName;						// 银行网点名称
 	SSCardProvince	nProvinceCode;						// 省市代码
 };
 
@@ -687,6 +727,7 @@ struct SysConfig
 		pSettings->SetLongValue("PageTimeOut", "ChangeSSCardPWD", nPageTimeout[Page_ChangeSSCardPWD]);
 		pSettings->SetLongValue("PageTimeOut", "RegisterLost", nPageTimeout[Page_RegisterLost]);
 		pSettings->SetLongValue("PageTimeOut", "AdforFinance", nPageTimeout[Page_AdforFinance]);
+		pSettings->SetLongValue("PageTimeOut", "ModifyPersonInfo", nPageTimeout[Page_ModifyInfo]);
 	}
 
 	void SaveMaskPageTimeout(CSimpleIniA* pSettings)
@@ -780,7 +821,7 @@ struct SysConfig
 		nPageTimeout[Page_QueryInformation]	 = pSettings->GetLongValue("PageTimeOut","QueryInfo", 30);
 		nPageTimeout[Page_AdforFinance]		 = pSettings->GetLongValue("PageTimeOut","AdforFinance", 30);
 		nPageTimeout[Page_CommitNewInfo]	 = pSettings->GetLongValue("PageTimeOut","CommitNewInfo", 30);
-
+		nPageTimeout[Page_ModifyInfo]	 = pSettings->GetLongValue("PageTimeOut", "ModifyPersonInfo", 300);
 	}
 
 	void LoadMaskPageTimeout(CSimpleIniA* pSettings)
@@ -967,6 +1008,7 @@ public:
 	string			strCardVersion;
 	QSqlDatabase	SQLiteDB;
 	bool			bGuardian;	// 启用监护人
+	bool			bSwitchBank = false;// 跨行换卡
 	bool			bDebug;
 	bool			bEnableUpdate = true;
 	bool			bSkipWriteCard = false;
@@ -1091,14 +1133,17 @@ public:
 	int  GetCardStatus(QString& strMessage);
 	int  RegisterLost(QString& strMessage);
 	int  PremakeCard(QString& strMessage);
+	int	modifyPersonInfo(string& strBase64Photo, QString& strMessage);
 	int  CommitPersionInfo(QString& strMessage);
 	int	 SafeWriteCard(QString& strMessage);
+	int GenerateAuthorization(QString& strMessage);
 	int	 SafeWriteCardTest(QString& strMessage);
 	int	 SafeReadCard(QString& strMessage);
 	int  DownloadPhoto(string& strBase64Photo, QString& strMessage);
 	int  LoadPhoto(string& strPhoto, QString& strMessage, PhotoType nType = PhotoType::Photo_CardID);
 	int  LoadGuardianPhoto(string& strPhoto, QString& strMessage);
 	int  EnsureData(QString& strMessage);
+	int ReplaceCardSwitchCard(QString& strMessage);
 	int  ActiveCard(QString& strMessage);
 	void RemoveTempPersonInfo();
 private:

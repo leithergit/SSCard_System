@@ -87,8 +87,6 @@ void MainPage::on_pushButton_RegisterLost_clicked()
 
 void MainPage::on_pushButton_QueryInfo_clicked()
 {
-	void on_pushButton_MainPage_clicked();
-
 	((MainWindow*)m_pMainWindow)->on_pushButton_QueryInfo_clicked();
 }
 

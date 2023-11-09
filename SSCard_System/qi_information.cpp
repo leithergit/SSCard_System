@@ -195,7 +195,14 @@ int qi_Information::ProcessBussiness()
 	ui->lineEdit_CardStatus->setText(strCardStatus2);
 	ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName.c_str()));
 	ui->lineEdit_CardID->setText(pSSCardInfo->strIdentity.c_str());
-
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_QueryInformation)
+	{
+		ui->pushButton_ModifyInfo->show();
+	}
+	else
+	{
+		ui->pushButton_ModifyInfo->hide();
+	}
 	return nResult;
 }
 
@@ -208,3 +215,9 @@ void qi_Information::on_pushButton_OK_clicked()
 {
 	((MainWindow*)qApp->activeWindow())->on_pushButton_MainPage_clicked();
 }
+
+void qi_Information::on_pushButton_ModifyInfo_clicked()
+{
+	emit ShowMaskWidget("请稍等", "", Success, Goto_Page, Page_ModifyInfo);
+}
+

@@ -85,7 +85,7 @@ int uc_EnsureInformation::ProcessBussiness()
 				}
 			}
 
-		if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
+		if (QFailed(pService->QueryCardInfoAll(strJsonIn, strJsonOut)))
 		{
 			CJsonObject jsonOut(strJsonOut);
 			string strText;

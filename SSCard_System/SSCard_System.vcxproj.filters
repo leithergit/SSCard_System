@@ -255,6 +255,18 @@
     <ClCompile Include="sscardreport.cpp">
       <Filter>MainPage</Filter>
     </ClCompile>
+    <ClCompile Include="qu_ModifyInfo.cpp">
+      <Filter>Page\form</Filter>
+    </ClCompile>
+    <ClCompile Include="qu_InfoModify.cpp">
+      <Filter>Page\form</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_modify_info.cpp">
+      <Filter>Page\form</Filter>
+    </ClCompile>
+    <ClCompile Include="qu_ModifyInfo.cpp">
+      <Filter>Page</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utility\AutoLock.h">
@@ -267,9 +279,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <ClInclude Include="DevBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\KT_Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <QtMoc Include="MaskWidget.h">
@@ -321,6 +330,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SimpleIni.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\KT_Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -461,6 +473,18 @@
     </QtUic>
     <QtUic Include="SystemManager.ui">
       <Filter>SystemManager\Form</Filter>
+    </QtUic>
+    <QtUic Include="qu_InfoModify.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="Widget1.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="mi_modify_info.ui">
+      <Filter>Page\form</Filter>
+    </QtUic>
+    <QtUic Include="qu_modifyinfo.ui">
+      <Filter>Page\form</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -735,6 +759,18 @@
     </QtMoc>
     <QtMoc Include="sscardreport.h">
       <Filter>MainPage</Filter>
+    </QtMoc>
+    <QtMoc Include="qu_ModifyInfo.h">
+      <Filter>Page\form</Filter>
+    </QtMoc>
+    <QtMoc Include="qu_InfoModify.h">
+      <Filter>Page\form</Filter>
+    </QtMoc>
+    <QtMoc Include="mi_modify_info.h">
+      <Filter>Page\form</Filter>
+    </QtMoc>
+    <QtMoc Include="qu_ModifyInfo.h">
+      <Filter>Page</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -23,6 +23,8 @@ public:
 private slots:
     void on_pushButton_OK_clicked();
 
+    void on_pushButton_ModifyInfo_clicked();
+
 private:
 	Ui::qi_Information* ui;
 };

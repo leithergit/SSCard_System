@@ -1,5 +1,6 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "mainwindow.h"
+#include <QObject>
 #include <QApplication>
 #include <QString>
 #include <QDesktopWidget>
@@ -8,6 +9,9 @@
 #include <sstream>
 #include <QSharedMemory>
 #include <QSplashScreen>
+#ifdef _DEBUG
+#include <windows.h>
+#endif
 #include "DevBase.h"
 #include "Gloabal.h"
 #include "license.h"
@@ -43,6 +47,14 @@ static void SetupExceptionHandler()
 	BT_InstallSehFilter();
 }
 
+//int WaitForDebugEvent()
+//{
+//	while (true)
+//	{
+//		Sleep(10000);
+//	}
+//	return 0;
+//}
 
 int TestPrinter(void* pParam)
 {
@@ -59,6 +71,8 @@ int TestPrinter(void* pParam)
 		return 0;
 }
 
+void resizeChildren(QWidget* parent, double scale);
+
 #define WSA_VERSION MAKEWORD(2,2)
 const wchar_t* g_pUniqueID = L"Global\\2F026B66-2CCA-40AB-AD72-435B5AC2E625";
 HANDLE g_hAppMutex = nullptr;
@@ -68,6 +82,9 @@ bool g_bSkipLicense = false;
 
 int main(int argc, char* argv[])
 {
+#ifdef _DEBUG
+	//WaitForDebugEvent();
+#endif
 	SetupExceptionHandler();
 	CurlInitializer curlInit;
 	if (OpenMutexW(MUTEX_ALL_ACCESS, FALSE, g_pUniqueID))
@@ -84,7 +101,7 @@ int main(int argc, char* argv[])
 	QStringList strArgList = a.arguments();
 	for (auto var : strArgList)
 	{
-		if (var.compare("/SkipLicense", Qt::CaseInsensitive) == 0)
+		if (var.compare("/OverviewLicense", Qt::CaseInsensitive) == 0)
 		{
 			g_bSkipLicense = true;
 			break;
@@ -138,6 +155,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	FLAGS_max_log_size = 256;
+	FLAGS_logbufsecs = 0;
 	google::SetLogDestination(google::GLOG_INFO, strLogDatePath.toLocal8Bit().data());	// 使用该设定时，默认情况下，所有级别日志都用同一的文件名
 	google::SetStderrLogging(google::GLOG_INFO);	// 大于该级别的日志输出到stderr
 	google::SetLogFilenameExtension(".log");
@@ -235,17 +253,23 @@ int main(int argc, char* argv[])
 			g_pDataCenter->GetSysConfigure()->nTimeWaitForPrinter,	// 超时
 			QString("正在初始化打印机:%1%"));	// 显示格式
 
-		
+
 		if (WaitingUI.exec() == QDialog::Rejected)
 		{
 			QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
 			return 0;
 		}
-		if (!CheckLocalLicense(Code_License))
+		//桌面版适用期
+		QDateTime current = QDateTime::currentDateTime();
+		QDateTime deadline(QDate(2024, 2, 1));
+		if (current > deadline)
 		{
-			ShowLicense s;
-			s.show();
-			return a.exec();
+			if (!CheckLocalLicense(Code_License))
+			{
+				ShowLicense s;
+				s.show();
+				return a.exec();
+			}
 		}
 	}
 
@@ -278,10 +302,31 @@ int main(int argc, char* argv[])
 
 	w.showFullScreen();
 	w.setGeometry(g_pCurScreen->geometry());
+	//double scale = 0.7;
+	//w.resize(w.size() * scale);
+	//resizeChildren(&w, scale);
+
+	w.show();
 	//w.showMaximized();		// 会导致窗口无法覆盖任务栏
 	int nRes = a.exec();
 	QString strInfo = "系统正常关闭!";
 	gInfo() << gQStr(strInfo);
 	google::ShutdownGoogleLogging();
 	return nRes;
+}
+
+void resizeChildren(QWidget* parent, double scale)
+{
+	for(QObject * obj:parent->children())
+	{
+		QWidget* widget = qobject_cast<QWidget*>(obj);
+		if (widget)
+		{
+			widget->resize(widget->size() * scale);
+			QPoint pos = widget->pos();
+			pos *= scale;
+			widget->move(pos);
+			resizeChildren(widget, scale);
+		}
+	}
 }

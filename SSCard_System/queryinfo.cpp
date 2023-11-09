@@ -3,7 +3,9 @@
 #include "ui_queryinfo.h"
 #include "uc_readidcard.h"
 #include "qi_information.h"
+#include "qu_modifyinfo.h"
 #include "uc_inputidcardinfo.h"
+#include "nc_commitpersoninfo.h"
 #include "OperatorSucceed.h"
 
 QueryInfo::QueryInfo(QWidget* parent) :
@@ -20,6 +22,8 @@ QueryInfo::QueryInfo(QWidget* parent) :
 		uc_InputIDCardInfo* puc_InputIDCardInfo = new uc_InputIDCardInfo(ui->label_step, "QueryInfo1.png", Page_InputIDCardInfo);
 		AddPage(puc_InputIDCardInfo);		// step 1
 		AddPage(new qi_Information(ui->label_step, "QueryInfo2.png", Page_QueryInformation));
+		qu_ModifyInfo* pnc_ModifyInfo = new qu_ModifyInfo(ui->label_step, "Sandong/newcard3.png", Page_ModifyInfo);
+		AddPage(pnc_ModifyInfo);		// step 2
 		AddPage(new OperatorSucceed(nullptr, "", Page_Succeed));
 		for (int i = 0; i < m_pStackWidget->count(); i++)
 		{

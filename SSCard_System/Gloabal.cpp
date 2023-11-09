@@ -44,7 +44,7 @@
 #pragma comment(lib, "../SDK/7Z/lib/bit7z.lib")
 #pragma comment(lib,"../SSCard_System/release/Update")
 #endif
-
+#define PORT_NUM__ 100
 const char* szPrinterTypeList[PRINTER_MAX] =
 {
 	Str(EVOLIS_KC200),
@@ -551,9 +551,11 @@ int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage
 				break;
 			}
 			ifstream fsDesc(strDescPath);
+			fsDesc.seekg(3);
 			stringstream ss;
 			ss << fsDesc.rdbuf();
 			string strJsonIn = ss.str();
+			gInfo() << "ServiceDescription:" << strJsonIn;
 			string strJsonOut;
 			if (QFailed(pSScardSerivce->Initialize(strJsonIn, strJsonOut)))
 			{
@@ -584,6 +586,8 @@ int DataCenter::OpenSSCardService(SSCardService** ppService, QString& strMessage
 				strMessage = "设置业务类型失败,只能是新办卡,补办和挂失/解挂";
 				break;
 			}
+			pSScardSerivce->SetSwitchBank(g_pDataCenter->bSwitchBank);
+			LOG(ERROR) << "bSwitchBank : " << g_pDataCenter->bSwitchBank;
 			*ppService = pSScardSerivce;
 			nResult = 0;
 		} while (0);
@@ -808,7 +812,7 @@ int DataCenter::OpenSSCardReader(QString& strMessage)
 					strMessage = QString("Reader_Create'%1'失败,错误代码:%2").arg(DevConfig.strSSCardReadType.c_str()).arg(szRCode);
 					break;
 				}
-				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
+				if (QFailed(nResult = m_pSSCardReader->Reader_Init(PORT_NUM__, szRCode)))
 				{
 					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
 					break;
@@ -864,7 +868,8 @@ int DataCenter::OpenSSCardReader(QString strLib, ReaderBrand nReaderType, QStrin
 					strMessage = QString("Reader_Create(‘%1’)失败,错误代码:%2").arg(nReaderType).arg(szRCode);
 					break;
 				}
-				if (QFailed(nResult = m_pSSCardReader->Reader_Init(szRCode)))
+
+				if (QFailed(nResult = m_pSSCardReader->Reader_Init(PORT_NUM__, szRCode)))
 				{
 					strMessage = QString("Reader_Init失败,错误代码:%2").arg(szRCode);
 					break;
@@ -918,13 +923,22 @@ int DataCenter::TestCard(QString& strMessage)
 		qDebug() << __FILE__ << " " << __LINE__;
 		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
 		{
+
 			strMessage = QString("Printer_Status失败，错误代码:%1!").arg(szRCode);
 			break;
 		}
 		if (PrinterStatus.fwDevice != 0)
 		{
-			strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
-			break;
+			//avansia通过打印空图片才可进卡，此处会显示正忙
+			if (DevConfig.nPrinterType == EVOLIS_AVANSIA && PrinterStatus.fwDevice == 1)
+			{
+				PrinterStatus.fwDevice = 0;
+			}
+			else {
+				strMessage = QString("打印机未就绪,状态代码:%1!").arg(PrinterStatus.fwDevice);
+				break;
+			}
+
 		}
 		// 0-无卡；2-卡在内部；3-卡在上电位，4-卡在闸门外 5-堵卡；6-卡片未知
 		bool bSucceed = false;
@@ -977,29 +991,29 @@ int DataCenter::TestCard(QString& strMessage)
 			}
 			gInfo() << "BankNum:" << szBankNum;
 
-			string strMatchBankName;
-			for (auto var : mapBankCode)
-			{
-				const char* pDest = strstr((const char*)szBankNum, var.first.c_str());
-				if ((pDest - szBankNum) == 0)
-				{
-					strMatchBankName = var.second;
-					break;
-				}
-			}
-			gInfo() << "Card BankNum" << szBankNum << "\tMatched BankName:" << UTF8_GBK(strMatchBankName.c_str());
-			if (strMatchBankName.size())
-			{
-				string strCurrentBank;
-				CheckBankCode(strCurrentBank, strMessage);
-				gInfo() << "Current Bank:" << UTF8_GBK(strCurrentBank.c_str());
-				if (strCurrentBank.find(strMatchBankName) == string::npos &&
-					strMatchBankName.find(strCurrentBank) == string::npos)
-				{
-					strMessage = QString("当前社保卡(%1)与网点银行(%2)不匹配,请检查设置!").arg(strMatchBankName.c_str()).arg(strCurrentBank.c_str());
-					break;
-				}
-			}
+			//string strMatchBankName;
+			//for (auto var : mapBankCode)
+			//{
+			//	const char* pDest = strstr((const char*)szBankNum, var.first.c_str());
+			//	if ((pDest - szBankNum) == 0)
+			//	{
+			//		strMatchBankName = var.second;
+			//		break;
+			//	}
+			//}
+			//gInfo() << "Card BankNum" << szBankNum << "\tMatched BankName:" << UTF8_GBK(strMatchBankName.c_str());
+			//if (strMatchBankName.size())
+			//{
+			//	string strCurrentBank;
+			//	CheckBankCode(strCurrentBank, strMessage);
+			//	gInfo() << "Current Bank:" << UTF8_GBK(strCurrentBank.c_str());
+			//	if (strCurrentBank.find(strMatchBankName) == string::npos &&
+			//		strMatchBankName.find(strCurrentBank) == string::npos)
+			//	{
+			//		strMessage = QString("当前社保卡(%1)与网点银行(%2)不匹配,请检查设置!").arg(strMatchBankName.c_str()).arg(strCurrentBank.c_str());
+			//		break;
+			//	}
+			//}
 
 			bSucceed = true;
 			break;
@@ -1537,7 +1551,7 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		gInfo() << "Try to InnerAuth";
 		if (QFailed(nResult = InnerAuth(hsmInfo, szKey)))
 		{
-			strMessage = QString("读取医保信息失败,cardExternalAuth,resCode:%1").arg(nResult);
+			strMessage = QString("读取医保信息失败,InnerAuth,resCode:%1").arg(nResult);
 			break;
 		}
 
@@ -1574,9 +1588,9 @@ int DataCenter::ReadCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		strFieldList = QString(szRespond).split("|", Qt::KeepEmptyParts);
 		strcpy(hsmInfo.strRandom1, strFieldList[0].toStdString().c_str());
 		strcpy(hsmInfo.strRandom2, strFieldList[1].toStdString().c_str());
-
+		int step = 2;
 		gInfo() << "Try to cardExternalAuth";
-		if (QFailed(nResult = cardExternalAuth(hsmInfo, szKey)))
+		if (QFailed(nResult = cardExternalAuth(hsmInfo, szKey,step)))
 		{
 			strMessage = QString("读取医保信息失败,cardExternalAuth,resCode:%1").arg(nResult);
 			break;
@@ -1682,7 +1696,7 @@ int DataCenter::WriteCard(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessage)
 		strcpy(HsmInfo.strRandom1, strRomdom[1].toStdString().c_str());
 		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
 		gInfo() << "Try to cardExternalAuth";
-		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
+		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData,2)))
 		{
 			strMessage = QString("卡版外部信息认证失败,Result:%1").arg(nResult);
 			break;
@@ -1865,7 +1879,7 @@ int DataCenter::WriteCardTest(SSCardBaseInfoPtr& pSSCardInfo, QString& strMessag
 		strcpy(HsmInfo.strRandom2, strRomdom[2].toStdString().c_str());
 
 		gInfo() << "Try to cardExternalAuth";
-		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData)))
+		if (QFailed(nResult = cardExternalAuth(HsmInfo, szExAuthData,2)))
 		{
 			strMessage = QString("卡片外部信息认证失败,Result:%1").arg(nResult);
 			break;
@@ -2468,14 +2482,27 @@ int  DataCenter::PremakeCard(QString& strMessage)
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		strJsonIn = jsonIn.ToString();
 		gInfo() << "JsonIn = " << strJsonIn;
-		if (QFailed(pSScardSerivce->PreMakeCard(strJsonIn, strJsonOut)))
-		{
-			CJsonObject jsonOut(strJsonOut);
-			string strErrText;
-			jsonOut.Get("Message", strErrText);
-			strMessage = QString("预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
-			break;
+		if (!g_pDataCenter->bSwitchBank) {
+			if (QFailed(pSScardSerivce->PreMakeCard(strJsonIn, strJsonOut)))
+			{
+				CJsonObject jsonOut(strJsonOut);
+				string strErrText;
+				jsonOut.Get("Message", strErrText);
+				strMessage = QString("预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+				break;
+			}
 		}
+		else {
+			if (QFailed(pSScardSerivce->PreMakeCardHk(strJsonIn, strJsonOut)))
+			{
+				CJsonObject jsonOut(strJsonOut);
+				string strErrText;
+				jsonOut.Get("Message", strErrText);
+				strMessage = QString("跨行换卡预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+				break;
+			}
+		}
+		
 		gInfo() << "JsonOut = " << strJsonOut;
 		CJsonObject jsonOut(strJsonOut);
 		if (!jsonOut.KeyExist("CardNum") ||
@@ -2541,6 +2568,55 @@ int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage, PhotoTyp
 		gInfo() << e.what();
 		return -1;
 	}
+}
+
+int DataCenter::modifyPersonInfo(string& strBase64Photo, QString& strMessage)
+{
+	if (!pSScardSerivce)
+	{
+		strMessage = "卡管服务不可用!";
+		return -1;
+	}
+
+	CJsonObject jsonQuery;
+	jsonQuery.Clear();
+
+	jsonQuery.Add("CardID", pSSCardInfo->strIdentity);
+	jsonQuery.Add("Name", pSSCardInfo->strName);
+	jsonQuery.Add("City", pSSCardInfo->strCity);
+
+	string strJsonQuery = jsonQuery.ToString();
+	string strJsonOut;
+	string strCommand = "ModifyPersonInfo";
+
+	if (QFailed(pSScardSerivce->SetExtraInterface(strCommand, strJsonQuery, strJsonOut)))
+	{
+		CJsonObject jsonOut(strJsonOut);
+		string strText;
+		int nErrCode = -1;
+		jsonOut.Get("Result", nErrCode);
+		jsonOut.Get("Message", strText);
+		strMessage = QString("获取个人照片失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+		return -1;
+	}
+	CJsonObject jsonOut(strJsonOut);
+
+	if (jsonOut.Get("Photo", strBase64Photo))
+	{
+		SaveSSCardPhoto(strMessage, strBase64Photo.c_str());
+		if (QFailed(SaveSSCardPhotoBase64(strMessage, strBase64Photo.c_str())))
+		{
+			strMessage = QString("保存照片数据失败!");
+			return -1;
+		}
+	}
+	else
+	{
+		strMessage = QString("社保后台未返回个人照片!");
+		return 1;
+	}
+	return 0;
+
 }
 
 int DataCenter::DownloadPhoto(string& strBase64Photo, QString& strMessage)
@@ -2648,7 +2724,7 @@ int DataCenter::GetCardStatus(QString& strMessage)
 		jsonOut.Get("Message", strText);
 		jsonOut.Get("errcode", strErrcode);
 		nErrCode = strtol(strErrcode.c_str(), nullptr, 10);
-		if (nErrCode == 3)	// 已经申请过,则继续制卡
+		if ((nErrCode == 3) || (nErrCode == 4 && QString::fromStdString(strText).contains("放号")))	// 已经申请过,则继续制卡
 		{
 			strMessage = QString::fromLocal8Bit(strText.c_str());
 			return 0;
@@ -2664,6 +2740,7 @@ int DataCenter::GetCardStatus(QString& strMessage)
 int  DataCenter::CommitPersionInfo(QString& strMessage)
 {
 	int nResult = -1;
+	RegionInfo* pInfo = &(pSysConfig->Region);
 	pSSCardInfo->strBankCode = pSysConfig->Region.strBankCode;
 	string strJsonIn, strJsonOut;
 	do
@@ -2694,6 +2771,10 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("Occupation", pSSCardInfo->strOccupType);
 		jsonIn.Add("AuthorizeType", "01");		// 验证授权方式，01 人脸识别，02电子签名 03上传纸质授权 04读取身份证 05上传身份证正反面，06短信验证 07 授权文字声明勾选
+		jsonIn.Add("JJRName", pInfo->strJJRName);
+		jsonIn.Add("JJRID", pInfo->strJJRId);
+		jsonIn.Add("JJRMobile", pInfo->strJJRMobile);
+		jsonIn.Add("BankNodeName", pInfo->strBankNodeName);
 		CJsonObject jsonAuthorize;
 		jsonAuthorize.AddEmptySubArray("AuthorizeData");
 		if (g_pDataCenter->bGuardian)
@@ -2720,7 +2801,53 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		{
 		case ServiceType::Service_NewCard:
 		{
+			LOG(INFO) << "newcard:  switch bank :" << g_pDataCenter->bSwitchBank;
+			
+			if (g_pDataCenter->bSwitchBank)
+			{
+				string yuan{ "" }, fen{ "" };
+				//获取社保卡号
+				strJsonIn = jsonIn.ToString();
+				if (QFailed(pSScardSerivce->getCardInfo(strJsonIn, strJsonOut)))
+				{
+					CJsonObject jsonOut(strJsonOut);
+					string strText, strErrcode;
+					int nErrCode = -1;
+					jsonOut.Get("Result", nErrCode);
+					jsonOut.Get("Message", strText);
+					jsonOut.Get("errcode", strErrcode);
+					strMessage = QString("查询制卡状态失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+					return -1;
+				}
+				//查询余额，余额为零才可继续换卡流程
+				if (QFailed(pSScardSerivce->QueryCardBalance(strJsonIn, strJsonOut)))
+				{
+					CJsonObject jsonOut(strJsonOut);
+					string strText, strErrcode;
+					int nErrCode = -1;
+					//jsonOut.Get("Result", nErrCode);
+					jsonOut.Get("Message", strText);
+					jsonOut.Get("errcode", strErrcode);
 
+					jsonOut.Get("Yuan", yuan);
+
+					jsonOut.Get("Fen", fen);
+					if (strErrcode == "1")
+					{
+						strMessage = QString("查询卡余额失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+						LOG(ERROR) << strMessage.toStdString();
+						return -1;
+					}
+				}
+
+				if ((QString(yuan.c_str()).toInt() != 0) || QString(fen.c_str()).toInt() != 0)
+				{
+					//存在余额，提示返回
+					strMessage = "使用赛顺平台转出余额后办卡";
+
+					return -1;
+				}
+			}
 		}
 		break;
 		case ServiceType::Service_ReplaceCard:
@@ -2729,6 +2856,17 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		}
 		break;
 		case ServiceType::Service_RegisterLost:
+		{
+
+			
+		}
+		break;
+		case ServiceType::Service_ReplaceCardSwitchBank:
+		{
+
+
+		}
+		break;
 		default:
 		{
 			strMessage = "不支持的制卡服务!";
@@ -2738,7 +2876,7 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		}
 
 		strJsonIn = jsonIn.ToString();
-
+		
 		if (QFailed(pSScardSerivce->CommitPersonInfo(strJsonIn, strJsonOut)))
 		{
 			gInfo() << "JsonOut = " << strJsonOut;
@@ -2748,7 +2886,9 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 			jsonOut.Get("Message", strErrText);
 			jsonOut.Get("errcode", strErrcode);
 			QString qstrErrText = QString::fromLocal8Bit(strErrText.c_str());
-			if (qstrErrText.contains("申卡人存在有效的制卡申请"))
+			if (qstrErrText.contains("申卡人存在有效的制卡申请")||
+				qstrErrText.contains("已提交制卡申请") ||
+				qstrErrText.contains("放号"))
 			{
 				nResult = 0;
 				break;
@@ -2867,6 +3007,8 @@ int  DataCenter::EnsureData(QString& strMessage)
 	int nResult = -1;
 	QString strInfo;
 	string strJsonIn, strJsonOut;
+	string strBankNodeCode = "";
+	RegionInfo* pInfo = &(pSysConfig->Region);
 	do
 	{
 		if (!pSSCardInfo || !pSScardSerivce)
@@ -2885,7 +3027,10 @@ int  DataCenter::EnsureData(QString& strMessage)
 		jsonIn.Add("ChipNum", pSSCardInfo->strChipNum);
 		jsonIn.Add("MagNum", pSSCardInfo->strBankNum);
 		jsonIn.Add("CardVersion", pSSCardInfo->strCardVersion);
-		jsonIn.Add("ChipType", "32");
+		jsonIn.Add("ChipType", "80");
+
+		
+		jsonIn.Add("BankNodeName", pInfo->strBankNodeName);
 
 		strJsonIn = jsonIn.ToString();
 		gInfo() << "JsonIn = " << strJsonIn;
@@ -2899,10 +3044,58 @@ int  DataCenter::EnsureData(QString& strMessage)
 			break;
 		}
 		gInfo() << "JsonOut = " << strJsonOut;
+		strJsonOut.clear();
+		if (QFailed(pSScardSerivce->QueryLKId(strJsonIn, strJsonOut)))
+		{
+			gInfo() << "JsonOut = " << strJsonOut;
+			CJsonObject jsonOut(strJsonOut);
+			string strErrText;
+			jsonOut.Get("Message", strErrText);
+			strMessage = QString::fromLocal8Bit(strErrText.c_str());
+			break;
+		}
+		
+		CJsonObject jsonOut(strJsonOut);
+		string strds;
+		//jsonOut.Get("ds", strds);
+		gInfo() << strds;
+		CJsonObject jsonds = jsonOut["ds"];
+			
+		jsonds.Get("fkdid", strBankNodeCode);
+		gInfo() << "bankNodeCode : " << strBankNodeCode;
+		jsonIn.Add("BankNodeCode", strBankNodeCode);
+		
+		gInfo() << "JsonOut = " << strJsonOut;
+		strJsonOut.clear();
+		if (g_pDataCenter->bGuardian)
+		{
+			jsonIn.Add("JJRName", pSSCardInfo->strGuardianName);
+			jsonIn.Add("JJRID", pSSCardInfo->strGuardianIDentity);
+			
+		}
+		else
+		{
+			jsonIn.Add("JJRName", pSSCardInfo->strName);
+			jsonIn.Add("JJRID", pSSCardInfo->strIdentity);
+		}
+		jsonIn.Add("JJRMobile", pSSCardInfo->strMobile);
+		strJsonIn = jsonIn.ToString();
+		if (QFailed(pSScardSerivce->handToPerson(strJsonIn, strJsonOut)))
+		{
+			gInfo() << "JsonOut = " << strJsonOut;
+			CJsonObject jsonOut(strJsonOut);
+			string strErrText;
+			jsonOut.Get("Message", strErrText);
+			strMessage = QString::fromLocal8Bit(strErrText.c_str());
+			break;
+		}
+		gInfo() << "JsonOut = " << strJsonOut;
 		nResult = 0;
 	} while (0);
 	return nResult;
 }
+
+
 
 int  DataCenter::ActiveCard(QString& strMessage)
 {

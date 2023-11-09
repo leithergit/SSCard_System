@@ -7,25 +7,24 @@
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>D:\Work\SSCard_System.MVC\MainProject\Debug\SSCard_System.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>/SkipLicense</LocalDebuggerCommandArguments>
-    <LocalDebuggerWorkingDirectory>D:\Work\SSCard_System.MVC\MainProject\Debug</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>/OverviewLicense</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>$(projectDir)..\..\SSCardSystem_for_debug</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <RemoteDebuggerCommand>D:\SSCard_System.mvc\SSCard_System.exe</RemoteDebuggerCommand>
-    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <RemoteDebuggerWorkingDirectory>D:\SSCard_System.mvc\</RemoteDebuggerWorkingDirectory>
     <RemoteDebuggerServerName>10.0.0.121</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
     <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
-    <LocalDebuggerCommand>Z:\SSCard_System.MVC\SSCard_System.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments />
-    <LocalDebuggerWorkingDirectory>Z:\SSCard_System.MVC</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>D:\npfworkspace\proc\SSCardSystem_for_debug\SSCard_System.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>D:\npfworkspace\proc\SSCardSystem_for_debug</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2022-10-26T10:16:29.6667685Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-05T14:17:25.3868064Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2022-10-26T10:16:29.5710784Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2023-11-05T14:17:24.9727611Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

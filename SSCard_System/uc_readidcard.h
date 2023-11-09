@@ -56,6 +56,8 @@ private slots:
 	void OnErrorMessage(QString strErrorMsg);
 	void On_WithoutIDCard(int arg1);
 
+    void on_checkBox_SwitchBank_stateChanged(int arg1);
+
 private:
 	Ui::ReadIDCard* ui;
 };

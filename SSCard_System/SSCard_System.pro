@@ -55,6 +55,7 @@ SOURCES += \
     qnationwidget.cpp \
     qpinkeybroad.cpp \
     qstackpage.cpp \
+    qu_modifyinfo.cpp \
     queryinfo.cpp \
     registerlost.cpp \
     showlicense.cpp \
@@ -112,6 +113,7 @@ HEADERS += \
     qnationwidget.h \
     qpinkeybroad.h \
     qstackpage.h \
+    qu_modifyinfo.h \
     queryinfo.h \
     registerlost.h \
     showlicense.h \
@@ -160,6 +162,7 @@ FORMS += \
     nc_commitpersoninfo.ui \
     qi_information.ui \
     qnationwidget.ui \
+    qu_modifyinfo.ui \
     queryinfo.ui \
     registerlost.ui \
     showlicense.ui \
