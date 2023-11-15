@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <windows.h>
-#include "KT_Define.h"
+#include "..\..\..\SDK.git\sd_sscardinfo\SD_SSCardInfo\SD_SSCardInfo\KT_DEFINE.h"
 
 #define DLL_PUBLIC __declspec(dllexport)
 
@@ -16,7 +16,7 @@ EXTERN_C_START
 * @param[out] pOutInfo 返回json字符串
 * @return 0:成功 1:失败
  */
-DLL_PUBLIC int initCardInfo(const char* inJson, std::string& pOutInfo);
+	DLL_PUBLIC int initCardInfo(const char* inJson, std::string& pOutInfo);
 
 /**
 * @brief 申领卡信息校验
@@ -51,12 +51,35 @@ DLL_PUBLIC int saveCardSqListByGuardian(SD_SSCardInfo& info, std::string& pOutIn
 DLL_PUBLIC int queryCardZksqList(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
+* @brief 查询社保余额
+* @param[in] info 需要cardID,cardType,name,city,cardNum,chipNum
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int queryCardAccountBalance(SD_SSCardInfo& info, std::string& pOutInfo);
+
+/**
 * @brief 即时制卡预开户
 * @param[in] info 需要cardID,cardType,name,bankCode,operator,city
 * @param[out] pOutInfo 返回json字符串
 * @return 0:成功 1:失败
  */
+
 DLL_PUBLIC int saveCardOpen(SD_SSCardInfo& info, std::string& pOutInfo);
+/**
+* @brief 即时制卡预开户换卡，输入info，下为需要的info信息
+* @param[in]  info.cardID			有效证件号码
+* @param[in]  info.cardType			有效证件类型
+* @param[in]  info.name				姓名
+* @param[in]  info.systemType		系统类别 默认0
+* @param[in]  info.operator			经办人
+* @param[in]  info.city				行政区划代码
+* @param[in]  info.bankCode			银行编号
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int saveCardOpenHk(SD_SSCardInfo& info, std::string& pOutInfo);
+
 
 /**
 * @brief 制卡完成
@@ -66,6 +89,20 @@ DLL_PUBLIC int saveCardOpen(SD_SSCardInfo& info, std::string& pOutInfo);
  */
 DLL_PUBLIC int saveCardCompleted(SD_SSCardInfo& info, std::string& pOutInfo);
 
+/**
+* @brief 保存卡片交接到个人
+* @param[in] info 需要CardId,CardNum,Name,BankNodeNum,InterId,InterName,InterMobile,city,systemType,Operator
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int saveCardHandToGr(SD_SSCardInfo& info, std::string& pOutInfo);
+/**
+* @brief 查询领卡点信息
+* @param[in] info 需要city,systemType,bankCode
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int queryLkdInfoLov(SD_SSCardInfo& info, std::string& pOutInfo);
 /**
 * @brief 社保卡启用
 * @param[in] info 需要cardID,cardType,name,cardNum,bankCode,operator,city
@@ -88,7 +125,7 @@ DLL_PUBLIC int saveCardJrzhActive(SD_SSCardInfo& info, std::string& pOutInfo);
 * @param[out] pOutInfo 返回json字符串
 * @return 0:成功 1:失败
  */
-DLL_PUBLIC int queryCardInfoBySfzhm(SD_SSCardInfo& info, std::string& pOutInfo,string strStatustoQuery);
+DLL_PUBLIC int queryCardInfoBySfzhm(SD_SSCardInfo& info, std::string& pOutInfo, string strStatustoQuery);
 
 /**
 * @brief 社保卡临时挂失
@@ -171,6 +208,27 @@ DLL_PUBLIC int saveCardBhList(SD_SSCardInfo& info, std::string& pOutInfo);
 DLL_PUBLIC int saveCardBhk(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
+* @brief 保存更换银行换卡名单信息,输入info，下为需要的info信息
+* @param[in]  systemType		系统类别
+* @param[in]  cardID			有效证件号码
+* @param[in]  cardType			有效证件类型
+* @param[in]  name				姓名
+* @param[in]  cardNum			卡号
+* @param[in]  bankCode			新申请银行编号
+* @param[in]  oldBankCode		老银行编号
+* @param[in]  oldMagNum			老磁条账号
+* @param[in]  oldChipNum		老卡芯片号
+* @param[in]  getMethod			获取方式
+* @param[in]  operator			经办人
+* @param[in]  city				行政区划代码
+* @param[in]  phoneNum			手机号
+* @param[in]  OccupType			职业类别
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int saveCardHkGhyhList(SD_SSCardInfo& info, std::string& pOutInfo);
+
+/**
 * @brief 获取CA
 * @param[in]  name  姓名
 * @param[in]  cardID  身份证号
@@ -198,6 +256,15 @@ DLL_PUBLIC int checkAuthorizeInfo(SD_SSCardInfo& info, std::string& pOutInfo);
 * @return 0:成功 1:失败
  */
 DLL_PUBLIC int makeAuthorizeInfo(SD_SSCardInfo& info, std::string& pOutInfo);
+
+
+/**
+* @brief 修改个人基本信息
+* @param[in] info 需要cardID,cardType,name(前三项无法修改),sex,birthday, nation,address,mobile,operator,city,releaseDate,validDate,cardUnit,postcal,birthplace,PerAddr,RegAttr,Education,Marital,ContactsName,ContactsMobile
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int modifyPersonInfoByGuardian(SD_SSCardInfo& info, std::string& pOutInfo);
 
 #ifdef __cplusplus
 EXTERN_C_END

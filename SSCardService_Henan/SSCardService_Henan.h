@@ -881,7 +881,8 @@ public:
 		strJsonOut = jsonOut.ToString();
 		return nResult;
 	}
-
+	virtual int QueryLKId(string& strJsonIn, string& strJsonOut){}
+	virtual int handToPerson(string& strJsonIn, string& strJsonOut) {}
 	// 激活及后续收尾工作
 	// cardID,cardType,name,cardNum,bankCode,operator,city,magNum
 	virtual int ActiveCard(string& strJsonIn, string& strJsonOut)

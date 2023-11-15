@@ -46,6 +46,7 @@ public:
 	void	ShowGuardianWidget(bool bShow);
 	void	ClearGuardianInfo();
 	bool	LoadPersonInfo(QString strJson);
+	bool	LoadCurrentPerson();
 	void	SavePersonInfo();
 	bool	eventFilter(QObject* watched, QEvent* event) override;
 	void	ClearInfo();

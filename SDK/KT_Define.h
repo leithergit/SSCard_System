@@ -168,15 +168,51 @@ struct SD_SSCardInfo
 	string strPhoto;			//相片
 	string strAuthorizeTime;	//授权时间
 	string strAuthorizeType;	//授权类型
+	string strGetCardMethod = "0";	//领卡方式(默认0，0自取，1邮寄)
+	string strApplicationInfoID;	//材料ID
+	string strAPPlicationID;		//制卡申请流水号
+	string strSuccessFlag;			//成功标识
+	string strFailedReason;			//失败原因
+	string strTransAmount;			//转账金额
+	string strSystemType = "26";	//系统类别 默认 26, 26便携机，02银行
+	string strCancelReason;			//注销原因
+	string strFinancialAccCancel;	//金融账号是否注销 "0"未注销，"1"注销
+	string strPostName;				//邮寄收卡人
+	string strPostPhoneNum;			//邮寄手机号码
+	string strPostAddr;				//邮寄地址
+	string strPostCardID;			//邮寄人证件号码
+	string strPostRegion;			//邮寄人所在省份
+	string strPostCity;				//邮寄人所在城市
+	string strPostCompany;			//邮寄公司
+	string strPostTracingNum;		//邮寄单号
+	string strPostDistrict;		//邮寄人所在区、县
+	string strOldCardNum;		// 旧卡号
+	string strOldBankNum;		// 
+	string strOldBankCode;		// 旧卡银行代码
+	string strOldChipestNum;	// 旧卡芯片号
+	string strOldMagNum;		// 旧磁条账号
+	string strBankNodeCode;		//银行网点编号
+	string strInterName;		//交接人姓名
+	string strInterMobile;		//交接人联系方式
+	string strInterId;			//交接人身份证号
+	string strBankNodeName;		//银行网点名称
+	string strBalanceYuan;		//卡余额（元）
+	string strBalanceFen;		//卡余额（分）
+	string strGuardianReleaseDate; //监护人证件起始日期
+	string strGuardianValidDate;	//监护人终止日期
+	string strGuardianAgency;		//监护人发证机关
+	string strGuardianSex;			//监护人性别
+	string strGuardianMobile;		//监护人联系电话
+	string strNationality;			//国籍
 	list<string> listAuthorizeData;	//授权数据
 };
 //山东济宁卡信息
 struct SSCardInfo_JiNing :public SD_SSCardInfo
 {
-	string strOldCardNum;		// 旧卡号
-	string strOldBankNum;		// 
-	string strOldBankCode;		// 旧卡银行代码
-	string strOldChipestNum;	// 旧卡芯片号
+	//string strOldCardNum;		// 旧卡号
+	//string strOldBankNum;		// 
+	//string strOldBankCode;		// 旧卡银行代码
+	//string strOldChipestNum;	// 旧卡芯片号
 	string strIssuedSite;		// 领取地点
 	string strMakeCardFlag;		// 即制卡标识,需要即时制卡则传递1，否则为0
 	string strCardFront;		// 身份证正面

@@ -31,6 +31,22 @@ qu_ModifyInfo::qu_ModifyInfo(QLabel* pTitle, QString strStepImage, Page_Index nI
 	{
 		ui->comboBox_Nationality->addItem(var.strNationalty.c_str(), var.strCode.c_str());
 	}
+	for (auto var : g_vecHukouCode)
+	{
+		ui->comboBox_Hukou_Attr->addItem(var.strHukou.c_str(), var.strCode.c_str());
+	}
+	for (auto var : g_vecEducationCode)
+	{
+		ui->comboBox_Education->addItem(var.strEducationLevel.c_str(), var.strCode.c_str());
+	}
+	for (auto var : g_vecMarriageCode)
+	{
+		ui->comboBox_Marriage->addItem(var.strMarriage.c_str(), var.strCode.c_str());
+	}
+	for (auto var : g_vecGuojiCode)
+	{
+		ui->comboBox_Guoji->addItem(var.strGuoji.c_str(), var.strCode.c_str());
+	}
 
 	pButtonGrp = new QButtonGroup(this);
 	pButtonGrp->addButton(ui->radioButton_Male, 0);
@@ -354,14 +370,163 @@ int qu_ModifyInfo::ProcessBussiness()
 	{
 		pMainWind->pLastStackPage->ResetTimer(true, this);
 	}
+	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+	SSCardBaseInfoPtr  pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	ResetPage();
-
+	QString strMessage{ "" };
+	SSCardService* pService = nullptr;
+	int nIndex = 0;
 	if (g_pDataCenter->GetIDCardInfo())
 	{
-		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
+		gInfo() << __FUNCTION__ << __LINE__;
+		if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage)))
+		{
+			gInfo() << "open Service failed!";
+			return 0;
+		}
+			
+		CJsonObject jsonIn;
+		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
+		jsonIn.Add("Name", pSSCardInfo->strName);
+		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+		string strJsonIn = jsonIn.ToString();
+		string strJsonOut;
+		string strCommand = "QueryPersonInfo";
+		if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+		{
+			CJsonObject jsonOut(strJsonOut);
+			string strText;
+			int nErrCode = -1;
+			jsonOut.Get("Result", nErrCode);
+			jsonOut.Get("Message", strText);
+			strMessage = QString("获取信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			gInfo() << strMessage.toStdString();
+			return 0;
+		}
+		CJsonObject jsonOut(strJsonOut);
+		//性别
+		std::string strGender;
+		jsonOut.Get("Gender",strGender);
+		if (strGender == "1")
+			ui->radioButton_Male->setChecked(true);
+		else
+			ui->radioButton_Female->setChecked(true);
+		//证件有效期
+		std::string strValidDate{};
+		std::string strReleaseDate{};
+		jsonOut.Get("PaperIssuedDate", strReleaseDate);
+		ui->dateEdit_Issued->setDateTime(QDateTime::fromString(QString::fromStdString(strReleaseDate), "yyyyMMdd"));
+		jsonOut.Get("PaperExpireDate", strValidDate);
+		ui->dateEdit_Expired->setDateTime(QDateTime::fromString(QString::fromStdString(strValidDate), "yyyyMMdd"));
+		//生日
+		std::string strBirthday;
+		jsonOut.Get("Birthday", strBirthday);
+		ui->dateEdit_Birthday->setDateTime(QDateTime::fromString(QString::fromStdString(strBirthday), "yyyyMMdd"));
+		//手机号码
+		std::string strPhoneNum;
+		jsonOut.Get("Mobile", strPhoneNum);
+		ui->lineEdit_GuardianMobile->setText(QString::fromStdString(strPhoneNum));
+		//发证机关
+		std::string strCardAgency;
+		jsonOut.Get("CardAgency", strCardAgency);
+		ui->lineEdit_Card_Agency->setText(QString::fromLocal8Bit(strCardAgency.c_str()));
+		//出生地
+		std::string strBirthPlace;
+		jsonOut.Get("BirthPlace", strBirthPlace);
+		ui->lineEdit_BirthPlace->setText(QString::fromLocal8Bit(strBirthPlace.c_str()));
+		//户籍所在地
+		std::string strHujiPlace;
+		jsonOut.Get("HujiPlace", strHujiPlace);
+		ui->lineEdit_Huji_Place->setText(QString::fromLocal8Bit(strHujiPlace.c_str()));
+		//通讯地址
+		std::string strAddress;
+		jsonOut.Get("Address", strAddress);
+		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit(strAddress.c_str()));
+		//联系人姓名
+		std::string strContactsName;
+		jsonOut.Get("ContactsName", strContactsName);
+		ui->lineEdit_Contact_Person_Name->setText(QString::fromLocal8Bit(strContactsName.c_str()));
+		//联系人电话
+		std::string strContactsPhone;
+		jsonOut.Get("ContactsPhone", strContactsPhone);
+		ui->lineEdit_Contact_Person_Phone->setText(QString::fromStdString(strContactsPhone));
+		//邮政编码
+		std::string strPostalCode ;
+		jsonOut.Get("PostalCode", strPostalCode);
+		ui->lineEdit_PostalCode->setText(QString::fromStdString(strPostalCode));
+
+		//民族
+		std::string strNationality;
+		jsonOut.Get("Nation", strNationality);
+		strNationality += "族";
+		nIndex = ui->comboBox_Nationality->findText(QString::fromStdString(strNationality));
+		if (nIndex != -1)
+			ui->comboBox_Nationality->setCurrentIndex(nIndex);
+
+		//户口性质
+		std::string strHukou;
+		jsonOut.Get("HuKou", strHukou);
+		nIndex = ui->comboBox_Hukou_Attr->findData(QString::fromStdString(strHukou));
+		if (nIndex != -1)
+			ui->comboBox_Hukou_Attr->setCurrentIndex(nIndex);
+
+		//文化程度
+		std::string strEducation;
+		jsonOut.Get("Education", strEducation);
+		nIndex = ui->comboBox_Education->findData(QString::fromStdString(strHukou));
+		if (nIndex != -1)
+			ui->comboBox_Education->setCurrentIndex(nIndex);
+
+		//国籍
+		std::string strGuoji;
+		jsonOut.Get("Guoji", strGuoji);
+		nIndex = ui->comboBox_Guoji->findData(QString::fromStdString(strGuoji));
+		if (nIndex != -1)
+			ui->comboBox_Guoji->setCurrentIndex(nIndex);
+
+		//婚姻状况
+		std::string strMarital;
+		jsonOut.Get("Marital", strMarital);
+		nIndex = ui->comboBox_Marriage->findData(QString::fromStdString(strMarital));
+		if (nIndex != -1)
+			ui->comboBox_Marriage->setCurrentIndex(nIndex);
+
+		int age = GetAge(strBirthday);
+		
+		if (age > 0 && age <= 16)
+		{
+			//监护人相关信息
+			ui->checkBox_Agency->setChecked(true);
+			g_pDataCenter->bGuardian = true;
+			ShowGuardianWidget(true);
+
+			std::string guardianName;
+			jsonOut.Get("GuardianName", guardianName);
+			ui->lineEdit_Guardian->setText(QString::fromLocal8Bit(guardianName.c_str()));
+			std::string guardianID;
+			jsonOut.Get("GuardianID", guardianID);
+			ui->lineEdit_GuardianCardID->setText(QString::fromStdString(guardianID));
+
+			std::string strGuardianValidDate{};
+			std::string strGuardianReleaseDate{};
+			jsonOut.Get("GuardianIssuedDate", strGuardianReleaseDate);
+			ui->dateEdit_Issued_2->setDateTime(QDateTime::fromString(QString::fromStdString(strGuardianReleaseDate), "yyyyMMdd"));
+			jsonOut.Get("GuardianExpireDate", strGuardianValidDate);
+			ui->dateEdit_Expired_2->setDateTime(QDateTime::fromString(QString::fromStdString(strGuardianValidDate), "yyyyMMdd"));
+
+			std::string strGuardianGender;
+			jsonOut.Get("GuardianSex", strGuardianGender);
+			if (strGuardianGender == "1")
+				ui->radioButton_Male_2->setChecked(true);
+			else
+				ui->radioButton_Female_2->setChecked(true);
+		}
+
+
+		//IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
 		ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
-		QString strGender = QString::fromLocal8Bit((char*)pIDCard->szGender);
+		/*QString strGender = QString::fromLocal8Bit((char*)pIDCard->szGender);
 		if (strGender == "男")
 			ui->radioButton_Male->setChecked(true);
 		else
@@ -374,27 +539,27 @@ int qu_ModifyInfo::ProcessBussiness()
 		QString strNationalty = QString::fromLocal8Bit((char*)pIDCard->szNationalty) + "族";
 		int nIndex = ui->comboBox_Nationality->findText(strNationalty);
 		if (nIndex != -1)
-			ui->comboBox_Nationality->setCurrentIndex(nIndex);
+			ui->comboBox_Nationality->setCurrentIndex(nIndex);*/
 	}
-	QString strAppPath = qApp->applicationDirPath();
-	QString path = strAppPath + "/data";
-	QDirIterator iter(path, QStringList() << "Person*.json", QDir::Files | QDir::NoSymLinks);
-	QStringList strNameList;
-	while (iter.hasNext())
-	{
-		iter.next();
-		qDebug() << "fileName:" << iter.fileName();  // 只有文件名
-		qDebug() << "filePath:" << iter.filePath();  //包含文件名的文件的全路径
+	//QString strAppPath = qApp->applicationDirPath();
+	//QString path = strAppPath + "/data";
+	//QDirIterator iter(path, QStringList() << "Person*.json", QDir::Files | QDir::NoSymLinks);
+	//QStringList strNameList;
+	//while (iter.hasNext())
+	//{
+	//	iter.next();
+	//	qDebug() << "fileName:" << iter.fileName();  // 只有文件名
+	//	qDebug() << "filePath:" << iter.filePath();  //包含文件名的文件的全路径
 
-		QString strAbsoluteFilePath = iter.filePath();
-		QString strName;
-		if (GetPersonName(strAbsoluteFilePath, strName))
-		{
-			strNameList << strName;
-			auto [it, Inserted] = mapPersonFile.try_emplace(strName, strAbsoluteFilePath);
-		}
-	}
-	pCompleter->setModel(new QStringListModel(strNameList, pCompleter));
+	//	QString strAbsoluteFilePath = iter.filePath();
+	//	QString strName;
+	//	if (GetPersonName(strAbsoluteFilePath, strName))
+	//	{
+	//		strNameList << strName;
+	//		auto [it, Inserted] = mapPersonFile.try_emplace(strName, strAbsoluteFilePath);
+	//	}
+	//}
+	//pCompleter->setModel(new QStringListModel(strNameList, pCompleter));
 	return 0;
 }
 
@@ -1262,38 +1427,178 @@ void qu_ModifyInfo::on_pushButton_OK_clicked()
 			jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 			jsonIn.Add("Name", pSSCardInfo->strName);
 			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
-			string strJsonIn = jsonIn.ToString();
+			string strJsonIn;
 			string strJsonOut;
-			string strCommand = "QueryPersonInfo";
-			if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+			string strCommand;
+			//string strCommand = "QueryPersonInfo";
+			//if (QFailed(pService->SetExtraInterface(strCommand, strJsonIn, strJsonOut)))
+			//{
+			//	CJsonObject jsonOut(strJsonOut);
+			//	string strText;
+			//	int nErrCode = -1;
+			//	jsonOut.Get("Result", nErrCode);
+			//	jsonOut.Get("Message", strText);
+			//	strMessage = QString("获取信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+			//	break;
+			//}
+			string systemType;
+#ifdef DESKTOP_CLIENT__
+			systemType = "02";
+#else
+			systemType = "26";
+#endif
+			jsonIn.Add("SystemType", systemType.c_str());
+			if (ui->radioButton_Male->isChecked())
 			{
-				CJsonObject jsonOut(strJsonOut);
-				string strText;
-				int nErrCode = -1;
-				jsonOut.Get("Result", nErrCode);
-				jsonOut.Get("Message", strText);
-				strMessage = QString("获取信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+				jsonIn.Add("Sex", "1");
+			}
+			else
+			{
+				jsonIn.Add("Sex", "2");
+			}
+			string birthDay = ui->dateEdit_Birthday->dateTime().toString("yyyyMMdd").toLocal8Bit();
+			if (birthDay.empty())
+			{
+				strMessage = "生日不能为空";
 				break;
 			}
+			else
+			{
+				jsonIn.Add("Birthday", birthDay.c_str());
+			}
+			
+			string  CardAgency = ui->lineEdit_Card_Agency->text().toLocal8Bit();
+			if (CardAgency.empty())
+			{
+				strMessage = "发证机关不能为空";
+				break;
+			}
+			else
+			{
+				jsonIn.Add("CardAgency", CardAgency.c_str());
+			}
+
+			string  birthPlace = ui->label_BirthPlace->text().toLocal8Bit();
+			if (birthPlace.empty())
+			{
+				strMessage = "出生地不能为空";
+				break;
+			}
+			else
+			{
+				jsonIn.Add("BirthPlace", birthPlace.c_str());
+			}
+
+			string  huJi = ui->lineEdit_Huji_Place->text().toLocal8Bit();
+			if (huJi.empty())
+			{
+				strMessage = "户籍所在地不能为空";
+				break;
+			}
+			else
+			{
+				jsonIn.Add("HuJi", huJi.c_str());
+			}
+
+			string  ContactsName = ui->lineEdit_Contact_Person_Name->text().toLocal8Bit();
+			if (ContactsName.empty())
+			{
+				strMessage = "联系人姓名不能为空";
+				break;
+			}
+			else
+			{
+				jsonIn.Add("ContactsName", ContactsName.c_str());
+			}
+
+			string  ContactsPhone = ui->lineEdit_Contact_Person_Phone->text().toLocal8Bit();
+			if (ContactsPhone.empty())
+			{
+				strMessage = "联系人电话不能为空";
+				break;
+			}
+			else
+			{
+				jsonIn.Add("ContactsPhone", ContactsPhone.c_str());
+			}
+
+			string  PoatalCode = ui->lineEdit_Contact_Person_Phone->text().toLocal8Bit();
+			if (PoatalCode.empty())
+			{
+				strMessage = "邮政编码不能为空";
+				break;
+			}
+			else
+			{
+				jsonIn.Add("PoatalCode", PoatalCode.c_str());
+			}
+
+			string  CareerCode = ui->comboBox_Career->currentData().toString().toStdString();
+			jsonIn.Add("Career", PoatalCode.c_str());
+
+			string  eductionCode = ui->comboBox_Education->currentData().toString().toStdString();
+			jsonIn.Add("Education", eductionCode.c_str());
+
+			string  hukouAttr = ui->comboBox_Hukou_Attr->currentData().toString().toStdString();
+			jsonIn.Add("HukouAttr", hukouAttr.c_str());
+
+			string  marriage = ui->comboBox_Marriage->currentData().toString().toStdString();
+			jsonIn.Add("Marriage", marriage.c_str());
+
+			string  guoji = ui->comboBox_Guoji->currentData().toString().toStdString();
+			jsonIn.Add("Guoji", guoji.c_str());
+
+			string  Minzu  = ui->comboBox_Nationality->currentData().toString().toStdString();
+			jsonIn.Add("Nation", Minzu.c_str());
+
+			//修改证件有效期
 			string releaseDate = ui->dateEdit_Issued->dateTime().toString("yyyyMMdd").toStdString();
 			string validDate = ui->dateEdit_Expired->dateTime().toString("yyyyMMdd").toStdString();
-			jsonIn.Clear();
-			jsonIn(strJsonOut);
-			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
-			//修改证件有效期
 			jsonIn.Add("ReleaseDate", releaseDate.c_str());
 			jsonIn.Add("ValidDate", validDate.c_str());
 
 			//修改电话
 			jsonIn.Add("Mobile", ui->lineEdit_GuardianMobile->text().toStdString());
 			//修改地址
-			jsonIn.Add("Address", ui->plainTextEdit_Address->toPlainText().toStdString());
+			QString address = ui->plainTextEdit_Address->toPlainText();
+			jsonIn.Add("Address", address.toLocal8Bit().constData());
+
+			jsonIn.Add("jbr", "金乔炜煜制卡软件");
 			if (g_pDataCenter->bGuardian)
 			{
 				string guardianReleaseDate = ui->dateEdit_Issued_2->dateTime().toString("yyyyMMdd").toStdString();
 				string guardianValidDate = ui->dateEdit_Expired_2->dateTime().toString("yyyyMMdd").toStdString();
 				jsonIn.Add("GuardianReleaseDate", guardianReleaseDate.c_str());
 				jsonIn.Add("GuardianValidDate", guardianValidDate.c_str());
+
+				string  guardianName = ui->lineEdit_Guardian->text().toLocal8Bit();
+				if (guardianName.empty())
+				{
+					strMessage = "监护人姓名不能为空";
+					break;
+				}
+				else
+				{
+					jsonIn.Add("GuardianName", guardianName.c_str());
+				}
+				string  guardianId= ui->lineEdit_GuardianCardID->text().toLocal8Bit();
+				if (guardianId.empty())
+				{
+					strMessage = "监护人身份证号不能为空";
+					break;
+				}
+				else
+				{
+					jsonIn.Add("GuardianId", guardianId.c_str());
+				}
+				if (ui->radioButton_Male_2->isChecked())
+				{
+					jsonIn.Add("GuardianSex", "1");
+				}
+				else
+				{
+					jsonIn.Add("GuardianSex", "2");
+				}
 			}
 
 			strJsonIn = jsonIn.ToString();

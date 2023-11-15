@@ -150,10 +150,10 @@ enum Page_Index
 	Page_ChangeSSCardPWD,			// 修改社保卡密码	
 	Page_RegisterLost,				// 挂失/解挂
 	Page_CommitNewInfo,				// 提交新办卡信息
-	Page_QueryInformation,			// 信息查询
-	Page_AdforFinance,				// 开通金融页面
+	Page_QueryInformation,			// 信息查询	
 	Page_Succeed,					// 操作成功
-	Page_ModifyInfo					// 修改个人信息
+	Page_ModifyInfo,				// 修改个人信息
+	Page_AdforFinance				// 开通金融页面
 };
 
 #define  Switch2Page(x)	(x - Page_ReaderIDCard + Switch_NextPage - 1)
@@ -892,6 +892,30 @@ struct NationaltyCode
 	string strNationalty;
 };
 
+struct HukouCode
+{
+	string strCode;
+	string strHukou;
+};
+
+struct EductionCode
+{
+	string  strCode;
+	string	strEducationLevel;
+};
+
+struct MarrageCode
+{
+	string strCode;
+	string strMarriage;
+};
+
+struct GuojiCode
+{
+	string strCode;
+	string strGuoji;
+};
+
 using ReadIDCard_CallBack = std::function<void(QWidget* pWidget, IDCardInfo* pIDCard)>;
 
 class DataCenter
@@ -1167,7 +1191,10 @@ private:
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
 extern vector<NationaltyCode> g_vecNationCode;
-
+extern vector<HukouCode> g_vecHukouCode;
+extern vector<EductionCode> g_vecEducationCode;
+extern vector<MarrageCode> g_vecMarriageCode;
+extern vector<GuojiCode> g_vecGuojiCode;
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
 
 class QWaitCursor

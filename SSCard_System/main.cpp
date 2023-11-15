@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
 			QMessageBox_CN(QMessageBox::Critical, "提示", "初始化打印机超时,请检查打印机是否已正常连接!", QMessageBox::Ok, &WaitingUI);
 			return 0;
 		}
-		//桌面版适用期
+		//桌面版
 		QDateTime current = QDateTime::currentDateTime();
 		QDateTime deadline(QDate(2024, 2, 1));
 		if (current > deadline)

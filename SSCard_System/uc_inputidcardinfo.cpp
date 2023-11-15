@@ -1367,21 +1367,21 @@ void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
 	g_pDataCenter->bGuardian = bChecked;
 	//桌面版注释
 
-	/*if (bChecked)
-	{
+	//if (bChecked)
+	//{
 
-		StartDetect();
-		pDialogReadIDCard = new Sys_DialogReadIDCard("请刷监护人身份证");
-		if (pDialogReadIDCard->exec() != QDialog::Accepted)
-		{
-			ui->checkBox_Agency->setChecked(false);
-			ShowGuardianWidget(false);
-			g_pDataCenter->bGuardian = false;
-		}
-		delete pDialogReadIDCard;
-		pDialogReadIDCard = nullptr;
-		StopDetect();
-	}*/
+	//	StartDetect();
+	//	pDialogReadIDCard = new Sys_DialogReadIDCard("请刷监护人身份证");
+	//	if (pDialogReadIDCard->exec() != QDialog::Accepted)
+	//	{
+	//		ui->checkBox_Agency->setChecked(false);
+	//		ShowGuardianWidget(false);
+	//		g_pDataCenter->bGuardian = false;
+	//	}
+	//	delete pDialogReadIDCard;
+	//	pDialogReadIDCard = nullptr;
+	//	StopDetect();
+	//}
 }
 
 void uc_InputIDCardInfo::on_Name_textChanged(const QString& arg1)

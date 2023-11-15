@@ -13,6 +13,7 @@
 #include <QXmlStreamWriter>
 #include <list>
 #include <string>
+#include <vector>
 #include "Gloabal.h"
 #include "Utility.h"
 #pragma comment(lib,"libssl.lib")
@@ -442,6 +443,118 @@ bool GetHardwareCode2(std::string& strMachineCode)
 	return true;
 }
 
+bool CheckLocalLicense3(DWORD dwSoftCode)
+{
+	std::string strSN;
+	const std::string avanSN[]
+	{
+		"Z7Y02513",
+		"Z0511628",
+		"Z0Z13293",
+		"Z0Z13294",
+		"Z0Z13296",
+		"Z0Z13298",
+		"Z1213957",
+		"Z1213958",
+		"Z1213959",
+		"Z1213960",
+		"Z1213961",
+		"Z1213963",
+		"Z1213964",
+		"Z1214004",
+		"Z1214021",
+		"Z1214022",
+		"Z1214023",
+		"Z1214024",
+		"Z1214025",
+		"Z1214026",
+		"Z1214027",
+		"Z1313962",
+		"Z1314260",
+		"Z1314261",
+		"Z1314262",
+		"Z1314263",
+		"Z1314264",
+		"Z1314265",
+		"Z1314266",
+		"Z1314267",
+		"Z1314369",
+		"Z1314376",
+		"Z1314482",
+		"Z1314486",
+		"Z1314487",
+		"Z1314488",
+		"Z1314501",
+		"Z1314502",
+		"Z1314503",
+		"Z1314504",
+		"Z1314505",
+		"Z1314506",
+		"Z1314507",
+		"Z1314509",
+		"Z1314542",
+		"Z1314549",
+		"Z1314550",
+		"Z1314551",
+		"Z1314552",
+		"Z1314554",
+		"Z1314555",
+		"Z1314557",
+		"Z1314628",
+		"Z1314629",
+		"Z1314630",
+		"Z1314631",
+		"Z1414785",
+		"Z1414786",
+		"Z1414787",
+		"Z1414788",
+		"Z1415073",
+		"Z1415074",
+		"Z1415075",
+		"Z1415076",
+		"Z1815914",
+		"Z1815917",
+		"Z1815918",
+		"Z1815919",
+		"Z9X10541"
+	};
+	if (!GetHardwareCode3(strSN))
+	{
+		return false;
+	}
+	for (const std::string& code : avanSN)
+	{
+		//LOG(INFO) << code;
+		if (strSN == code)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool GetHardwareCode3(std::string& strMachineCode)
+{
+	if (!g_pDataCenter)
+		return false;
+	QString strMessage;
+	if (g_pDataCenter->OpenPrinter(strMessage))
+	{
+		gInfo() << gQStr(strMessage);
+		return false;
+	}
+	char szResult[1024] = { 0 };
+	if (g_pDataCenter->GetPrinter()->Printer_ExtraCommand("Rsn", szResult))
+	{
+		gInfo() << QString("发送命令Rsn失败:%1").arg(szResult).toLocal8Bit().data();
+		return false;
+	}
+	
+	strMachineCode = szResult;
+	LOG(INFO) << "Avansia SN:" << strMachineCode;
+	return true;
+}
+
 std::string DecryptRSAKey(const char* szKey, const std::string& strData)
 {
 	if (strData.empty())
@@ -494,6 +607,8 @@ bool CheckLocalLicense(DWORD dwSoftCode)
 	if (CheckLocalLicense1(dwSoftCode))
 		return true;
 	else if (CheckLocalLicense2(dwSoftCode))
+		return true;
+	else if (CheckLocalLicense3(dwSoftCode))
 		return true;
 	else
 		return false;

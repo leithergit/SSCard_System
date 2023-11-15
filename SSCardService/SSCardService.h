@@ -9,6 +9,7 @@ enum class ServiceType
 	Service_ReplaceCard,
 	Service_RegisterLost,
 	Service_QueryInformation,
+	Service_ReplaceCardSwitchBank,
 };
 
 enum class PayResult
@@ -106,6 +107,7 @@ class SSCardService
 {
 protected:
 	ServiceType nServiceType;
+	bool isSwitchBank;
 public:
 	SSCardService()
 	{}
@@ -115,6 +117,8 @@ public:
 	//}
 
 	virtual int SetServiceType(ServiceType nSvrType, string& strIdentity) = 0;
+
+	virtual int SetSwitchBank(bool) = 0;
 
 	virtual int Initialize(string& szJson, string& szOut) = 0;
 
@@ -130,7 +134,9 @@ public:
 
 	// 查询卡信息
 	virtual int QueryCardInfo(string& strJsonIn, string& strJsonOut) = 0;
-
+	virtual int QueryCardInfo0(string& strJsonIn, string& strJsonOut) = 0;
+	virtual int QueryCardInfo2(string& strJsonIn, string& strJsonOut) = 0;
+	virtual int QueryCardInfoAll(string& strJsonIn, string& strJsonOut) = 0;
 	// 提交制卡人信息
 	virtual int CommitPersonInfo(string& strJsonIn, string& strJsonOut) = 0;
 
@@ -158,6 +164,12 @@ public:
 	// 正式挂失/解挂
 	virtual int RegisterLost(string& strJsonIn, string& strJsonOut, int nOperation = 0) = 0;
 
+	//查询余额
+	virtual int QueryCardBalance(string& strJsonIn, string& strJsonOut) = 0;
+
+	//获取卡信息
+	virtual int getCardInfo(string& strJsonIn, string& strJsonOut) = 0;
+
 	virtual int LoadCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) = 0;
 
 	virtual int SaveCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) = 0;
@@ -169,4 +181,10 @@ public:
 	virtual int GetCA(string& strJsonIn, string& strJsonout) = 0;
 
 	virtual int GetPersonInfoFromStage(string& strJsonout) = 0;
+
+	virtual int QueryLKId(string& strJsonIn, string& strJsonOut) = 0;
+
+	virtual int handToPerson(string& strJsonIn, string& strJsonOut) = 0;
+
+	virtual int PreMakeCardHk(string& strJsonIn, string& strJsonOut) = 0;
 };

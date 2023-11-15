@@ -7,6 +7,7 @@
 #include <process.h>
 #include <TCHAR.H>
 #include <string>
+#include <vector>
 using namespace std;
 
 #define Code_License		1048577
@@ -26,5 +27,10 @@ bool GetHardwareCode1(std::string& strMachineCode);
 // 基于打印机序列号的授权检查
 bool CheckLocalLicense2(DWORD dwSoftCode);
 bool GetHardwareCode2(std::string& strMachineCode);
+
+//基于avansia sn码的授权检查
+bool CheckLocalLicense3(DWORD dwSoftCode);
+bool GetHardwareCode3(std::string& strMachineCode);
+
 
 #endif // MAGOLICENSE_H

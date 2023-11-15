@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1418</width>
+    <width>1302</width>
     <height>821</height>
    </rect>
   </property>
@@ -45,19 +45,19 @@
                <property name="minimumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -75,20 +75,20 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>300</width>
-                 <height>40</height>
+                 <width>200</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>300</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="readOnly">
@@ -101,19 +101,19 @@
                <property name="minimumSize">
                 <size>
                  <width>100</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>100</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -137,19 +137,19 @@
                  <property name="minimumSize">
                   <size>
                    <width>100</width>
-                   <height>40</height>
+                   <height>30</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>40</height>
+                   <height>30</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
                    <family>思源黑体 CN Medium</family>
-                   <pointsize>16</pointsize>
+                   <pointsize>12</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -191,19 +191,19 @@ QRadioButton::indicator::checked {
                  <property name="minimumSize">
                   <size>
                    <width>100</width>
-                   <height>40</height>
+                   <height>30</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>40</height>
+                   <height>30</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
                    <family>思源黑体 CN Medium</family>
-                   <pointsize>16</pointsize>
+                   <pointsize>12</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -256,19 +256,19 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>210</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>210</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -295,25 +295,25 @@ QRadioButton::indicator::checked {
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,1,0">
+            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0,0">
              <item>
               <widget class="QLabel" name="label_IDCard">
                <property name="minimumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -332,19 +332,19 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>500</width>
-                 <height>0</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>500</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="maxLength">
@@ -356,55 +356,62 @@ QRadioButton::indicator::checked {
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_Nation">
+              <widget class="QLabel" name="label_BirthDay">
                <property name="minimumSize">
                 <size>
-                 <width>120</width>
-                 <height>40</height>
+                 <width>80</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>120</width>
-                 <height>16777215</height>
+                 <width>80</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
                 <string notr="true"/>
                </property>
                <property name="text">
-                <string>民族</string>
+                <string>出生日期</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="comboBox_Nationality">
+              <widget class="QDateEdit" name="dateEdit_Birthday">
                <property name="minimumSize">
                 <size>
-                 <width>200</width>
-                 <height>40</height>
+                 <width>120</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>290</width>
-                 <height>40</height>
+                 <width>120</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
-               <property name="styleSheet">
-                <string notr="true"/>
+               <property name="dateTime">
+                <datetime>
+                 <hour>8</hour>
+                 <minute>0</minute>
+                 <second>0</second>
+                 <year>2000</year>
+                 <month>12</month>
+                 <day>30</day>
+                </datetime>
                </property>
               </widget>
              </item>
@@ -445,19 +452,19 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -472,20 +479,20 @@ QRadioButton::indicator::checked {
               <widget class="QDateEdit" name="dateEdit_Issued">
                <property name="minimumSize">
                 <size>
-                 <width>150</width>
-                 <height>40</height>
+                 <width>120</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>300</width>
-                 <height>40</height>
+                 <width>120</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="dateTime">
@@ -523,20 +530,20 @@ QRadioButton::indicator::checked {
               <widget class="QDateEdit" name="dateEdit_Expired">
                <property name="minimumSize">
                 <size>
-                 <width>150</width>
-                 <height>40</height>
+                 <width>120</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>300</width>
-                 <height>40</height>
+                 <width>120</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="dateTime">
@@ -555,20 +562,20 @@ QRadioButton::indicator::checked {
               <widget class="QLabel" name="label_GuardianMobile">
                <property name="minimumSize">
                 <size>
-                 <width>160</width>
-                 <height>40</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>160</width>
-                 <height>16777215</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -584,19 +591,19 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>200</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>300</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -629,19 +636,19 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>120</width>
-                 <height>40</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -656,20 +663,20 @@ QRadioButton::indicator::checked {
               <widget class="QComboBox" name="comboBox_Career">
                <property name="minimumSize">
                 <size>
-                 <width>700</width>
-                 <height>40</height>
+                 <width>400</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>500</width>
-                 <height>40</height>
+                 <width>400</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -678,7 +685,192 @@ QRadioButton::indicator::checked {
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="label_Agency">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>发证机关</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_Card_Agency">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>300</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <spacer name="horizontalSpacer_14">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QLabel" name="label_BirthPlace">
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>60</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>出生地</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_BirthPlace">
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>300</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lable_Huji_Place">
+               <property name="minimumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>户籍所在地</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_Huji_Place">
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>300</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_5">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -711,7 +903,7 @@ QRadioButton::indicator::checked {
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -727,19 +919,19 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>700</width>
-                 <height>100</height>
+                 <height>80</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>120</height>
+                 <height>80</height>
                 </size>
                </property>
                <property name="font">
                 <font>
                  <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
+                 <pointsize>12</pointsize>
                 </font>
                </property>
                <property name="verticalScrollBarPolicy">
@@ -752,6 +944,473 @@ QRadioButton::indicator::checked {
              </item>
              <item>
               <spacer name="horizontalSpacer_10">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="lable_Hukou_Attr">
+               <property name="minimumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>户口性质</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_Hukou_Attr">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lable_Eductaion">
+               <property name="minimumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>文化程度</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_Education">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_Nation">
+               <property name="minimumSize">
+                <size>
+                 <width>40</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>40</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>民族</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_Nationality">
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_Nation_2">
+               <property name="minimumSize">
+                <size>
+                 <width>40</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>40</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>国籍</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_Guoji">
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_Marriage">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>婚姻状况</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_Marriage">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QLabel" name="label_ContactPersonName">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>联系人姓名</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_Contact_Person_Name">
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>150</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_ContactPersonPhone">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>联系人电话</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_Contact_Person_Phone">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>300</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lable_Postal_Code">
+               <property name="minimumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>邮政编码</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_PostalCode">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>思源黑体 CN Medium</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_12">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -803,19 +1462,19 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>120</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>120</width>
-               <height>16777215</height>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="styleSheet">
@@ -831,19 +1490,19 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>250</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>300</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="readOnly">
@@ -856,19 +1515,19 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>180</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>160</width>
-               <height>16777215</height>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="styleSheet">
@@ -883,20 +1542,20 @@ QRadioButton::indicator::checked {
             <widget class="QDateEdit" name="dateEdit_Issued_2">
              <property name="minimumSize">
               <size>
-               <width>150</width>
-               <height>40</height>
+               <width>120</width>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>300</width>
-               <height>40</height>
+               <width>120</width>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="dateTime">
@@ -934,20 +1593,20 @@ QRadioButton::indicator::checked {
             <widget class="QDateEdit" name="dateEdit_Expired_2">
              <property name="minimumSize">
               <size>
-               <width>150</width>
-               <height>40</height>
+               <width>120</width>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>300</width>
-               <height>40</height>
+               <width>120</width>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="dateTime">
@@ -997,26 +1656,26 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>120</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>120</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="styleSheet">
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>监护人证件</string>
+              <string>监护人证件号码</string>
              </property>
             </widget>
            </item>
@@ -1025,19 +1684,19 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>500</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>500</width>
-               <height>40</height>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="maxLength">
@@ -1074,137 +1733,154 @@ QRadioButton::indicator::checked {
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="label_Gender_2">
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QLabel" name="label_Gender_2">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>120</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>思源黑体 CN Medium</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>监护人性别</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="radioButton_Male_2">
              <property name="minimumSize">
               <size>
-               <width>120</width>
-               <height>40</height>
+               <width>100</width>
+               <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>120</width>
-               <height>40</height>
+               <width>16777215</width>
+               <height>30</height>
               </size>
              </property>
              <property name="font">
               <font>
                <family>思源黑体 CN Medium</family>
-               <pointsize>16</pointsize>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true"/>
+              <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
              </property>
              <property name="text">
-              <string>监护人性别</string>
+              <string>男</string>
              </property>
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
-             <property name="spacing">
-              <number>6</number>
+            <spacer name="horizontalSpacer_18">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
-             <item>
-              <widget class="QRadioButton" name="radioButton_Male_2">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QRadioButton::indicator { 
-	width: 32px;
-	height: 32px;
-}
-QRadioButton::indicator::unchecked {
-	image: url(:/Image/RadioUnChecked.png);
-}
-QRadioButton::indicator::checked { 
-	image: url(:/Image/RadioCheck.png);
-}
-</string>
-               </property>
-               <property name="text">
-                <string>男</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_18">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radioButton_Female_2">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>思源黑体 CN Medium</family>
-                 <pointsize>16</pointsize>
-                </font>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QRadioButton::indicator { 
-	width: 32px;
-	height: 32px;
-}
-QRadioButton::indicator::unchecked {
-	image: url(:/Image/RadioUnChecked.png);
-}
-QRadioButton::indicator::checked { 
-	image: url(:/Image/RadioCheck.png);
-}
-</string>
-               </property>
-               <property name="text">
-                <string>女</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item>
-            <spacer name="horizontalSpacer_8">
+            <widget class="QRadioButton" name="radioButton_Female_2">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>思源黑体 CN Medium</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QRadioButton::indicator { 
+	width: 32px;
+	height: 32px;
+}
+QRadioButton::indicator::unchecked {
+	image: url(:/Image/RadioUnChecked.png);
+}
+QRadioButton::indicator::checked { 
+	image: url(:/Image/RadioCheck.png);
+}
+</string>
+             </property>
+             <property name="text">
+              <string>女</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_13">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>

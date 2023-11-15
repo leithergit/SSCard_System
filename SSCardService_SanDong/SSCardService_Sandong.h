@@ -106,7 +106,7 @@ public:
 				{
 					"chkCanCardSq",
 					"saveCardSqList",
-					//"queryCardZksqList",
+					"queryCardZksqList",
 					"saveCardOpen",
 					"WriteCard",
 					"PrintCard",
@@ -125,7 +125,7 @@ public:
 					"chkCanCardBh",
 					"queryCardInfoBySfzhm",
 					"saveCardBhList",
-					//"queryCardZksqList",
+					"queryCardZksqList",
 					"saveCardOpen",
 					"WriteCard",
 					"PrintCard",
@@ -351,14 +351,21 @@ public:
 		if (QFailed(nResult))
 			return false;
 		jsonProc.Get("Datagram", strDatagram);
+		if (QFailed(strDatagram.empty()))
+			return false;
 		gInfo() << strKey << " get Datagram from progress file!";
 		return true;
+	}
+	virtual int SetSwitchBank(bool bSwitchBank) override
+	{
+		isSwitchBank = bSwitchBank;
+		return 0;
 	}
 
 	virtual int SetServiceType(ServiceType nSvrType, string& strIdentity) override
 	{
 		if (nSvrType < ServiceType::Service_NewCard ||
-			nSvrType > ServiceType::Service_QueryInformation)
+			nSvrType > ServiceType::Service_ReplaceCardSwitchBank)
 			return -1;
 		else
 		{
@@ -383,6 +390,9 @@ public:
 				case ServiceType::Service_QueryInformation:
 					strCurService = "";
 					break;
+				/*case ServiceType::Service_ReplaceCardSwitchBank:
+					strCurService = "SwitchBank";
+					break;*/
 				case ServiceType::Service_Unknown:
 				default:
 					return -1;
@@ -439,7 +449,7 @@ public:
 		if (!jsonInit.Parse(strInitJson))
 		{
 			strOutInfo = "卡管服务配置无法识别, 请检查SSCardService.json文件!";
-			gError() << strOutInfo;
+			gError() << strOutInfo << __FUNCTION__ << __LINE__;
 			return -1;
 		}
 
@@ -603,6 +613,7 @@ public:
 	// cardID,name,city,bankcode,PaperType
 	int QueryNewCardStatus(string& strJsonIn, string& strJsonOut)
 	{
+		
 		CJsonObject jsonIn;
 		int nSSResult = -1;
 		int nResult = -1;
@@ -645,21 +656,31 @@ public:
 			}
 
 			UpdatePerson();
-			strKey = "chkCanCardSq";
-			string strFunction = "申领卡信息校验(chkCanCardSq)";
-			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			
+			//跨行换卡不需要执行
+			if (!isSwitchBank)
 			{
-				if (QFailed(nSSResult = chkCanCardSq(*pCardInfo, strOutInfo)))
+				LOG(INFO) << "normal workflow";
+				strKey = "chkCanCardSq";
+				string strFunction = "申领卡信息校验(chkCanCardSq)";
+				if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 				{
-					strMessage = strFunction + "失败:";
-					strMessage += std::to_string(nSSResult);
-					break;
-				}
-				CJsonObject tmpJson;
-				if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
-					break;
+					if (QFailed(nSSResult = chkCanCardSq(*pCardInfo, strOutInfo)))
+					{
+						strMessage = strFunction + "失败:";
+						strMessage += std::to_string(nSSResult);
+						break;
+					}
+					CJsonObject tmpJson;
+					if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+						break;
 
-				UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+					UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+				}
+			}
+			else
+			{
+				LOG(INFO) << "skip by switchBank";
 			}
 			strMessage = "Succeed";
 			nResult = 0;
@@ -756,6 +777,106 @@ public:
 
 		return nResult;
 	}
+	//即时制卡预开户（换卡）
+	virtual int PreMakeCardHk(string& strJsonIn, string& strJsonOut) override
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		CJsonObject json(strJsonIn);
+		do
+		{
+			if (json.IsEmpty())
+			{
+				strMessage = "Json Input is empty!";
+				break;
+			}
+			string strGender, strNationality, strPhoto;
+			pCardInfo->strDealType = "1";	// replace card
+			pCardInfo->strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			pCardInfo->strOperator = strOperator;
+			json.Get("CardID", pCardInfo->strCardID);
+			json.Get("Name", pCardInfo->strName);
+			json.Get("BankCode", pCardInfo->strBankCode);
+			json.Get("City", pCardInfo->strCity);
+
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strBankCode.empty() ||
+				pCardInfo->strCity.empty())
+			{
+				strMessage = "身份号码,姓名,银行代码或城市代码中存在空字段!";
+				break;
+			}
+
+			strKey = "saveCardOpenHk";
+			CJsonObject tmpJson;
+
+			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			{
+				string strFunction = "即制卡开户换卡(saveCardOpenHk)";
+				// cardID,cardType,name,bankCode,operator,city
+				if (QFailed(nSSResult = saveCardOpenHk(*pCardInfo, strOutInfo)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+
+				if QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction))
+					break;
+
+				UpdateStage(strKey, 0, tmpJson.ToFormattedString());
+				try
+				{
+					string strOutputFile = "./Debug/Carddata_" + pCardInfo->strCardID + ".json";
+					fstream fs(strOutputFile, ios::out);
+					fs << strOutInfo;
+					fs.close();
+				}
+				catch (std::exception& e)
+				{
+					string strException = e.what();
+				}
+			}
+			else
+				tmpJson.Parse(strDatagram);
+
+			CJsonObject ds = tmpJson["ds"];
+			if (ds.IsEmpty())
+			{
+				LOG(ERROR) << "ds from output of queryCardZksqList is invalid !";
+				break;
+			}
+			ds.Get("kh", pCardInfo->strCardNum);//接口文档里是sbkh，实际是kh
+			ds.Get("zp", pCardInfo->strPhoto);
+			ds.Get("mz", pCardInfo->strNation);
+
+			CJsonObject outJson;
+			outJson.Add("CardNum", pCardInfo->strCardNum);
+			outJson.Add("Photo", pCardInfo->strPhoto);
+			UpdatePerson();
+			strJsonOut = outJson.ToString();
+			nResult = 0;
+			nErrFlag = 0;
+		} while (0);
+		if (nErrFlag)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+
+		return nResult;
+	}
 
 	int GetAge(string& strBirthday)
 	{
@@ -785,7 +906,80 @@ public:
 		return nAge;
 	}
 
+	virtual int QueryCardBalance(string& strJsonIn, string& strJsonOut) override
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey{ "" };
+		LOG(INFO) << __FUNCTION__ << __LINE__;
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			jsonIn.Get("CardID", pCardInfo->strCardID);
+			jsonIn.Get("Name", pCardInfo->strName);
+			jsonIn.Get("City", pCardInfo->strCity);
+			jsonIn.Get("CardNum", pCardInfo->strCardNum);
+			jsonIn.Get("ChipNum", pCardInfo->strChipNum);
 
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strCardNum.empty()||
+				pCardInfo->strChipNum.empty())
+			{
+				strMessage = "身份证,姓名,城市代码、社保卡号、卡芯片账号不能为空!";
+				break;
+			}
+			CJsonObject outJson;
+			UpdatePerson();
+			strKey = "queryCardAccountBalance";
+			string strFunction = "查询社保卡余额(queryCardAccountBalance)";
+			if (QFailed(nSSResult = queryCardAccountBalance(*pCardInfo, strOutInfo)))
+			{
+				strMessage = strFunction + "失败:";
+				strMessage += strOutInfo;
+				break;
+			}
+			CJsonObject tmpJson;
+			if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+				break;
+
+			UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+			outJson.Parse(strOutInfo);
+			outJson.Get("ye", pCardInfo->strBalanceYuan);
+			outJson.Get("ye_cents", pCardInfo->strBalanceFen);
+			outJson.Clear();
+			nResult = 0;
+			outJson.Add("Result", nResult);
+			outJson.Get("Yuan", pCardInfo->strBalanceYuan);
+			outJson.Get("Fen", pCardInfo->strBalanceFen);
+
+			strJsonOut = outJson.ToString();
+
+			nErrFlag = 0;
+
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
 	int QueryCardInfo(string& strJsonIn, string& strJsonOut)
 	{
 		CJsonObject jsonIn;
@@ -825,6 +1019,8 @@ public:
 			strKey = "queryCardInfoBySfzhm";
 			if (//!GetStageStatus(strKey, nResult, strDatagram) ||
 				//QFailed(nResult) ||
+				nServiceType == ServiceType::Service_NewCard ||
+				nServiceType == ServiceType::Service_ReplaceCard ||
 				nServiceType == ServiceType::Service_RegisterLost ||
 				nServiceType == ServiceType::Service_QueryInformation)
 			{
@@ -848,7 +1044,7 @@ public:
 			CJsonObject ds = outJson["ds"];
 			if (ds.IsEmpty())
 			{
-				strMessage = "ds from output of queryCardInfoBySfzhm is invalid !";
+				LOG(INFO) << "ds from output of queryCardInfoBySfzhm is invalid !";
 				break;
 			}
 
@@ -918,7 +1114,408 @@ public:
 		}
 		return nResult;
 	}
+	int QueryCardInfo0(string& strJsonIn, string& strJsonOut)
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		string strCardStatusToQuery = "0";
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			jsonIn.Get("CardID", pCardInfo->strCardID);
+			jsonIn.Get("Name", pCardInfo->strName);
+			jsonIn.Get("City", pCardInfo->strCity);
+			jsonIn.Get("BankCode", pCardInfo->strBankCode);
+			jsonIn.Get("StatustoQuery", strCardStatusToQuery);
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
 
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strBankCode.empty())
+			{
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
+				break;
+			}
+			CJsonObject outJson;
+			UpdatePerson();
+			strKey = "queryCardInfoBySfzhm";
+			if (//!GetStageStatus(strKey, nResult, strDatagram) ||
+				//QFailed(nResult) ||
+				nServiceType == ServiceType::Service_NewCard ||
+				nServiceType == ServiceType::Service_ReplaceCard ||
+				nServiceType == ServiceType::Service_RegisterLost ||
+				nServiceType == ServiceType::Service_QueryInformation)
+			{
+				string strFunction = "查询社保卡信息(queryCardInfoBySfzhm)";
+				if (QFailed(nSSResult = queryCardInfoBySfzhm(*pCardInfo, strOutInfo, strCardStatusToQuery)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+				CJsonObject tmpJson;
+				if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+					break;
+
+				UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+				outJson.Parse(strOutInfo);
+			}
+			/*else
+				;*/
+
+			CJsonObject ds = outJson["ds"];
+			if (ds.IsEmpty())
+			{
+				LOG(INFO) << "ds from output of queryCardInfoBySfzhm is invalid !";
+				break;
+			}
+
+			ds.Get("shbzhm", pCardInfo->strCardID);
+			ds.Get("kh", pCardInfo->strCardNum);
+			ds.Get("xm", pCardInfo->strName);
+			ds.Get("kxpzh", pCardInfo->strChipNum);
+			ds.Get("kctzh", pCardInfo->strMagNum);
+			ds.Get("yhbh", pCardInfo->strBankCode);		// 银行编号
+			ds.Get("sjhm", pCardInfo->strMobile);
+			ds.Get("yhbh", pCardInfo->strBankCode);
+			ds.Get("sjhm", pCardInfo->strMobile);
+
+			string strCardStatus;
+			string strBankName;
+			ds.Get("kztmc", strCardStatus);
+
+			const char* szStatus[] = {
+				"放号",
+				"正常",
+				"挂失",
+				"临时挂失",
+				"挂失后注销",
+				"注销",
+				"未启用"
+			};
+			CardStatus nCardStatus = CardStatus::Card_Unknow;
+			int nIndex = 0;
+			for (auto var : szStatus)
+			{
+				if (strCardStatus == var)
+				{
+					nCardStatus = (CardStatus)nIndex;
+				}
+				nIndex++;
+			}
+
+			ds.Get("yhmc", strBankName);
+
+			//CardInfo.strst = ds["kzt"].ToString();
+			//PersionInfo.strCardStatus = ds["kztmc"] .ToString();	// 卡状态名称
+			//PersionInfo.strBankCode = ds["yhmc"] .ToString();		// 银行名称
+
+			outJson.Clear();
+			nResult = 0;
+			outJson.Add("Result", nResult);
+			outJson.Add("Name", pCardInfo->strName);
+			outJson.Add("CardID", pCardInfo->strCardID);
+			outJson.Add("CardNum", pCardInfo->strCardNum);
+			outJson.Add("BankName", strBankName);
+			outJson.Add("BankCode", pCardInfo->strBankCode);
+			outJson.Add("CardStatus", (int)nCardStatus);
+			outJson.Add("Mobile", pCardInfo->strMobile);
+
+			strJsonOut = outJson.ToString();
+
+			nErrFlag = 0;
+
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
+	int QueryCardInfo2(string& strJsonIn, string& strJsonOut)
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		string strCardStatusToQuery = "2";
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			jsonIn.Get("CardID", pCardInfo->strCardID);
+			jsonIn.Get("Name", pCardInfo->strName);
+			jsonIn.Get("City", pCardInfo->strCity);
+			jsonIn.Get("BankCode", pCardInfo->strBankCode);
+			jsonIn.Get("StatustoQuery", strCardStatusToQuery);
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strBankCode.empty())
+			{
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
+				break;
+			}
+			CJsonObject outJson;
+			UpdatePerson();
+			strKey = "queryCardInfoBySfzhm";
+			if (//!GetStageStatus(strKey, nResult, strDatagram) ||
+				//QFailed(nResult) ||
+				nServiceType == ServiceType::Service_NewCard ||
+				nServiceType == ServiceType::Service_ReplaceCard ||
+				nServiceType == ServiceType::Service_RegisterLost ||
+				nServiceType == ServiceType::Service_QueryInformation)
+			{
+				string strFunction = "查询社保卡信息(queryCardInfoBySfzhm)";
+				if (QFailed(nSSResult = queryCardInfoBySfzhm(*pCardInfo, strOutInfo, strCardStatusToQuery)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+				CJsonObject tmpJson;
+				if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+					break;
+
+				UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+				outJson.Parse(strOutInfo);
+			}
+			/*else
+				;*/
+
+			CJsonObject ds = outJson["ds"];
+			if (ds.IsEmpty())
+			{
+				LOG(INFO) << "ds from output of queryCardInfoBySfzhm is invalid !";
+				break;
+			}
+
+			ds.Get("shbzhm", pCardInfo->strCardID);
+			ds.Get("kh", pCardInfo->strCardNum);
+			ds.Get("xm", pCardInfo->strName);
+			ds.Get("kxpzh", pCardInfo->strChipNum);
+			ds.Get("kctzh", pCardInfo->strMagNum);
+			ds.Get("yhbh", pCardInfo->strBankCode);		// 银行编号
+			ds.Get("sjhm", pCardInfo->strMobile);
+			ds.Get("yhbh", pCardInfo->strBankCode);
+			ds.Get("sjhm", pCardInfo->strMobile);
+
+			string strCardStatus;
+			string strBankName;
+			ds.Get("kztmc", strCardStatus);
+
+			const char* szStatus[] = {
+				"放号",
+				"正常",
+				"挂失",
+				"临时挂失",
+				"挂失后注销",
+				"注销",
+				"未启用"
+			};
+			CardStatus nCardStatus = CardStatus::Card_Unknow;
+			int nIndex = 0;
+			for (auto var : szStatus)
+			{
+				if (strCardStatus == var)
+				{
+					nCardStatus = (CardStatus)nIndex;
+				}
+				nIndex++;
+			}
+
+			ds.Get("yhmc", strBankName);
+
+			//CardInfo.strst = ds["kzt"].ToString();
+			//PersionInfo.strCardStatus = ds["kztmc"] .ToString();	// 卡状态名称
+			//PersionInfo.strBankCode = ds["yhmc"] .ToString();		// 银行名称
+
+			outJson.Clear();
+			nResult = 0;
+			outJson.Add("Result", nResult);
+			outJson.Add("Name", pCardInfo->strName);
+			outJson.Add("CardID", pCardInfo->strCardID);
+			outJson.Add("CardNum", pCardInfo->strCardNum);
+			outJson.Add("BankName", strBankName);
+			outJson.Add("BankCode", pCardInfo->strBankCode);
+			outJson.Add("CardStatus", (int)nCardStatus);
+			outJson.Add("Mobile", pCardInfo->strMobile);
+
+			strJsonOut = outJson.ToString();
+
+			nErrFlag = 0;
+
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
+	int QueryCardInfoAll(string& strJsonIn, string& strJsonOut)
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		string strCardStatusToQuery = "";
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			jsonIn.Get("CardID", pCardInfo->strCardID);
+			jsonIn.Get("Name", pCardInfo->strName);
+			jsonIn.Get("City", pCardInfo->strCity);
+			jsonIn.Get("BankCode", pCardInfo->strBankCode);
+			jsonIn.Get("StatustoQuery", strCardStatusToQuery);
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strBankCode.empty())
+			{
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
+				break;
+			}
+			CJsonObject outJson;
+			UpdatePerson();
+			strKey = "queryCardInfoBySfzhm";
+			if (//!GetStageStatus(strKey, nResult, strDatagram) ||
+				//QFailed(nResult) ||
+				nServiceType == ServiceType::Service_NewCard ||
+				nServiceType == ServiceType::Service_ReplaceCard ||
+				nServiceType == ServiceType::Service_RegisterLost ||
+				nServiceType == ServiceType::Service_QueryInformation)
+			{
+				string strFunction = "查询社保卡信息(queryCardInfoBySfzhm)";
+				if (QFailed(nSSResult = queryCardInfoBySfzhm(*pCardInfo, strOutInfo, strCardStatusToQuery)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+				CJsonObject tmpJson;
+				if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+					break;
+
+				UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+				outJson.Parse(strOutInfo);
+			}
+			/*else
+				;*/
+
+			CJsonObject ds = outJson["ds"];
+			if (ds.IsEmpty())
+			{
+				LOG(INFO) << "ds from output of queryCardInfoBySfzhm is invalid !";
+				break;
+			}
+
+			ds.Get("shbzhm", pCardInfo->strCardID);
+			ds.Get("kh", pCardInfo->strCardNum);
+			ds.Get("xm", pCardInfo->strName);
+			ds.Get("kxpzh", pCardInfo->strChipNum);
+			ds.Get("kctzh", pCardInfo->strMagNum);
+			ds.Get("yhbh", pCardInfo->strBankCode);		// 银行编号
+			ds.Get("sjhm", pCardInfo->strMobile);
+			ds.Get("yhbh", pCardInfo->strBankCode);
+			ds.Get("sjhm", pCardInfo->strMobile);
+
+			string strCardStatus;
+			string strBankName;
+			ds.Get("kztmc", strCardStatus);
+
+			const char* szStatus[] = {
+				"放号",
+				"正常",
+				"挂失",
+				"临时挂失",
+				"挂失后注销",
+				"注销",
+				"未启用"
+			};
+			CardStatus nCardStatus = CardStatus::Card_Unknow;
+			int nIndex = 0;
+			for (auto var : szStatus)
+			{
+				if (strCardStatus == var)
+				{
+					nCardStatus = (CardStatus)nIndex;
+				}
+				nIndex++;
+			}
+
+			ds.Get("yhmc", strBankName);
+
+			//CardInfo.strst = ds["kzt"].ToString();
+			//PersionInfo.strCardStatus = ds["kztmc"] .ToString();	// 卡状态名称
+			//PersionInfo.strBankCode = ds["yhmc"] .ToString();		// 银行名称
+
+			outJson.Clear();
+			nResult = 0;
+			outJson.Add("Result", nResult);
+			outJson.Add("Name", pCardInfo->strName);
+			outJson.Add("CardID", pCardInfo->strCardID);
+			outJson.Add("CardNum", pCardInfo->strCardNum);
+			outJson.Add("BankName", strBankName);
+			outJson.Add("BankCode", pCardInfo->strBankCode);
+			outJson.Add("CardStatus", (int)nCardStatus);
+			outJson.Add("Mobile", pCardInfo->strMobile);
+
+			strJsonOut = outJson.ToString();
+
+			nErrFlag = 0;
+
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
 	/*
 	input string
 		{
@@ -933,6 +1530,135 @@ public:
 		"message":""
 	}
 	*/
+	virtual int getCardInfo(string& strJsonIn, string& strJsonOut) override
+	{
+		CJsonObject jsonIn;
+		int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		string strCardStatusToQuery = "1";
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			jsonIn.Get("CardID", pCardInfo->strCardID);
+			jsonIn.Get("Name", pCardInfo->strName);
+			jsonIn.Get("City", pCardInfo->strCity);
+			jsonIn.Get("BankCode", pCardInfo->strBankCode);
+			jsonIn.Get("StatustoQuery", strCardStatusToQuery);
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strBankCode.empty())
+			{
+				strMessage = "身份证,姓名,城市代码或银行代码不能为空!";
+				break;
+			}
+			CJsonObject outJson;
+			UpdatePerson();
+			strKey = "queryCardInfoBySfzhm";
+			if (//!GetStageStatus(strKey, nResult, strDatagram) ||
+				//QFailed(nResult) ||
+				nServiceType == ServiceType::Service_NewCard )
+			{
+				string strFunction = "查询社保卡信息(queryCardInfoBySfzhm)";
+				if (QFailed(nSSResult = queryCardInfoBySfzhm(*pCardInfo, strOutInfo, strCardStatusToQuery)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+				CJsonObject tmpJson;
+				if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+					break;
+
+				UpdateStage(strKey, nErrFlag, tmpJson.ToFormattedString());
+				outJson.Parse(strOutInfo);
+			}
+			/*else
+				;*/
+			LOG(INFO) <<"queryCardInfoBySfzhm out:"  << strOutInfo;
+			CJsonObject ds = outJson["ds"];
+			if (ds.IsEmpty())
+			{
+				LOG(INFO) << "ds from output of queryCardInfoBySfzhm is invalid !";
+				break;
+			}
+
+			ds.Get("shbzhm", pCardInfo->strCardID);
+			ds.Get("kh", pCardInfo->strCardNum);
+			ds.Get("xm", pCardInfo->strName);
+			ds.Get("kxpzh", pCardInfo->strChipNum);
+			ds.Get("kctzh", pCardInfo->strMagNum);
+			ds.Get("yhbh", pCardInfo->strOldBankCode);		// 旧银行编号
+			ds.Get("sjhm", pCardInfo->strMobile);
+
+			string strCardStatus;
+			string strBankName;
+			ds.Get("kztmc", strCardStatus);
+
+			const char* szStatus[] = {
+				"放号",
+				"正常",
+				"挂失",
+				"临时挂失",
+				"挂失后注销",
+				"注销",
+				"未启用"
+			};
+			CardStatus nCardStatus = CardStatus::Card_Unknow;
+			int nIndex = 0;
+			for (auto var : szStatus)
+			{
+				if (strCardStatus == var)
+				{
+					nCardStatus = (CardStatus)nIndex;
+				}
+				nIndex++;
+			}
+
+			ds.Get("yhmc", strBankName);
+
+			//CardInfo.strst = ds["kzt"].ToString();
+			//PersionInfo.strCardStatus = ds["kztmc"] .ToString();	// 卡状态名称
+			//PersionInfo.strBankCode = ds["yhmc"] .ToString();		// 银行名称
+
+			outJson.Clear();
+			nResult = 0;
+			outJson.Add("Result", nResult);
+			outJson.Add("Name", pCardInfo->strName);
+			outJson.Add("CardID", pCardInfo->strCardID);
+			outJson.Add("CardNum", pCardInfo->strCardNum);
+			outJson.Add("BankName", strBankName);
+			outJson.Add("BankCode", pCardInfo->strBankCode);
+			outJson.Add("CardStatus", (int)nCardStatus);
+			outJson.Add("Mobile", pCardInfo->strMobile);
+
+			strJsonOut = outJson.ToString();
+
+			nErrFlag = 0;
+
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
 
 	virtual int QueryCardStatus(string& strJsonIn, string& strJsonOut) override
 	{
@@ -946,6 +1672,8 @@ public:
 			break;
 		case ServiceType::Service_RegisterLost:
 		case ServiceType::Service_QueryInformation:
+		case ServiceType::Service_ReplaceCardSwitchBank:
+			break;
 		default:
 		{
 			CJsonObject jsonOut;
@@ -1118,14 +1846,14 @@ public:
 			{
 				bByGuardian = true;
 				jsonIn.Get("Guardian", pCardInfo->strGuardianName);
-				jsonIn.Get("GuardianShip", pCardInfo->strGuardianType);
+				//jsonIn.Get("GuardianShip", pCardInfo->strGuardianType);
 				jsonIn.Get("GuardianCardID", pCardInfo->strGuardianCardID);
 				pCardInfo->strGuardianCardType = "A";
 				if (pCardInfo->strGuardianName.empty() ||
-					pCardInfo->strGuardianCardID.empty() ||
-					pCardInfo->strGuardianType.empty())
+					pCardInfo->strGuardianCardID.empty()/* ||
+					pCardInfo->strGuardianType.empty()*/)
 				{
-					strMessage = "监护人姓名,监护人身份证号码,监护关系不能为空!";
+					strMessage = "监护人姓名,监护人身份证号码!";
 					break;
 				}
 			}
@@ -1153,34 +1881,50 @@ public:
 			CJsonObject tmpJson;
 			int nSSResult = -1;
 			string strFunction;
-
-
-			strKey = "saveCardSqList";
-
-			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			//跨行换卡不需要执行
+			if (!isSwitchBank)
 			{
-				if (QFailed(CheckAuthorize(*pCardInfo, strMessage)))
-					break;
-				strFunction = "提交申领名单(saveCardSqList)";
-				if (bByGuardian)
+				strKey = "saveCardSqList";
+
+				if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
 				{
-					strFunction = "监护提交申领名单(saveCardSqListByGuardian)";
-					if (QFailed(nSSResult = saveCardSqListByGuardian(*pCardInfo, strOutInfo)))
+					if (QFailed(CheckAuthorize(*pCardInfo, strMessage)))
+						break;
+					strFunction = "提交申领名单(saveCardSqList)";
+					if (bByGuardian)
+					{
+						strFunction = "监护提交申领名单(saveCardSqListByGuardian)";
+						if (QFailed(nSSResult = saveCardSqListByGuardian(*pCardInfo, strOutInfo)))
+						{
+							strMessage = strFunction + "失败:";
+							strMessage += strOutInfo;
+						}
+					}
+					else if (QFailed(nSSResult = saveCardSqList(*pCardInfo, strOutInfo)))
 					{
 						strMessage = strFunction + "失败:";
 						strMessage += strOutInfo;
+						break;
 					}
+					if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+						break;
+
+					UpdateStage(strKey, 0, tmpJson.ToFormattedString());
 				}
-				else if (QFailed(nSSResult = saveCardSqList(*pCardInfo, strOutInfo)))
+			}
+			else {
+
+				if (QFailed(CheckAuthorize(*pCardInfo, strMessage)))
+					break;
+				pCardInfo->strSystemType = "26";
+
+				strFunction = "保存更换银行换卡名单信息【saveCardHkGhyhList】";
+				if (QFailed(nSSResult = saveCardHkGhyhList(*pCardInfo, strOutInfo)))
 				{
 					strMessage = strFunction + "失败:";
 					strMessage += strOutInfo;
 					break;
 				}
-				if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
-					break;
-
-				UpdateStage(strKey, 0, tmpJson.ToFormattedString());
 			}
 			//auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			//auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::hours(24));
@@ -1268,6 +2012,199 @@ public:
 
 	// cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo
 	int CommitReplaceCardInfo(string& strJsonIn, string& strJsonOut)
+	{
+		CJsonObject json(strJsonIn);
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		do
+		{
+			if (json.IsEmpty())
+			{
+				strMessage = "补换卡信息为空!";
+				break;
+			}
+			string strGender;
+			pCardInfo->strDealType = "1";	// replace card
+			pCardInfo->strCardType = "A";	// 仅支持身份证//json["PaperType"].ToString();
+			json.Get("OverBank", bOverBank);	// 是否为跨行操作
+
+			json.Get("CardID", pCardInfo->strCardID);
+			json.Get("Name", pCardInfo->strName);
+			json.Get("BankCode", pCardInfo->strBankCode);
+			json.Get("City", pCardInfo->strCity);
+			json.Get("Mobile", pCardInfo->strMobile);
+			//pCardInfo->strReason = "Replace Card!";
+			pCardInfo->strOperator = strOperator;
+			//json.Get("Reason", CardInfo.strReason);
+			//json.Get("Operator", CardInfo.strOperator);
+			//json.Get("OccupType", CardInfo.strOccupType);
+			pCardInfo->strOccupType = "8000000";
+			json.Get("IssueDate", pCardInfo->strReleaseDate);
+			json.Get("ExpireDate", pCardInfo->strValidDate);
+			json.Get("Birthday", pCardInfo->strBirthday);
+			json.Get("Gender", strGender);
+			json.Get("Nation", pCardInfo->strNation);
+			json.Get("Address", pCardInfo->strAdress);
+			json.Get("CardNum", pCardInfo->strCardNum);
+			json.Get("Photo", pCardInfo->strPhoto);
+			json.Get("Occupation", pCardInfo->strOccupType);
+			json.Get("AuthorizeType", pCardInfo->strAuthorizeType);
+			json.Get("AuthorizeTime", pCardInfo->strAuthorizeTime);
+			if (bAuthorize)
+			{
+				CJsonObject jsonAuthrizeData;
+				int nArraySize = 0;
+				if (!json.Get("AuthorizeData", jsonAuthrizeData) ||
+					!jsonAuthrizeData.IsArray() ||
+					!(nArraySize = jsonAuthrizeData.GetArraySize()))
+				{
+					strMessage = "没有授权数据或授权数据无效!";
+					break;
+				}
+				for (int i = 0; i < nArraySize; i++)
+					pCardInfo->listAuthorizeData.emplace_back(jsonAuthrizeData(i));
+			}
+
+			if (pCardInfo->strOccupType.empty())
+				pCardInfo->strOccupType = "8000000";
+
+			if (pCardInfo->strCardID.empty()
+				|| pCardInfo->strName.empty()
+				|| pCardInfo->strCity.empty()
+				|| pCardInfo->strMobile.empty()
+				|| pCardInfo->strBirthday.empty()
+				|| pCardInfo->strAdress.empty()
+				|| pCardInfo->strPhoto.empty()
+				|| strGender.empty()
+				|| pCardInfo->strNation.empty())
+			{
+				strMessage = "身份证,姓名,城市代码,银行代码,手机,证件有效期,生日,性别,民族,住址或照片不能为空!";
+				break;
+			}
+			int nAge = GetAge(pCardInfo->strBirthday);
+			if (nAge < 0)
+			{
+				strMessage = "生日不是一个有效的日期!";
+				break;
+			}
+			bool bByGuardian = false;
+			if (nAge < 16 || json.KeyExist("ByGuardian"))
+			{
+				bByGuardian = true;
+				string strGuardianShip;
+				json.Get("Guardian", pCardInfo->strGuardianName);
+				json.Get("GuardianShip", strGuardianShip);
+
+				char szGuardianShip[64] = { 0 };
+				ANSI2UTF8(strGuardianShip.c_str(), szGuardianShip, 64);
+				if (strcmp(szGuardianShip, "父子"))
+					pCardInfo->strGuardianType = "1";
+				else if (strcmp(szGuardianShip, "父女"))
+					pCardInfo->strGuardianType = "2";
+				else if (strcmp(szGuardianShip, "母子"))
+					pCardInfo->strGuardianType = "3";
+				else if (strcmp(szGuardianShip, "母女"))
+					pCardInfo->strGuardianType = "4";
+				else
+				{
+					strMessage = "监护关系有误,只能是父子,父女,母子,母女中的一种!";
+					break;
+				}
+
+				json.Get("GuardianCardID", pCardInfo->strGuardianCardID);
+				pCardInfo->strGuardianCardType = "A";
+				if (pCardInfo->strGuardianName.empty() ||
+					pCardInfo->strGuardianCardID.empty() ||
+					pCardInfo->strGuardianType.empty())
+				{
+					strMessage = "监护人姓名,监护人身份证号码,监护关系不能为空!";
+					break;
+				}
+			}
+			else if (nAge >= 16)
+			{
+				if (pCardInfo->strReleaseDate.empty()
+					|| pCardInfo->strValidDate.empty())
+				{
+					strMessage = "16周岁及以上人员证件有效期不能为空!";
+					break;
+				}
+			}
+
+			if (strGender == "男")
+				pCardInfo->strSex = "1";
+			else if (strGender == "女")
+				pCardInfo->strSex = "2";
+			else
+				pCardInfo->strSex = "9";
+
+			pCardInfo->strReason = "卡片丢失";
+			UpdatePerson();
+			strKey = "saveCardBhList";
+			string strErrFlag;
+			CJsonObject tmpJson;
+			string strFunction;
+			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			{
+				if (QFailed(CheckAuthorize(*pCardInfo, strMessage)))
+					break;
+				
+				if (bByGuardian)
+				{
+					if (QFailed(saveCardBhListByGuardian(*pCardInfo, strOutInfo)))
+					{
+						strFunction = "监护人代申请补换卡(saveCardBhListByGuardian)";
+						strMessage = strFunction + "失败:";
+						strMessage += strOutInfo;
+						break;
+					}
+				}
+				else if (QFailed(saveCardBhList(*pCardInfo, strOutInfo)))
+				{
+					strFunction = "申请补换卡(saveCardBhList)";
+					strMessage = "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+				if QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction))
+					break;
+
+				UpdateStage(strKey, 0, tmpJson.ToFormattedString());
+			}
+			auto tNow = chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			auto tNext = chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::hours(24));
+			stringstream date1, date2;
+
+			// date1 = "2022-01-26 09:51:00"
+			// date1 << std::put_time(std::localtime(&tNow), "%Y-%m-%d %X");
+			date1 << std::put_time(std::localtime(&tNow), "%Y%m%d");
+			// 20210126
+			date2 << std::put_time(std::localtime(&tNext), "%Y%m%d");
+
+			pCardInfo->strReleaseDate = date1.str();
+			pCardInfo->strValidDate = date2.str();
+
+			nResult = 0;
+			nErrFlag = 0;
+		} while (0);
+		if (nErrFlag)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+
+		return nResult;
+	}
+
+	int CommitReplaceSwitchCardInfo(string& strJsonIn, string& strJsonOut)
 	{
 		CJsonObject json(strJsonIn);
 		int nResult = -1;
@@ -1489,6 +2426,7 @@ public:
 			break;
 		case ServiceType::Service_RegisterLost:
 		case ServiceType::Service_QueryInformation:
+			break;
 		default:
 		{
 			CJsonObject jsonOut;
@@ -1671,10 +2609,10 @@ public:
 			json.Get("BankCode", pCardInfo->strBankCode);
 			json.Get("City", pCardInfo->strCity);
 			json.Get("CardNum", pCardInfo->strCardNum);
-			json.Get("ChipNum", pCardInfo->strChipNum);
-			json.Get("MagNum", pCardInfo->strMagNum);
 			json.Get("CardATR", pCardInfo->strCardATR);
 			json.Get("CardIdentity", pCardInfo->strIdentifyNum);
+			json.Get("ChipNum", pCardInfo->strChipNum);
+			json.Get("MagNum", pCardInfo->strMagNum);
 			json.Get("CardVersion", pCardInfo->strCardVersion);
 			json.Get("ChipType", pCardInfo->strChipType);
 
@@ -1690,7 +2628,18 @@ public:
 				pCardInfo->strCardVersion.empty() ||
 				pCardInfo->strChipType.empty())
 			{
-				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号,卡芯片号,磁条号,ATR,卡识别码,卡版本或芯片类型不能为空!";
+				strMessage = "身份证:" + pCardInfo->strCardID +\
+					", 姓名 ： " + pCardInfo->strName +\
+					", 银行代码 : "+ pCardInfo->strBankCode +\
+					", 城市代码 : " + pCardInfo->strCity +\
+					", 社保卡号 : " + pCardInfo->strCardNum + \
+					", 卡芯片号 : " + pCardInfo->strChipNum + \
+					", 磁条号 : " + pCardInfo->strMagNum + \
+					", ATR : " + pCardInfo->strCardATR + \
+					", 卡识别码 :" + pCardInfo->strIdentifyNum + \
+					", 卡版本 : " + pCardInfo->strCardVersion + \
+					",芯片类型 : " + pCardInfo->strChipType + \
+					"不能为空!";
 				break;
 			}
 			//UpdatePerson();
@@ -1701,6 +2650,164 @@ public:
 			{
 				string strFunction = "制卡完成(saveCardCompleted)";
 				if (QFailed(nSSResult = saveCardCompleted(*pCardInfo, strOutInfo)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+
+				if QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction))
+					break;
+
+				UpdateStage(strKey, 0, tmpJson.ToFormattedString(), false);
+			}
+			nErrFlag = 0;
+			nResult = 0;
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
+
+	virtual int QueryLKId(string& strJsonIn, string& strJsonOut) override
+	{
+		CJsonObject json(strJsonIn);
+		int nResult = -1;
+		int nSSResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		do
+		{
+			if (json.IsEmpty())
+			{
+				strMessage = "Json Input is empty!";
+				break;
+			}
+
+			pCardInfo->strDealType = "1";	// replace card
+			pCardInfo->strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			pCardInfo->strOperator = strOperator;
+
+			json.Get("BankCode", pCardInfo->strBankCode);
+			json.Get("City", pCardInfo->strCity);
+			json.Get("BankNodeName", pCardInfo->strBankNodeName);
+
+			if (pCardInfo->strBankCode.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strBankNodeName.empty())
+			{
+				strMessage = "银行代码,城市代码,银行网点名称不能为空!";
+				break;
+			}
+			strKey = "queryLkdInfoLov";
+			CJsonObject tmpJson;
+			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			{
+				string strFunction = "查询领卡点信息(queryLkdInfoLov)";
+				if (QFailed(nSSResult = queryLkdInfoLov(*pCardInfo, strJsonOut)))
+				{
+					strMessage = strFunction + "失败:";
+					strMessage += strOutInfo;
+					break;
+				}
+				if (strJsonOut.empty())
+				{
+					strMessage = "没有找到配置的银行网点名称";
+					break;
+
+				}
+
+				//if QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction))
+				//	break;
+
+				UpdateStage(strKey, 0, tmpJson.ToFormattedString(), false);
+			}
+			nErrFlag = 0;
+			nResult = 0;
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
+
+	virtual int handToPerson(string& strJsonIn, string& strJsonOut) override
+	{
+		CJsonObject json(strJsonIn);
+		int nResult = -1;
+		int nSSResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode = "0";
+		string strKey = "";
+		string strDatagram = "";
+		do
+		{
+			if (json.IsEmpty())
+			{
+				strMessage = "Json Input is empty!";
+				break;
+			}
+
+			pCardInfo->strDealType = "1";	// replace card
+			pCardInfo->strCardType = "A";// 仅支持身份证//json["PaperType"].ToString();
+			pCardInfo->strOperator = strOperator;
+
+			json.Get("CardID", pCardInfo->strCardID);
+			json.Get("Name", pCardInfo->strName);
+			json.Get("BankCode", pCardInfo->strBankCode);
+			json.Get("City", pCardInfo->strCity);
+			json.Get("JJRName", pCardInfo->strInterName);
+			json.Get("JJRID", pCardInfo->strInterId);
+			json.Get("JJRMobile", pCardInfo->strInterMobile);
+			json.Get("BankNodeCode", pCardInfo->strBankNodeCode);
+			json.Get("Operator", pCardInfo->strOperator);
+
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty() ||
+				pCardInfo->strBankCode.empty() ||
+				pCardInfo->strInterName.empty() ||
+				pCardInfo->strInterId.empty() ||
+				pCardInfo->strInterMobile.empty() ||
+				pCardInfo->strBankNodeCode.empty() ||
+				pCardInfo->strOperator.empty())
+			{
+				strMessage = "身份证,姓名,银行代码,城市代码,银行网点代码，交接人姓名、交接人证件号、交接人联系方式、经办人不能为空!";
+				LOG(ERROR) << "身份证 ：" + pCardInfo->strCardID +
+					",姓名," + pCardInfo->strName +
+					", 银行代码," + pCardInfo->strBankCode +
+					" 城市代码" + pCardInfo->strCity +
+					", 银行网点代码" + pCardInfo->strBankNodeCode +
+					"，交接人姓名" + pCardInfo->strInterName +
+					"、交接人证件号" + pCardInfo->strInterId +
+					"、交接人联系方式" + pCardInfo->strInterMobile +
+					"、经办人" + pCardInfo->strOperator +
+					"不能为空!";
+				break;
+			}
+			strKey = "saveCardHandToGr";
+			CJsonObject tmpJson;
+			if (!GetStageStatus(strKey, nResult, strDatagram) || QFailed(nResult))
+			{
+				string strFunction = "保存卡片交付给个人(saveCardHandToGr)";
+				if (QFailed(nSSResult = saveCardHandToGr(*pCardInfo, strOutInfo)))
 				{
 					strMessage = strFunction + "失败:";
 					strMessage += strOutInfo;
@@ -1764,7 +2871,12 @@ public:
 				pCardInfo->strBankCode.empty() ||
 				pCardInfo->strCardNum.empty())
 			{
-				strMessage = "身份证,姓名,银行代码,城市代码,社保卡号,卡芯片号,磁条号,ATR,卡识别码,卡版本或芯片类型不能为空!";
+				strMessage = "身份证 : " + pCardInfo->strCardID + 
+					", 姓名,"+ pCardInfo->strName +
+					" 银行代码,"+ pCardInfo->strBankCode +
+					" 城市代码,"+ pCardInfo->strCity +
+					"社保卡号,"+ pCardInfo->strCardNum +
+					" 磁条号不能为空!";
 				break;
 			}
 
@@ -2025,6 +3137,10 @@ public:
 		{
 			return  ModifyPersonInfo(strJsonIn, strJsonOut);
 		}
+		else if (strCommand == "modifyPersonInfoByGuardian")
+		{
+			return  ModifyPersonInfoByGuardian(strJsonIn, strJsonOut);
+		}
 
 		return -1;
 	}
@@ -2035,6 +3151,7 @@ public:
 	*/
 	int QueryPersionOnfo(string& strJsonIn, string& strJsonOut)
 	{
+		LOG(INFO) << __FUNCTION__ << __LINE__;
 		CJsonObject jsonIn;
 		//int nSSResult = -1;
 		int nResult = -1;
@@ -2073,14 +3190,8 @@ public:
 			CJsonObject tmpJson;
 			if (QFailed(CheckOutJson(strJsonOut, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
 				break;
-
 			CJsonObject ds = tmpJson["ds"];
-			if (ds.IsEmpty())
-			{
-				strMessage = "ds from output of queryPersonInfo is invalid !";
-				break;
-			}
-
+			
 			ds.Get("yxzjhm", pCardInfo->strCardID);		//有效证件号码			
 			ds.Get("shbzhm", pCardInfo->strCardNum);	//社会保障号码			
 			ds.Get("xm", pCardInfo->strName);			//姓名
@@ -2089,9 +3200,27 @@ public:
 			ds.Get("mz", pCardInfo->strNation);			//民族
 			ds.Get("txdz", pCardInfo->strAdress);		//通讯地址
 			ds.Get("sjhm", pCardInfo->strMobile);		//手机号码
+			//ds.Get("xtlb", pCardInfo->strSystemType);		//系统类别
 			ds.Get("zylb", pCardInfo->strOccupType);	//职业类别
-			ds.Get("zjqsrq", pCardInfo->strReleaseDate);
-			ds.Get("zjdqrq", pCardInfo->strValidDate);
+			ds.Get("zjqsrq", pCardInfo->strReleaseDate);//证件起始日期
+			ds.Get("zjdqrq", pCardInfo->strValidDate);	//证件失效日期
+			ds.Get("jhrxm", pCardInfo->strGuardianName);	//监护人姓名
+			ds.Get("jhrxb", pCardInfo->strGuardianSex);	//监护人姓名
+			ds.Get("jhryxzjlx", pCardInfo->strGuardianCardType);	//监护人有效证件类型
+			ds.Get("jhryxzjhm", pCardInfo->strGuardianCardID);	//监护人有效证件号码
+			ds.Get("jhrzjqsrq", pCardInfo->strGuardianReleaseDate);	//监护人证件起始日期
+			ds.Get("jhrzjzzrq", pCardInfo->strGuardianValidDate);	//监护人证件失效日期
+			ds.Get("fzjg", pCardInfo->strCardUnit);	//发证机关
+			ds.Get("gj", pCardInfo->strNationality);	//国籍
+			ds.Get("yzbm", pCardInfo->strPostalCode);	//邮政编码			
+			ds.Get("csd", pCardInfo->strBirthPlace);	//出生地	
+			ds.Get("hjszd", pCardInfo->strPerAddr);		//户籍所在地
+			ds.Get("hkxz", pCardInfo->strRegAttr);		//户口性质
+			ds.Get("whcd", pCardInfo->strEducation);		//文化程度
+			ds.Get("hyzk", pCardInfo->strMarital);		//婚姻状况
+			ds.Get("lxrxm", pCardInfo->strContactsName);		//联系人姓名
+			ds.Get("sjhm", pCardInfo->strContactsMobile);		//手机号码
+			
 
 			CJsonObject jsonOut;
 			//jsonOut.Add("CardID", CardInfo.strCardID);			
@@ -2105,6 +3234,23 @@ public:
 			jsonOut.Add("Occupation", pCardInfo->strOccupType);
 			jsonOut.Add("PaperIssuedDate", pCardInfo->strReleaseDate);
 			jsonOut.Add("PaperExpireDate", pCardInfo->strValidDate);
+			jsonOut.Add("GuardianName", pCardInfo->strGuardianName);
+			jsonOut.Add("GuardianSex", pCardInfo->strGuardianSex);
+			jsonOut.Add("GuardianID", pCardInfo->strGuardianCardID);
+			jsonOut.Add("GuardianIssuedDate", pCardInfo->strGuardianReleaseDate);
+			jsonOut.Add("GuardianExpireDate", pCardInfo->strGuardianValidDate);
+			//jsonOut.Add("GuardianCardType", pCardInfo->strGuardianCardType);
+			jsonOut.Add("CardAgency", pCardInfo->strCardUnit);
+			jsonOut.Add("BirthPlace", pCardInfo->strBirthPlace);
+			jsonOut.Add("HujiPlace", pCardInfo->strPerAddr);
+			jsonOut.Add("ContactsName", pCardInfo->strContactsName);
+			jsonOut.Add("ContactsPhone", pCardInfo->strContactsMobile);
+			jsonOut.Add("PostalCode", pCardInfo->strPostalCode);
+			jsonOut.Add("HuKou", pCardInfo->strRegAttr);
+			jsonOut.Add("Education", pCardInfo->strEducation);
+			jsonOut.Add("Guoji", pCardInfo->strNationality);
+			jsonOut.Add("Marital", pCardInfo->strMarital);
+
 			strJsonOut = jsonOut.ToString();
 			nErrFlag = 0;
 			nResult = 0;
@@ -2192,9 +3338,172 @@ public:
 
 	int ModifyPersonInfo(string& strJsonIn, string& strJsonOut)
 	{
-		X_UNUSED(strJsonIn);
-		X_UNUSED(strJsonOut);
-		return -1;
+		CJsonObject jsonIn;
+		//int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode;
+		string strKey = "";
+		string strDatagram = "";
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			//jsonIn.Get("CardID", pCardInfo->strCardID);
+			//jsonIn.Get("Name", pCardInfo->strName);
+			//jsonIn.Get("City", pCardInfo->strCity);
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			//pCardInfo->strOperator = "金乔炜煜制卡机";
+			jsonIn.Get("CardID", pCardInfo->strCardID);		//有效证件号码			
+			jsonIn.Get("CardNum", pCardInfo->strCardNum);	//社会保障号码			
+			jsonIn.Get("Name", pCardInfo->strName);			//姓名
+			jsonIn.Get("Sex", pCardInfo->strSex);			//性别
+			jsonIn.Get("Birthday", pCardInfo->strBirthday);		//出生日期
+			jsonIn.Get("Nation", pCardInfo->strNation);			//民族
+			jsonIn.Get("Address", pCardInfo->strAdress);		//通讯地址
+			jsonIn.Get("Mobile", pCardInfo->strMobile);		//手机号码
+			jsonIn.Get("SystemType", pCardInfo->strSystemType);		//系统类别
+			jsonIn.Get("Career", pCardInfo->strOccupType);	//职业类别
+			jsonIn.Get("ReleaseDate", pCardInfo->strReleaseDate);//证件起始日期
+			jsonIn.Get("ValidDate", pCardInfo->strValidDate);	//证件失效日期
+			//jsonIn.Get("jhrxm", pCardInfo->strGuardianName);	//监护人姓名
+			//jsonIn.Get("jhryxzjlx", pCardInfo->strGuardianCardType);	//监护人有效证件类型
+			//jsonIn.Get("jhryxzjhm", pCardInfo->strGuardianCardID);	//监护人有效证件号码
+			//jsonIn.Get("jhrzjqsrq", pCardInfo->strGuardianReleaseDate);	//监护人证件起始日期
+			//jsonIn.Get("jhrzjzzrq", pCardInfo->strGuardianValidDate);	//监护人证件失效日期
+			jsonIn.Get("CardAgency", pCardInfo->strCardUnit);	//发证机关
+			jsonIn.Get("Guoji", pCardInfo->strNationality);	//国籍
+			jsonIn.Get("PoatalCode", pCardInfo->strPostalCode);	//邮政编码			
+			jsonIn.Get("BirthPlace", pCardInfo->strBirthPlace);	//出生地	
+			jsonIn.Get("HuJi", pCardInfo->strPerAddr);		//户籍所在地
+			jsonIn.Get("HukouAttr", pCardInfo->strRegAttr);		//户口性质
+			jsonIn.Get("Education", pCardInfo->strEducation);		//文化程度
+			jsonIn.Get("Marriage", pCardInfo->strMarital);		//婚姻状况
+			jsonIn.Get("ContactsName", pCardInfo->strContactsName);		//联系人姓名
+			jsonIn.Get("ContactsPhone", pCardInfo->strContactsMobile);		//联系人手机号码
+			jsonIn.Get("City", pCardInfo->strCity);		//行政区划代码
+			jsonIn.Get("jbr", pCardInfo->strOperator);		//经办人
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty())
+			{
+				strMessage = "身份证,姓名,城市代码不能为空!";
+				break;
+			}
+			string strFunction = "修改人员信息(modifyPersonInfo)";
+			if (QFailed(modifyPersonInfo(*pCardInfo, strOutInfo)))
+			{
+				strMessage = strFunction + "失败:";
+				strMessage += strOutInfo;
+				break;
+			}
+
+			CJsonObject tmpJson;
+			if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+				break;
+
+			nErrFlag = 0;
+			nResult = 0;
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
+	}
+	int ModifyPersonInfoByGuardian(string& strJsonIn, string& strJsonOut)
+	{
+		CJsonObject jsonIn;
+		//int nSSResult = -1;
+		int nResult = -1;
+		int nErrFlag = -1;
+		string strMessage;
+		string strOutInfo;
+		string strErrcode;
+		string strKey = "";
+		string strDatagram = "";
+		do
+		{
+			if (!jsonIn.Parse(strJsonIn))
+			{
+				strMessage = "strJsonIn Input is invalid!";
+				break;
+			}
+			//jsonIn.Get("CardID", pCardInfo->strCardID);
+			//jsonIn.Get("Name", pCardInfo->strName);
+			//jsonIn.Get("City", pCardInfo->strCity);
+			pCardInfo->strCardType = "A";// 仅支持身份证//jsonIn["PaperType"].ToString();
+			pCardInfo->strGuardianCardType = "A";
+			jsonIn.Get("CardID", pCardInfo->strCardID);		//有效证件号码			
+			jsonIn.Get("CardNum", pCardInfo->strCardNum);	//社会保障号码			
+			jsonIn.Get("Name", pCardInfo->strName);			//姓名
+			jsonIn.Get("Sex", pCardInfo->strSex);			//性别
+			jsonIn.Get("Birthday", pCardInfo->strBirthday);		//出生日期
+			jsonIn.Get("Nation", pCardInfo->strNation);			//民族
+			jsonIn.Get("Address", pCardInfo->strAdress);		//通讯地址
+			jsonIn.Get("Mobile", pCardInfo->strMobile);		//手机号码
+			jsonIn.Get("SystemType", pCardInfo->strSystemType);		//系统类别
+			jsonIn.Get("Career", pCardInfo->strOccupType);	//职业类别
+			jsonIn.Get("ReleaseDate", pCardInfo->strReleaseDate);//证件起始日期
+			jsonIn.Get("ValidDate", pCardInfo->strValidDate);	//证件失效日期
+			jsonIn.Get("GuardianName", pCardInfo->strGuardianName);	//监护人姓名
+			//jsonIn.Get("jhryxzjlx", pCardInfo->strGuardianCardType);	//监护人有效证件类型
+			jsonIn.Get("GuardianId", pCardInfo->strGuardianCardID);	//监护人有效证件号码
+			jsonIn.Get("GuardianSex", pCardInfo->strGuardianSex);	//监护人有效证件号码
+			jsonIn.Get("GuardianReleaseDate", pCardInfo->strGuardianReleaseDate);	//监护人证件起始日期
+			jsonIn.Get("GuardianValidDate", pCardInfo->strGuardianValidDate);	//监护人证件失效日期
+			jsonIn.Get("CardAgency", pCardInfo->strCardUnit);	//发证机关
+			jsonIn.Get("Guoji", pCardInfo->strNationality);	//国籍
+			jsonIn.Get("PoatalCode", pCardInfo->strPostalCode);	//邮政编码			
+			jsonIn.Get("BirthPlace", pCardInfo->strBirthPlace);	//出生地	
+			jsonIn.Get("HuJi", pCardInfo->strPerAddr);		//户籍所在地
+			jsonIn.Get("HukouAttr", pCardInfo->strRegAttr);		//户口性质
+			jsonIn.Get("Education", pCardInfo->strEducation);		//文化程度
+			jsonIn.Get("Marriage", pCardInfo->strMarital);		//婚姻状况
+			jsonIn.Get("ContactsName", pCardInfo->strContactsName);		//联系人姓名
+			jsonIn.Get("ContactsPhone", pCardInfo->strContactsMobile);		//联系人手机号码
+			jsonIn.Get("City", pCardInfo->strCity);		//行政区划代码
+			jsonIn.Get("jbr", pCardInfo->strOperator);		//经办人
+			if (pCardInfo->strCardID.empty() ||
+				pCardInfo->strName.empty() ||
+				pCardInfo->strCity.empty())
+			{
+				strMessage = "身份证,姓名,城市代码不能为空!";
+				break;
+			}
+			string strFunction = "修改人员信息(modifyPersonInfo)";
+			if (QFailed(modifyPersonInfo(*pCardInfo, strOutInfo)))
+			{
+				strMessage = strFunction + "失败:";
+				strMessage += strOutInfo;
+				break;
+			}
+
+			CJsonObject tmpJson;
+			if (QFailed(CheckOutJson(strOutInfo, tmpJson, strMessage, strErrcode, nErrFlag, strFunction)))
+				break;
+
+			nErrFlag = 0;
+			nResult = 0;
+		} while (0);
+		if (nResult)
+		{
+			CJsonObject jsonOut;
+			jsonOut.Add("Result", nErrFlag);
+			jsonOut.Add("Message", strMessage);
+			jsonOut.Add("errcode", strErrcode);
+			strJsonOut = jsonOut.ToString();
+		}
+		return nResult;
 	}
 
 	// CardID,Name,City,CardNum,SignatureKey
