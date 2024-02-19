@@ -34,10 +34,11 @@ public:
 	virtual int Reader_Create(ReaderBrand ReaderType, char* resCode) = 0;
 	/**
 	 * @brief 初始化读卡器端口
+	 * @param[in] nPort 读卡器商品，1-99为串口,100以上为串口
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"
 	 * @return 0:成功 1:失败
 	 */
-	virtual int Reader_Init(char* resCode) = 0;
+	virtual int Reader_Init(int nPort,char* resCode) = 0;
 	/**
 	 * @brief 读卡器端口退出
 	 * @param[out] resCode 返回4位数返回值,成功返回 "0000"

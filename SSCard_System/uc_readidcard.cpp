@@ -82,14 +82,15 @@ void uc_ReadIDCard::StopDetect()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
-	//桌面版暂时注释
-	/*if (!g_pDataCenter->OpenCamera())
+	//桌面版不用
+#ifndef  _DESKTOP
+	if (!g_pDataCenter->OpenCamera())
 	{
 		gInfo() << "Failed in OpenCamera";
 		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fetal, Return_MainPage);
 		return -1;
-	}*/
-
+	}
+#endif
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
 	QSize WindowsSize = size();
@@ -115,7 +116,7 @@ int uc_ReadIDCard::ProcessBussiness()
 	{
 		ui->checkBox_WithoutIDCard->show();
 	}
-	
+	ui->checkBox_SwitchBank->setChecked(false);
 	if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
 	{
 		ui->checkBox_SwitchBank->show();

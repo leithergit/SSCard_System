@@ -59,7 +59,7 @@ struct SSCardBaseInfo
 	std::string strCardStatus;		// 制卡中(或制卡完成(待分发)待领卡或卡已领取)
 	// 山东特有						    
 	std::string strPersonType;		// 人员类别
-	std::string strCardType;		// 证件类型
+	std::string strCardType = "A";		// 证件类型
 	// 河南特有						    
 	std::string strPCH;				// 批次号
 	std::string strReleaseDate;		// 发卡日期
@@ -92,7 +92,8 @@ struct SSCardBaseInfo
 	std::string strCommunity;		// 所在社区
 	std::string strCompanyName;		// 单位名称
 	std::string strGuardianName;	// 监护人姓名
-	std::string strGuardianIDentity;// 监护人证件
+	std::string strGuardianIDentity;// 监护人证件号
+	std::string strGuardianDocType = "A";	// 监护人证件类型
 	std::string strGuardianShip;	// 监护关系，父子：1，父女：2，母子：3，母女：4
 	std::string strPostalCode;		// 邮政编码
 	std::string strEmail;			// 电子邮箱
@@ -137,8 +138,11 @@ public:
 	virtual int QueryCardInfo0(string& strJsonIn, string& strJsonOut) = 0;
 	virtual int QueryCardInfo2(string& strJsonIn, string& strJsonOut) = 0;
 	virtual int QueryCardInfoAll(string& strJsonIn, string& strJsonOut) = 0;
+	virtual int QueryCardInfoS(string& strJsonIn, string& strJsonOut) = 0;
 	// 提交制卡人信息
 	virtual int CommitPersonInfo(string& strJsonIn, string& strJsonOut) = 0;
+	//预制卡校验
+	virtual int CheckPremakeCard(string& strJsonIn, string& strJsonOut) = 0;
 
 	// 预制卡
 	virtual int PreMakeCard(string& strJsonIn, string& strJsonOut) = 0;
@@ -170,6 +174,9 @@ public:
 	//获取卡信息
 	virtual int getCardInfo(string& strJsonIn, string& strJsonOut) = 0;
 
+	//修改照片
+	virtual int ModifyPhoto(string& strJsonIn, string& strJsonOut) = 0;
+
 	virtual int LoadCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) = 0;
 
 	virtual int SaveCardData(string& strCardID, SSCardBaseInfo& SSCardInfo) = 0;
@@ -185,6 +192,8 @@ public:
 	virtual int QueryLKId(string& strJsonIn, string& strJsonOut) = 0;
 
 	virtual int handToPerson(string& strJsonIn, string& strJsonOut) = 0;
+
+	virtual int CheckPremakeCardHK(string& strJsonIn, string& strJsonOut) = 0;
 
 	virtual int PreMakeCardHk(string& strJsonIn, string& strJsonOut) = 0;
 };

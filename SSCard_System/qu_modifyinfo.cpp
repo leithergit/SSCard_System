@@ -24,7 +24,7 @@ qu_ModifyInfo::qu_ModifyInfo(QLabel* pTitle, QString strStepImage, Page_Index nI
 	ui->lineEdit_CardID->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")));   //只能输入数字
 	ui->lineEdit_Name->setValidator(new QRegExpValidator(QRegExp("[\u4e00-\u9fa5]{2,10}")));
 
-	ui->lineEdit_GuardianMobile->setValidator(new QRegExpValidator(QRegExp("0?(13|15|16|17|18|19)[0-9]{9}")));   //只能输入数字
+	ui->lineEdit_Mobile->setValidator(new QRegExpValidator(QRegExp("0?(13|15|16|17|18|19)[0-9]{9}")));   //只能输入数字
 	//ui->lineEdit_ExpiredDate->setValidator(new QRegExpValidator(QRegExp("((\\d{3}[1-9]|\\d{2}[1-9]\\d|\\d[1-9]\\d{2}|[1-9]\\d{3})(((0[13578]|1[02])(0[1-9]|[12]\\d|3[01]))|((0[469]|11)(0[1-9]|[12]\\d|30))|(02(0[1-9]|[1]\\d|2[0-8]))))|(((\\d{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)")));
 	//ui->lineEdit_IssuedDate->setValidator(new QRegExpValidator(QRegExp("((\\d{3}[1-9]|\\d{2}[1-9]\\d|\\d[1-9]\\d{2}|[1-9]\\d{3})(((0[13578]|1[02])(0[1-9]|[12]\\d|3[01]))|((0[469]|11)(0[1-9]|[12]\\d|30))|(02(0[1-9]|[1]\\d|2[0-8]))))|(((\\d{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)")));
 	for (auto var : g_vecNationCode)
@@ -116,8 +116,8 @@ qu_ModifyInfo::qu_ModifyInfo(QLabel* pTitle, QString strStepImage, Page_Index nI
 	/*ui->comboBox_Town->setStyleSheet(strQSS);
 	ui->comboBox_Street->setStyleSheet(strQSS);*/
 	//ui->comboBox_Guardianship->setStyleSheet(strQSS);
-	ui->comboBox_Nationality->setStyleSheet(strQSS);
-	ui->comboBox_Career->setStyleSheet(strQSS);
+	//ui->comboBox_Nationality->setStyleSheet(strQSS);
+	//ui->comboBox_Career->setStyleSheet(strQSS);
 	//InitializeDB(strMessage);
 	connect(this, &qu_ModifyInfo::AddNewIDCard, this, &qu_ModifyInfo::on_AddNewIDCard, Qt::QueuedConnection);
 	connect(this, &qu_ModifyInfo::CheckPersonInfo, this, &qu_ModifyInfo::on_CheckPersonInfo);
@@ -202,6 +202,7 @@ bool qu_ModifyInfo::LoadPersonInfo(QString strJson)
 		json.Get("Address", pSSCardInfo->strAddress);
 		json.Get("BankCode", pSSCardInfo->strBankCode);
 		json.Get("City", pSSCardInfo->strCity);
+		json.Get("DocType", pSSCardInfo->strCardType);
 
 		string strAddress;
 		//string strProvince, strCity, strCounty;
@@ -237,7 +238,7 @@ bool qu_ModifyInfo::LoadPersonInfo(QString strJson)
 
 		ui->dateEdit_Issued->setDateTime(QDateTime::fromString(pSSCardInfo->strReleaseDate.c_str(), "yyyyMMdd"));
 		ui->dateEdit_Expired->setDateTime(QDateTime::fromString(pSSCardInfo->strValidDate.c_str(), "yyyyMMdd"));
-		ui->lineEdit_GuardianMobile->setText(pSSCardInfo->strMobile.c_str());
+		ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile.c_str());
 		ui->plainTextEdit_Address->setPlainText(QString::fromLocal8Bit(pSSCardInfo->strAddress.c_str()));
 		if (strAddress.size())
 			ui->plainTextEdit_Address->setPlainText(strAddress.c_str());
@@ -330,6 +331,7 @@ void qu_ModifyInfo::SavePersonInfo()
 	json.Add("Mobile", pSSCardInfo->strMobile);
 	json.Add("BankCode", pSSCardInfo->strBankCode);
 	json.Add("City", pSSCardInfo->strCity);
+	json.Add("DocType", pSSCardInfo->strCardType);
 
 	//json.Add("Province", strProvince.toLocal8Bit().data());
 	//json.Add("CityName", strCity.toLocal8Bit().data());
@@ -389,6 +391,7 @@ int qu_ModifyInfo::ProcessBussiness()
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
 		string strCommand = "QueryPersonInfo";
@@ -425,7 +428,7 @@ int qu_ModifyInfo::ProcessBussiness()
 		//手机号码
 		std::string strPhoneNum;
 		jsonOut.Get("Mobile", strPhoneNum);
-		ui->lineEdit_GuardianMobile->setText(QString::fromStdString(strPhoneNum));
+		ui->lineEdit_Mobile->setText(QString::fromStdString(strPhoneNum));
 		//发证机关
 		std::string strCardAgency;
 		jsonOut.Get("CardAgency", strCardAgency);
@@ -506,6 +509,13 @@ int qu_ModifyInfo::ProcessBussiness()
 			std::string guardianID;
 			jsonOut.Get("GuardianID", guardianID);
 			ui->lineEdit_GuardianCardID->setText(QString::fromStdString(guardianID));
+			std::string guardianAgency;
+			jsonOut.Get("GuardianAgency", guardianAgency);
+			ui->lineEdit_Guardian_Card_Agency->setText(QString::fromStdString(guardianID));
+			std::string guardianMobile;
+			jsonOut.Get("GuardianMobile", guardianMobile);
+			ui->lineEdit_Guardian_Mobile->setText(QString::fromStdString(guardianMobile));
+
 
 			std::string strGuardianValidDate{};
 			std::string strGuardianReleaseDate{};
@@ -761,7 +771,7 @@ void qu_ModifyInfo::ClearInfo()
 	ui->lineEdit_Name->setText("");
 	ui->lineEdit_CardID->setText("");
 	ui->plainTextEdit_Address->setPlainText("");
-	ui->lineEdit_GuardianMobile->setText("");
+	ui->lineEdit_Mobile->setText("");
 	ui->comboBox_Nationality->setCurrentIndex(0);
 	ui->radioButton_Male->setChecked(false);
 	ui->radioButton_Female->setChecked(false);
@@ -794,7 +804,7 @@ int	qu_ModifyInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMessage)
 		strMessage = "身份证信息无效!";
 		return -1;
 	}
-	QString strMobile = ui->lineEdit_GuardianMobile->text();
+	QString strMobile = ui->lineEdit_Mobile->text();
 	if (strMobile.size() < 11)
 	{
 		strMessage = "手机号码输入有误,必须为11位数字!";
@@ -1011,6 +1021,7 @@ void qu_ModifyInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 
 int qu_ModifyInfo::QueryPersonInfo(void* p)
 {
+	gInfo() << __FUNCTION__;
 	QWaitCursor W;
 	QString strMessage;
 	QString strCardProgress;
@@ -1075,6 +1086,7 @@ int qu_ModifyInfo::QueryPersonInfo(void* p)
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
@@ -1151,10 +1163,10 @@ void qu_ModifyInfo::ShowGuardianWidget(bool bShow)
 	ui->label_ExpireDate_2->setVisible(bShow);
 	if (bShow)
 	{
-		ui->label_GuardianMobile->setMinimumSize(QSize(200, 60));
-		ui->label_GuardianMobile->setMaximumSize(QSize(200, 60));
-		ui->lineEdit_GuardianMobile->setMinimumSize(QSize(300, 60));
-		ui->lineEdit_GuardianMobile->setMaximumSize(QSize(300, 60));
+		/*ui->label_Mobile->setMinimumSize(QSize(200, 60));
+		ui->label_Mobile->setMaximumSize(QSize(200, 60));
+		ui->lineEdit_Mobile->setMinimumSize(QSize(300, 60));
+		ui->lineEdit_Mobile->setMaximumSize(QSize(300, 60));*/
 
 
 		if (ui->horizontalLayout_Guardian->count() == 5)
@@ -1167,10 +1179,10 @@ void qu_ModifyInfo::ShowGuardianWidget(bool bShow)
 	}
 	else
 	{
-		ui->label_GuardianMobile->setMinimumSize(QSize(220, 60));
-		ui->label_GuardianMobile->setMaximumSize(QSize(220, 60));
-		ui->lineEdit_GuardianMobile->setMinimumSize(QSize(700, 60));
-		ui->lineEdit_GuardianMobile->setMaximumSize(QSize(700, 60));
+		/*ui->label_Mobile->setMinimumSize(QSize(220, 60));
+		ui->label_Mobile->setMaximumSize(QSize(220, 60));
+		ui->lineEdit_Mobile->setMinimumSize(QSize(700, 60));
+		ui->lineEdit_Mobile->setMaximumSize(QSize(700, 60));*/
 		if (ui->horizontalLayout_Guardian->count() == 6)
 		{
 			horizontalSpacer_Mobile = (QSpacerItem*)ui->horizontalLayout_Guardian->itemAt(2);
@@ -1427,6 +1439,9 @@ void qu_ModifyInfo::on_pushButton_OK_clicked()
 			jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 			jsonIn.Add("Name", pSSCardInfo->strName);
 			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+			jsonIn.Add("DocType", pSSCardInfo->strCardType);
+			jsonIn.Add("GuardianDocType", pSSCardInfo->strGuardianDocType);
+
 			string strJsonIn;
 			string strJsonOut;
 			string strCommand;
@@ -1558,12 +1573,13 @@ void qu_ModifyInfo::on_pushButton_OK_clicked()
 			jsonIn.Add("ValidDate", validDate.c_str());
 
 			//修改电话
-			jsonIn.Add("Mobile", ui->lineEdit_GuardianMobile->text().toStdString());
+			jsonIn.Add("Mobile", ui->lineEdit_Mobile->text().toStdString());
 			//修改地址
 			QString address = ui->plainTextEdit_Address->toPlainText();
 			jsonIn.Add("Address", address.toLocal8Bit().constData());
 
-			jsonIn.Add("jbr", "金乔炜煜制卡软件");
+			QString jbr("金乔炜煜制卡软件");
+			jsonIn.Add("jbr", jbr.toLocal8Bit().constData());
 			if (g_pDataCenter->bGuardian)
 			{
 				string guardianReleaseDate = ui->dateEdit_Issued_2->dateTime().toString("yyyyMMdd").toStdString();
@@ -1591,6 +1607,26 @@ void qu_ModifyInfo::on_pushButton_OK_clicked()
 				{
 					jsonIn.Add("GuardianId", guardianId.c_str());
 				}
+				string  guardianAgency = ui->lineEdit_Guardian_Card_Agency->text().toLocal8Bit();
+				if (guardianAgency.empty())
+				{
+					strMessage = "监护人发证机关不能为空";
+					break;
+				}
+				else
+				{
+					jsonIn.Add("GuardianAgency", guardianAgency.c_str());
+				}
+				string  guardianMobile = ui->lineEdit_Guardian_Mobile->text().toLocal8Bit();
+				if (guardianMobile.empty())
+				{
+					strMessage = "监护人联系电话不能为空";
+					break;
+				}
+				else
+				{
+					jsonIn.Add("GuardianMobile", guardianMobile.c_str());
+				}
 				if (ui->radioButton_Male_2->isChecked())
 				{
 					jsonIn.Add("GuardianSex", "1");
@@ -1616,6 +1652,11 @@ void qu_ModifyInfo::on_pushButton_OK_clicked()
 				int nErrCode = -1;
 				jsonOut.Get("Result", nErrCode);
 				jsonOut.Get("Message", strText);
+				if (strText.empty())
+				{
+					strMessage = QString("修改信息失败:%1").arg(QString::fromStdString(strJsonOut));
+					break;
+				}
 				strMessage = QString("修改信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
 				break;
 			}
@@ -1693,7 +1734,7 @@ void qu_ModifyInfo::on_checkBox_Agency_clicked()
 	bool bChecked = ui->checkBox_Agency->isChecked();
 	ShowGuardianWidget(bChecked);
 	g_pDataCenter->bGuardian = bChecked;
-	//桌面版注释
+	//客户要求取消检测身份证
 	/*if (bChecked)
 	{
 
@@ -1749,7 +1790,8 @@ void qu_ModifyInfo::on_CheckPersonInfo()
 	SSCardBaseInfoPtr  pSSCardInfo = make_shared<SSCardBaseInfo>();
 	pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
 	pSSCardInfo->strName = (const char*)pIDCard->szName;
-
+	//修改信息只支持中国人
+	pSSCardInfo->strCardType = "A";
 	int nResult = -1;
 	WaitingProgress WaitingUI(qu_ModifyInfo::QueryPersonInfo,
 		pSSCardInfo.get(),
@@ -1766,7 +1808,7 @@ void qu_ModifyInfo::on_CheckPersonInfo()
 		if (nIndex != -1)
 			ui->comboBox_Career->setCurrentIndex(nIndex);
 		if (pSSCardInfo->strMobile.size())
-			ui->lineEdit_GuardianMobile->setText(pSSCardInfo->strMobile.c_str());
+			ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile.c_str());
 		ui->dateEdit_Issued->setDate(QDate::fromString(pSSCardInfo->strReleaseDate.c_str(), "yyyyMMdd"));
 		ui->dateEdit_Expired->setDate(QDate::fromString(pSSCardInfo->strValidDate.c_str(), "yyyyMMdd"));
 

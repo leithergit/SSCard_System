@@ -272,6 +272,7 @@ int Sys_BatchMakeCard::BuildNewCardInfo(QString& strMessage)
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 
 		strJsonIn = jsonIn.ToString();
 		string strJsonout;
@@ -380,6 +381,7 @@ int Sys_BatchMakeCard::BuildUpdateCardInfo(QString& strMessage)
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 
 		strJsonIn = jsonIn.ToString();
 		string strJsonout;

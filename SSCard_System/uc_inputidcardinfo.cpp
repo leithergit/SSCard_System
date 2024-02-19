@@ -9,6 +9,7 @@
 #include "Sys_dialogcameratest.h"
 #include "waitingprogress.h"
 
+#include <QPair>
 #include <ctime>
 
 int GetAge(string strBirthday)
@@ -129,6 +130,22 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	connect(this, &uc_InputIDCardInfo::CheckPersonInfo, this, &uc_InputIDCardInfo::on_CheckPersonInfo);
 	//connect(ui->lineEdit_Name, &QLineEdit::editingFinished, this, &uc_InputIDCardInfo::on_Name_EditingFinished);
 	connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+	ui->comboBox_GuardianDocType->clear();
+	ui->comboBox_DocType->clear();
+	ui->comboBox_GuardianDocType->blockSignals(true);
+	for (auto var : g_vecDocCode)
+	{
+		ui->comboBox_GuardianDocType->addItem(QString::fromStdString(var.strDocName), QString::fromStdString(var.strCode));
+	}
+	ui->comboBox_GuardianDocType->blockSignals(false);
+	ui->comboBox_GuardianDocType->setCurrentIndex(0);
+	ui->comboBox_DocType->blockSignals(true);
+	for (auto var : g_vecDocCode)
+	{
+		ui->comboBox_DocType->addItem(QString::fromStdString(var.strDocName), QString::fromStdString(var.strCode));
+	}
+	ui->comboBox_DocType->blockSignals(false);
+	ui->comboBox_DocType->setCurrentIndex(0);
 }
 
 /*
@@ -206,6 +223,7 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 		json.Get("Address", pSSCardInfo->strAddress);
 		json.Get("BankCode", pSSCardInfo->strBankCode);
 		json.Get("City", pSSCardInfo->strCity);
+		json.Get("DocType", pSSCardInfo->strCardType);
 
 		string strAddress;
 		//string strProvince, strCity, strCounty;
@@ -334,6 +352,7 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	json.Add("Mobile", pSSCardInfo->strMobile);
 	json.Add("BankCode", pSSCardInfo->strBankCode);
 	json.Add("City", pSSCardInfo->strCity);
+	json.Add("DocType", pSSCardInfo->strCardType);
 
 	//json.Add("Province", strProvince.toLocal8Bit().data());
 	//json.Add("CityName", strCity.toLocal8Bit().data());
@@ -375,7 +394,7 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		pMainWind->pLastStackPage->ResetTimer(true, this);
 	}
 	ResetPage();
-
+	QString strMessage;
 	if (g_pDataCenter->GetIDCardInfo())
 	{
 		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
@@ -395,6 +414,80 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		int nIndex = ui->comboBox_Nationality->findText(strNationalty);
 		if (nIndex != -1)
 			ui->comboBox_Nationality->setCurrentIndex(nIndex);
+		if (g_pDataCenter->bSwitchBank && g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+		{
+			SSCardService* pService = nullptr;
+			if (QFailed(g_pDataCenter->OpenSSCardService(&pService, strMessage, pIDCard)))
+			{
+				gError() << strMessage.toStdString();
+				emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+				return -1;
+			}
+			CJsonObject jsonIn;
+			jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
+			jsonIn.Add("Name", (char*)pIDCard->szName);
+			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
+			QString strDocType = ui->comboBox_DocType->currentIndex();
+			pSSCardInfo->strCardType = strDocType.toStdString();
+			jsonIn.Add("DocType", strDocType.toStdString());
+			string strjsonIn, strjsonout;
+			string strJsonIn = jsonIn.ToString();
+			string strJsonOut;
+
+			if (QFailed(pService->QueryCardInfo(strJsonIn, strJsonOut)))
+			{
+				CJsonObject jsonOut(strJsonOut);
+				string strText;
+				int nErrCode = -1;
+				jsonOut.Get("Result", nErrCode);
+				jsonOut.Get("Message", strText);
+				strMessage = QString("查询正常状态卡信息失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+				emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+				return -1;
+			}
+			CJsonObject jsonOut(strJsonOut);
+			strJsonOut.clear();
+			string strCardNum,strChipNum;
+			jsonOut.Get("CardNum", strCardNum);
+			jsonOut.Get("ChipNum", strChipNum);
+			jsonIn.Add("CardNum", strCardNum);
+			jsonIn.Add("ChipNum", strChipNum);
+			if (QFailed(pService->QueryCardBalance(strjsonIn, strjsonout)))
+			{
+				CJsonObject jsonOut(strJsonOut);
+				string strText;
+				int nErrCode = -1;
+				jsonOut.Get("Result", nErrCode);
+				jsonOut.Get("Message", strText);
+				strMessage = QString("查询余额失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
+				emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+				return -1;
+			}
+			jsonOut(strJsonOut);
+			string yuan;
+			jsonOut.Get("Yuan", yuan);
+			QString Yuan = QString::fromStdString(yuan);
+			ui->lineEdit_Balance->setText(Yuan);
+		}
+		else
+		{
+			ui->lineEdit_Balance->setVisible(false);
+			ui->label_Balance->setVisible(false);
+		}
+	}
+	if (!(g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard
+		&& g_pDataCenter->bSwitchBank))
+	{
+		ui->lineEdit_Balance->setVisible(false);
+		ui->label_Balance->setVisible(false);
+	}
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_QueryInformation)
+	{
+		ui->comboBox_CardStatues->setVisible(true);
+	}
+	else
+	{
+		ui->comboBox_CardStatues->setVisible(false);
 	}
 	QString strAppPath = qApp->applicationDirPath();
 	QString path = strAppPath + "/data";
@@ -497,6 +590,26 @@ void uc_InputIDCardInfo::HideItem()
 	ui->pushButton_SelectPhoto->setVisible(false);
 	ui->pushButton_OK->setVisible(false);
 	ui->pushButton_GetCardID->setVisible(true);
+	ui->label_Balance->setVisible(false);
+	ui->lineEdit_Balance->setVisible(false);
+
+	ui->comboBox_CardStatues->setVisible(true);
+	ui->comboBox_CardStatues->clear();
+	vector<std::pair<std::string, int>> vStatue = {
+		{ "放号",0 },
+		{ "正常",1 },
+		{ "挂失",2 },
+		{ "临时挂失",3 },//b
+		{ "挂失后注销",4 },//3
+		{ "注销",5 },//4
+		{ "未启用",6 }//A
+	};
+	for (auto var : vStatue)
+	{
+		ui->comboBox_CardStatues->addItem(var.first.c_str(), var.second);
+	}
+	ui->comboBox_CardStatues->setCurrentText("正常");
+
 
 }
 
@@ -622,6 +735,7 @@ void uc_InputIDCardInfo::ClearInfo()
 	ui->radioButton_Female->setChecked(false);
 	ui->pushButton_OK->setEnabled(true);
 	ui->checkBox_Agency->setChecked(false);
+	ui->lineEdit_Balance->setText("");
 	pIDCard = nullptr;
 	pSSCardInfo = nullptr;
 	ui->label_Photo->setStyleSheet("border-image: url();");
@@ -930,6 +1044,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 
 		string strJsonIn = jsonIn.ToString();
 		string strJsonOut;
@@ -997,6 +1112,8 @@ void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
 	ui->lineEdit_Guardian->setVisible(bShow);
 	ui->comboBox_Guardianship->setVisible(bShow);
 	ui->lineEdit_GuardianCardID->setVisible(bShow);
+	ui->comboBox_GuardianDocType->setVisible(bShow);
+	ui->label_GuardianDocType->setVisible(bShow);
 	if (bShow)
 	{
 		ui->label_GuardianMobile->setMinimumSize(QSize(200, 60));
@@ -1010,7 +1127,6 @@ void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
 			horizontalSpacer_Mobile = new QSpacerItem(40, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 			ui->horizontalLayout_Guardian->insertSpacerItem(2, horizontalSpacer_Mobile);
 		}
-
 		qDebug() << "Item Count =" << ui->horizontalLayout_Guardian->count();
 	}
 	else
@@ -1278,6 +1394,8 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 			jsonIn.Add("Name", (const char*)pIDCard->szName);
 			jsonIn.Add("City", g_pDataCenter->GetSysConfigure()->Region.strCityCode);
 			jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
+			QString strDocType = ui->comboBox_DocType->currentData().toString();
+			jsonIn.Add("DocType", strDocType.toStdString());
 			string strJsonIn = jsonIn.ToString();
 			string strJsonOut;
 			if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))
@@ -1365,7 +1483,7 @@ void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
 	bool bChecked = ui->checkBox_Agency->isChecked();
 	ShowGuardianWidget(bChecked);
 	g_pDataCenter->bGuardian = bChecked;
-	//桌面版注释
+	//客户反馈不需要
 
 	//if (bChecked)
 	//{
@@ -1422,7 +1540,7 @@ void uc_InputIDCardInfo::on_CheckPersonInfo()
 	SSCardBaseInfoPtr  pSSCardInfo = make_shared<SSCardBaseInfo>();
 	pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
 	pSSCardInfo->strName = (const char*)pIDCard->szName;
-
+	pSSCardInfo->strCardType = ui->comboBox_DocType->currentData().toString().toStdString();
 	int nResult = -1;
 	WaitingProgress WaitingUI(uc_InputIDCardInfo::QueryPersonInfo,
 		pSSCardInfo.get(),
@@ -1479,3 +1597,57 @@ void uc_InputIDCardInfo::on_lineEdit_CardID_textEdited(const QString& arg1)
 		return;
 	emit CheckPersonInfo();
 }
+
+void uc_InputIDCardInfo::on_comboBox_CardStatues_currentIndexChanged(int index)
+{
+	int nIndex;
+	nIndex = ui->comboBox_CardStatues->currentIndex();
+	switch (nIndex)
+	{
+	case 0:
+		g_pDataCenter->nCardStratus = CardStatus::Card_Release;
+		break;
+	case 1:
+		g_pDataCenter->nCardStratus = CardStatus::Card_Normal;
+		break;
+	case 2:
+		g_pDataCenter->nCardStratus = CardStatus::Card_RegisterLost;
+		break;
+	case 3:
+		g_pDataCenter->nCardStratus = CardStatus::Card_RegisgerTempLost;
+		break;
+	case 4:
+		g_pDataCenter->nCardStratus = CardStatus::Card_CanceledOnRegisterLost;
+		break;
+	case 5:
+		g_pDataCenter->nCardStratus = CardStatus::Card_Canceled;
+		break;
+	case 6:
+		g_pDataCenter->nCardStratus = CardStatus::Card_DeActived;
+		break;
+	default:
+		break;
+	}
+}
+
+
+void uc_InputIDCardInfo::on_comboBox_DocType_currentIndexChanged(int index)
+{
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	pSSCardInfo->strCardType = ui->comboBox_DocType->currentData().toString().toStdString();
+}
+
+
+void uc_InputIDCardInfo::on_comboBox_Guoji_currentIndexChanged(int index)
+{
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	pSSCardInfo->strGuardianDocType = ui->comboBox_GuardianDocType->currentIndex();
+}
+
+
+void uc_InputIDCardInfo::on_comboBox_GuardianDocType_currentIndexChanged(int index)
+{
+	SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	pSSCardInfo->strGuardianDocType = ui->comboBox_GuardianDocType->currentData().toString().toStdString();
+}
+

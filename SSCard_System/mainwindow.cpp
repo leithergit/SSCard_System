@@ -429,6 +429,7 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	}
 
 	m_pNewCard->ResetAllPages();
+#ifndef _DESKTOP
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
@@ -447,6 +448,7 @@ void MainWindow::on_pushButton_NewCard_clicked()
 		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+#endif
 	g_pDataCenter->ResetIDData();
 	g_pDataCenter->nCardServiceType = ServiceType::Service_NewCard;
 	m_pNewCard->StartBusiness();
@@ -478,6 +480,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		return;
 	}
 	m_pUpdateCard->ResetAllPages();
+#ifndef _DESKTOP
 	int nResult = -1;
 	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
 	{
@@ -496,6 +499,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 		return;
 	}
+#endif
 	g_pDataCenter->ResetIDData();
 
 	g_pDataCenter->nCardServiceType = ServiceType::Service_ReplaceCard;

@@ -149,6 +149,17 @@ vector<NationaltyCode> g_vecNationCode = {
 			{ "99","其他" }
 };
 
+vector<DocType> g_vecDocCode ={
+	{"A","居民身份证（户口簿）"},
+	{"C","护照"},
+	{"D","外国人永久居留证"},
+	{"J","港澳居民来往内地通行证"},
+	{"K","台湾居民往来大陆通行证"},
+	{"M","港澳台居民居住证"},
+	{"JH","香港特区护照/港澳居民来往内地通行证"},
+	{"JM","澳门特区护照/港澳居民来往内地通行证"}
+};
+
 vector<HukouCode> g_vecHukouCode = {
 	{"10","非农业户口"},
 	{"11","本地非农业户口（本地城镇）"},
@@ -2762,6 +2773,7 @@ QString CardStatusString(CardStatus nCardStratus)
 
 int  DataCenter::PremakeCard(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	string strJsonIn, strJsonOut;
 
@@ -2774,26 +2786,78 @@ int  DataCenter::PremakeCard(QString& strMessage)
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("City", pSSCardInfo->strCity);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 		strJsonIn = jsonIn.ToString();
 		gInfo() << "JsonIn = " << strJsonIn;
+		bool bskip = false;
+
 		if (!g_pDataCenter->bSwitchBank) {
-			if (QFailed(pSScardSerivce->PreMakeCard(strJsonIn, strJsonOut)))
+			//需要插入申请校验
+			if(QFailed(pSScardSerivce->CheckPremakeCard(strJsonIn,strJsonOut)))
 			{
 				CJsonObject jsonOut(strJsonOut);
-				string strErrText;
-				jsonOut.Get("Message", strErrText);
-				strMessage = QString("预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
-				break;
+				string tmp; 
+				jsonOut.Get("errCode", tmp);
+				if (tmp != "3")
+				{
+					string strErrText;
+					jsonOut.Get("Message", strErrText);
+					strMessage = QString("申领卡信息校验失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+					break;
+				}
+				strJsonOut.clear();
+				bskip = true;
 			}
+			
+			if (bskip)
+			{
+
+			}
+			else
+			{
+				if (QFailed(pSScardSerivce->PreMakeCard(strJsonIn, strJsonOut)))
+				{
+					CJsonObject jsonOut(strJsonOut);
+					string strErrText;
+					jsonOut.Get("Message", strErrText);
+					strMessage = QString("预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+					break;
+				}
+			}
+			
 		}
 		else {
-			if (QFailed(pSScardSerivce->PreMakeCardHk(strJsonIn, strJsonOut)))
+			//需要插入申请校验
+			if (QFailed(pSScardSerivce->CheckPremakeCardHK(strJsonIn, strJsonOut)))
 			{
 				CJsonObject jsonOut(strJsonOut);
-				string strErrText;
-				jsonOut.Get("Message", strErrText);
-				strMessage = QString("跨行换卡预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
-				break;
+				string tmp;
+				jsonOut.Get("errCode", tmp);
+				if (tmp != "3")
+				{
+					string strErrText;
+					jsonOut.Get("Message", strErrText);
+					strMessage = QString("申领卡信息校验失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+					break;
+				}
+				strJsonOut.clear();
+				bskip = true;
+			}
+
+			if (bskip)
+			{
+
+			}
+			else
+			{
+				if (QFailed(pSScardSerivce->PreMakeCardHk(strJsonIn, strJsonOut)))
+				{
+					CJsonObject jsonOut(strJsonOut);
+					string strErrText;
+					jsonOut.Get("Message", strErrText);
+					strMessage = QString("跨行换卡预制卡开户失败:%1").arg(QString::fromLocal8Bit(strErrText.c_str()));
+					break;
+				}
 			}
 		}
 		
@@ -2826,6 +2890,7 @@ int  DataCenter::PremakeCard(QString& strMessage)
 
 int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage, PhotoType nType)
 {
+	LOG(INFO) << __FUNCTION__;
 	string stPhotoFile = "";
 	if (nType == PhotoType::Photo_CardID)
 	{
@@ -2866,6 +2931,7 @@ int  DataCenter::LoadPhoto(string& strBase64Photo, QString& strMessage, PhotoTyp
 
 int DataCenter::modifyPersonInfo(string& strBase64Photo, QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	if (!pSScardSerivce)
 	{
 		strMessage = "卡管服务不可用!";
@@ -2915,6 +2981,7 @@ int DataCenter::modifyPersonInfo(string& strBase64Photo, QString& strMessage)
 
 int DataCenter::DownloadPhoto(string& strBase64Photo, QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	if (!pSScardSerivce)
 	{
 		strMessage = "卡管服务不可用!";
@@ -2927,6 +2994,7 @@ int DataCenter::DownloadPhoto(string& strBase64Photo, QString& strMessage)
 	jsonQuery.Add("CardID", pSSCardInfo->strIdentity);
 	jsonQuery.Add("Name", pSSCardInfo->strName);
 	jsonQuery.Add("City", pSSCardInfo->strCity);
+	jsonQuery.Add("DocType", pSSCardInfo->strCardType);
 
 	string strJsonQuery = jsonQuery.ToString();
 	string strJsonOut;
@@ -2964,6 +3032,7 @@ int DataCenter::DownloadPhoto(string& strBase64Photo, QString& strMessage)
 
 int DataCenter::RegisterLost(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	if (!pSSCardInfo || !pSScardSerivce)
 	{
 		strMessage = "卡管服务或社保卡信息不可用!";
@@ -2997,6 +3066,7 @@ int DataCenter::RegisterLost(QString& strMessage)
 
 int DataCenter::GetCardStatus(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	CJsonObject jsonIn;
 	jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
 	jsonIn.Add("Name", (const char*)pIDCard->szName);
@@ -3033,6 +3103,7 @@ int DataCenter::GetCardStatus(QString& strMessage)
 
 int  DataCenter::CommitPersionInfo(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	RegionInfo* pInfo = &(pSysConfig->Region);
 	pSSCardInfo->strBankCode = pSysConfig->Region.strBankCode;
@@ -3069,27 +3140,29 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 		jsonIn.Add("JJRID", pInfo->strJJRId);
 		jsonIn.Add("JJRMobile", pInfo->strJJRMobile);
 		jsonIn.Add("BankNodeName", pInfo->strBankNodeName);
-		CJsonObject jsonAuthorize;
-		jsonAuthorize.AddEmptySubArray("AuthorizeData");
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
+		//CJsonObject jsonAuthorize;
+		//jsonAuthorize.AddEmptySubArray("AuthorizeData");
+		jsonIn.AddEmptySubArray("AuthorizeData");
 		if (g_pDataCenter->bGuardian)
 		{
 			jsonIn.Add("ByGuardian", 1);	// 启用监护人信息
 			jsonIn.Add("Guardian", pSSCardInfo->strGuardianName);
 			jsonIn.Add("GuardianShip", pSSCardInfo->strGuardianShip);
 			jsonIn.Add("GuardianCardID", pSSCardInfo->strGuardianIDentity);
-			//无需加载监护人照片
-			//string strGuaidianBase64;
-			//
-			///*if QFailed(LoadPhoto(strGuaidianBase64, strMessage, PhotoType::Photo_Guardian))
-			//	break;*/
-			//jsonAuthorize["AuthorizeData"].Add(strGuaidianBase64);
+			jsonIn.Add("GuardianDocTpye", pSSCardInfo->strGuardianDocType);
+			//加载监护人照片
+			string strGuaidianBase64;
+			
+			if QFailed(LoadPhoto(strGuaidianBase64, strMessage, PhotoType::Photo_Guardian))
+				break;
+			jsonIn["AuthorizeData"].Add(strGuaidianBase64);
 		}
 
 		if QFailed(LoadPhoto(pSSCardInfo->strPhoto, strMessage))
 			break;
 
-		jsonAuthorize["AuthorizeData"].Add(pSSCardInfo->strPhoto);
-
+		jsonIn["AuthorizeData"].Add(pSSCardInfo->strPhoto);
 		gInfo() << "JsonIn(without photo) = " << jsonIn.ToFormattedString();
 		jsonIn.Add("Photo", pSSCardInfo->strPhoto);
 
@@ -3125,9 +3198,7 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 					jsonOut.Get("Message", strText);
 					jsonOut.Get("errcode", strErrcode);
 
-					jsonOut.Get("Yuan", yuan);
 
-					jsonOut.Get("Fen", fen);
 					if (strErrcode == "1")
 					{
 						strMessage = QString("查询卡余额失败:%1").arg(QString::fromLocal8Bit(strText.c_str()));
@@ -3135,12 +3206,15 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 						return -1;
 					}
 				}
+				CJsonObject jsonOut(strJsonOut);
+				jsonOut.Get("Yuan", yuan);
 
+				jsonOut.Get("Fen", fen);
 				if ((QString(yuan.c_str()).toInt() != 0) || QString(fen.c_str()).toInt() != 0)
 				{
 					//存在余额，提示返回
 					strMessage = "使用赛顺平台转出余额后办卡";
-
+					LOG(INFO) << strMessage.toStdString();
 					return -1;
 				}
 			}
@@ -3235,6 +3309,7 @@ int	 DataCenter::SafeReadCard(QString& strMessage)
 
 int	 DataCenter::SafeWriteCard(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	string strJsonIn, strJsonOut;
 	QString strInfo;
@@ -3269,6 +3344,7 @@ int	 DataCenter::SafeWriteCard(QString& strMessage)
 
 int	 DataCenter::SafeWriteCardTest(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	string strJsonIn, strJsonOut;
 	QString strInfo;
@@ -3300,11 +3376,13 @@ int	 DataCenter::SafeWriteCardTest(QString& strMessage)
 
 int  DataCenter::EnsureData(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	QString strInfo;
 	string strJsonIn, strJsonOut;
 	string strBankNodeCode = "";
 	RegionInfo* pInfo = &(pSysConfig->Region);
+	gInfo() << __FUNCTION__;
 	do
 	{
 		if (!pSSCardInfo || !pSScardSerivce)
@@ -3323,6 +3401,7 @@ int  DataCenter::EnsureData(QString& strMessage)
 		jsonIn.Add("ChipNum", pSSCardInfo->strChipNum);
 		jsonIn.Add("MagNum", pSSCardInfo->strBankNum);
 		jsonIn.Add("CardVersion", pSSCardInfo->strCardVersion);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 		jsonIn.Add("ChipType", "80");
 
 		
@@ -3347,7 +3426,7 @@ int  DataCenter::EnsureData(QString& strMessage)
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
 			jsonOut.Get("Message", strErrText);
-			strMessage = QString::fromLocal8Bit(strErrText.c_str());
+			strMessage = "QueryLKId" + QString::fromLocal8Bit(strErrText.c_str());
 			break;
 		}
 		
@@ -3363,17 +3442,9 @@ int  DataCenter::EnsureData(QString& strMessage)
 		
 		gInfo() << "JsonOut = " << strJsonOut;
 		strJsonOut.clear();
-		if (g_pDataCenter->bGuardian)
-		{
-			jsonIn.Add("JJRName", pSSCardInfo->strGuardianName);
-			jsonIn.Add("JJRID", pSSCardInfo->strGuardianIDentity);
-			
-		}
-		else
-		{
-			jsonIn.Add("JJRName", pSSCardInfo->strName);
-			jsonIn.Add("JJRID", pSSCardInfo->strIdentity);
-		}
+		jsonIn.Add("JJRName", pSSCardInfo->strName);
+		jsonIn.Add("JJRID", pSSCardInfo->strIdentity);
+
 		jsonIn.Add("JJRMobile", pSSCardInfo->strMobile);
 		strJsonIn = jsonIn.ToString();
 		if (QFailed(pSScardSerivce->handToPerson(strJsonIn, strJsonOut)))
@@ -3382,7 +3453,7 @@ int  DataCenter::EnsureData(QString& strMessage)
 			CJsonObject jsonOut(strJsonOut);
 			string strErrText;
 			jsonOut.Get("Message", strErrText);
-			strMessage = QString::fromLocal8Bit(strErrText.c_str());
+			strMessage = "handtoGr" + QString::fromLocal8Bit(strErrText.c_str());
 			break;
 		}
 		gInfo() << "JsonOut = " << strJsonOut;
@@ -3395,6 +3466,7 @@ int  DataCenter::EnsureData(QString& strMessage)
 
 int  DataCenter::ActiveCard(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	QString strInfo;
 	string strJsonIn, strJsonOut;
@@ -3499,6 +3571,7 @@ int ProcessHeaderImage(QString& strHeaderPhoto, QString& strMessage)
 
 bool  DataCenter::InitializeDB(QString& strMessage)
 {
+	LOG(INFO) << __FUNCTION__;
 	SQLiteDB = QSqlDatabase::addDatabase("QSQLITE");
 	//设置数据库
 	SQLiteDB.setDatabaseName("./Data/ChinaRegion.db");

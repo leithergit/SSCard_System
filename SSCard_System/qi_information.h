@@ -25,6 +25,10 @@ private slots:
 
     void on_pushButton_ModifyInfo_clicked();
 
+    void on_pushButton_ModifPhoto_clicked();
+
+    void on_pushButton_ActiveCard_clicked();
+
 private:
 	Ui::qi_Information* ui;
 };

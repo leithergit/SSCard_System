@@ -50,8 +50,8 @@ color: 0
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>18</width>
-         <height>20</height>
+         <width>13</width>
+         <height>414</height>
         </size>
        </property>
       </spacer>
@@ -170,6 +170,9 @@ color: 0
                <string>身份证号</string>
               </property>
              </widget>
+            </item>
+            <item>
+             <layout class="QFormLayout" name="formLayout"/>
             </item>
             <item>
              <widget class="QLineEdit" name="lineEdit_CardID">
@@ -360,6 +363,55 @@ color: 0
             </item>
            </layout>
           </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <widget class="QLabel" name="label_Balance">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>余额</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_Balance">
+              <property name="minimumSize">
+               <size>
+                <width>400</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 57 24pt &quot;思源黑体 CN Medium&quot;;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>24</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
          </layout>
         </item>
        </layout>
@@ -400,6 +452,9 @@ color: 0
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
@@ -438,6 +493,35 @@ QPushButton:!enabled{background:#cacaca;}
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_ActiveCard">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>266</width>
+         <height>101</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 25px;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+
+</string>
+       </property>
+       <property name="text">
+        <string>激活</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_ModifyInfo">
        <property name="enabled">
         <bool>true</bool>
@@ -467,16 +551,45 @@ QPushButton:!enabled{background:#cacaca;}
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_ModifPhoto">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>266</width>
+         <height>101</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background-color: #298cf0;
+border-radius: 25px;
+font: 57 42px &quot;思源黑体 CN Medium&quot;;
+font-weight: normal;
+line-height: 49px;
+letter-spacing: 1px;
+color: #ffffff;}
+QPushButton:pressed{background:#38a357;}
+QPushButton:!enabled{background:#cacaca;}
+
+</string>
+       </property>
+       <property name="text">
+        <string>修改照片</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>QSizePolicy::Expanding</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>200</width>
+         <width>40</width>
          <height>20</height>
         </size>
        </property>

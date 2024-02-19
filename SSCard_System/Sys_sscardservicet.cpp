@@ -179,6 +179,7 @@ void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 			QByteArray ba(ss.str().c_str(), ss.str().size());
 			QByteArray baBase64 = ba.toBase64();
 			jsonIn.Add("Photo", baBase64.data());
+			jsonIn.Add("DocTYpe", pSSCardInfo->strCardType);
 		}
 		break;
 		case ServiceType::Service_ReplaceCard:
@@ -200,7 +201,8 @@ void SSCardServiceT::on_pushButton_CommitInfo_clicked()
 			jsonIn.Add("Nation", (char*)pIDCardInfo->szNationaltyCode);
 			jsonIn.Add("Address", (char*)pIDCardInfo->szAddress);
 			jsonIn.Add("BankCode", Reginfo.strBankCode);
-			jsonIn.Add("CardNum", "M82492669");
+			jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
+			jsonIn.Add("DocType", pSSCardInfo->strCardType);
 		}
 		break;
 		case ServiceType::Service_RegisterLost:
@@ -664,6 +666,7 @@ void SSCardServiceT::on_pushButton_GetPhoto_clicked()
 		jsonIn.Add("CardID", (char*)pIDCard->szIdentity);
 		jsonIn.Add("Name", (char*)pIDCard->szName);
 		jsonIn.Add("City", (char*)Reginfo.strCityCode.c_str());
+		jsonIn.Add("DocType", "A");
 
 		strJsonIn = jsonIn.ToString();
 		string strJsonout;

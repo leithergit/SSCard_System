@@ -141,6 +141,7 @@ int nc_commitPersonInfo::ProcessBussiness()
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("City", Reginfo.strCityCode);
+		jsonIn.Add("DocType", pSSCardInfo->strCardType);
 
 		strJsonIn = jsonIn.ToString();
 		string strJsonout;

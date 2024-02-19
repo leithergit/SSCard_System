@@ -73,6 +73,27 @@ int uc_MakeCard::ProcessBussiness()
 	int nResult = -1;
 	QString strMessage;
 	ui->pushButton_OK->setText("确定");
+#ifdef _DESKTOP
+	//int nResult = -1;
+	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+
+	if (QFailed(nResult = g_pDataCenter->TestPrinter(strMessage)))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+
+	if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
+	{
+		emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
+		return -1;
+	}
+
+#endif
 
 	if (!g_pDataCenter->GetPrinter())
 	{

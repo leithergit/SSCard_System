@@ -356,6 +356,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			jsonIn.Add("BankCode", Reginfo.strBankCode);
 			jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 			jsonIn.Add("Operator", Reginfo.strOperator);
+			jsonIn.Add("DocType", pSSCardInfo->strCardType);
 			string strJsonIn = jsonIn.ToString();
 			string strJsonout;
 			int nResult = 0;
@@ -439,6 +440,7 @@ void uc_EnsureInformation::on_pushButton_OK_clicked()
 			jsonIn.Add("BankCode", Reginfo.strBankCode);
 			jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 			jsonIn.Add("Operator", Reginfo.strOperator);
+			jsonIn.Add("DocType", pSSCardInfo->strCardType);
 			string strJsonIn = jsonIn.ToString();
 			string strJsonout;
 

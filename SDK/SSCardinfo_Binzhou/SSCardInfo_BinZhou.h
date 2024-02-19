@@ -184,6 +184,27 @@ DLL_PUBLIC int queryPersonInfo(SD_SSCardInfo& info, std::string& pOutInfo);
 DLL_PUBLIC int chkCanCardBh(SD_SSCardInfo& info, std::string& pOutInfo);
 
 /**
+* @brief 换卡申请校验
+* @param[in]  cardID			有效证件号码
+* @param[in]  cardType			有效证件类型 可以为空
+* @param[in]  name				姓名
+* @param[in]  bankCode			银行编号
+* @param[in]  city				行政区划代码
+* @param[in]  Financial_Acc_Flag	金融账号是否注销 "0"未注销，"1"注销
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int chkCanCardHkGhyh(SD_SSCardInfo& info, std::string& pOutInfo);
+
+/**
+* @brief 保存个人照片信息
+* @param[in] info 需要cardID,cardType,name,photo,systemType,city,operator
+* @param[out] pOutInfo 返回json字符串
+* @return 0:成功 1:失败
+ */
+DLL_PUBLIC int savePerCardPhoto(SD_SSCardInfo& info, std::string& pOutInfo);
+
+/**
 * @brief 保存补换卡名单信息(监护人代申请,需填监护人信息)
 * @param[in] info 需要cardID,cardType,name,bankCode,city,mobile,reason,operator,OccupType,birthday,sex,nation,address,photo,GuardianName,GuardianCardType,GuardianCardID,GuardianType
 * @param[out] pOutInfo 返回json字符串

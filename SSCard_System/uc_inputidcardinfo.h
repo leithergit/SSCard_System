@@ -6,6 +6,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QToolTip>
 #include <QVariantList>
 #include "qstackpage.h"
 #include "sys_dialogreadidcard.h"
@@ -96,6 +97,14 @@ private slots:
 	void on_lineEdit_Name_textEdited(const QString& arg1);
 	// 只响应UI编辑事件
 	void on_lineEdit_CardID_textEdited(const QString& arg1);
+
+    void on_comboBox_CardStatues_currentIndexChanged(int index);
+
+    void on_comboBox_DocType_currentIndexChanged(int index);
+
+    void on_comboBox_Guoji_currentIndexChanged(int index);
+
+    void on_comboBox_GuardianDocType_currentIndexChanged(int index);
 
 private:
 	Ui::uc_InputIDCardInfo* ui;

@@ -892,6 +892,12 @@ struct NationaltyCode
 	string strNationalty;
 };
 
+struct DocType
+{
+	string strCode;
+	string strDocName;
+};
+
 struct HukouCode
 {
 	string strCode;
@@ -1195,6 +1201,7 @@ extern vector<HukouCode> g_vecHukouCode;
 extern vector<EductionCode> g_vecEducationCode;
 extern vector<MarrageCode> g_vecMarriageCode;
 extern vector<GuojiCode> g_vecGuojiCode;
+extern vector<DocType> g_vecDocCode;
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
 
 class QWaitCursor
