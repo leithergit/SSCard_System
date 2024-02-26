@@ -260,6 +260,7 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage)
 		ds.Get("sbkh", pSSCardInfo->strCardNum);
 		ds.Get("zp", pSSCardInfo->strPhoto);
 		ds.Get("mz", pSSCardInfo->strNation);
+		ds.Get("yxzjlx", pSSCardInfo->strCardType);
 
 		pSSCardInfo->strName = (const char*)pIDCard->szName;
 		pSSCardInfo->strGender = (const char*)pIDCard->szGender;

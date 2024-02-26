@@ -54,6 +54,7 @@
 #include <QtXlsx/QtXlsx>
 #include "DevBase.h"
 #include "SimpleIni.h"
+#include "AuthorizeMessage.h"
 
 #include "../utility/Utility.h"
 #include "../utility/TimeUtility.h"
@@ -1243,3 +1244,5 @@ struct _CareerType
 
 extern vector<_CareerType> vecCareer;
 #endif // GLOABAL_H
+
+

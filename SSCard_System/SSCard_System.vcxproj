@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="desktop|Win32">
+      <Configuration>desktop</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -37,6 +41,9 @@
     <IntermediateDirectory>debug\</IntermediateDirectory>
     <PrimaryOutput>SSCard_System</PrimaryOutput>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='desktop|Win32'">
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
     <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
@@ -59,7 +66,7 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\proc\main_project;C:\Qt\5.15.2\msvc2019\include\QtXlsx;D:\proc\main_project\SSCard_System\glog;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtCore;.\;.\..\SDK;$(IncludePath)</IncludePath>
+    <IncludePath>D:\proc\main_project\SDK\glog;D:\proc\main_project;C:\Qt\5.15.2\msvc2019\include\QtXlsx;D:\proc\main_project\SSCard_System\glog;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtCore;.\;.\..\SDK;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Qt\5.15.2\msvc2019\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -69,6 +76,10 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='desktop|Win32'">
+    <IncludePath>D:\proc\main_project\SDK\glog;..\sdk;.;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\5.15.2\msvc2019\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QtModules>core;sql;network;gui;widgets;xlsx</QtModules>
@@ -80,6 +91,10 @@
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>5.15.2_msvc2019</QtInstall>
     <QtModules>core;sql;network;gui;widgets;xlsx</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='desktop|Win32'">
+    <QtModules>core;sql;network;gui;widgets;xlsx</QtModules>
+    <QtInstall>5.15.2_msvc2019</QtInstall>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
@@ -170,7 +185,7 @@ copy /y  $(TargetPath) D:\npfworkspace\proc\SSCardSystem_for_test</Command>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;_DEBUG;MARKUP_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;_DEBUG;MARKUP_STL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -228,6 +243,12 @@ copy/y $(TargetDir)$(TargetName).pdb $(projectDir)..\..\SSCardSystem_for_debug</
       <Command>::@call updatesdk.bat $(Configuration)
 ::@call  $(SolutionDir)updatesdk2RemoteDev.bat $(Configuration) $(SolutionDir)</Command>
     </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='desktop|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;_DEBUG;MARKUP_STL;_DESKTOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\utility\json\cJSON.c" />
@@ -316,6 +337,7 @@ copy/y $(TargetDir)$(TargetName).pdb $(projectDir)..\..\SSCardSystem_for_debug</
     <QtMoc Include="dialogconfigbank.h" />
     <QtMoc Include="sscardreport.h" />
     <QtMoc Include="qu_ModifyInfo.h" />
+    <ClInclude Include="AuthorizeMessage.h" />
     <ClInclude Include="SimpleIni.h" />
     <ClInclude Include="WMIQuery.h" />
     <QtMoc Include="Sys_qwidgetreadidcard.h" />
@@ -482,7 +504,6 @@ copy/y $(TargetDir)$(TargetName).pdb $(projectDir)..\..\SSCardSystem_for_debug</
     <QtUic Include="updatepassword.ui">
     </QtUic>
     <QtUic Include="waitingprogress.ui" />
-    <QtUic Include="Widget1.ui" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\Bkgrnd.png" />

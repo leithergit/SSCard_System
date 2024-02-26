@@ -1790,8 +1790,7 @@ void qu_ModifyInfo::on_CheckPersonInfo()
 	SSCardBaseInfoPtr  pSSCardInfo = make_shared<SSCardBaseInfo>();
 	pSSCardInfo->strIdentity = (const char*)pIDCard->szIdentity;
 	pSSCardInfo->strName = (const char*)pIDCard->szName;
-	//修改信息只支持中国人
-	pSSCardInfo->strCardType = "A";
+
 	int nResult = -1;
 	WaitingProgress WaitingUI(qu_ModifyInfo::QueryPersonInfo,
 		pSSCardInfo.get(),
