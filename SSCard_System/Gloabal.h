@@ -487,8 +487,10 @@ struct RegionInfo
 		strJJRId		 = pSettings->GetValue("Region", "JJR_ID");
 
 		strBankNodeName	 = pSettings->GetValue("Region", "BankNodeName");
-		//
 		strBankNodeName = utf8ToGbk(strBankNodeName);
+
+		strBankNodeCode = pSettings->GetValue("Region", "BankNodeCode");
+		strDeviceSN = pSettings->GetValue("Region", "DeviceSN");
 		//strBankNodeName = QString(strBankNodeName.c_str()).toUtf8();
 		/*
 		SSCardDefaulutPin=123456
@@ -569,6 +571,8 @@ struct RegionInfo
 	string		strJJRMobile;							// 经办人联系方式
 	string		strJJRId;								// 经办人身份证号
 	string		strBankNodeName;						// 银行网点名称
+	string		strBankNodeCode;						// 银行网点代码
+	string		strDeviceSN;							// 在社保局备案的设备号
 	SSCardProvince	nProvinceCode;						// 省市代码
 };
 

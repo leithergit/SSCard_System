@@ -23,12 +23,18 @@
     <LocalDebuggerWorkingDirectory>D:\npfworkspace\proc\SSCardSystem_for_debug</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2024-02-24T02:51:36.1498353Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-06-12T03:11:47.2700348Z</QtLastBackgroundBuild>
+    <QtTouchProperty>
+    </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2024-02-24T02:51:35.9725688Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-06-12T03:11:46.8891228Z</QtLastBackgroundBuild>
+    <QtTouchProperty>
+    </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='desktop|Win32'">
-    <QtLastBackgroundBuild>2024-02-24T02:51:35.7882464Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-06-12T03:11:46.7276673Z</QtLastBackgroundBuild>
+    <QtTouchProperty>
+    </QtTouchProperty>
   </PropertyGroup>
 </Project>

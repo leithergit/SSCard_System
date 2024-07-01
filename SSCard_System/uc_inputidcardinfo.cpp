@@ -353,8 +353,8 @@ void uc_InputIDCardInfo::SavePersonInfo()
 	json.Add("Gender", pSSCardInfo->strGender);
 	json.Add("Birthday", pSSCardInfo->strBirthday);
 	json.Add("Nantion", pSSCardInfo->strNation);
-	json.Add("PaperIssuedate", (const char*)pIDCard->szExpirationDate1);
-	json.Add("PaperExpiredate", (const char*)pIDCard->szExpirationDate2);
+	json.Add("PaperIssuedate", pSSCardInfo->strReleaseDate);
+	json.Add("PaperExpiredate", pSSCardInfo->strValidDate);
 	json.Add("Mobile", pSSCardInfo->strMobile);
 	json.Add("BankCode", pSSCardInfo->strBankCode);
 	json.Add("City", pSSCardInfo->strCity);
@@ -471,9 +471,9 @@ int uc_InputIDCardInfo::ProcessBussiness()
 				emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 				return -1;
 			}
-			jsonOut(strJsonOut);
+			CJsonObject jsonBalanceOut(strJsonOut);
 			string yuan;
-			jsonOut.Get("Yuan", yuan);
+			jsonBalanceOut.Get("Yuan", yuan);
 			QString Yuan = QString::fromStdString(yuan);
 			ui->lineEdit_Balance->setText(Yuan);
 		}
@@ -795,6 +795,8 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	pSSCardInfo->strOccupType = ui->comboBox_Career->currentData().toString().toStdString();
 	pSSCardInfo->strCardType = ui->comboBox_DocType->currentData().toString().toStdString();
 	pSSCardInfo->strMobile = strMobile.toStdString();
+	pSSCardInfo->strReleaseDate = ui->dateEdit_Issued->dateTime().toString("yyyyMMdd").toStdString();
+	pSSCardInfo->strValidDate = ui->dateEdit_Expired->dateTime().toString("yyyyMMdd").toStdString();
 	if (ui->checkBox_Agency->isChecked())
 	{
 		QString strGuardian = ui->lineEdit_Guardian->text();
@@ -1137,7 +1139,7 @@ int uc_InputIDCardInfo::QueryPersonInfo(void* p)
 				
 				return -1;
 			}
-			jsonOut(strJsonOut);
+			CJsonObject jsonBalanceOut(strJsonOut);
 			string yuan;
 			jsonOut.Get("Yuan", yuan);
 			pSSCardInfo->strReserver[0] = yuan;
@@ -1425,6 +1427,7 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 		}*/
 
 		SavePersonInfo();
+		
 
 		if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
 		{
@@ -1441,6 +1444,11 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 			jsonIn.Add("BankCode", g_pDataCenter->GetSysConfigure()->Region.strBankCode);
 			QString strDocType = ui->comboBox_DocType->currentData().toString();
 			jsonIn.Add("DocType", strDocType.toStdString());
+			SSCardBaseInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+			if (!pSSCardInfo)
+				return;
+			jsonIn.Add("PaperIssuedDate", pSSCardInfo->strReleaseDate);
+			jsonIn.Add("PaperExpireDate", pSSCardInfo->strValidDate);
 			string strJsonIn = jsonIn.ToString();
 			string strJsonOut;
 			if (QFailed(pService->QueryCardStatus(strJsonIn, strJsonOut)))
@@ -1606,7 +1614,7 @@ void uc_InputIDCardInfo::on_CheckPersonInfo()
 			ui->lineEdit_GuardianMobile->setText(pSSCardInfo->strMobile.c_str());
 		ui->dateEdit_Issued->setDate(QDate::fromString(pSSCardInfo->strReleaseDate.c_str(), "yyyyMMdd"));
 		ui->dateEdit_Expired->setDate(QDate::fromString(pSSCardInfo->strValidDate.c_str(), "yyyyMMdd"));
-		ui->lineEdit_Balance->setText(pSSCardInfo->strReserver[0].c_str());
+		ui->lineEdit_Balance->setText(QString::fromStdString(pSSCardInfo->strReserver[0]).toLocal8Bit());
 		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
 		ui->label_Photo->setStyleSheet(strStyle);
 		ui->label_Photo->setText("");

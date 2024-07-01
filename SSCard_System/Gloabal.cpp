@@ -1274,10 +1274,23 @@ int DataCenter::TestCard(QString& strMessage)
 			char szCardATR[128] = { 0 };
 			char szRCode[128] = { 0 };
 			int nCardATRLen = 0;
-			if (QFailed(m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+			int retryTimes{ 0 };
+			while (retryTimes < 3)
 			{
-				strMessage = "卡片上电失败,请更换卡片或重新进卡!";
-				break;
+				if (QFailed(m_pSSCardReader->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
+				{
+					stringstream ss;
+					ss << "卡片上电失败次数：" << retryTimes << ", 请更换卡片或重新进卡!";
+					strMessage = QString::fromStdString(ss.str());
+					LOG(INFO) << ss.str();
+					retryTimes++;
+					continue;
+				}
+				else
+				{
+					strMessage = "";
+					break;
+				}
 			}
 			const char* szCommand = "0084000008";
 			char szOut[1024] = { 0 };
@@ -2776,7 +2789,7 @@ int  DataCenter::PremakeCard(QString& strMessage)
 	LOG(INFO) << __FUNCTION__;
 	int nResult = -1;
 	string strJsonIn, strJsonOut;
-
+	RegionInfo* pInfo = &(pSysConfig->Region);
 	do
 	{
 		if (!pSSCardInfo || !pSScardSerivce)
@@ -2787,6 +2800,23 @@ int  DataCenter::PremakeCard(QString& strMessage)
 		jsonIn.Add("City", pSSCardInfo->strCity);
 		jsonIn.Add("BankCode", pSSCardInfo->strBankCode);
 		jsonIn.Add("DocType", pSSCardInfo->strCardType);
+		jsonIn.Add("DeviceSN", pInfo->strDeviceSN);
+		jsonIn.Add("BankNodeCode", pInfo->strBankNodeCode);
+		//2024 添加证件有效期和手机号字段
+		string jStrPersonInfo;
+		g_pDataCenter->GetSSCardService()->GetPersonInfoFromStage(jStrPersonInfo);
+		CJsonObject jsonPersonInfo;
+		jsonPersonInfo.Parse(jStrPersonInfo);
+		string strPaperIssueDate{}, strPaperExpireDate{};
+		jsonPersonInfo.Get("PaperIssuedate", strPaperIssueDate);
+		jsonPersonInfo.Get("PaperExpiredate", strPaperExpireDate);
+		jsonIn.Add("IssueDate", strPaperIssueDate);
+
+		if (strPaperExpireDate == "长期")
+			jsonIn.Add("ExpireDate", "99991231");
+		else
+			jsonIn.Add("ExpireDate", strPaperExpireDate);
+		jsonIn.Add("Mobile", pSSCardInfo->strMobile);
 		strJsonIn = jsonIn.ToString();
 		gInfo() << "JsonIn = " << strJsonIn;
 		bool bskip = false;
@@ -3026,6 +3056,7 @@ int DataCenter::RegisterLost(QString& strMessage)
 	jsonIn.Add("BankCode", RegInfo.strBankCode);
 	jsonIn.Add("CardNum", pSSCardInfo->strCardNum);
 	jsonIn.Add("Operator", RegInfo.strOperator);
+	jsonIn.Add("DocType", pSSCardInfo->strCardType);
 	string strJsonIn = jsonIn.ToString();
 	string strJsonout;
 	int nResult = 0;
@@ -3096,12 +3127,19 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 			break;
 		}
 		CJsonObject jsonIn;
-		jsonIn.Add("IssueDate", (char*)pIDCard->szExpirationDate1);
-		QString strExpireDate = QString::fromLocal8Bit((const char*)pIDCard->szExpirationDate2);
-		if (strExpireDate == "长期")
+		string jStrPersonInfo;
+		g_pDataCenter->GetSSCardService()->GetPersonInfoFromStage(jStrPersonInfo);
+		CJsonObject jsonPersonInfo;
+		jsonPersonInfo.Parse(jStrPersonInfo);
+		string strPaperIssueDate{}, strPaperExpireDate{};
+		jsonPersonInfo.Get("PaperIssuedate", strPaperIssueDate);
+		jsonPersonInfo.Get("PaperExpiredate", strPaperExpireDate);
+		jsonIn.Add("IssueDate", strPaperIssueDate);
+		
+		if (strPaperExpireDate == "长期")
 			jsonIn.Add("ExpireDate", "99991231");
 		else
-			jsonIn.Add("ExpireDate", (char*)pIDCard->szExpirationDate2);
+			jsonIn.Add("ExpireDate", strPaperExpireDate);
 
 		jsonIn.Add("Name", pSSCardInfo->strName);
 		jsonIn.Add("CardID", pSSCardInfo->strIdentity);
@@ -3229,7 +3267,12 @@ int  DataCenter::CommitPersionInfo(QString& strMessage)
 				CJsonObject jsonOut(strJsonOut);
 				jsonOut.Get("Yuan", yuan);
 				jsonOut.Get("Fen", fen);
-				
+				if (QString(yuan.c_str()).contains("三要素"))
+				{
+					strMessage = "证件三要素输入不全";
+					LOG(INFO) << strMessage.toStdString();
+					return -1;
+				}
 				if ((QString(yuan.c_str()).toInt() != 0) || QString(fen.c_str()).toInt() != 0)
 				{
 					//存在余额，提示返回

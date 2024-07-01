@@ -171,6 +171,11 @@ int qi_Information::ProcessBussiness()
 		CJsonObject jsonOut(strJsonOut);
 		string strSSCardNum, strBankCode, strMobile;
 		int nCardStatus;
+		if (strMessage.contains("未查询到"))
+		{
+			break;
+		}
+
 		if (!jsonOut.Get("CardNum", strSSCardNum) ||
 			!jsonOut.Get("CardStatus", nCardStatus) ||
 			!jsonOut.Get("BankCode", strBankCode) ||
@@ -195,12 +200,13 @@ int qi_Information::ProcessBussiness()
 			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
 			return -1;
 		}
-
-		jsonOut(strJsonOut);
+		CJsonObject jsonBalanceOut(strJsonOut);
+		
+		gInfo() << strJsonOut << std::endl;
 		string yuan;
-		jsonOut.Get("Yuan", yuan);
+		jsonBalanceOut.Get("Yuan", yuan);
 		gInfo() << "yuan : " << yuan;
-		QString Yuan = QString::fromStdString(yuan);
+		QString Yuan = QString::fromStdString(yuan).toLocal8Bit();
 		ui->lineEdit_Balance->setText(Yuan);
 
 		strJsonIn = jsonIn.ToString();
