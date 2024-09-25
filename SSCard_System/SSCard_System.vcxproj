@@ -31,7 +31,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="QtSettings">
-    <QtInstall>5.15.2_msvc2019</QtInstall>
+    <QtInstall>Qt5.15.2</QtInstall>
     <QtModules>core;gui;network;sql;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -56,22 +56,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <OutDir>..\..\SSCard_System1.0.0.69.full</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;./SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;../SDK/SSCardInfo_Henan;../SSCardService;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;_HN2022;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;..\openssl-1.0.1g\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>@echo copy $(TargetPath) to remote device
-copy /y "$(TargetPath)" "$(SolutionDir)..\..\public\SSCard_System"
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,6 +165,7 @@ copy /y "$(TargetPath)" "$(SolutionDir)..\..\public\SSCard_System"
     <QtUic Include="MaskWidget.ui" />
     <QtUic Include="Newcard.ui" />
     <QtUic Include="OperatorSucceed.ui" />
+    <QtUic Include="QRegisterPayment.ui" />
     <QtUic Include="registerlost.ui" />
     <QtUic Include="showlicense.ui" />
     <QtUic Include="SSCard_System.ui" />

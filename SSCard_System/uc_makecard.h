@@ -30,6 +30,7 @@ public:
 	~uc_MakeCard();
 	virtual int ProcessBussiness() override;
 	virtual void OnTimeout() override;
+	//void registerPaymentTemp();
 	int PrecessCardInMaking(QString& strMessage);
 	int PrepareMakeCard(QString& strMessage);
 	void ShowSSCardInfo();

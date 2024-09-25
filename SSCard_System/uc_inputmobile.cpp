@@ -25,8 +25,18 @@ int uc_InputMobile::ProcessBussiness()
 	ui->lineEdit_Mobile->selectAll();
 	m_nMobilePhoneSize = g_pDataCenter->GetSysConfigure()->nMobilePhoneSize;
 	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
-	m_strMobile = "";
+	char szMobile[32] = { 0 };
+	if (g_pDataCenter->GetProgressField("Mobile", szMobile) && strlen(szMobile) == m_nMobilePhoneSize)
+	{
+		ui->lineEdit_Mobile->setText(szMobile);
+		g_pDataCenter->strMobilePhone = szMobile;
+		m_strMobile = szMobile;
+	}
+	else
+	{
+		m_strMobile = "";
+	}
+	
 	return 0;
 }
 
@@ -154,25 +164,12 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 		strcpy((char*)pSSCardInfo->strMobile, (const char*)g_pDataCenter->strMobilePhone.c_str());
 		QString strMessage;
-		/*int nResult = 0;
-		if (QFailed(QueryPayResult(strMessage, nResult)))
-		{
-			gInfo() << strMessage.toLocal8Bit().data();
-			emit ShowMaskWidget("操作失败", strMessage, Fetal, Return_MainPage);
-			return;
-		}
-		if (QSucceed(nResult))
-		{
-			QString strInfo = "手机号码已确认,并且补卡费用已支付,稍后开始制卡!";
-			gInfo() << strInfo.toLocal8Bit().data();
-			emit ShowMaskWidget("操作成功", strInfo, Success, Skip_NextPage);
-		}
-		else*/
-		{
-			QString strInfo = "手机号码已确认,稍后将进入费用支付流程!";
-			gInfo() << strInfo.toLocal8Bit().data();
-			emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
-		}
+		g_pDataCenter->SetProgressField("Mobile", (char *)g_pDataCenter->strMobilePhone.c_str());
+
+		QString strInfo = "手机号码已确认,稍后将进入费用支付流程!";
+		gInfo() << strInfo.toLocal8Bit().data();
+		emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
+		
 	}
 	else
 	{

@@ -55,7 +55,9 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
+#ifdef HN2022
 		strcpy((char*)pSSCardInfo->strIDCardIssuedDate, (const char*)pIDCard->szExpirationDate1);
+#endif
 		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
 		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
 		strcpy((char*)pSSCardInfo->strTransType, "5");
@@ -69,7 +71,7 @@ int uc_EnsureInformation::ProcessBussiness()
 		strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 
-		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
+		if (QFailed(nResult = QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
 		{
 			break;
 		}
@@ -93,29 +95,47 @@ int uc_EnsureInformation::ProcessBussiness()
 
 		if (nStatus != 0 && nStatus != 1)
 			break;
-
-		if (QFailed(nResult = g_pDataCenter->QuerySSCardStatus(pSSCardInfo, strMessage)))
-			break;
-
-		if (nStatus != 0)
+		bool bQuerySucceed = false;
+		do 
 		{
-			break;
-		}
+			if (QFailed(nResult = g_pDataCenter->QuerySSCardStatus(pSSCardInfo, strMessage)))
+				break;
 
-		strcpy((char*)pSSCardInfo->strBankCode, pTempSSCardInfo->strBankCode);
-		ui->label_Hello->setText(QString("您好，%1").arg(QString::fromLocal8Bit(pSSCardInfo->strName)));
-		ui->label_SSCard->setText(QString("社保卡号:%1").arg(pSSCardInfo->strCardNum));
-		string strBankName;
-		if (QFailed(g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName)))
-		{
-			strMessage = QString("未知的银行代码:%1").arg(pSSCardInfo->strBankCode);
-			break;
-		}
+			if (nStatus != 0)
+				break;
 
-		ui->label_Bank->setText(QString("服务银行:%1").arg(QString(strBankName.c_str())));
-		string strCardStatus;
-		ui->label_CardStatus->setText(QString("卡片状态:%1").arg(pSSCardInfo->strCardStatus));
-		nResult = 0;
+			bQuerySucceed = true;
+			g_pDataCenter->SetProgressField("OldCardNum", (char *)pSSCardInfo->strCardNum);
+			strcpy((char*)pSSCardInfo->strBankCode, pTempSSCardInfo->strBankCode);
+			ui->label_Hello->setText(QString("您好，%1").arg(QString::fromLocal8Bit(pSSCardInfo->strName)));
+			ui->label_SSCard->setText(QString("社保卡号:%1").arg(pSSCardInfo->strCardNum));
+			string strBankName;
+			if (QFailed(g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName)))
+			{
+				strMessage = QString("未知的银行代码:%1").arg(pSSCardInfo->strBankCode);
+				break;
+			}
+
+			ui->label_Bank->setText(QString("服务银行:%1").arg(QString(strBankName.c_str())));
+			string strCardStatus;
+			ui->label_CardStatus->setText(QString("卡片状态:%1").arg(pSSCardInfo->strCardStatus));
+			QString strTemp = QString::fromLocal8Bit((char*)pSSCardInfo->strCardStatus);
+			qDebug() << strTemp;
+			if (strcmp((char *)pSSCardInfo->strCardStatus,"封存") == 0)
+			{
+				if (QFailed(EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+				{
+					gError() << gQStr(strMessage);
+					break;
+				}
+				else
+					continue;
+			}
+			else // 后续代码会处理正式挂失的情况
+				break;
+			bQuerySucceed = true;
+		} while (!bQuerySucceed);
+	
 	} while (0);
 
 	if (QFailed(nResult))

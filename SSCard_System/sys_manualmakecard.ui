@@ -47,7 +47,7 @@ color: 0
         </size>
        </property>
        <property name="text">
-        <string>使用测试数据</string>
+        <string>模拟数据</string>
        </property>
       </widget>
      </item>

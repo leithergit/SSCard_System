@@ -27,9 +27,24 @@
     <Filter Include="utility">
       <UniqueIdentifier>{4cea7139-0ae2-4b46-8da0-c18f4cf29df2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Page">
+      <UniqueIdentifier>{6ffc991f-ec21-4654-b436-358b6fe00fe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{a807acbc-263a-4b6c-9308-b95f13506add}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Page">
+      <UniqueIdentifier>{dbec3dff-9020-4dda-b575-9a808a73878f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{f14b8a61-447c-43a0-943b-937e8375bf50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="SSCard_System.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="QRegisterPayment.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -43,85 +58,7 @@
     <ClCompile Include="waitingprogress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="updatepassword.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="updatecard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="up_readsscard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="up_Inputpwd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="up_changepwd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_readidcard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_pay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_makecard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_inputmobile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_inputidcardinfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_facecapture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_ensureinformation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uc_adforfinance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_regionconfigure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_qwidgetreadidcard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_pageconfigure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_otheroptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sys_manualmakecard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_logmanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sys_dialogreadidcard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_dialogidcardinfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_dialogcameratest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_DeviceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sys_cardmanger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="showlicense.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="registerlost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="qstackpage.cpp">
@@ -137,9 +74,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OperatorSucceed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="newcard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MaskWidget.cpp">
@@ -166,9 +100,6 @@
     <ClCompile Include="aes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="administer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\utility\json\cJSON.c">
       <Filter>json</Filter>
     </ClCompile>
@@ -184,8 +115,92 @@
     <ClCompile Include="license.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="uc_adforfinance.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_ensureinformation.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_facecapture.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_inputidcardinfo.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_inputmobile.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_makecard.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_pay.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="uc_readidcard.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="up_changepwd.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="up_Inputpwd.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="up_readsscard.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="updatecard.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="newcard.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_cardmanger.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_DeviceManager.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_dialogcameratest.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_dialogidcardinfo.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="sys_dialogreadidcard.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_logmanager.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="sys_manualmakecard.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_otheroptions.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_pageconfigure.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_qwidgetreadidcard.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sys_regionconfigure.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
     <ClCompile Include="sys_sscardapitest.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemManager.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="registerlost.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="updatepassword.cpp">
+      <Filter>Source Files\Page</Filter>
+    </ClCompile>
+    <ClCompile Include="administer.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -331,9 +346,6 @@
     <QtMoc Include="MaskWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="newcard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="OperatorSucceed.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -346,92 +358,95 @@
     <QtMoc Include="qstackpage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="registerlost.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="showlicense.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_cardmanger.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_DeviceManager.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_dialogcameratest.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_dialogidcardinfo.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="sys_dialogreadidcard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_logmanager.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="sys_manualmakecard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_otheroptions.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_pageconfigure.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_qwidgetreadidcard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Sys_regionconfigure.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="SystemManager.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_adforfinance.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_ensureinformation.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_facecapture.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_inputidcardinfo.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_inputmobile.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_makecard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_pay.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="uc_readidcard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="updatecard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="up_changepwd.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="up_Inputpwd.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="up_readsscard.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="updatepassword.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="waitingprogress.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="Sys_cardmanger.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_DeviceManager.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_dialogcameratest.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_dialogidcardinfo.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_dialogreadidcard.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_logmanager.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="sys_manualmakecard.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_otheroptions.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_pageconfigure.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_qwidgetreadidcard.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="Sys_regionconfigure.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
     <QtMoc Include="sys_sscardapitest.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="SystemManager.h">
+      <Filter>Header Files\System</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_adforfinance.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_ensureinformation.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_facecapture.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_inputidcardinfo.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_inputmobile.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_makecard.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_pay.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="uc_readidcard.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="up_changepwd.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="up_Inputpwd.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="up_readsscard.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="updatecard.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="updatepassword.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="registerlost.h">
+      <Filter>Header Files\Page</Filter>
+    </QtMoc>
+    <QtMoc Include="newcard.h">
+      <Filter>Header Files\Page</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -84,7 +84,6 @@ QWaitCursor::~QWaitCursor()
 		QApplication::restoreOverrideCursor();
 }
 
-
 extern DataCenterPtr g_pDataCenter;
 MainWindow* g_pMainWnd = nullptr;
 QScreen* g_pCurScreen = nullptr;
@@ -946,6 +945,29 @@ optional<CJsonObjectPtr > DataCenter::OpenProgress(string& strProgressFile, bool
 	return OpenProgress((string&&)strProgressFile, bCreate);
 }
 
+void TraverseJson( neb::CJsonObject& jsonObject, const std::string& prefix = "") 
+{
+	std::string key;
+	std::string value;
+	neb::CJsonObject subObject;
+
+	for (int i = 0; i < jsonObject.ArraySize(); ++i) 
+	{
+		jsonObject.Get(i, subObject);
+		TraverseJson(subObject, prefix + "[" + std::to_string(i) + "]");
+	}
+
+	while (jsonObject.GetKey(key)) {
+		if (jsonObject.Get(key, value)) 
+		{
+			qDebug() << prefix.c_str() << key.c_str() << ": " << value.c_str();
+		}
+		else if (jsonObject.Get(key, subObject)) {
+			TraverseJson(subObject, prefix + key + ".");
+		}
+	}
+}
+
 optional<CJsonObjectPtr > DataCenter::OpenProgress(string &&strProgressFile,bool bCreate)
 {
 	try
@@ -958,11 +980,13 @@ optional<CJsonObjectPtr > DataCenter::OpenProgress(string &&strProgressFile,bool
 			return std::nullopt;
 		}
 
-		if (fs::exists(strProgressFile))
+		if (!bCreate && fs::exists(strProgressFile))
 		{
+			
 			ifstream ifs(strProgressFile, ios::in | ios::binary);
 			stringstream ss;
 			ss << ifs.rdbuf();
+			//gInfo() << ss.str();
 			if (!pJson->Parse(ss.str()))
 			{
 				gInfo() << strProgressFile << " is invalid.";
@@ -971,6 +995,7 @@ optional<CJsonObjectPtr > DataCenter::OpenProgress(string &&strProgressFile,bool
 				fs::remove(strProgressFile);
 				pJson->Clear();
 			}
+			TraverseJson(*pJson);
 			return pJson;
 		}
 		else
@@ -987,7 +1012,70 @@ optional<CJsonObjectPtr > DataCenter::OpenProgress(string &&strProgressFile,bool
 	}
 }
 
-bool DataCenter::SetProgress(tuple<ProgrerssType, string, CJsonObjectPtr>& tpl)
+bool DataCenter::SetProgress(SSCardInfoPtr& pSSCard,CJsonObjectPtr pJson,bool bSave)
+{
+	if (!pSSCard)
+	{
+		gError() << "pSSCard can't be nullptr";
+		return false;
+	}
+
+	if (!pJson)
+	{
+		if (!pJsonProgress)
+		{
+			gError() << "pJson and pJsonProgress can't be nullptr and the same time";
+			return false;
+		}
+		else
+			pJson = pJsonProgress;
+	}
+	if (bSave)
+	{
+		// 创建时已经由身份证信息写入
+		//JsGetValueP(pJson, "Name", pSSCardInfo->strName);
+		//JsGetValueP(pJson, "CardID", pSSCardInfo->strCard);
+		//JsGetValueP(pJson, "Birthday", pSSCardInfo->strBirthday);
+
+		SetJsonPtrValue(pJson, "CardNum", pSSCard->strCardNum);
+		SetJsonPtrValue(pJson, "Address", pSSCard->strAddress);
+		SetJsonPtrValue(pJson, "NationCode", pSSCardInfo->strNation);
+		SetJsonPtrValue(pJson, "Sex", pSSCardInfo->strSex);
+		SetJsonPtrValue(pJson, "Birthday", pSSCardInfo->strBirthday);
+		SetJsonPtrValue(pJson, "Mobile", pSSCard->strMobile);
+		SetJsonPtrValue(pJson, "BankCode", pSSCard->strBankCode);
+		SetJsonPtrValue(pJson, "City", pSSCard->strCity);
+		SetJsonPtrValue(pJson, "PersonType", pSSCard->strPersonType);
+		SetJsonPtrValue(pJson, "CompanyName", pSSCard->strCompanyName);
+		SetJsonPtrValue(pJson, "ReleaseDate", pSSCard->strReleaseDate);
+		SetJsonPtrValue(pJson, "ValidDate", pSSCard->strValidDate);
+		SetJsonPtrValue(pJson, "PCH", pSSCard->strPCH);
+		SetJsonPtrValue(pJson, "Photo", pSSCard->strPhoto);
+
+		SetJsonPtrValue(pJson, "Community", pSSCard->strCommunity);		
+		SetJsonPtrValue(pJson, "Department", pSSCard->strDepartmentName);
+		SetJsonPtrValue(pJson, "LocalNum", pSSCard->strLocalNum);
+		SetJsonPtrValue(pJson, "Class", pSSCard->strClassName);
+		SetJsonPtrValue(pJson, "OrganID", pSSCard->strOrganID);		
+		SetJsonPtrValue(pJson, "PostalCode", pSSCard->strPostalCode);
+		SetJsonPtrValue(pJson, "Email", pSSCard->strEmail);
+		SetJsonPtrValue(pJson, "GuardianName", pSSCard->strGuardianName);
+		SetJsonPtrValue(pJson, "TransType", pSSCard->strTransType);
+		SetJsonPtrValue(pJson, "SSQX", pSSCard->strSSQX);
+		SetJsonPtrValue(pJson, "CityAccTime", pSSCard->strCityAccTime);
+		SetJsonPtrValue(pJson, "CityInfo", pSSCard->strCityInfo);
+		SetJsonPtrValue(pJson, "CardStatus", pSSCard->strCardStatus);
+		SetJsonPtrValue(pJson, "IdentifyNum", pSSCard->strIdentifyNum);
+		SetJsonPtrValue(pJson, "CardATR", pSSCard->strCardATR);
+		SetJsonPtrValue(pJson, "BankNum", pSSCard->strBankNum);
+		
+		return SaveProgress(pJsonProgress, strPersonProgressFile);
+	}
+	else
+		return true;
+}
+
+bool DataCenter::SetProgress(tuple<ProgrerssType, string, CJsonObjectPtr>& tpl,bool bSave)
 {	
 	std::tie(nProgressType, strPersonProgressFile, pJsonProgress) = tpl;
 	if (strPersonProgressFile.empty() || !pJsonProgress)
@@ -995,7 +1083,7 @@ bool DataCenter::SetProgress(tuple<ProgrerssType, string, CJsonObjectPtr>& tpl)
 		gError() << "strPersonProgressFile is empty or pJsonProgress is nullptr";
 		return false;
 	}
-	return SetProgress(pIDCard, pJsonProgress, true);
+	return SetProgress(pIDCard, pJsonProgress, bSave);
 	/*{
 		gError() << __FUNCTION__ << " Failed in update IDCard Information.";
 		return false;
@@ -1027,14 +1115,22 @@ bool DataCenter::SetProgress(IDCardInfoPtr& pIDCard,CJsonObjectPtr pJson,bool bS
 	}
 	if (bSave)
 	{
-		JsSetValueP(pJson, "Name", pIDCard->szName);
-		JsSetValueP(pJson, "Identity", pIDCard->szIdentity);
-		JsSetValueP(pJson, "Gender", pIDCard->szGender);
-		JsSetValueP(pJson, "Nation", pIDCard->szName);
-		JsSetValueP(pJson, "Address", pIDCard->szAddress);
-		JsSetValueP(pJson, "Nation", pIDCard->szNationalty);
-		JsSetValueP(pJson, "PaperIssuedate", pIDCard->szExpirationDate1);
-		JsSetValueP(pJson, "PaperExpiredate", pIDCard->szExpirationDate2);
+		SetJsonPtrValue(pJson, "Name", pIDCard->szName);
+		SetJsonPtrValue(pJson, "Identity", pIDCard->szIdentity);
+		SetJsonPtrValue(pJson, "Gender", pIDCard->szGender);
+		SetJsonPtrValue(pJson, "NationCode", pIDCard->szNationaltyCode);
+		SetJsonPtrValue(pJson, "Address", pIDCard->szAddress);
+		SetJsonPtrValue(pJson, "Nation", pIDCard->szNationalty);
+		SetJsonPtrValue(pJson, "PaperIssuedate", pIDCard->szExpirationDate1);
+		SetJsonPtrValue(pJson, "PaperExpiredate", pIDCard->szExpirationDate2);
+		char szPayCode[64] = { 0 };
+		if (g_pDataCenter->GetProgressField("payCode", szPayCode))
+			g_pDataCenter->strPayCode = szPayCode;
+		char szTranTime[64] = { 0 };
+		if (g_pDataCenter->GetProgressField("transTime", szTranTime))
+			g_pDataCenter->strTransTime = szTranTime;
+		SetJsonPtrValue(pJson, "payCode", (char*)g_pDataCenter->strPayCode.c_str());
+		SetJsonPtrValue(pJson, "transTime", (char*)g_pDataCenter->strTransTime.c_str());
 		return SaveProgress(pJsonProgress, strPersonProgressFile);
 	}
 	else
@@ -1060,77 +1156,15 @@ bool DataCenter::GetProgress(IDCardInfoPtr& pIDCard,CJsonObjectPtr pJson)
 			pJson = pJsonProgress;
 	}
 
-	JsGetValueP(pJson, "Name", pIDCard->szName);
-	JsGetValueP(pJson, "Identity", pIDCard->szIdentity);
-	JsGetValueP(pJson, "Gender", pIDCard->szGender);
-	JsGetValueP(pJson, "Nation", pIDCard->szName);
-	JsGetValueP(pJson, "Address", pIDCard->szAddress);
-	JsGetValueP(pJson, "Nation", pIDCard->szNationalty);
-	JsGetValueP(pJson, "PaperIssuedate", pIDCard->szExpirationDate1);
-	JsGetValueP(pJson, "PaperExpiredate", pIDCard->szExpirationDate2);
+	GetJsonPtrValue(pJson, "Name", pIDCard->szName);
+	GetJsonPtrValue(pJson, "Identity", pIDCard->szIdentity);
+	GetJsonPtrValue(pJson, "Gender", pIDCard->szGender);
+	GetJsonPtrValue(pJson, "Nation", pIDCard->szName);
+	GetJsonPtrValue(pJson, "Address", pIDCard->szAddress);
+	GetJsonPtrValue(pJson, "Nation", pIDCard->szNationalty);
+	GetJsonPtrValue(pJson, "PaperIssuedate", pIDCard->szExpirationDate1);
+	GetJsonPtrValue(pJson, "PaperExpiredate", pIDCard->szExpirationDate2);
 	return true;
-}
-
-bool DataCenter::SetProgress(SSCardInfoPtr& pSSCard,CJsonObjectPtr pJson,bool bSave)
-{
-	if (!pSSCard)
-	{
-		gError() << "pSSCard can't be nullptr";
-		return false;
-	}
-
-	if (!pJson)
-	{
-		if (!pJsonProgress)
-		{
-			gError() << "pJson and pJsonProgress can't be nullptr and the same time";
-			return false;
-		}
-		else
-			pJson = pJsonProgress;
-	}
-	if (bSave)
-	{
-		// 创建时已经由身份证信息写入
-		//JsGetValueP(pJson, "Name", pSSCardInfo->strName);
-		//JsGetValueP(pJson, "CardID", pSSCardInfo->strCard);
-		//JsGetValueP(pJson, "Birthday", pSSCardInfo->strBirthday);
-
-		JsSetValueP(pJson, "CardNum", pSSCard->strCardNum);
-		JsSetValueP(pJson, "Address", pSSCard->strAddress);
-		JsSetValueP(pJson, "NationCode", pSSCardInfo->strNation);
-		JsSetValueP(pJson, "GenderCode", pSSCardInfo->strSex);
-		JsSetValueP(pJson, "Mobile", pSSCard->strMobile);
-		JsSetValueP(pJson, "BankCode", pSSCard->strBankCode);
-		JsSetValueP(pJson, "City", pSSCard->strCity);
-		JsSetValueP(pJson, "PersonType", pSSCard->strPersonType);
-		JsSetValueP(pJson, "CompanyName", pSSCard->strCompanyName);
-		JsSetValueP(pJson, "ReleaseDate", pSSCard->strReleaseDate);
-		JsSetValueP(pJson, "ValidDate", pSSCard->strValidDate);
-		JsSetValueP(pJson, "PCH", pSSCard->strPCH);
-		JsSetValueP(pJson, "Photo", pSSCard->strPhoto);
-
-		JsSetValueP(pJson, "Community", pSSCard->strCommunity);		
-		JsSetValueP(pJson, "Department", pSSCard->strDepartmentName);
-		JsSetValueP(pJson, "LocalNum", pSSCard->strLocalNum);
-		JsSetValueP(pJson, "Class", pSSCard->strClassName);
-		JsSetValueP(pJson, "OrganID", pSSCard->strOrganID);		
-		JsSetValueP(pJson, "PostalCode", pSSCard->strPostalCode);
-		JsSetValueP(pJson, "Email", pSSCard->strEmail);
-		JsSetValueP(pJson, "GuardianName", pSSCard->strGuardianName);
-		JsSetValueP(pJson, "TransType", pSSCard->strTransType);
-		JsSetValueP(pJson, "SSQX", pSSCard->strSSQX);
-		JsSetValueP(pJson, "CityAccTime", pSSCard->strCityAccTime);
-		JsSetValueP(pJson, "CityInfo", pSSCard->strCityInfo);
-		JsSetValueP(pJson, "CardStatus", pSSCard->strCardStatus);
-		JsSetValueP(pJson, "IdentifyNum", pSSCard->strIdentifyNum);
-		JsSetValueP(pJson, "CardATR", pSSCard->strCardATR);
-		JsSetValueP(pJson, "BankNum", pSSCard->strBankNum);
-		
-		return SaveProgress(pJsonProgress, strPersonProgressFile);
-	}
-	else
-		return true;
 }
 
 bool DataCenter::GetProgress(SSCardInfoPtr& pSSCard,CJsonObjectPtr pJson)
@@ -1151,40 +1185,47 @@ bool DataCenter::GetProgress(SSCardInfoPtr& pSSCard,CJsonObjectPtr pJson)
 			pJson = pJsonProgress;
 	}
 
-	JsGetValueP(pJson, "Name", pSSCard->strName);
-	JsGetValueP(pJson, "CardID", pSSCard->strCardID);
-	JsGetValueP(pJson, "Birthday", pSSCard->strBirthday);
-	JsGetValueP(pJson, "CardNum", pSSCard->strCardNum);
-	JsGetValueP(pJson, "Address", pSSCard->strAddress);
-	JsGetValueP(pJson, "NationCode", pSSCard->strNation);
-	JsGetValueP(pJson, "GenderCode", pSSCard->strSex);
-	JsGetValueP(pJson, "Mobile", pSSCard->strMobile);
-	JsGetValueP(pJson, "BankCode", pSSCard->strBankCode);
-	JsGetValueP(pJson, "City", pSSCard->strCity);
-	JsGetValueP(pJson, "PersonType", pSSCard->strPersonType);
-	JsGetValueP(pJson, "CompanyName", pSSCard->strCompanyName);
-	JsGetValueP(pJson, "ReleaseDate", pSSCard->strReleaseDate);
-	JsGetValueP(pJson, "ValidDate", pSSCard->strValidDate);
-	JsGetValueP(pJson, "PCH", pSSCard->strPCH);
-	JsGetValuePP(pJson, "Photo", pSSCard->strPhoto);
-	JsGetValueP(pJson, "CardVender", pSSCard->strCardVender);
-
-	JsGetValueP(pJson, "Community", pSSCard->strCommunity);
-	JsGetValueP(pJson, "LocalNum", pSSCard->strLocalNum);
-	JsGetValueP(pJson, "Department", pSSCard->strDepartmentName);
-	JsGetValueP(pJson, "Class", pSSCard->strClassName);
-	JsGetValueP(pJson, "OrganID", pSSCard->strOrganID);
-	JsGetValueP(pJson, "PostalCode", pSSCard->strPostalCode);
-	JsGetValueP(pJson, "Email", pSSCard->strEmail);
-	JsGetValueP(pJson, "GuardianName", pSSCard->strGuardianName);
-	JsGetValueP(pJson, "TransType", pSSCard->strTransType);
-	JsGetValueP(pJson, "SSQX", pSSCard->strSSQX);
-	JsGetValueP(pJson, "CityAccTime", pSSCard->strCityAccTime);
-	JsGetValueP(pJson, "CityInfo", pSSCard->strCityInfo);
-	JsGetValueP(pJson, "CardStatus", pSSCard->strCardStatus);	
-	JsGetValueP(pJson, "IdentifyNum", pSSCard->strIdentifyNum);
-	JsGetValueP(pJson, "CardATR", pSSCard->strCardATR);
-	JsGetValueP(pJson, "BankNum", pSSCard->strBankNum);
+	GetJsonPtrValue(pJson, "Name", pSSCard->strName);
+	GetJsonPtrValue(pJson, "Identity", pSSCard->strCardID);
+	GetJsonPtrValue(pJson, "Birthday", pSSCard->strBirthday);
+	GetJsonPtrValue(pJson, "CardNum", pSSCard->strCardNum);
+	GetJsonPtrValue(pJson, "Address", pSSCard->strAddress);
+	GetJsonPtrValue(pJson, "NationCode", pSSCard->strNation);
+	GetJsonPtrValue(pJson, "Sex", pSSCard->strSex);
+	GetJsonPtrValue(pJson, "Mobile", pSSCard->strMobile);
+	GetJsonPtrValue(pJson, "BankCode", pSSCard->strBankCode);
+	GetJsonPtrValue(pJson, "City", pSSCard->strCity);
+	GetJsonPtrValue(pJson, "PersonType", pSSCard->strPersonType);
+	GetJsonPtrValue(pJson, "CompanyName", pSSCard->strCompanyName);
+	GetJsonPtrValue(pJson, "ReleaseDate", pSSCard->strReleaseDate);
+	GetJsonPtrValue(pJson, "ValidDate", pSSCard->strValidDate);
+	GetJsonPtrValue(pJson, "PCH", pSSCard->strPCH);
+	GetJsonPtrStrValue(pJson, "payCode", g_pDataCenter->strPayCode);
+	strcpy(pSSCard->strPayCode , g_pDataCenter->strPayCode.c_str());
+	GetJsonPtrStrValue(pJson, "transTime", g_pDataCenter->strTransTime);
+	strcpy(pSSCard->strTransactionTime, g_pDataCenter->strTransTime.c_str());
+#ifdef HN2022
+	GetJsonPtrValue(pJson, "PaperIssuedate", pSSCard->strIDCardIssuedDate);
+#endif
+	GetJsonPtrValuePtr(pJson, "Photo", pSSCard->strPhoto);
+	GetJsonPtrValue(pJson, "CardVender", pSSCard->strCardVender);
+	
+	GetJsonPtrValue(pJson, "Community", pSSCard->strCommunity);
+	GetJsonPtrValue(pJson, "LocalNum", pSSCard->strLocalNum);
+	GetJsonPtrValue(pJson, "Department", pSSCard->strDepartmentName);
+	GetJsonPtrValue(pJson, "Class", pSSCard->strClassName);
+	GetJsonPtrValue(pJson, "OrganID", pSSCard->strOrganID);
+	GetJsonPtrValue(pJson, "PostalCode", pSSCard->strPostalCode);
+	GetJsonPtrValue(pJson, "Email", pSSCard->strEmail);
+	GetJsonPtrValue(pJson, "GuardianName", pSSCard->strGuardianName);
+	GetJsonPtrValue(pJson, "TransType", pSSCard->strTransType);
+	GetJsonPtrValue(pJson, "SSQX", pSSCard->strSSQX);
+	GetJsonPtrValue(pJson, "CityAccTime", pSSCard->strCityAccTime);
+	GetJsonPtrValue(pJson, "CityInfo", pSSCard->strCityInfo);
+	GetJsonPtrValue(pJson, "CardStatus", pSSCard->strCardStatus);	
+	GetJsonPtrValue(pJson, "IdentifyNum", pSSCard->strIdentifyNum);
+	GetJsonPtrValue(pJson, "CardATR", pSSCard->strCardATR);
+	GetJsonPtrValue(pJson, "BankNum", pSSCard->strBankNum);
 	return true;
 }
 
@@ -1202,6 +1243,10 @@ void DataCenter::CloseProgress()
 		if (pJsonProgress)
 			pJsonProgress = nullptr;
 		
+		if (!fs::exists("./Finished"))
+		{
+			fs::create_directory("./Finished");
+		}
 		QString strAppPath = QApplication::applicationDirPath();
 		QString strFinishPath = QString("%1/Finished/Progress_%2.json").arg(strAppPath).arg((char*)pIDCard->szIdentity);
 		string strBaseFile = strFinishPath.toLocal8Bit().data();
@@ -1239,7 +1284,7 @@ bool DataCenter::SetProgressField(const char* szKey, char* szVal)
 	}
 	try
 	{		
-		JsSetValueP(pJsonProgress, szKey, szVal);
+		SetJsonPtrValue(pJsonProgress, szKey, szVal);
 		ofstream ifs(strPersonProgressFile, ios::out | ios::binary);
 		ifs << pJsonProgress->ToFormattedString();
 		return true;
@@ -1290,52 +1335,17 @@ bool DataCenter::GetProgressField(const char* szKey, string& strVal)
 
 optional<CJsonObjectPtr> DataCenter::LoadSSCardData(string strProgressFile,SSCardInfoPtr& pSSCard)
 {
-	auto optProgressFile = OpenProgress(strProgressFile);
+	auto optProgressFile = OpenProgress(strProgressFile,false);
 	if (!optProgressFile)
 	{
 		gError() << "Failed in OpenProgress.";
 		return std::nullopt;
 	}
-	auto pJson = optProgressFile.value();
+ 	auto pJson = optProgressFile.value();
 	if (GetProgress(pSSCard, pJson))
 		return { pJson };
 	else
 		return nullopt;	
-	/*JsGetValueP(pJson, "Name",			pSSCardInfo->strName);
-	JsGetValueP(pJson, "CardID",		pSSCardInfo->strCard);
-	JsGetValueP(pJson, "Gender",		pSSCardInfo->strSex);
-	JsGetValueP(pJson, "Birthday",		pSSCardInfo->strBirthday);
-
-	JsGetValueP(pJson, "Mobile",		pSSCardInfo->strMobile);
-	JsGetValueP(pJson, "BankCode",		pSSCardInfo->strBankCode);
-	JsGetValueP(pJson, "City",			pSSCardInfo->strCity);
-	JsGetValueP(pJson, "PersonType",	pSSCardInfo->strPersonType);
-	JsGetValueP(pJson, "Company",		pSSCardInfo->strCompanyName);
-	JsGetValueP(pJson, "Community",		pSSCardInfo->strCommunity);
-	JsGetValueP(pJson, "LocalNum",		pSSCardInfo->strLocalNum);
-	JsGetValueP(pJson, "Department",	pSSCardInfo->strDepartmentName);
-	JsGetValueP(pJson, "Class",			pSSCardInfo->strClassName);
-
-	JsGetValueP(pJson, "OrganID",		pSSCardInfo->strOrganID);
-	JsGetValueP(pJson, "CardNum",		pSSCardInfo->strCardNum);
-	JsGetValueP(pJson, "Address",		pSSCardInfo->strAddress);
-	JsGetValueP(pJson, "PostalCode",	pSSCardInfo->strPostalCode);
-	JsGetValueP(pJson, "Email",			pSSCardInfo->strEmail);
-	JsGetValueP(pJson, "GuardianName",	pSSCardInfo->strGuardianName);
-	JsGetValueP(pJson, "TransType",		pSSCardInfo->strTransType);
-	JsGetValueP(pJson, "City",			pSSCardInfo->strCity);
-	JsGetValueP(pJson, "SSQX",			pSSCardInfo->strSSQX);
-	JsGetValueP(pJson, "CityAccTime",	pSSCardInfo->strCityAccTime);
-	JsGetValueP(pJson, "CityInfo",		pSSCardInfo->strCityInfo);
-	JsGetValueP(pJson, "CardStatus",	pSSCardInfo->strCardStatus);
-	JsGetValueP(pJson, "Card",			pSSCardInfo->strCard);
-	JsGetValueP(pJson, "ReleaseDate",	pSSCardInfo->strReleaseDate);
-	JsGetValueP(pJson, "ValidDate",		pSSCardInfo->strValidDate);
-	JsGetValueP(pJson, "IdentifyNum",	pSSCardInfo->strIdentifyNum);
-	JsGetValueP(pJson, "CardATR",		pSSCardInfo->strCardATR);
-	JsGetValueP(pJson, "BankNum",		pSSCardInfo->strBankNum);
-	JsGetValueP(pJson, "PCH",			pSSCardInfo->strPCH);
-	JsGetValuePP(pJson, "Photo",		pSSCardInfo->strPhoto);*/
 }
 
 bool DataCenter::SaveProgress(CJsonObjectPtr& pJson, string& strProgressFile)
@@ -1412,22 +1422,27 @@ bool DataCenter::SaveProgress()
 	}
 }
 */
-int DataCenter::GetProgressStatus(string strProcessName)
+int DataCenter::GetProgressStatus(string strProcessName, CJsonObjectPtr pInJsonProgress)
 {
 	int nStatus = 0;
+	CJsonObjectPtr pProgress = nullptr;
 	try
 	{
-		if (!pJsonProgress)
+		if (pInJsonProgress)
+			pProgress = pInJsonProgress;
+		else
+			pProgress = pJsonProgress;
+		if (!pProgress)
 		{
-			gError() <<"pJsonProgress can't be null.";
-			return 0;
+			gError() <<"pProgress can't be null.";
+			return -1;
 		}
-		if (!pJsonProgress->KeyExist("Progress"))
+		if (!pProgress->KeyExist("Progress"))
 		{
 			gError() << "Can't locate key 'Progress'.";
 			return 0;
 		}
-		CJsonObject pSubJson =	(*pJsonProgress)["Progress"];
+		CJsonObject pSubJson =	(*pProgress)["Progress"];
 		if (pSubJson.IsEmpty())
 		{
 			gError() << "Can't get a valid json object with key 'Progress' from pJsonProgress.";
@@ -1480,9 +1495,12 @@ bool DataCenter::SetProgressStatus(string strProcessName, int nStatus)
 			pJsonProgress->Add("Progress", pSubJson);
 			gInfo() << "Create node 'Progress'.";
 		}
-				
+		pJsonProgress->Replace("Progress", pSubJson);
+		gInfo() << "Progress:" << pSubJson.ToFormattedString();
 		ofstream ifs(strPersonProgressFile, ios::out | ios::binary);
+		gInfo() << pJsonProgress->ToFormattedString();
 		ifs << pJsonProgress->ToFormattedString();
+		ifs.flush();
 		return true;
 	}
 	catch (std::exception& e)
@@ -1537,6 +1555,13 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		case 1:			// 1-卡在门口:
 		{
+			if (g_pDataCenter->bDebug)
+			{
+				gInfo() << "Warning!!!In Remote Debug,Skip the card on Eject postion!";
+				nResult = 0;
+				bSucceed = true;
+				break;
+			}
 			strMessage = QString("打印机出卡口尚有未取走卡片,请先取走卡片后重新操作!");
 			nResult = 1;
 			break;
@@ -1545,6 +1570,12 @@ int DataCenter::TestPrinter(QString& strMessage)
 		case 3:			// 3-卡在上电位
 		case 4:			// 4-卡在闸门外
 		{
+			if (g_pDataCenter->bDebug)
+			{
+				bSucceed = true;
+				break;;
+			}
+				
 			if (QFailed(m_pPrinter->Printer_Retract(1, szRCode)))
 			{
 				strMessage = QString("打印机尚有未取走卡片,尝试将其移动到回收箱失败，错误代码:%1!").arg(szRCode);
@@ -1569,7 +1600,16 @@ int DataCenter::TestPrinter(QString& strMessage)
 		}
 		if (!bSucceed)
 			break;
-		if (QFailed(g_pDataCenter->Depense(strMessage)))
+		if (g_pDataCenter->bDebug )
+		{
+			if (PrinterStatus.fwMedia == 0)
+				if (QFailed(g_pDataCenter->Depense(strMessage)))
+				{
+					bSucceed = false;
+					break;
+				}
+		}
+		else if (QFailed(g_pDataCenter->Depense(strMessage)))
 		{
 			bSucceed = false;
 			break;
@@ -1788,7 +1828,11 @@ int DataCenter::PrintCard(SSCardInfoPtr& pSSCardInfo, QString strPhoto, QString&
 			if (QFailed(m_pPrinter->Printer_AddImage((char*)strPhoto.toStdString().c_str(), ImgPos.nAngle, ImgPos.fxPos, ImgPos.fyPos, ImgPos.fHeight, ImgPos.fWidth, szRCode)))
 				break;
 		}
-
+		if (g_pDataCenter->bDebug)
+		{
+			gInfo() << "In Debug mode,skip Printing!";
+			return 0;
+		}
 		if (QFailed(m_pPrinter->Printer_StartPrint(szRCode)))
 		{
 			strMessage = QString("Printer_StartPrint失败，错误代码:%1!").arg(szRCode);
@@ -1847,11 +1891,11 @@ int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 	do
 	{
-		if (!m_pSSCardReader)
-		{
-			strMessage = "读卡器未就绪!";
-			break;
-		}
+		//if (!m_pSSCardReader)
+		//{
+		//	strMessage = "读卡器未就绪!";
+		//	break;
+		//}
 
 		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
 		{
@@ -1988,11 +2032,11 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 
 	do
 	{
-		if (!m_pSSCardReader)
-		{
-			strMessage = "读卡器未就绪!";
-			break;
-		}
+		//if (!m_pSSCardReader)
+		//{
+		//	strMessage = "读卡器未就绪!";
+		//	break;
+		//}
 
 		if (QFailed(nResult = g_pDataCenter->GetSSCardReader()->Reader_PowerOn(DevConfig.nSSCardReaderPowerOnType, szCardATR, nCardATRLen, szRCode)))
 		{
@@ -2104,7 +2148,12 @@ int DataCenter::WriteCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		{
 			break;
 		}
-
+		if (g_pDataCenter->bDebug)
+		{
+			gInfo() << "Skip iWriteCA in Debug mode.";
+			return 0;
+		}
+			
 		// 		QMZS：签名证书 ,JMZS：加密证书 ,JMMY：加密密钥 ,GLYPIN：管理员pin ,ZKMY：主控密钥 ,pOutInfo 传出信息
 		if (QFailed(nResult = iWriteCA(DevConfig.nSSCardReaderPowerOnType, caInfo.QMZS, caInfo.JMZS, caInfo.JMMY, caInfo.GLYPIN, caInfo.ZKMY, szWriteCARes)))
 		{
@@ -2759,48 +2808,111 @@ int GetAge(string strBirthday)
 	return nAge;
 }
 
-tuple<ProgrerssType, string,CJsonObjectPtr > FindCardData(const char* szIdentify, SSCardInfoPtr& pSSCard)
+tuple<ProgrerssType, string,CJsonObjectPtr > FindCardProgress(const char* szIdentify, SSCardInfoPtr& pSSCard)
 {
 	pSSCard = make_shared<SSCardInfo>();
 	string strCardDataMaking = QString("%1/data/Progress_%2.json").arg(qApp->applicationDirPath()).arg((char*)szIdentify).toLocal8Bit().data();
-	string strCardDataFinished = QString("%1/Finished/Progress_%2.json").arg(qApp->applicationDirPath()).arg((char*)szIdentify).toLocal8Bit().data();
+	//string strCardDataFinished = QString("%1/Finished/Progress_%2.json").arg(qApp->applicationDirPath()).arg((char*)szIdentify).toLocal8Bit().data();
 
-	bool bExistCardData = false;
-	string strCardData = strCardDataMaking;
-	if (fs::exists(strCardDataMaking))
+	string strCurProgressFile = "";
+	ProgrerssType nProgress = ProgrerssType::Progress_UnStart;
+	optional<CJsonObjectPtr> optProgress;
+	/*auto pTellProgress = [&](string &strProgressFile) 
 	{
-		auto optProgress = g_pDataCenter->LoadSSCardData(strCardDataMaking, pSSCard);
+		optProgress = g_pDataCenter->LoadSSCardData(strProgressFile, pSSCard);
 		if (optProgress)
 		{
-			if (strlen(pSSCard->strPCH) > 0 &&
-				strlen(pSSCard->strCardNum) >= 8 &&
-				strlen(pSSCard->strPhoto) >= 128)
+			do
 			{
-				return { ProgrerssType::Progress_Making,strCardDataMaking, optProgress.value()};
-			}
+				int nEnableCard = g_pDataCenter->GetProgressStatus("EnableCard", optProgress.value());
+				int nMarkcard = g_pDataCenter->GetProgressStatus("MarkCard", optProgress.value());
+				if (nMarkcard == -1)
+					break;
+				else if (nMarkcard == 0)
+					nProgress = ProgrerssType::Progress_UnStart;
+				else if (nMarkcard == 1)
+				{
+					if (nEnableCard == 0)
+						nProgress = ProgrerssType::Progress_Making;
+					else if (nEnableCard == 1)
+						nProgress = ProgrerssType::Progress_Finished;
+				}
+				strCurProgressFile = strProgressFile;
+			} while (0);
+			return true;
+		}
+		else
+		{
+			gError() << "Failed in load file " << strProgressFile;
+			return false;
+		}
+	};*/
+	if (fs::exists(strCardDataMaking))
+	{//检查制卡中的数据
+		//pTellProgress(strCardDataMaking);
+		optProgress = g_pDataCenter->LoadSSCardData(strCardDataMaking, pSSCard);
+		if (optProgress)
+		{
+			do
+			{
+				int nEnableCard = g_pDataCenter->GetProgressStatus("EnableCard", optProgress.value());
+				int nMarkcard = g_pDataCenter->GetProgressStatus("MarkCard", optProgress.value());
+				if (nMarkcard == -1)
+					break;
+				else if (nMarkcard == 0)
+					nProgress = ProgrerssType::Progress_UnStart;
+				else if (nMarkcard == 1)
+				{
+					if (nEnableCard == 0)
+						nProgress = ProgrerssType::Progress_Making;
+					else if (nEnableCard == 1)
+						nProgress = ProgrerssType::Progress_Finished;
+				}
+				strCurProgressFile = strCardDataMaking;
+			} while (0);
+			return { nProgress,strCurProgressFile,optProgress.value() };
 		}
 		else
 		{
 			gError() << "Failed in load file " << strCardDataMaking;
+			return { nProgress,strCurProgressFile,nullptr };
 		}
 	}
-	if (!bExistCardData && fs::exists(strCardDataFinished))
+	else
 	{
-		ZeroMemory(pSSCard.get(), sizeof(SSCardInfo));
-		auto optProgress = g_pDataCenter->LoadSSCardData(strCardDataFinished, pSSCard);
-		if (optProgress)
-		{
-			if (strlen(pSSCard->strPCH) > 0 &&
-				strlen(pSSCard->strCardNum) >= 8 &&
-				strlen(pSSCard->strPhoto) >= 128)
-			{
-				return { ProgrerssType::Progress_Finished,strCardDataFinished,optProgress.value() };
-			}
-		}
-		else
-		{
-			gInfo() << "Failed in load file " << strCardDataFinished;
-		}
+		return { nProgress,"",nullptr};
 	}
-	return { ProgrerssType::Progress_UnStart,"",nullptr };
+			
+}
+
+int LoadPersonInfo(QString strJson,IDCardInfoPtr & pIDCard)
+{
+	try
+	{
+		string strProgressFile = strJson.toLocal8Bit().data();
+		if (!fs::exists(strProgressFile))
+			return 1;
+
+		ifstream ifs(strProgressFile, ios::in | ios::binary);
+		stringstream ss;
+		ss << ifs.rdbuf();
+		CJsonObject json;
+		if (!json.Parse(ss.str()))
+			return 1;
+
+		GetJsonValue(json, "Identity", pIDCard->szIdentity);
+		GetJsonValue(json, "Name", pIDCard->szName);
+		GetJsonValue(json, "Gender", pIDCard->szGender);
+		GetJsonValue(json, "Birthday", pIDCard->szBirthday);
+		GetJsonValue(json, "Nation", pIDCard->szNationalty);
+		GetJsonValue(json, "Address", pIDCard->szAddress);
+		GetJsonValue(json, "PaperIssuedate", pIDCard->szExpirationDate1);
+		GetJsonValue(json, "PaperExpiredate", pIDCard->szExpirationDate2);
+		return 0;
+	}
+	catch (std::exception& e)
+	{
+		gError() << "Catch a exception:" << e.what();
+		return 1;
+	}
 }

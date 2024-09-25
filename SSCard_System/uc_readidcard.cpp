@@ -39,6 +39,7 @@ uc_ReadIDCard::uc_ReadIDCard(QLabel* pTitle, QString strStepImage, Page_Index nI
 		QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
 		QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");*/
 	connect(this, &QStackPage::ErrorMessage, this, &uc_ReadIDCard::OnErrorMessage);
+	connect(this, &uc_ReadIDCard::UseFinishedProgress, this, &uc_ReadIDCard::on_UseFinishedProgress,Qt::BlockingQueuedConnection);
 	qDebug() << geometry();
 }
 
@@ -130,9 +131,11 @@ void uc_ReadIDCard::OnErrorMessage(QString strErrorMsg)
 	ui->label_Notify->setText(strErrorMsg);
 }
 
+
 void uc_ReadIDCard::ThreadWork()
 {
 	auto tLast = high_resolution_clock::now();
+	auto tTimeTick = tLast;
 	QString strMessage;
 	while (m_bWorkThreadRunning)
 	{
@@ -140,8 +143,19 @@ void uc_ReadIDCard::ThreadWork()
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
 		if (tDuration.count() >= 1000)
 		{
+			int nResult = -1;
 			tLast = high_resolution_clock::now();
-			int nResult = g_pDataCenter->ReaderIDCard(m_pIDCard.get());
+			if (g_pDataCenter->bDebug)
+			{
+				auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tTimeTick);
+				if (tDuration.count() < 10 * 1000)
+					continue;
+				QString strApp = qApp->applicationDirPath() + "/debug/Person_Test.json";
+				nResult = LoadPersonInfo(strApp,m_pIDCard);
+			}
+			else
+				nResult = g_pDataCenter->ReaderIDCard(m_pIDCard.get());
+			
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
 				g_pDataCenter->SetIDCardInfo(m_pIDCard);
@@ -157,7 +171,10 @@ void uc_ReadIDCard::ThreadWork()
 				SSCardInfoPtr pSSCardInfo = nullptr;
 				QString strMessage = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
 				// 近回文件类型，文件名和json指针(若文件存在)
-				auto tpProgressInfo = FindCardData((const char*)m_pIDCard->szIdentity, pSSCardInfo);
+				auto tpProgressInfo = FindCardProgress((const char*)m_pIDCard->szIdentity, pSSCardInfo);
+#ifdef HN2022
+				strcpy((char*)pSSCardInfo->strIDCardIssuedDate, (char *)m_pIDCard->szExpirationDate1);
+#endif
 				switch (std::get<0>(tpProgressInfo))
 				{
 				default:
@@ -170,7 +187,7 @@ void uc_ReadIDCard::ThreadWork()
 					case ServiceType::Service_ReplaceCard:
 					{// 创建新的流程
 						auto optProgressFile = g_pDataCenter->GetProgressFile(m_pIDCard);
-						auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value());
+						auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value(),true);
 						if (optProgressJson)
 						{
 							std::get<1>(tpProgressInfo) = optProgressFile.value();
@@ -190,14 +207,40 @@ void uc_ReadIDCard::ThreadWork()
 				}
 					
 				case ProgrerssType::Progress_Making:
-				case ProgrerssType::Progress_Finished:
-				{// 使用现有流程
+				{
 					g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 					g_pDataCenter->SetProgress(tpProgressInfo);
+					g_pDataCenter->strCardMakeProgress = "制卡中";
 					//strMessage = QString("\t\t姓名:%1\n\t\t身份证:%2\n\t\t社保卡号:%3\n\t\t日期:%4").arg((char*)m_pIDCard->szName).arg((char*)m_pIDCard->szIdentity).arg(pSSCardInfo->strCardNum).arg(pSSCardInfo->strReleaseDate);
-					//strMessage = QString("发现当前用户未完成制卡数据\n\%1,现将转入制卡页面").arg(strUserInfo);
-					nOperation = Switch_NextPage;
+					strMessage = QString("发现当前用户未完成制卡数据,现将转入制卡页面");
+					nOperation = Goto_Page;
+					nNewPage = Page_MakeCard;
 					nResult = 0;
+					break;
+				}
+				case ProgrerssType::Progress_Finished:
+				{// 使用现有流程
+					if (emit UseFinishedProgress())
+					{
+						g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+						g_pDataCenter->SetProgress(tpProgressInfo);
+						//strMessage = QString("\t\t姓名:%1\n\t\t身份证:%2\n\t\t社保卡号:%3\n\t\t日期:%4").arg((char*)m_pIDCard->szName).arg((char*)m_pIDCard->szIdentity).arg(pSSCardInfo->strCardNum).arg(pSSCardInfo->strReleaseDate);
+						//strMessage = QString("发现当前用户未完成制卡数据\n\%1,现将转入制卡页面").arg(strUserInfo);
+						nOperation = Goto_Page;
+						nNewPage = Page_MakeCard;
+						nResult = 0;
+					}
+					else // 使用新进度文件
+					{
+						auto optProgressFile = g_pDataCenter->GetProgressFile(m_pIDCard);
+						auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value(),true);
+						if (optProgressJson)
+						{
+							std::get<1>(tpProgressInfo) = optProgressFile.value();
+							std::get<2>(tpProgressInfo) = optProgressJson.value();
+							g_pDataCenter->SetProgress(tpProgressInfo);
+						}
+					}
 					break;
 				}
 				}
@@ -216,7 +259,6 @@ void uc_ReadIDCard::ThreadWork()
 				emit ErrorMessage(strMessage);
 			}
 		}
-		
 	}
 }
 
@@ -233,4 +275,9 @@ void uc_ReadIDCard::On_WithoutIDCard(int arg1)
 		g_pDataCenter->bWithoutIDCard = true;
 		pMainWind->pLastStackPage->emit SwitchPage(Goto_Page, Page_InputIDCardInfo);
 	}
+}
+
+bool uc_ReadIDCard::on_UseFinishedProgress()
+{
+	return QMessageBox_CN(QMessageBox::Question, "询问", "系统中存在一个已经完成的制卡进度文件，是否需使用该进度?如果是仅打印卡面选择是!", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes;
 }

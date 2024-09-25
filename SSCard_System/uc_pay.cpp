@@ -324,7 +324,13 @@ void uc_Pay::ThreadWork()
 
 	if (nPayResult == PayResult::PaySucceed)
 	{
+		//g_pDataCenter->SetProgressField("Payment", "1");
 		int nStatus = -1;
+		SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+		g_pDataCenter->SetProgressField("payCode", (char *)g_pDataCenter->strPayCode.c_str());
+		g_pDataCenter->SetProgressField("transTime", (char *)g_pDataCenter->strTransTime.c_str());
+		strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
+		strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
 		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
 		gInfo() << GBKStr("注册缴费:") << "Result = " << nResult << " Status = " << nStatus;
 		if (QFailed(nResult))

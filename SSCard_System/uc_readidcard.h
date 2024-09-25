@@ -45,10 +45,11 @@ public:
 
 signals:
 	void ShowNationWidget(bool bShow);
+	bool UseFinishedProgress();
 private slots:
 	void OnErrorMessage(QString strErrorMsg);
 	void On_WithoutIDCard(int arg1);
-
+	bool on_UseFinishedProgress();
 private:
 	Ui::ReadIDCard* ui;
 };

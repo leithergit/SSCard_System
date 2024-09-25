@@ -55,6 +55,33 @@ void uc_MakeCard::ShowSSCardInfo()
 	ui->label_Pohoto->setStyleSheet(strStyle);
 }
 
+//void uc_MakeCard::registerPaymentTemp()
+//{
+//	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+//	SSCardInfoPtr& pSSCardInfo1 = g_pDataCenter->GetSSCardInfo();
+//	
+//	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+//	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+//	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+//	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+//	strcpy((char*)pSSCardInfo->strTransType, "5");
+//	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+//	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+//	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
+//	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+//	strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
+//	strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
+//
+//	strcpy((char*)pSSCardInfo->strCardID, pSSCardInfo1->strCardID);
+//	strcpy((char*)pSSCardInfo->strName, pSSCardInfo1->strName);
+//	strcpy((char*)pSSCardInfo->strCity, pSSCardInfo1->strCity);
+//	strcpy((char*)pSSCardInfo->strPayCode, "41000024100022372382");
+//	strcpy((char*)pSSCardInfo->strTransactionTime, "2024-04-18 10:08:26");
+//
+//	QString strMessage;
+//	int nStatus = 0;
+//	ResgisterPayment(strMessage, nStatus, pSSCardInfo);          // 缴费登记
+//}
 int uc_MakeCard::ProcessBussiness()
 {
 	for (auto var : m_LableStep)
@@ -94,9 +121,35 @@ int uc_MakeCard::ProcessBussiness()
 	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
 	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
 	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+	if (!g_pDataCenter->strPayCode.size())
+	{
+		char szPayCode[64] = { 0 };
+		if (g_pDataCenter->GetProgressField("payCode", szPayCode))
+			g_pDataCenter->strPayCode = szPayCode;
+		else
+		{
+			emit ShowMaskWidget("操作失败", "缴费码为空!", Fatal, Return_MainPage);
+			return -1;
+		}
+	}
+	if (!g_pDataCenter->strTransTime.size())
+	{
+		char szTranTime[64] = { 0 };
+		if (g_pDataCenter->GetProgressField("transTime", szTranTime))
+			g_pDataCenter->strTransTime = szTranTime;
+		else
+		{
+			emit ShowMaskWidget("操作失败", "缴费时间为空!", Fatal, Return_MainPage);
+			return -1;
+		}
+	}
+		
+	strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
+	strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
 	ZeroMemory(StepStatus, sizeof(StepStatus));
 	int nStatus = 0;
-	ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+	//registerPaymentTemp();
+	ResgisterPayment(strMessage, nStatus,pSSCardInfo);          // 缴费登记
 	if (g_pDataCenter->strCardMakeProgress == "制卡中")
 	{
 		if (QFailed(PrecessCardInMaking(strMessage)))
@@ -150,7 +203,7 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 	int nCardProgress = 0;
 	do
 	{
-		if (!g_pDataCenter->GetProgressStatus("Mark"))		// 未标注
+		if (!g_pDataCenter->GetProgressStatus("MarkCard"))		// 未标注
 		{
 			if (QFailed(nResult = MarkCard(strMessage, nStatus, pSSCardInfo)))
 			{
@@ -187,12 +240,13 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 				nResult = -1;
 				break;
 			}
-			g_pDataCenter->SetProgressStatus("Mark", 1);
+			g_pDataCenter->SetProgressStatus("MarkCard", 1);
 		}
 		else
 			nResult = 0;
-		if (!g_pDataCenter->GetProgressStatus("GetCardData"))		// 未取得卡数据
+		//if (!g_pDataCenter->GetProgressStatus("GetCardData"))		// 未取得卡数据
 		{
+			// GetCardData 内部作了处理，可以自动从进度文件中取得数据
 			if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 			{
 				break;
@@ -205,8 +259,12 @@ int uc_MakeCard::PrecessCardInMaking(QString& strMessage)
 			}
 			g_pDataCenter->SetProgressStatus("GetCardData", 1);
 		}
-		else
-			nResult = 0;
+// 		else
+// 		{
+// 			g_pDataCenter->LoadSSCardData()
+// 			nResult = 0;
+// 		}
+			
 		
 	} while (0);
 	return nResult;
@@ -283,7 +341,7 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 		else
 			nResult = 0;
 
-		if (!g_pDataCenter->GetProgressStatus("GetCardData"))
+		//if (!g_pDataCenter->GetProgressStatus("GetCardData"))
 		{
 			if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
 			{
@@ -308,8 +366,8 @@ int uc_MakeCard::PrepareMakeCard(QString& strMessage)
 			}
 			g_pDataCenter->SetProgressStatus("GetCardData", 1);
 		}
-		else
-			nResult = 0;
+		//else
+		//	nResult = 0;
 
 	} while (0);
 	return nResult;
@@ -321,7 +379,7 @@ void uc_MakeCard::ThreadWork()
 	char szRCode[32] = { 0 };
 	int nResult = -1;
 	QString strMessage;
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	auto& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szBuffer[1024] = { 0 };
 	int nBufferSize = sizeof(szBuffer);
 	DeviceConfig& DevConfig = g_pDataCenter->GetSysConfigure()->DevConfig;
@@ -332,7 +390,7 @@ void uc_MakeCard::ThreadWork()
 	{
 		nResult = -1;
 		if (!g_pDataCenter->GetProgressStatus("WriteCard"))
-		//if (!StepStatus[Step_WriteCard])
+			//if (!StepStatus[Step_WriteCard])
 		{
 			if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
 			{
@@ -340,13 +398,21 @@ void uc_MakeCard::ThreadWork()
 				gError() << gQStr(strMessage);
 				break;
 			}
-			StepStatus[Step_WriteCard] = true;
+			g_pDataCenter->SetProgressField("IdentifyNum", pSSCardInfo->strIdentifyNum);
+			g_pDataCenter->SetProgressField("CardATR", pSSCardInfo->strCardATR);
+			g_pDataCenter->SetProgressField("BankNum", pSSCardInfo->strBankNum);
 			g_pDataCenter->SetProgressStatus("WriteCard", 1);
+			StepStatus[Step_WriteCard] = true;
 		}
 		else
-			gInfo() << GBKString("写卡成功")
+		{
+			g_pDataCenter->GetProgressField("IdentifyNum", pSSCardInfo->strIdentifyNum);
+			g_pDataCenter->GetProgressField("CardATR", pSSCardInfo->strCardATR);
+			g_pDataCenter->GetProgressField("BankNum", pSSCardInfo->strBankNum);
+			gInfo() << GBKString("写卡成功");
+		}
 
-			emit UpdateProgress(MP_WriteCard);
+		emit UpdateProgress(MP_WriteCard);
 		if (!g_pDataCenter->GetProgressStatus("PrintCard"))
 		//if (!StepStatus[Step_PrintCard])
 		{
@@ -355,7 +421,7 @@ void uc_MakeCard::ThreadWork()
 				strMessage = "%1,请检查制卡机后,然后点击重试以继续完成卡片制作!";
 				return;
 			}
-			g_pDataCenter->SetProgressStatus("WriteCard", 1);
+			g_pDataCenter->SetProgressStatus("PrintCard", 1);
 			//StepStatus[Step_PrintCard] = true;
 		}
 

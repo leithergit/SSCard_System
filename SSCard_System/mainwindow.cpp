@@ -10,6 +10,7 @@
 #include "SystemManager.h"
 #include "qmainstackpage.h"
 #include "CheckPassword.h"
+#include "Payment.h"
 MaskWidget* g_pMaskWindow = nullptr;
 
 
@@ -115,6 +116,33 @@ int TestHost(string strIP, USHORT nPort, int nNetTimeout)
 	else
 		return false;
 }
+//void registerPaymentT()
+//{
+//	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+//	SSCardInfoPtr& pSSCardInfo1 = g_pDataCenter->GetSSCardInfo();
+//
+//	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+//	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+//	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+//	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+//	strcpy((char*)pSSCardInfo->strTransType, "5");
+//	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+//	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+//	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
+//	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+//	strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
+//	strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
+//	QString strName = "刘祥志";
+//	
+//	strcpy((char*)pSSCardInfo->strCardID, "412726195911147912");
+//	strcpy((char*)pSSCardInfo->strName, UTF8_GBK("刘祥志").c_str());
+//	strcpy((char*)pSSCardInfo->strPayCode, "41000024100022372382");
+//	strcpy((char*)pSSCardInfo->strTransactionTime, "2024-04-18 10:08:26");
+//
+//	QString strMessage;
+//	int nStatus = 0;
+//	ResgisterPayment(strMessage, nStatus, pSSCardInfo);          // 缴费登记
+//}
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -163,7 +191,7 @@ MainWindow::MainWindow(QWidget* parent)
 	m_pMainpage->show();
 	QString strError;
 	LoadConfigure(strError);		// 加载配置时会自动关闭已经打开的打印和读卡器
-
+	//registerPaymentT();
 	/*
 	Constant                Value           Description
 	Qt::WindowNoState       0x00000000      The window has no state set (in normal state).
@@ -393,7 +421,7 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 		return;
 	}
-
+	
 	nResult = g_pDataCenter->TestPrinter(strMessage);
 	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
 	if (QFailed(nResult))
@@ -488,7 +516,7 @@ void MainWindow::on_pushButton_MainPage_clicked()
 	}
 	pThreadAsync = new std::thread([]() {
 		char szRCode[128] = { 0 };
-		if (g_pDataCenter->GetPrinter())
+		if (g_pDataCenter->GetPrinter() && !g_pDataCenter->bDebug)
 			g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 		g_pDataCenter->CloseDevice();
 		});
@@ -524,7 +552,7 @@ void MainWindow::On_ShowMaskWidget(QString strTitle, QString strDesc, int nStatu
 	if (nOperation == Return_MainPage)
 	{
 		char szRCode[128] = { 0 };
-		if (g_pDataCenter->GetPrinter())
+		if (g_pDataCenter->GetPrinter() && !g_pDataCenter->bDebug)
 			g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 	}
 

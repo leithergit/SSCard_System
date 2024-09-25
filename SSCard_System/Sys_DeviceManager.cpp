@@ -373,7 +373,7 @@ void DeviceManager::on_pushButton_ReaderTest_clicked()
 	}
 
 
-	g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
+	//g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 }
 
 void DeviceManager::on_pushButton_BrowseDesktopReaderModule_clicked()
@@ -909,7 +909,7 @@ int DeviceManager::ReaderTest_clicked(bool bContinue)
 			break;
 		}
 		bSucceed = true;
-		strMessage = QString("读卡测试成功\n银行卡号:%2\n稍后请取出卡片").arg(pSSCardInfo->strBankNum);
+		strMessage = QString("读卡测试成功\n银行卡号:%2").arg(pSSCardInfo->strBankNum);
 	} while (0);
 	if (!bContinue)
 	{

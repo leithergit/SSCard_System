@@ -19,10 +19,12 @@ public:
 	int ReaderIDCard(const char* szPort, IDCardInfo& CardInfo);
 	void fnThreadReadIDCard(string strPort);
 	IDCardInfo CardInfo;
+	SSCardInfoPtr pSSCardInfo;
 	bool bThreadReadIDCardRunning = false;
 	std::thread* pThreadReadIDCard;
 	void EnableUI(QObject* pUIObj, bool bEnable = true);
-
+	QString strCurrentProgress = "";
+	optional<CJsonObjectPtr> ProgressJson;
 	int ReadSSCardInfo(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo);
 	int	QuerySSCardStatus(QString& strMessage, SSCardInfoPtr& pSSCardInfo);
 	void ProceBatchLock();
@@ -36,7 +38,9 @@ public:
 
     int uc_ReqestPaymentQR2(QString& strMessage, QString& strPayCode, QString& strTransTime, QImage& QRImage);
 
-	int LoadPersonSSCardData(QString& strMesssage,bool bDefault = true);
+	int LoadProgress(QString &strProgressFile,QString& strMesssage);
+
+	void GetProgressFile(IDCardInfoPtr& pIDCard, QString &strFile,bool bFinished = false);
 
 signals:
 	void ShowIDCardInfo(bool bSuccceed, QString strMessage);

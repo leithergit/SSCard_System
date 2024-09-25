@@ -105,6 +105,89 @@ void InitCodec()
 }
 #include <mbctype.h>
 
+
+#include <QJsonDocument>  
+#include <QJsonObject>  
+#include <QJsonArray>  
+#include <QFile>  
+#include <QDebug>  
+
+void printJsonKeyValue(const QJsonValue& value, const QString& key, const QString& prefix = "")
+{
+	QString fullKey = prefix.isEmpty() ? key : prefix + "." + key;
+
+	switch (value.type()) {
+	case QJsonValue::Null:
+		qDebug() << fullKey << ": null";
+		break;
+	case QJsonValue::Bool:
+		qDebug() << fullKey << ":" << (value.toBool() ? "true" : "false");
+		break;
+	case QJsonValue::Double:
+		qDebug() << fullKey << ":" << value.toDouble();
+		break;
+	case QJsonValue::String:
+		qDebug() << fullKey << ":" << value.toString();
+		break;
+	case QJsonValue::Array:
+	{
+		qDebug() << fullKey << ": [Array]";
+		QJsonArray arr = value.toArray();
+		for (int i = 0; i < arr.size(); ++i) {
+			printJsonKeyValue(arr[i], QString("[%1]").arg(i), fullKey);
+		}
+		break;
+	}
+	case QJsonValue::Object:
+	{
+		qDebug() << fullKey << ": {Object}";
+		QJsonObject obj = value.toObject();
+		for (auto it = obj.begin(); it != obj.end(); ++it) {
+			printJsonKeyValue(it.value(), it.key(), fullKey);
+		}
+		break;
+	}
+	default:
+		qDebug() << fullKey << ": Unknown type";
+	}
+}
+
+bool readAndPrintJson(const QString& filePath)
+{
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly)) {
+		qWarning() << "Could not open file:" << filePath;
+		return false;
+	}
+
+	QByteArray jsonData = file.readAll();
+	file.close();
+
+	QJsonDocument document = QJsonDocument::fromJson(jsonData);
+	if (document.isNull()) {
+		qWarning() << "Failed to parse JSON";
+		return false;
+	}
+
+	if (document.isObject()) {
+		QJsonObject obj = document.object();
+		for (auto it = obj.begin(); it != obj.end(); ++it) {
+			printJsonKeyValue(it.value(), it.key());
+		}
+	}
+	else if (document.isArray()) {
+		QJsonArray arr = document.array();
+		for (int i = 0; i < arr.size(); ++i) {
+			printJsonKeyValue(arr[i], QString("[%1]").arg(i));
+		}
+	}
+	else {
+		qWarning() << "Document is neither an object nor an array";
+		return false;
+	}
+
+	return true;
+}
 int main(int argc, char* argv[])
 {
 	//TestJson();
@@ -160,7 +243,7 @@ int main(int argc, char* argv[])
 	char szError[1024] = { 0 };
 	SetConsoleOutputCP(936);
 	int len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, 10060, MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED), (LPSTR)szError, 1024, NULL);*/
-	InitCodec();
+	//InitCodec();
 #ifdef _DEBUG
 	QStringList strArgList = a.arguments();
 	for (auto var : strArgList)
@@ -302,6 +385,11 @@ int main(int argc, char* argv[])
 	jsonReg.Add("TerminatorID", devInfo.strTerminalCode);
 	jsonReg.Add("OperatorID", devInfo.strOperatorID);
 	string strJson = jsonReg.ToString();
+	//string strJsonPath = "./Data/Progress_411624200409164543.json";
+	//readAndPrintJson(strJsonPath.c_str());
+
+	//SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	//g_pDataCenter->LoadSSCardData(strJsonPath, pSSCardInfo);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 引入山东授权管理代码

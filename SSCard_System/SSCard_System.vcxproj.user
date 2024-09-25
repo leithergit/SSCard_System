@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>$(SolutionDir)..\..\public\SSCard_System\SSCard_System.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\public\SSCard_System</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>D:\Work\SSCard_System.Win32_Henan\From.T14s\SSCard_System1.0.0.69.full\SSCard_System.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>D:\Work\SSCard_System.Win32_Henan\From.T14s\SSCard_System1.0.0.69.full</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <RemoteDebuggerCommand>D:\SSCard_System\SSCard_System.EXE</RemoteDebuggerCommand>
     <RemoteDebuggerWorkingDirectory>D:\SSCard_System</RemoteDebuggerWorkingDirectory>
-    <RemoteDebuggerServerName>KT-M1</RemoteDebuggerServerName>
+    <RemoteDebuggerServerName>10.0.0.128</RemoteDebuggerServerName>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
-    <LocalDebuggerCommandArguments>$(QmlDebug) /SkipLicense</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/SkipLicense</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>D:\Work\SSCard_System.Win32_Henan\public\SSCardSystem1.0.4.1 full\SSCard_System.exe</LocalDebuggerCommand>
@@ -16,9 +16,13 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <QtLastBackgroundBuild>2023-07-10T16:33:37.3342398Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-07-19T04:08:26.0917588Z</QtLastBackgroundBuild>
+    <QtTouchProperty>
+    </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <QtLastBackgroundBuild>2023-07-10T16:33:37.4946229Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-07-19T04:08:26.3995458Z</QtLastBackgroundBuild>
+    <QtTouchProperty>
+    </QtTouchProperty>
   </PropertyGroup>
 </Project>

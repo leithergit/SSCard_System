@@ -96,7 +96,6 @@ extern QScreen* g_pCurScreen;
 
 using KT_PrinterLibPtr = shared_ptr<KTModule<KT_Printer>>;
 using KT_ReaderLibPtr = shared_ptr<KTModule<KT_Reader>>;
-
 string UTF8_GBK(const char* strUtf8);
 string GBK_UTF8(const char* strGBK);
 
@@ -126,6 +125,8 @@ enum class ProgrerssType
 
 enum Step_Index
 {
+	Step_GetMobile = -2,
+	Step_Pay = -1,
 	Step_Mark = 0,
 	Step_PreMake,
 	Step_WriteCard,
@@ -1068,7 +1069,7 @@ public:
 	optional<CJsonObjectPtr> OpenProgress(string&strProgressFile,bool bCreate = false);
 	optional<CJsonObjectPtr> OpenProgress(string&& strProgressFile, bool bCreate = false);
 
-	bool SetProgress(tuple<ProgrerssType, string, CJsonObjectPtr>& tpl);
+	bool SetProgress(tuple<ProgrerssType, string, CJsonObjectPtr>& tpl,bool bSave = true);
 
 	bool SetProgress(IDCardInfoPtr& pIDCard, CJsonObjectPtr pJson = nullptr,bool bSave = true);
 
@@ -1098,7 +1099,7 @@ public:
 
 	// 获取指定流程的状态
 	// 没有或未完成流程时返回0，否则返回1
-	int  GetProgressStatus(string strProcessName);
+	int  GetProgressStatus(string strProcessName, CJsonObjectPtr pJsonProgress = nullptr);
 
 	bool SetProgressStatus(string strProcessName, int nStatus);
 
@@ -1184,26 +1185,41 @@ private:
 	CJsonObjectPtr pJsonProgress = nullptr;
 };
 
-#define	JsSetValueP(json,field,value)	if (json->KeyExist(field)) \
-											json->Replace(field, (char *)value);\
-										else\
-											json->Add(field, (char *)value);
+#define	SetJsonPtrValue(json,field,value)	if (json->KeyExist(field)) \
+												json->Replace(field, (char *)value);\
+											else\
+												json->Add(field, (char *)value);
 
 // 赋值给数据组型变量
-#define JsGetValueP(json,Key,Value) {\
-		string strTemp;\
+#define GetJsonPtrValue(json,Key,Value) {\
 		if (json->KeyExist(Key)){\
+			string strTemp;\
 			json->Get(Key, strTemp);\
-			qDebug("%s = %s", Key, strTemp.c_str());\
+			if (strTemp.size() > 512)\
+				gInfo()<<#Key <<" size = "<< strTemp.size()<<"\tHead 512 bytes:"<<strTemp.substr(0,512);\
+			else\
+				gInfo()<<#Key <<"= "<< strTemp.c_str();\
 			strcpy((char*)Value, strTemp.c_str());\
 			}\
 		}
-// 赋值给指针型变量，同时会检查指针
-#define JsGetValuePP(json,Key,Value) {\
-		string strTemp;\
+#define GetJsonPtrStrValue(json,Key,Value) {\
 		if (json->KeyExist(Key)){\
+			json->Get(Key, Value);\
+			if (Value.size() > 512)\
+				gInfo()<<#Key <<" size = "<< Value.size()<<"\tHead 512 bytes:"<<Value.substr(0,512);\
+			else\
+				gInfo()<<#Key <<"= "<< Value.c_str();\
+			}\
+		}
+// 赋值给指针型变量，同时会检查指针
+#define GetJsonPtrValuePtr(json,Key,Value) {\
+		if (json->KeyExist(Key)){\
+			string strTemp;\
 			json->Get(Key, strTemp);\
-			qDebug("%s = %s", Key, strTemp.c_str());\
+			if (strTemp.size() > 512)\
+				gInfo()<<#Key <<" size = "<< strTemp.size()<<"\tHead 512 bytes:"<<strTemp.substr(0,512);\
+			else\
+				gInfo()<<#Key <<"= "<< strTemp.c_str();\
 			if (!Value)\
 				Value = new char[strTemp.size() + 1];\
 			strcpy((char*)Value, strTemp.c_str());\
@@ -1212,9 +1228,9 @@ private:
 //#define JsGetValueP(json,Key,Value)	{string strTemp;json->Get(Key, strTemp);qDebug("%s = %s",Key,strTemp.c_str()); strcpy_s((char *)Value,sizeof(Value),strTemp.c_str());}
 
 
-#define JsGetValue(json,Key,Value)	{\
-		string strTemp;\
+#define GetJsonValue(json,Key,Value)	{\
 		if (json.KeyExist(Key)){\
+			string strTemp;\
 			json.Get(Key, strTemp);\
 			qDebug("%s = %s", Key, strTemp.c_str());\
 			strcpy((char*)Value, strTemp.c_str());\
@@ -1233,25 +1249,18 @@ private:
 //			}\
 //		}
 
-#define	JsSetValue(json,field,value)	if (json.KeyExist(field)) \
+#define	SetJsonValue(json,field,value)	if (json.KeyExist(field)) \
 											json.Replace(field, value);\
 										else\
 											json.Add(field, value);
 
-#define	UpdateSSCard(json,key,val)	if (strlen(val))\
-							{\
-								if (json.KeyExist(key))\
-									json.Replace(key,val);\
-								else\
-									json.Add(key,val);\
-							}
 
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
 
 int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
 
-tuple<ProgrerssType,string,CJsonObjectPtr> FindCardData(const char *szIDentify,SSCardInfoPtr &pSSCardInfo);
+tuple<ProgrerssType,string,CJsonObjectPtr> FindCardProgress(const char *szIDentify,SSCardInfoPtr &pSSCardInfo);
 
 class QWaitCursor
 {
@@ -1263,6 +1272,8 @@ public:
 
 	~QWaitCursor();
 };
+
+int LoadPersonInfo(QString strJson, IDCardInfoPtr& pIDCard);
 
 int GetAge(string strBirthday);
 

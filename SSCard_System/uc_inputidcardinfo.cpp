@@ -139,25 +139,25 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 		char szNation[64] = { 0 };
 
-		JsGetValueP(pJson, "Name", pSSCardInfo->strName);
-		JsGetValueP(pJson, "Identity", pSSCardInfo->strCardID);
-		JsGetValueP(pJson, "Gender", pSSCardInfo->strSex);
-		JsGetValueP(pJson, "Birthday", pSSCardInfo->strBirthday);
-		JsGetValueP(pJson, "Nation", szNation);
-		JsGetValueP(pJson, "PaperIssuedate", pSSCardInfo->strReleaseDate);
-		JsGetValueP(pJson, "PaperExpiredate", pSSCardInfo->strValidDate);
-		JsGetValueP(pJson, "Mobile", pSSCardInfo->strMobile);
-		JsGetValueP(pJson, "Address", pSSCardInfo->strAddress);
-		JsGetValueP(pJson, "PostCode", pSSCardInfo->strPostalCode);
-		JsGetValueP(pJson, "BankCode", pSSCardInfo->strBankCode);
-		JsGetValueP(pJson, "City", pSSCardInfo->strCity);
+		GetJsonPtrValue(pJson, "Name", pSSCardInfo->strName);
+		GetJsonPtrValue(pJson, "Identity", pSSCardInfo->strCardID);
+		GetJsonPtrValue(pJson, "Gender", pSSCardInfo->strSex);
+		GetJsonPtrValue(pJson, "Birthday", pSSCardInfo->strBirthday);
+		GetJsonPtrValue(pJson, "Nation", szNation);
+		GetJsonPtrValue(pJson, "PaperIssuedate", pSSCardInfo->strReleaseDate);
+		GetJsonPtrValue(pJson, "PaperExpiredate", pSSCardInfo->strValidDate);
+		GetJsonPtrValue(pJson, "Mobile", pSSCardInfo->strMobile);
+		GetJsonPtrValue(pJson, "Address", pSSCardInfo->strAddress);
+		GetJsonPtrValue(pJson, "PostCode", pSSCardInfo->strPostalCode);
+		GetJsonPtrValue(pJson, "BankCode", pSSCardInfo->strBankCode);
+		GetJsonPtrValue(pJson, "City", pSSCardInfo->strCity);
 				   
-		JsGetValueP(pJson, "PersonType", pSSCardInfo->strPersonType);
-		JsGetValueP(pJson, "Company", pSSCardInfo->strCompanyName);
-		JsGetValueP(pJson, "Community", pSSCardInfo->strCommunity);
-		JsGetValueP(pJson, "LocalNum", pSSCardInfo->strLocalNum);
-		JsGetValueP(pJson, "Department", pSSCardInfo->strDepartmentName);
-		JsGetValueP(pJson, "Class", pSSCardInfo->strClassName);
+		GetJsonPtrValue(pJson, "PersonType", pSSCardInfo->strPersonType);
+		GetJsonPtrValue(pJson, "Company", pSSCardInfo->strCompanyName);
+		GetJsonPtrValue(pJson, "Community", pSSCardInfo->strCommunity);
+		GetJsonPtrValue(pJson, "LocalNum", pSSCardInfo->strLocalNum);
+		GetJsonPtrValue(pJson, "Department", pSSCardInfo->strDepartmentName);
+		GetJsonPtrValue(pJson, "Class", pSSCardInfo->strClassName);
 
 
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName));
@@ -519,7 +519,9 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	strcpy_s((char*)pSSCardInfo->strCardID, sizeof(pSSCardInfo->strCardID), (const char*)pIDCard->szIdentity);
 	strcpy_s((char*)pSSCardInfo->strAddress, sizeof(pSSCardInfo->strAddress), strAddress.toLocal8Bit().data());
 	strcpy_s((char*)pSSCardInfo->strReleaseDate, sizeof(pSSCardInfo->strReleaseDate), (char*)pIDCard->szExpirationDate1);
+#ifdef HN2022
 	strcpy_s((char*)pSSCardInfo->strIDCardIssuedDate, sizeof(pIDCard->szExpirationDate1), (char*)pIDCard->szExpirationDate1);
+#endif
 	strcpy_s((char*)pSSCardInfo->strValidDate, sizeof(pSSCardInfo->strValidDate), (char*)pIDCard->szExpirationDate2);
 
 	strcpy_s((char*)pSSCardInfo->strOrganID, sizeof(pSSCardInfo->strOrganID), Reginfo.strAgency.c_str());
@@ -859,15 +861,12 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 		SavePersonInfo();
 			
 		SSCardInfoPtr pSSCardInfoLocal = nullptr;
-		auto tpProgressInfo = FindCardData((const char*)pIDCard->szIdentity, pSSCardInfoLocal);
+		auto tpProgressInfo = FindCardProgress((const char*)pIDCard->szIdentity, pSSCardInfoLocal);
 		switch (std::get<0>(tpProgressInfo))
 		{
 		default:
 		case ProgrerssType::Progress_UnStart:
 		{
-			//SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
-			//strcpy((char*)pTempSSCardInfo->strName, (const char*)pIDCard->szName);
-			//strcpy((char*)pTempSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
 			QFile filePhoto(g_pDataCenter->strSSCardPhotoFile.c_str());
 			if (!filePhoto.open(QIODevice::ReadOnly))
 			{
@@ -958,12 +957,27 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 		}
 		case ProgrerssType::Progress_Finished:
 		{
-			strMessage = "发现已经完成的制卡数据,现将转入制卡页面,你可以进行相关的操作!";
-			g_pDataCenter->SetSSCardInfo(pSSCardInfoLocal);
-			g_pDataCenter->SetProgress(tpProgressInfo);
-			nOperation = Goto_Page;
-			nPage = Page_MakeCard;
-			nResult = 0;
+			if (QMessageBox_CN(QMessageBox::Question, "询问", "系统中存在一个已经完成的制卡进度文件，是否需使用该进度?如果是仅打印卡面选择是!", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+			{
+				strMessage = "发现已经完成的制卡数据,现将转入制卡页面,你可以进行相关的操作!";
+				g_pDataCenter->SetSSCardInfo(pSSCardInfoLocal);
+				g_pDataCenter->SetProgress(tpProgressInfo);
+				nOperation = Goto_Page;
+				nPage = Page_MakeCard;
+				nResult = 0;
+			}
+			else
+			{
+				auto optProgressFile = g_pDataCenter->GetProgressFile(pIDCard);
+				auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value());
+				if (optProgressJson)
+				{
+					std::get<1>(tpProgressInfo) = optProgressFile.value();
+					std::get<2>(tpProgressInfo) = optProgressJson.value();
+					g_pDataCenter->SetProgress(tpProgressInfo);
+				}
+			}
+			
 			break;
 		}
 		}
@@ -1067,4 +1081,3 @@ void uc_InputIDCardInfo::on_lineEdit_CardID_textChanged(const QString & strCardI
 {
 	
 }
-

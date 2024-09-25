@@ -23,6 +23,10 @@ Sys_SSCardAPITest::Sys_SSCardAPITest(QWidget* parent) :
 		ui->comboBox_Nationality->addItem(var.strNationalty.c_str(), var.strCode.c_str());
 	}
 
+	ui->lineEdit_City->setText(g_pDataCenter->GetSysConfigure()->Region.strCityCode.c_str());
+	ui->lineEdit_Country->setText(g_pDataCenter->GetSysConfigure()->Region.strCountry.c_str());
+	ui->lineEdit_Agency->setText(g_pDataCenter->GetSysConfigure()->Region.strAgency.c_str());
+
 	pButtonGrp = new QButtonGroup(this);
 	pButtonGrp->addButton(ui->radioButton_Male, 0);
 	pButtonGrp->addButton(ui->radioButton_Female, 1);
@@ -35,7 +39,7 @@ Sys_SSCardAPITest::Sys_SSCardAPITest(QWidget* parent) :
 		{
 			ui->lineEdit_Name->setText(QString::fromLocal8Bit((char*)pIDCard->szName));
 			ui->lineEdit_CardID->setText(QString((char*)pIDCard->szIdentity));
-			ui->comboBox_Nationality->setCurrentText(QString((char*)pIDCard->szNationalty));
+			ui->comboBox_Nationality->setCurrentText(QString::fromLocal8Bit((char*)pIDCard->szNationalty));
 			QDateTime IssuedDate = QDateTime::fromString((char*)pIDCard->szExpirationDate1, "yyyyMMdd");
 			QDateTime ExpireDate = QDateTime::fromString((char*)pIDCard->szExpirationDate2, "yyyyMMdd");
 			ui->dateEdit_Issued->setDateTime(IssuedDate);
@@ -108,62 +112,65 @@ bool Sys_SSCardAPITest::LoadPersonInfo(QString strJson)
 {
 	try
 	{
-		if (!fs::exists(strJson.toLocal8Bit().data()))
+		string strProgressFile = strJson.toLocal8Bit().data();
+		if (!fs::exists(strProgressFile))
 			return false;
 
-		ifstream ifs(strJson.toLocal8Bit().data(), ios::in | ios::binary);
+		ifstream ifs(strProgressFile, ios::in | ios::binary);
 		stringstream ss;
 		ss << ifs.rdbuf();
 		CJsonObject json;
 		if (!json.Parse(ss.str()))
 			return false;
 
-		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-		char szNation[64] = { 0 };
-		string strTemp;
+		char szPersonType[8] = { 0 };
+		char szMobile[32] = { 0 };
+		char szBankCode[32] = { 0 };
+		char szCommunity[64] = { 0 };
+		char szCompany[64] = { 0 };
+		char szDepartment[64] = { 0 };
+		
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 
-		JsGetValue(json, "Name", pSSCardInfo->strName);
-		JsGetValue(json, "Identity", pSSCardInfo->strCardID);
-		JsGetValue(json, "Gender", pSSCardInfo->strSex);
-		JsGetValue(json, "Birthday", pSSCardInfo->strBirthday);
-		JsGetValue(json, "Nation", szNation);
-		JsGetValue(json, "PaperIssuedate", pSSCardInfo->strReleaseDate);
-		JsGetValue(json, "PaperExpiredate", pSSCardInfo->strValidDate);
-		JsGetValue(json, "Mobile", pSSCardInfo->strMobile);
-		JsGetValue(json, "Address", pSSCardInfo->strAddress);
-		JsGetValue(json, "PostCode", pSSCardInfo->strPostalCode);
-		JsGetValue(json, "BankCode", pSSCardInfo->strBankCode);
-		JsGetValue(json, "City", pSSCardInfo->strCity);
+		GetJsonValue(json, "Identity", pIDCard->szIdentity);
+		GetJsonValue(json, "Name", pIDCard->szName);		
+		GetJsonValue(json, "Gender", pIDCard->szGender);
+		GetJsonValue(json, "Birthday", pIDCard->szBirthday);
+		GetJsonValue(json, "Nation", pIDCard->szNationalty);
+		GetJsonValue(json, "Address", pIDCard->szAddress);
+		GetJsonValue(json, "PaperIssuedate", pIDCard->szExpirationDate1);
+		GetJsonValue(json, "PaperExpiredate", pIDCard->szExpirationDate2);
 
-		JsGetValue(json, "PersonType", pSSCardInfo->strPersonType);
-		JsGetValue(json, "Company", pSSCardInfo->strCompanyName);
-		JsGetValue(json, "Community", pSSCardInfo->strCommunity);
-		JsGetValue(json, "LocalNum", pSSCardInfo->strLocalNum);
-		JsGetValue(json, "Department", pSSCardInfo->strDepartmentName);
-		JsGetValue(json, "Class", pSSCardInfo->strClassName);
+		GetJsonValue(json, "Mobile", szMobile);
+		GetJsonValue(json, "PersonType", szPersonType);
+		GetJsonValue(json, "BankCode", szBankCode);
+		GetJsonValue(json, "Community", szCommunity);
+		GetJsonValue(json, "Company", szCompany);
+		GetJsonValue(json, "Department", szDepartment);
+		
+		g_pDataCenter->SetIDCardInfo(pIDCard);
+		
+		ui->lineEdit_Name->setText(QString::fromLocal8Bit((char *)pIDCard->szName));
+		ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
+		ui->lineEdit_Mobile->setText((char*)szMobile);
 
-
-		ui->lineEdit_Name->setText(QString(pSSCardInfo->strName));
-		ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
-		ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile);
-
-		int nGender = atoi(pSSCardInfo->strSex);
+		int nGender = atoi((char *)pIDCard->szGender);
 		if (nGender == 1)
 			ui->radioButton_Male->setChecked(true);
 		else if (nGender == 2)
 			ui->radioButton_Female->setChecked(true);
 
-		ui->dateEdit_Issued->setDateTime(QDateTime::fromString(pSSCardInfo->strReleaseDate, "yyyyMMdd"));
-		ui->dateEdit_Expired->setDateTime(QDateTime::fromString(pSSCardInfo->strValidDate, "yyyyMMdd"));
-		ui->lineEdit_Address->setText(QString(pSSCardInfo->strAddress));
+		ui->dateEdit_Issued->setDateTime(QDateTime::fromString((char *)pIDCard->szExpirationDate1, "yyyyMMdd"));
+		ui->dateEdit_Expired->setDateTime(QDateTime::fromString((char *)pIDCard->szExpirationDate2, "yyyyMMdd"));
+		ui->lineEdit_Address->setText(QString::fromLocal8Bit((char *)pIDCard->szAddress));
 		//ui->lineEdit_GuardianMobile->setText(pSSCardInfo->strMobile.c_str());
 		//ui->lineEdit_Address->setText(QString::fromLocal8Bit(pSSCardInfo->strAddress.c_str()));
 
-		int nIndex = ui->comboBox_Nationality->findText(QString(szNation));
+		int nIndex = ui->comboBox_Nationality->findText(QString::fromLocal8Bit((char *)pIDCard->szName));
 		if (nIndex != -1)
 			ui->comboBox_Nationality->setCurrentIndex(nIndex);
 
-		int nPersonType = atoi(pSSCardInfo->strPersonType);
+		int nPersonType = atoi(szPersonType);
 		ui->comboBox_PersonType->setCurrentIndex(nPersonType - 1);
 
 		switch (nPersonType)
@@ -188,7 +195,7 @@ bool Sys_SSCardAPITest::LoadPersonInfo(QString strJson)
 		case 2:	// 城镇居民
 		case 3:	// 农村居民
 		{
-			ui->lineEdit_Organization->setText(QString(pSSCardInfo->strCommunity));
+			ui->lineEdit_Organization->setText((char *)szCommunity);
 			//ui->lineEdit_OrganizationCode->setText(QString::fromLocal8Bit(pSSCardInfo->strLocalNum));
 			ui->label_Organization->setText("社区[村]");
 			//ui->label_OrganizationCode->setText("社区(村)编号");
@@ -217,8 +224,8 @@ bool Sys_SSCardAPITest::LoadPersonInfo(QString strJson)
 		//break;
 		case 4:	// 在读大学生
 		{
-			ui->lineEdit_Organization->setText(QString(pSSCardInfo->strCompanyName));
-			ui->lineEdit_Department->setText(QString(pSSCardInfo->strDepartmentName));
+			ui->lineEdit_Organization->setText((char *)szCompany);
+			ui->lineEdit_Department->setText((char *)szDepartment);
 			//ui->lineEdit_Class->setText(QString::fromLocal8Bit(pSSCardInfo->strClassName));
 
 			ui->label_Organization->setText("学校名称");
@@ -233,32 +240,6 @@ bool Sys_SSCardAPITest::LoadPersonInfo(QString strJson)
 		}
 		break;
 		}
-
-		//int nAge = GetAge(pSSCardInfo->strBirthday);
-		//if (nAge >= 0 && nAge < 16)
-		//{
-		//	ui->checkBox_Agency->setChecked(true);
-		//	ShowGuardianWidget(true);
-		//	if (json.KeyExist("Guardian"))
-		//	{
-		//		json.Get("Guardian", pSSCardInfo->strGuardianName);
-		//		ui->lineEdit_Guardian->setText(QString::fromLocal8Bit(pSSCardInfo->strGuardianName.c_str()));
-		//	}
-		//
-		//	if (json.KeyExist("GuardianShip"))
-		//	{
-		//		json.Get("GuardianShip", pSSCardInfo->strGuardianShip);
-		//		int nIndex = ui->comboBox_Guardianship->findText(QString::fromLocal8Bit(pSSCardInfo->strGuardianShip.c_str()));
-		//		if (nIndex != -1)
-		//			ui->comboBox_Guardianship->setCurrentIndex(nIndex);
-		//	}
-		//
-		//	if (json.KeyExist("GuardianCardID"))
-		//	{
-		//		json.Get("GuardianCardID", pSSCardInfo->strGuardianIDentity);
-		//		ui->lineEdit_GuardianCardID->setText(pSSCardInfo->strGuardianIDentity.c_str());
-		//	}
-		//}
 
 		string strPhoto;
 		if (json.KeyExist("Photo"))
@@ -310,6 +291,8 @@ void Sys_SSCardAPITest::SavePersonInfo()
 	json.Add("Department", pSSCardInfo->strDepartmentName);
 	json.Add("Class", pSSCardInfo->strClassName);
 	json.AddEmptySubObject("Progress");
+	json["Progress"].Add("Registerlost", 0);
+	json["Progress"].Add("InputMobile", 0);
 	json["Progress"].Add("Premake", 0);
 	json["Progress"].Add("Update", 0);
 	json["Progress"].Add("Add", 0);
@@ -363,7 +346,7 @@ bool Sys_SSCardAPITest::GetPersonName(QString strPersonFile, QString& strName)
 		if (!json.Get("Name", strTemp))
 			return false;
 
-		strName = QString(strTemp.c_str());
+		strName = QString::fromLocal8Bit(strTemp.c_str());
 		return true;
 	}
 	catch (std::exception& e)
@@ -999,22 +982,86 @@ void Sys_SSCardAPITest::on_pushButton_ResetPage_clicked()
 void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 {
 	int nSelect = ui->comboBox_Function->currentIndex();
-    g_pDataCenter->GetSysConfigure()->Region.strCityCode = ui->lineEdit_City->text().toStdString();
-    g_pDataCenter->GetSysConfigure()->Region.strCountry = ui->lineEdit_Country->text().toStdString();
-    g_pDataCenter->GetSysConfigure()->Region.strAgency = ui->lineEdit_Agency->text().toStdString();
+	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+	Reginfo.strCityCode = ui->lineEdit_City->text().toStdString();
+	Reginfo.strCountry = ui->lineEdit_Country->text().toStdString();
+	Reginfo.strAgency = ui->lineEdit_Agency->text().toStdString();
 	QString strMessage;
-	string strCardID;
-	string strName;
-	QString qstrName = ui->lineEdit_Name->text();
-	gInfo()<<"Name:"<<qstrName.toStdString();
-	strName = ui->lineEdit_Name->text().toLocal8Bit().data();
-	if (!pSSCardInfo)
-		pSSCardInfo = make_shared<SSCardInfo>();
-	if (QFailed(GetCardID(strCardID, strMessage)))
+	
+	if (!g_pDataCenter->GetSSCardInfo())
 	{
-		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
-		return ;
+		pSSCardInfo = make_shared<SSCardInfo>();
+		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	}
+	else
+		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+	if (!g_pDataCenter->GetIDCardInfo())
+	{
+		pIDCard = make_shared<IDCardInfo>();
+		g_pDataCenter->SetIDCardInfo(pIDCard);
+	}
+	else
+		pIDCard = g_pDataCenter->GetIDCardInfo();
+	
+	auto tpProgressInfo = FindCardProgress((const char*)pIDCard->szIdentity, pSSCardInfo);
+
+	auto ProgressJson = g_pDataCenter->LoadSSCardData(std::get<1>(tpProgressInfo), pSSCardInfo);
+	if (ProgressJson)
+	{
+		g_pDataCenter->SetSSCardInfo(pSSCardInfo);
+		g_pDataCenter->SetProgress(tpProgressInfo);
+	}
+	else
+	{
+		gInfo() << "Failed in load SSCardData from " << ProgressJson.value();
+		string strCardID = ui->lineEdit_CardID->text().toStdString();
+		string strName = ui->lineEdit_Name->text().toLocal8Bit().data();
+		string strNationality = ui->comboBox_Nationality->currentText().toLocal8Bit().data();
+		string strMobile = ui->lineEdit_Mobile->text().toStdString();
+		string strAddress = ui->lineEdit_Address->text().toStdString();
+
+		int nGender = pButtonGrp->checkedId() + 1;
+
+		string strIssuedDatetime = ui->dateEdit_Issued->dateTime().toString("yyyyMMdd").toStdString();
+		string strExpiredDatetime = ui->dateEdit_Expired->dateTime().toString("yyyyMMdd").toStdString();
+		
+		if (QFailed(GetCardID(strCardID, strMessage)))
+		{
+			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+			return;
+		}
+		strcpy((char*)pIDCard->szName,strName.c_str());
+		strcpy((char*)pIDCard->szIdentity, strCardID.c_str());
+		strcpy((char*)pIDCard->szAddress, strAddress.c_str());
+		strcpy((char*)pIDCard->szExpirationDate1, strIssuedDatetime.c_str());
+		strcpy((char*)pIDCard->szExpirationDate2, strExpiredDatetime.c_str());
+		strcpy((char*)pIDCard->szNationalty, strNationality.c_str());
+		
+		if (nGender == 1)
+			strcpy((char*)pIDCard->szGender, "男");
+		else
+			strcpy((char*)pIDCard->szGender, "女");
+		
+		strcpy((char*)pSSCardInfo->strName, strName.c_str());
+		strcpy((char*)pSSCardInfo->strCardID, strCardID.c_str());
+		strcpy((char*)pSSCardInfo->strMobile, strMobile.c_str());
+		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		strcpy((char*)pSSCardInfo->strTransType, "5");
+		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+		strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		auto optProgressFile = g_pDataCenter->GetProgressFile(pIDCard);
+		auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value());
+		if (optProgressJson)
+		{
+			std::get<1>(tpProgressInfo) = optProgressFile.value();
+			std::get<2>(tpProgressInfo) = optProgressJson.value();
+			g_pDataCenter->SetProgress(tpProgressInfo);
+		}
+	}
+		
 	int nStatus = 0;
 	int nResult = -1;
 	QString strCardProgress;
@@ -1023,9 +1070,6 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 	case 0:		// 移除制卡数据
 	default:
 	{
-
-		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-		strcpy(pSSCardInfo->strCardID, strCardID.c_str());
 		RemoveCardData(pSSCardInfo);
 		break;
 	}
@@ -1038,7 +1082,7 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 		break;
 	case 4:	// 加载制止数据
 	{
-		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+		//SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 		QString strAppPath = QCoreApplication::applicationDirPath();
 		strAppPath += "/Debug";
 		QFileInfo fdir(strAppPath);
@@ -1056,7 +1100,7 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 			dir.mkdir(strAppPath);
 		}
 
-		strAppPath += QString("/Progress_%1.json").arg(strCardID.c_str());
+		strAppPath += QString("/Progress_%1.json").arg((char *)pIDCard->szIdentity);
 		QFileInfo ffile(strAppPath);
 		if (ffile.isFile())
 		{
@@ -1069,10 +1113,10 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 	case 3:	// 查询制卡状态
 	{
 		SSCardInfoPtr pTempSSCardInfo = make_shared<SSCardInfo>();
-		strcpy((char*)pTempSSCardInfo->strName, (const char*)strName.c_str());
-		strcpy((char*)pTempSSCardInfo->strCardID, (const char*)strCardID.c_str());
-		strcpy((char*)pSSCardInfo->strName, (const char*)strName.c_str());
-		strcpy((char*)pSSCardInfo->strCardID, (const char*)strCardID.c_str());
+		strcpy((char*)pTempSSCardInfo->strName,(char *)pIDCard->szName);
+		strcpy((char*)pTempSSCardInfo->strCardID, (char *)pIDCard->szIdentity);
+		strcpy((char*)pSSCardInfo->strName, (char*)pIDCard->szName);
+		strcpy((char*)pSSCardInfo->strCardID, (char*)pIDCard->szIdentity);
 		if (QFailed(QueryCardProgress(strMessage, nStatus, pTempSSCardInfo)))
 		{
 			break;
@@ -1114,8 +1158,67 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 		{
 			QMessageBox_CN(QMessageBox::Information, "提示", "制卡中,无须挂失!",QMessageBox::Ok);
 		}
+		else
+		{
+			char szStatus[1024] = { 0 };
+			int nResult = 0;
+			if (QFailed(nResult = reportLostCard(*pSSCardInfo, szStatus)))
+			{
+				FailureMessage("挂失失败", pSSCardInfo, szStatus, strMessage);
+				nStatus = strtol(szStatus, nullptr, 0);
+				/*if (strcmp(szStatus, "08") == 0)
+					strMessage = QString("挂失失败:人社服务器没有响应,可能网络异常或人社服务器故障\n姓名:%1\1卡号:%2\t").arg(pSSCardInfo->strName).arg(pSSCardInfo->strCardNum);
+				else
+					strMessage = QString("挂失失败:失败:%1\n姓名:%2\t卡号:%3\t").arg(nResult).arg((char*)pSSCardInfo->strName).arg((char*)pSSCardInfo->strCardNum);*/
+				gError() << gQStr(strMessage);
+			}
+
+			gInfo() << "reportLostCard:" << szStatus;
+
+			char szDigit[16] = { 0 }, szText[1024] = { 0 };
+			SplitString(szStatus, szDigit, szText);
+			if (strlen(szText))
+			{
+				strMessage = QString::fromLocal8Bit(szText);
+				gInfo() << "挂失消息" << szText;
+			}
+			
+			if (strlen(szDigit))
+			{
+				gInfo() << "挂失返回：" << szDigit;
+			}
+			else
+			{
+				gInfo() << "挂失无返回";
+			}
+		}
 		break;
 	}
+    case 13:
+    {
+		char szStatus[1024] = { 0 };
+		int nResult = 0;
+		if (QFailed(nResult = cancelLostCard(*pSSCardInfo, szStatus)))
+		{
+			FailureMessage("解除挂失", pSSCardInfo, szStatus, strMessage);
+			gError() << gQStr(strMessage);
+			break;
+		}
+
+		gInfo() << "cancelLostCard:" << szStatus;
+		char szDigit[16] = { 0 }, szText[1024] = { 0 };
+		SplitString(szStatus, szDigit, szText);
+		if (strlen(szText))
+			strMessage = QString::fromLocal8Bit(szText);
+		if (strlen(szDigit))
+		{
+			nStatus = strtolong(szDigit, 10);
+			break;
+		}
+		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		
+        break;
+    }
 	case 6:// 注册缴费
 	{
 		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
@@ -1126,17 +1229,8 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
 		break;
 	}
-		
-	case 7:
-	{
-		nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
-		if (QFailed(nResult))
-		{
-			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
-		}
-		break;
-	}
-	case 8:// 即制卡标注
+			
+	case 7:// 即制卡标注
 	{
 		int nStatus = 0;
 		int nResult = 0;
@@ -1147,6 +1241,17 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
 		break;
 	}
+	
+	case 8:
+	{
+		nResult = ApplyCardReplacement(strMessage, nStatus, pSSCardInfo);     //  申请补换卡
+		if (QFailed(nResult))
+		{
+			QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		}
+		break;
+	}
+
 	case 9:// 获取制卡数据
 	{
 		if (QFailed(nResult = GetCardData(strMessage, nStatus, pSSCardInfo)))
@@ -1175,6 +1280,21 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 	}
 	case 10:	// 写卡
 	{
+		if (!g_pDataCenter->GetSSCardReader())
+		{
+			if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
+			{
+				gError() << gQStr(strMessage);
+				break;
+			}
+		}
+		if (QFailed(g_pDataCenter->SafeWriteCard(strMessage)))
+		{
+			strMessage = QString("%1,稍后,您可以点击重试按钮或更换卡片后继续制卡!");
+			gError() << gQStr(strMessage);
+			break;
+		}
+		QMessageBox_CN(QMessageBox::Critical, "提示", strMessage, QMessageBox::Ok);
 		break;
 	}
 	case 11: // 打印

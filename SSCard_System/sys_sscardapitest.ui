@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1320</width>
-    <height>849</height>
+    <height>894</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -400,7 +400,7 @@ QRadioButton::indicator::checked {
                </property>
                <property name="dateTime">
                 <datetime>
-                 <hour>8</hour>
+                 <hour>0</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>2000</year>
@@ -445,7 +445,7 @@ QRadioButton::indicator::checked {
                </property>
                <property name="dateTime">
                 <datetime>
-                 <hour>8</hour>
+                 <hour>0</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>2022</year>
@@ -1037,67 +1037,72 @@ QRadioButton::indicator::checked {
          </property>
          <item>
           <property name="text">
-           <string>移除制卡数据</string>
+           <string>0.移除制卡数据</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>照片采集</string>
+           <string>1.照片采集</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>自选照片</string>
+           <string>2.自选照片</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>查询制卡状态</string>
+           <string>3.查询制卡状态</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>加载制卡数据</string>
+           <string>4.加载制卡数据</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>挂失</string>
+           <string>5.挂失</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>注册缴费</string>
+           <string>6.注册缴费</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>即制卡标注</string>
+           <string>7.即制卡标注</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>即制卡申请</string>
+           <string>8.即制卡申请</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>获取制卡数据</string>
+           <string>9.获取制卡数据</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>写卡</string>
+           <string>10.写卡</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>打印</string>
+           <string>11.打印</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>回盘 + 启用</string>
+           <string>12.回盘 + 启用</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>13.解除挂失</string>
           </property>
          </item>
         </widget>

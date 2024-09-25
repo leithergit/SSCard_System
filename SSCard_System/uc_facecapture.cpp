@@ -48,23 +48,6 @@ int uc_FaceCapture::ProcessBussiness()
 	m_bFaceDetectSucceed = false;
 	QString strError;
 
-	//if (g_pDataCenter->IsVideoStart())
-	//{
-	//	g_pDataCenter->SwitchVideoWnd((HWND)ui->label_FaceDetect->winId());
-	//}
-	//else
-	//{
-	//	if (!g_pDataCenter->StartVideo((HWND)ui->label_FaceDetect->winId()));
-	//	{
-	//		emit ShowMaskWidget("操作失败", "获取视频数据失败!", Fetal, Return_MainPage);
-	//		return -1;
-	//	}
-	//	if (!g_pDataCenter->StartDetect(2000, 30000))
-	//	{
-	//		emit ShowMaskWidget("操作失败", "启动人脸检测失败!", Fetal, Return_MainPage);
-	//		return -1;
-	//	}
-	//}
 	if (g_pDataCenter->GetSysConfigure()->bSkipFaceCapture)
 	{
 		emit ShowMaskWidget("操作成功", "人脸识别成功!", Success, Switch_NextPage);

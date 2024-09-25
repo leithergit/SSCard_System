@@ -121,6 +121,9 @@ void Sys_ManualMakeCard::EnableUI(QObject* pUIObj, bool bEnable)
 
 void Sys_ManualMakeCard::on_pushButton_ReadID_clicked()
 {
+	pSSCardInfo = nullptr;
+	ProgressJson.reset();
+
 	if (!ui->checkBox->isChecked())
 	{
 		DeviceConfig& devCfg = g_pDataCenter->GetSysConfigure()->DevConfig;
@@ -140,12 +143,11 @@ void Sys_ManualMakeCard::on_pushButton_ReadID_clicked()
 	{
 		string strCardID, strName, strMobile;
 		g_pDataCenter->bDebug = true;
-		if (QSucceed(LoadTestData(strName, strCardID, strMobile)))
+		IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
+		SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+		if (QSucceed(LoadTestIDData(pIDCard, pSSCardInfo)))
 		{
-			IDCardInfoPtr pIDCard = make_shared<IDCardInfo>(CardInfo);
 			g_pDataCenter->SetIDCardInfo(pIDCard);
-			strcpy((char*)pIDCard->szName, strName.c_str());
-			strcpy((char*)pIDCard->szIdentity, strCardID.c_str());
 			ui->lineEdit_CardID->setText((char*)pIDCard->szIdentity);
 			ui->lineEdit_Name->setText(QString::fromLocal8Bit((const char*)pIDCard->szName));
 		}
@@ -302,31 +304,30 @@ void Sys_ManualMakeCard::on_pushButton_QueryCardStatus_clicked()
 
 }
 
-int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage,bool bDefault)
+void Sys_ManualMakeCard::GetProgressFile(IDCardInfoPtr& pIDCard, QString &strFile, bool bFinished)
 {
-	IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
-	
 	QString strCardDataPath = QCoreApplication::applicationDirPath();
-	if (bDefault)
-		strCardDataPath += "/Debug";
+	if (!bFinished)
+		strCardDataPath += "/Data";
 	else
 		strCardDataPath += "/Finished";
 
-	strCardDataPath += QString("/Progress_%1.json").arg((const char*)pIDCard->szIdentity);
-	QString strMessage;
+	strFile += QString("%1/Progress_%2.json").arg(strCardDataPath).arg((const char*)pIDCard->szIdentity);
+	
+}
 
-	QFileInfo ffile(strCardDataPath);
-	if (!ffile.isFile())
-	{		
-		strMesssage = "制卡数据不存在,可能制卡流程尚未开始!";
+int Sys_ManualMakeCard::LoadProgress(QString &strProgressFile, QString& strMessage)
+{
+	pSSCardInfo = make_shared<SSCardInfo>();
+	ProgressJson = g_pDataCenter->LoadSSCardData(strProgressFile.toLocal8Bit().data(), pSSCardInfo);
+	if (!ProgressJson)
+	{
+		strMessage = QString("加载制卡数据%1失败!").arg(strProgressFile);
 		return -1;
 	}
-
-	g_pDataCenter->LoadSSCardData(strCardDataPath.toStdString(),pSSCardInfo);
-	strcpy(pSSCardInfo->strName, (const char*)pIDCard->szName);
+	
 	GetImageStorePath(g_pDataCenter->strSSCardPhotoFile, 1);
-	//SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
+	SaveSSCardPhoto(strMessage, pSSCardInfo->strPhoto);
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	return 0;
 }
@@ -334,23 +335,62 @@ int Sys_ManualMakeCard::LoadPersonSSCardData(QString& strMesssage,bool bDefault)
 void Sys_ManualMakeCard::on_pushButton_LoadCardData_clicked()
 {
 	QString strMessage;
-
-	if (QFailed(LoadPersonSSCardData(strMessage)))
+	QString strProgrssFile = "";
+	int nResult = -1;
+	do 
 	{
-		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-		return;
-	}
-	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
-	ui->label_Pohoto->setStyleSheet(strStyle);
-	ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
-	ui->lineEdit_Name->setText(QString::fromLocal8Bit((const char*)pSSCardInfo->strName));
-	ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum);
-	ui->lineEdit_Datetime->setText(pSSCardInfo->strReleaseDate);
-	string strBankName;
-	g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName);
+		IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+		if (!pIDCard)
+		{
+			strMessage = "用户身份信息无效,请先刷身份证!";
+			break;
+		}
 
-	ui->lineEdit_Bank->setText(strBankName.c_str());
+		QString strCurrentProgress, strFinishedProgress;
+		GetProgressFile(pIDCard,strCurrentProgress);
+		GetProgressFile(pIDCard,strFinishedProgress,true);
+		QFileInfo fiCurrent(strCurrentProgress);
+		QFileInfo fiFinished(strFinishedProgress);
+		if (fiCurrent.isFile())
+		{
+			strProgrssFile = strCurrentProgress;
+		}
+		else if (fiFinished.isFile())
+		{
+			int nRes = QMessageBox_CN(QMessageBox::Information, "询问", "当前制卡数据不存在,是否从已经完成数据中加载？", QMessageBox::Yes| QMessageBox::No, this);
+			if (nRes == QMessageBox::No)
+				break;
+			strProgrssFile = strFinishedProgress;
+		}
+		else
+		{
+			strMessage = "当前制卡数据不存在,请先制卡!";
+			break;
+		}
+		
+		// 加载数据成功
+		if (QFailed(LoadProgress(strProgrssFile,strMessage)))
+		{
+			break;
+		}
+		if (pSSCardInfo)
+		{
+			QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
+			ui->label_Pohoto->setStyleSheet(strStyle);
+			ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
+			ui->lineEdit_Name->setText(QString::fromLocal8Bit((const char*)pSSCardInfo->strName));
+			ui->lineEditl_SSCard->setText(pSSCardInfo->strCardNum);
+			ui->lineEdit_Datetime->setText(pSSCardInfo->strReleaseDate);
+			string strBankName;
+			g_pDataCenter->GetBankName(pSSCardInfo->strBankCode, strBankName);
+			ui->lineEdit_Bank->setText(strBankName.c_str());
+			g_pDataCenter->SetProgress(pIDCard, ProgressJson.value(), false);
+			nResult = 0;
+		}
+		
+	} while (0);
+	if (nResult)
+		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok , this);
 }
 
 void Sys_ManualMakeCard::ProceBatchLock()
@@ -360,7 +400,6 @@ void Sys_ManualMakeCard::ProceBatchLock()
 
 	int nStatus = 0;
 	QString strInfo;
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 
 	do
 	{
@@ -385,8 +424,6 @@ void Sys_ManualMakeCard::ProceBatchLock()
 				strMessage += ",需社保局后台更新数据,请在2小时后再尝试制卡!";
 
 			break;
-			/*if (QFailed(nResult = CancelCardReplacement(strMessage, nStatus)))
-				break;*/
 		}
 		QString strStyle = QString("border-image: url(%1);").arg(g_pDataCenter->strSSCardPhotoFile.c_str());
 		ui->label_Pohoto->setStyleSheet(strStyle);
@@ -405,6 +442,7 @@ void Sys_ManualMakeCard::ProceBatchLock()
 		if (QFailed(g_pDataCenter->WriteCard(pSSCardInfo, strMessage)))
 			break;
 		strInfo = "写卡成功";
+
 		gInfo() << gQStr(strInfo);
 		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
 		{
@@ -491,12 +529,6 @@ void Sys_ManualMakeCard::PrintPhoto()
 	char szRCode[128] = { 0 };
 	do
 	{
-		if (QFailed(LoadPersonSSCardData(strMessage)))
-		{
-			break;
-		}
-		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-
 		if (!g_pDataCenter->GetPrinter())
 		{
 			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
@@ -547,11 +579,6 @@ void Sys_ManualMakeCard::EnableCard()
 	char szRCode[128] = { 0 };
 	do
 	{
-		if (QFailed(LoadPersonSSCardData(strMessage)))
-		{
-			break;
-		}
-		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 
 		if (!g_pDataCenter->GetPrinter())
 		{
@@ -721,12 +748,6 @@ void Sys_ManualMakeCard::PrintCardData()
 	char szRCode[128] = { 0 };
 	do
 	{
-		if (QFailed(LoadPersonSSCardData(strMessage)))
-		{
-			break;
-		}
-		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-
 		if (!g_pDataCenter->GetPrinter())
 		{
 			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
@@ -782,30 +803,35 @@ void Sys_ManualMakeCard::PrintCardData()
 			break;
 		}
 
-		// 数据回盘
-		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+		if (!g_pDataCenter->GetProgressStatus("ReturnData"))
 		{
-			gError() << strMessage.toLocal8Bit().data();
-			break;
-		}
+			// 数据回盘
+			if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+			{
+				gError() << strMessage.toLocal8Bit().data();
+				break;
+			}
 
-		if (nStatus != 0 && nStatus != 1)
-		{
-			strMessage = "数据回盘失败,请稍后重试!";
-			break;
+			if (nStatus != 0 && nStatus != 1)
+			{
+				strMessage = "数据回盘失败,请稍后重试!";
+				break;
+			}
 		}
-
-		// 启用
-		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+		if (!g_pDataCenter->GetProgressStatus("EnableCard"))
 		{
-			gError() << strMessage.toLocal8Bit().data();
-			break;
+			if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
+			{
+				gError() << strMessage.toLocal8Bit().data();
+				break;
+			}
+			if (nStatus != 0 && nStatus != 1)
+			{
+				strMessage = "卡片启用失败,请稍后重试!";
+				break;
+			}
 		}
-		if (nStatus != 0 && nStatus != 1)
-		{
-			strMessage = "卡片启用失败,请稍后重试!";
-			break;
-		}
+				
 
 		g_pDataCenter->GetPrinter()->Printer_Eject(szRCode);
 		strInfo = "卡片打印成功";
@@ -832,12 +858,6 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 
 	do
 	{
-		if (QFailed(LoadPersonSSCardData(strMessage)))
-		{
-			break;
-		}
-		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-
 		if (!g_pDataCenter->GetPrinter())
 		{
 			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
@@ -857,66 +877,11 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 			break;
 		strInfo = "写卡成功";
 		gInfo() << gQStr(strInfo);
-		//if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
-		//{
-		//	strMessage = "片卡打印失败,请稍后重试!";
-		//	strInfo = strMessage;
-		//	gInfo() << gQStr(strInfo);
-		//	break;
-		//}
-		//strInfo = "卡片打印成功";
-		gInfo() << gQStr(strInfo);
+
 		nResult = 0;
 	} while (0);
 
-	//	if (QFailed(nResult))
-	//	{
-	//		gInfo() << gQStr(strMessage);
-	//		do
-	//		{
-	//			gInfo() << "Try to CancelMarkCard";
-	//			if (QFailed(nResult = CancelMarkCard(strMessage, nStatus, pSSCardInfo)))
-	//			{
-	//				strMessage = QString("取消标注失败:%1").arg(strMessage);
-	//				gInfo() << gQStr(strMessage);
-	//				nResult = -1;
-	//				break;
-	//			}
-	//
-	//		} while (0);
-	//
-	//		gError() << strMessage.toLocal8Bit().data();
-	//		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
-	//		return;
-	//	}
-	//	gInfo() << gQStr(QString("写卡，打印成功"));
-	//	nResult = -1;
-	//	do
-	//	{
-	//		// 数据回盘
-	//		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
-	//		{
-	//			gError() << strMessage.toLocal8Bit().data();
-	//			break;
-	//		}
-	//#pragma Warning("回盘失败如何处理？")
-	//		if (nStatus != 0 && nStatus != 1)
-	//			break;
-	//
-	//		// 启用
-	//		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
-	//		{
-	//			gError() << strMessage.toLocal8Bit().data();
-	//			break;
-	//		}
-	//		if (nStatus != 0 && nStatus != 1)
-	//			break;
-	//
-	//		nResult = 0;
-	//	} while (0);
-	//
-	//	char* szResCode[128] = { 0 };
-	//	g_pDataCenter->GetPrinter()->Printer_Eject((char*)szResCode);
+
 
 	if (QFailed(nResult))
 		QMessageBox_CN(QMessageBox::Information, tr("提示"), strMessage, QMessageBox::Ok, this);
@@ -926,20 +891,57 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 
 void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 {
-	QString strMessage;
 	QWaitCursor Wait;
+	QString strMessage;
+	bool bDataValid = false;
+	do 
+	{
+		IDCardInfoPtr pIDCard = g_pDataCenter->GetIDCardInfo();
+		if (!pIDCard)
+		{
+			strMessage = "用户身份信息无效,请先刷身份证!";
+			break;
+		}
+		if (!pSSCardInfo)
+		{
+			strMessage = "制卡数据无效,请先加载制卡数据!";
+			break;
+		}
 
-	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
-	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransType, "5");
-	strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
-	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
-	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
-	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
+		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		strcpy((char*)pSSCardInfo->strTransType, "5");
+		strcpy((char*)pSSCardInfo->strCity, Reginfo.strCityCode.c_str());
+		strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
+		strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
+		strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
+		bDataValid = true;
+	} while (0);
+	
+	if (!bDataValid)
+	{
+		QMessageBox_CN(QMessageBox::Information, "提示", strMessage, QMessageBox::Ok);
+		return;
+	}
+	/*auto tpProgressInfo = FindCardProgress((const char*)g_pDataCenter->GetIDCardInfo()->szIdentity, pSSCardInfo);
+	auto optProgressFile = g_pDataCenter->GetProgressFile(g_pDataCenter->GetIDCardInfo());
+	auto optProgressJson = g_pDataCenter->OpenProgress(optProgressFile.value(), false);
+	if (optProgressJson)
+	{
+		std::get<1>(tpProgressInfo) = optProgressFile.value();
+		std::get<2>(tpProgressInfo) = optProgressJson.value();
+		g_pDataCenter->SetProgress(tpProgressInfo,false);
+	}
+	else
+	{
+		gError() << "Open Progress failed!";
+		QMessageBox_CN(QMessageBox::Information, tr("提示"), "打开制卡进度文件失败!", QMessageBox::Ok, this);
+		return;
+	}*/
 	int nIndex = ui->comboBox_Failure->currentIndex();
+	
 	switch (nIndex)
 	{
 	case 0:     // 上电失败
@@ -955,11 +957,7 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 	{
 		int nResult = 0;
 		int nStatus = 0;
-		if (QFailed(LoadPersonSSCardData(strMessage)))
-		{
-			break;
-		}
-
+		
 		//SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 		QString strCardProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus);
 		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, true)))
