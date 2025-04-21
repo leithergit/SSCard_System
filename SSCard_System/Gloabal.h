@@ -1258,7 +1258,7 @@ private:
 using DataCenterPtr = shared_ptr<DataCenter>;
 extern DataCenterPtr g_pDataCenter;
 
-int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons stdButtons, QWidget* parent = nullptr);
+int QMessageBox_CN(QMessageBox::Icon nIcon, QString strTitle, QString strText, QMessageBox::StandardButtons  stdButtons= QMessageBox::Ok, QWidget* parent = nullptr);
 
 tuple<ProgrerssType,string,CJsonObjectPtr> FindCardProgress(const char *szIDentify,SSCardInfoPtr &pSSCardInfo);
 

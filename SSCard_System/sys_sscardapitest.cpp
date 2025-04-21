@@ -1221,7 +1221,7 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
     }
 	case 6:// 注册缴费
 	{
-		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+		nResult = 0;// ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
 		if (QFailed(nResult))
 			strMessage = QString("缴费登记失败,Result:%1!").arg(nResult);
 		else if (nStatus != 0 && nStatus != 1)

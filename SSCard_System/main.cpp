@@ -384,6 +384,7 @@ int main(int argc, char* argv[])
 	jsonReg.Add("city", Reg.strCityCode);
 	jsonReg.Add("TerminatorID", devInfo.strTerminalCode);
 	jsonReg.Add("OperatorID", devInfo.strOperatorID);
+	jsonReg.Add("ServiceUrl", Reg.strCMURL);
 	string strJson = jsonReg.ToString();
 	//string strJsonPath = "./Data/Progress_411624200409164543.json";
 	//readAndPrintJson(strJsonPath.c_str());

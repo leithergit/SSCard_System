@@ -403,6 +403,12 @@ void Sys_ManualMakeCard::ProceBatchLock()
 
 	do
 	{
+		if (!pSSCardInfo)
+		{
+			strMessage = "制卡数据无效.";
+			break;
+		}
+
 		if (!g_pDataCenter->GetPrinter())
 		{
 			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
@@ -575,10 +581,16 @@ void Sys_ManualMakeCard::EnableCard()
 
 	int nStatus = 0;
 	QString strInfo;
-	SSCardInfoPtr pSSCardInfo;
+	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szRCode[128] = { 0 };
+
 	do
 	{
+		if (!pSSCardInfo)
+		{
+			strMessage = "制卡数据无效.";
+			break;
+		}
 
 		if (!g_pDataCenter->GetPrinter())
 		{
@@ -744,64 +756,78 @@ void Sys_ManualMakeCard::PrintCardData()
 
 	int nStatus = 0;
 	QString strInfo;
-	SSCardInfoPtr pSSCardInfo;
+	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	char szRCode[128] = { 0 };
 	do
 	{
+		if (!pSSCardInfo )
+		{
+			strMessage = "制卡数据无效.";
+			break;
+		}
 		if (!g_pDataCenter->GetPrinter())
 		{
 			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
 				break;
 		}
+	
 		if (!g_pDataCenter->GetSSCardReader())
 		{
 			if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
 				break;
 		}
+				
 
 		if (QFailed(g_pDataCenter->Depense(strMessage)))
 			break;
 		strInfo = "进卡成功";
 		gInfo() << gQStr(strInfo);
 
-		int nWriteCardCount = 0;
-		nResult = -1;
-		while (nWriteCardCount < 3)
+		if (!g_pDataCenter->GetProgressStatus("WriteCard"))
 		{
-			strInfo = QString("尝试第%1次读卡!").arg(nWriteCardCount + 1);
-			gInfo() << gQStr(strInfo);
-			nResult = g_pDataCenter->ReadCard(pSSCardInfo, strMessage);
-			if (nResult == 0)
-				break;
-			if (nResult == -4)
+			int nWriteCardCount = 0;
+			nResult = -1;
+			while (nWriteCardCount < 3)
 			{
-				nWriteCardCount++;
-				strMessage = "读卡上电失败!";
-				gInfo() << gQStr(strMessage);
-				g_pDataCenter->MoveCard(strMessage);
-				continue;
+				strInfo = QString("尝试第%1次读卡!").arg(nWriteCardCount + 1);
+				gInfo() << gQStr(strInfo);
+				nResult = g_pDataCenter->ReadCard(pSSCardInfo, strMessage);
+				if (nResult == 0)
+					break;
+				if (nResult == -4)
+				{
+					nWriteCardCount++;
+					strMessage = "读卡上电失败!";
+					gInfo() << gQStr(strMessage);
+					g_pDataCenter->MoveCard(strMessage);
+					continue;
+				}
+				else if (QFailed(nResult))
+				{
+					strMessage = "读卡失败!";
+					break;
+				}
 			}
-			else if (QFailed(nResult))
+
+			if (QFailed(nResult))
 			{
-				strMessage = "读卡失败!";
+				strInfo = "读卡失败";
+				gInfo() << gQStr(strInfo);
 				break;
 			}
 		}
 
-		if (QFailed(nResult))
+        if (!g_pDataCenter->GetProgressStatus("PrintCard"))
 		{
-			strInfo = "读卡失败";
-			gInfo() << gQStr(strInfo);
-			break;
+			if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
+			{
+				strMessage = "片卡打印失败,请稍后重试!";
+				strInfo = strMessage;
+				gInfo() << gQStr(strInfo);
+				break;
+			}
 		}
-
-		if (QFailed(g_pDataCenter->PrintCard(pSSCardInfo, "", strMessage)))
-		{
-			strMessage = "片卡打印失败,请稍后重试!";
-			strInfo = strMessage;
-			gInfo() << gQStr(strInfo);
-			break;
-		}
+		
 
 		if (!g_pDataCenter->GetProgressStatus("ReturnData"))
 		{
@@ -854,7 +880,7 @@ void Sys_ManualMakeCard::ProcessPowerOnFailed()
 	QString strMessage;
 
 	QString strInfo;
-	SSCardInfoPtr pSSCardInfo;
+	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 
 	do
 	{
@@ -951,9 +977,9 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 		ProceBatchLock();
 		break;
 	case 2:
-		PrintCardData();
+        PrintCardData();
 		break;
-	case 3:
+    case 3:
 	{
 		int nResult = 0;
 		int nStatus = 0;
@@ -967,12 +993,12 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
 		}
 		break;
 	}
-	case 4:
+    case 4:
 	{
 		this->EnableCard();
 		break;
 	}
-	case 5:
+    case 5:
 	{
 		TestApplyNewCard();
 		break;
@@ -982,6 +1008,26 @@ void Sys_ManualMakeCard::on_pushButton_MakeCard_clicked()
         TestQueryPayUrl();
 		break;
     }
+    case 7:
+	{
+		QString strMessage;
+		QString strPath = "D:/Work/SSCard_System.Win32_Henan/MainProject/TestData/Progress_412726197903074118.json";
+		if (LoadProgress(strPath, strMessage) != 0)
+		{
+			QMessageBox_CN(QMessageBox::Critical,"提示",strMessage);
+			return;
+		}
+
+		CAInfo caInfo;
+		string strPublicKey = "C98E6B8DB06454BAE26198952D055728324D3FBEEF57F503AE30A056462CAFBDB228900969A7D02442F2AEB744CE334DE3817052207EC68276F0B3E3B28352AF";
+		string strAlgorithm = "03";
+		int nResult = 0;
+		int nStatus = 0;
+		pSSCardInfo = g_pDataCenter->GetSSCardInfo();
+		nResult = GetCA(strMessage, nStatus, pSSCardInfo, strPublicKey.c_str(), strAlgorithm.c_str(), caInfo);
+		
+		break;
+	}
 
 	}
 }

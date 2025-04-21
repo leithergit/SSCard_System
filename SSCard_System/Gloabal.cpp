@@ -38,7 +38,7 @@
 #pragma comment(lib, "../SDK/KT_Reader/KT_Reader")
 #pragma comment(lib, "../SDK/SSCardDriver/SSCardDriver")
 #pragma comment(lib, "../SDK/SSCardHSM/SSCardHSM")
-#pragma comment(lib, "../SDK/SSCardInfo/SSCardInfo")
+#pragma comment(lib, "../SDK/SSCardInfo_Henan/SSCardInfo")
 #pragma comment(lib, "../SDK/libcurl/libcurl")
 #pragma comment(lib, "../SDK/QREncode/qrencode")
 #pragma comment(lib, "../SDK/IDCard/IDCard_API")
@@ -1906,13 +1906,20 @@ int DataCenter::ReadCard(SSCardInfoPtr& pSSCardInfo, QString& strMessage)
 		gInfo() << "CardATR:" << szCardATR;
 		strcpy(pSSCardInfo->strCardATR, szCardATR);
 		char szBankNum[64] = { 0 };
+		gInfo() << "Try to iReadBankNumber.";
 		if (QFailed(nResult = iReadBankNumber(DevConfig.nSSCardReaderPowerOnType, szBankNum)))
 		{
 			strMessage = QString("读银行卡信息失败,PowerOnType:%1,nResult:%2").arg((int)DevConfig.nSSCardReaderPowerOnType).arg(nResult);
 			break;
 		}
 		gInfo() << "BankNum:" << szBankNum;
-		strcpy(pSSCardInfo->strBankNum, szBankNum);
+		if (strlen(szBankNum) < sizeof(pSSCardInfo->strBankNum))
+			strcpy(pSSCardInfo->strBankNum, szBankNum);
+		else
+		{
+			strMessage = QString("Invalid bankNumber.");
+			break;
+		}
 		//if (QFailed(MultiPowerOn(strCardATR, strMessage)))
 		//{
 		//	gInfo() << gQStr(strMessage);

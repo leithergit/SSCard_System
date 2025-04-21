@@ -36,7 +36,7 @@
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="QtSettings">
-    <QtInstall>5.15.2_msvc2019</QtInstall>
+    <QtInstall>Qt5.15.2</QtInstall>
     <QtModules>core;gui;network;sql;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -63,15 +63,19 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;../SDK/IDCard;glog;../SDK/QREncode;../SDK/Printer;./SDK/Reader;../SDK;debug;/include;../openssl-1.0.1g/include;../utility;../SDK/Bugtrap;../SDK/SSCardInfo_Henan;../SSCardService;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;_HN2022;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;QT_AXCONTAINER_LIB;QT_AXBASE_LIB;_HN2022;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>.\SDK\IDCard;.\glog;.\SDK\PinKeybroad;.\SDK\QREncode;.\SDK\Printer;.\SDK\Reader;..\openssl-1.0.1g\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy/y $(TargetPath) D:\Work\SSCard_System.Win32_Henan\public\SSCard_System</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

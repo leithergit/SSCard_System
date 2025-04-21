@@ -110,7 +110,7 @@ color: 0
        </item>
        <item>
         <property name="text">
-         <string>打印卡面</string>
+         <string>写卡+打印+回盘+启用</string>
         </property>
        </item>
        <item>
@@ -131,6 +131,11 @@ color: 0
        <item>
         <property name="text">
          <string>查询支付码</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>测试CA</string>
         </property>
        </item>
       </widget>

@@ -149,7 +149,7 @@ int uc_MakeCard::ProcessBussiness()
 	ZeroMemory(StepStatus, sizeof(StepStatus));
 	int nStatus = 0;
 	//registerPaymentTemp();
-	ResgisterPayment(strMessage, nStatus,pSSCardInfo);          // 缴费登记
+	//ResgisterPayment(strMessage, nStatus,pSSCardInfo);          // 缴费登记
 	if (g_pDataCenter->strCardMakeProgress == "制卡中")
 	{
 		if (QFailed(PrecessCardInMaking(strMessage)))

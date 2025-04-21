@@ -14,7 +14,7 @@
     <ProjectGuid>{33AB2C65-02D7-3B31-9290-E148CCA8499F}</ProjectGuid>
     <RootNamespace>IDCard_API</RootNamespace>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>

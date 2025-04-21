@@ -230,26 +230,26 @@ void uc_Pay::ThreadReadIDCard()
 				int nStatus = -1;
 				bool bSucceed = false;
 				int nRetry = 0;
-				do
-				{
-					nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
-					if (QFailed(nResult))
-					{
-						strMessage = QString("缴费登记失败,Result:%1!").arg(nResult);
-						if (!Delay(bThreadReadIDCard, 1000))
-							break;
-					}
-					else if (nStatus != 0 && nStatus != 1)
-						strMessage = QString("缴费登记失败,Status:%1!").arg(nStatus);
-					else
-					{
-						strMessage = "缴费登记,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
-						bSucceed = true;
-						break;
-					}
-					gInfo() << GBKStr(strMessage);
-					nRetry++;
-				} while (nRetry < 5);
+				//do
+				//{
+				//	nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+				//	if (QFailed(nResult))
+				//	{
+				//		strMessage = QString("缴费登记失败,Result:%1!").arg(nResult);
+				//		if (!Delay(bThreadReadIDCard, 1000))
+				//			break;
+				//	}
+				//	else if (nStatus != 0 && nStatus != 1)
+				//		strMessage = QString("缴费登记失败,Status:%1!").arg(nStatus);
+				//	else
+				//	{
+				//		strMessage = "缴费登记,现将进入制卡流程,请确认进卡口已放入空白社保卡片!";
+				//		bSucceed = true;
+				//		break;
+				//	}
+				//	gInfo() << GBKStr(strMessage);
+				//	nRetry++;
+				//} while (nRetry < 5);
 				if (bSucceed)
 				{
 					gInfo() << GBKStr("管理员:") << pIDCard->szName << " 刷卡身份跳过付费!";
@@ -331,7 +331,7 @@ void uc_Pay::ThreadWork()
 		g_pDataCenter->SetProgressField("transTime", (char *)g_pDataCenter->strTransTime.c_str());
 		strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
 		strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
-		nResult = ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
+		nResult = 0;// ResgisterPayment(strMessage, nStatus, g_pDataCenter->GetSSCardInfo());          // 缴费登记
 		gInfo() << GBKStr("注册缴费:") << "Result = " << nResult << " Status = " << nStatus;
 		if (QFailed(nResult))
 		{

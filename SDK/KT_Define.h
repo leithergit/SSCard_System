@@ -118,8 +118,12 @@ struct SSCardInfo
 	char strDepartmentName[50] = { 0 };	//所在院系名称
 	char strFailType[10] = { 0 };		//失败类型(银行,制卡)
 	char strFailReason[101] = { 0 };	//失败原因
-	char strIDCardIssuedDate[16] = {0};		//身份证发证日期
 	char* strPhoto = NULL;				//相片
+#ifdef HN2022
+	char strIDCardIssuedDate[32] = { 0 };		//身份证发证日期
+#endif
+	char strTransactionTime[32] = { 0 };
+	char strPayCode[64] = { 0 };
 };
 
 //山东卡信息
@@ -132,7 +136,7 @@ struct SD_SSCardInfo
 	std::string strSex;				//性别
 	std::string strNation;			//民族
 	std::string strMobile;			//手机号
-	std::string strAddress;			//通讯地址
+	std::string strAdress;			//通讯地址
 	std::string strPostalCode;		//邮政编码
 	std::string strEmail;			//电子邮箱
 	std::string strGuardianName;	//监护人姓名

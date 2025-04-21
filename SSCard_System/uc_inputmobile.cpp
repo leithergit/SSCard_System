@@ -166,9 +166,10 @@ void uc_InputMobile::on_pushButton_OK_clicked()
 		QString strMessage;
 		g_pDataCenter->SetProgressField("Mobile", (char *)g_pDataCenter->strMobilePhone.c_str());
 
-		QString strInfo = "手机号码已确认,稍后将进入费用支付流程!";
+		QString strInfo = "手机号码已确认,现将转入制卡页面!";
 		gInfo() << strInfo.toLocal8Bit().data();
-		emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
+		//emit ShowMaskWidget("操作成功", strInfo, Success, Switch_NextPage);
+		emit ShowMaskWidget("操作成功",strInfo, Success, Goto_Page, Page_MakeCard);
 		
 	}
 	else
