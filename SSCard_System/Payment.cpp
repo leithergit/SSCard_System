@@ -896,7 +896,8 @@ int  GetCardData(QString& strMessage, int& nStatus, SSCardInfoPtr& pSSCardInfo, 
 				break;
 			using LPCHAR = char*;
 			strFnName = "获取批次号";
-			if (!g_pDataCenter->GetProgressField("PCH",(char*)pSSCardInfo->strPCH))
+			if (!g_pDataCenter->GetProgressField("PCH",(char*)pSSCardInfo->strPCH) || 
+				strlen(pSSCardInfo->strPCH) == 0)
 			{
 				if (QFailed(nResult = getHQPCH(*pSSCardInfo, szStatus)))
 					break;

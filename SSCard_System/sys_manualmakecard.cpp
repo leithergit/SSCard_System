@@ -640,17 +640,17 @@ void Sys_ManualMakeCard::EnableCard()
 		}
 
 		// 数据回盘
-		if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
-		{
-			gError() << strMessage.toLocal8Bit().data();
-			break;
-		}
+		//if (QFailed(nResult = ReturnCardData(strMessage, nStatus, pSSCardInfo, false)))
+		//{
+		//	gError() << strMessage.toLocal8Bit().data();
+		//	break;
+		//}
 
-		if (nStatus != 0 && nStatus != 1)
-		{
-			strMessage = "数据回盘失败,请稍后重试!";
-			break;
-		}
+		//if (nStatus != 0 && nStatus != 1)
+		//{
+		//	strMessage = "数据回盘失败,请稍后重试!";
+		//	break;
+		//}
 
 		// 启用
 		if (QFailed(nResult = EnalbeCard(strMessage, nStatus, pSSCardInfo)))
