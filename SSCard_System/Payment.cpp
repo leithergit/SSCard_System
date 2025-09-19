@@ -1122,7 +1122,7 @@ void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
 			return;
 
 		QString strCardDataPath = QCoreApplication::applicationDirPath();
-		strCardDataPath += "/Debug";
+		strCardDataPath += "/Data";
 
 		QFileInfo fdir(strCardDataPath);
 		if (fdir.exists())
@@ -1154,8 +1154,8 @@ void RemoveCardData(SSCardInfoPtr& pSSCardInfo)
 			dir.mkdir(strFinishPath);
 		}
 
-		strCardDataPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
-		strFinishPath += QString("/Carddata_%1.ini").arg(pSSCardInfo->strCardID);
+		strCardDataPath += QString("/Progress_%1.json").arg(pSSCardInfo->strCardID);
+		strFinishPath += QString("/Progress_%1.json").arg(pSSCardInfo->strCardID);
 		if (!fs::exists(strCardDataPath.toStdString()))
 			return;
 

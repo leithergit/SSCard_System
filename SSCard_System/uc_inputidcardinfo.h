@@ -56,6 +56,11 @@ public:
 
 	void ClearInfo();
 
+	void SetUpdateMode(bool bEnable = true)
+	{
+		m_bUpdateMode = bEnable;
+	}
+
 	QButtonGroup* pButtonGrp = nullptr;
 	Sys_DialogReadIDCard* pDialogReadIDCard = nullptr;
 	IDCardInfoPtr pIDCard = nullptr;
@@ -87,6 +92,7 @@ public slots:
 
 private:
 	Ui::uc_InputIDCardInfo* ui;
+	bool m_bUpdateMode = false;
 };
 
 #endif // UC_INPUTIDCARDINFO_H

@@ -1204,7 +1204,7 @@ bool DataCenter::GetProgress(SSCardInfoPtr& pSSCard,CJsonObjectPtr pJson)
 	strcpy(pSSCard->strPayCode , g_pDataCenter->strPayCode.c_str());
 	GetJsonPtrStrValue(pJson, "transTime", g_pDataCenter->strTransTime);
 	strcpy(pSSCard->strTransactionTime, g_pDataCenter->strTransTime.c_str());
-#ifdef HN2022
+#ifdef _HN2022
 	GetJsonPtrValue(pJson, "PaperIssuedate", pSSCard->strIDCardIssuedDate);
 #endif
 	GetJsonPtrValuePtr(pJson, "Photo", pSSCard->strPhoto);

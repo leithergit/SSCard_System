@@ -456,6 +456,8 @@ struct RegionInfo
 		strCountry = pSettings->value("Country").toString().toStdString();
 		strAgency = pSettings->value("Agency").toString().toStdString();
 		strPostCode = pSettings->value("PostCode").toString().toStdString();
+		
+		strSupport = pSettings->value("Support").toString();
 
 		strLicense = pSettings->value("License").toString().toStdString();
 		strEMURL = pSettings->value("EMURL").toString().toStdString();
@@ -535,6 +537,7 @@ struct RegionInfo
 	string		strBankCode;							// 银行代码
 	string		strCardVendor;							// 所属卡商
 	string		strUniqueID;							// 唯一支付ID
+	QString		strSupport;							    // 技术支持信息
 	SSCardProvince	nProvinceCode;						// 省市代码
 };
 
@@ -991,6 +994,7 @@ public:
 	string		   strCardVersion = "3.0";
 	string		   strTitle = "社保卡制卡系统";
 	bool		   bDebug;
+	bool		   bNoDevice = false;
 	bool		   bSkipFaceCapture = false;
 	bool		   bEnableUpdate = true;
 	int			   nSkipPayTime = 0;

@@ -78,12 +78,16 @@ void uc_ReadIDCard::StopDetect()
 
 int uc_ReadIDCard::ProcessBussiness()
 {
-	if (!g_pDataCenter->OpenCamera())
+	if (!g_pDataCenter->bNoDevice)
 	{
-		gInfo() << "Failed in OpenCamera";
-		emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fatal, Return_MainPage);
-		return -1;
+		if (!g_pDataCenter->OpenCamera())
+		{
+			gInfo() << "Failed in OpenCamera";
+			emit ShowMaskWidget("严重错误", "打开摄像机失败!", Fatal, Return_MainPage);
+			return -1;
+		}
 	}
+
 
 	/*if (g_pMaskWindow)
 		g_pMaskWindow->hide();*/
@@ -145,7 +149,7 @@ void uc_ReadIDCard::ThreadWork()
 		{
 			int nResult = -1;
 			tLast = high_resolution_clock::now();
-			if (g_pDataCenter->bDebug)
+			if (g_pDataCenter->bNoDevice)
 			{
 				auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tTimeTick);
 				if (tDuration.count() < 10 * 1000)
@@ -172,7 +176,7 @@ void uc_ReadIDCard::ThreadWork()
 				QString strMessage = "读取身份证成功,稍后将进行人脸识别以确认是否本人操作!";
 				// 近回文件类型，文件名和json指针(若文件存在)
 				auto tpProgressInfo = FindCardProgress((const char*)m_pIDCard->szIdentity, pSSCardInfo);
-#ifdef HN2022
+#ifdef _HN2022
 				strcpy((char*)pSSCardInfo->strIDCardIssuedDate, (char *)m_pIDCard->szExpirationDate1);
 #endif
 				switch (std::get<0>(tpProgressInfo))

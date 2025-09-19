@@ -48,7 +48,7 @@ int uc_FaceCapture::ProcessBussiness()
 	m_bFaceDetectSucceed = false;
 	QString strError;
 
-	if (g_pDataCenter->GetSysConfigure()->bSkipFaceCapture)
+	if (g_pDataCenter->bNoDevice)
 	{
 		emit ShowMaskWidget("操作成功", "人脸识别成功!", Success, Switch_NextPage);
 		return 0;

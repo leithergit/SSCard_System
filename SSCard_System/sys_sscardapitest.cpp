@@ -1003,6 +1003,8 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 	else
 		pIDCard = g_pDataCenter->GetIDCardInfo();
 	
+	if (pSSCardInfo && pIDCard)
+		g_pDataCenter->SetIDCardInfo(pIDCard);
 	auto tpProgressInfo = FindCardProgress((const char*)pIDCard->szIdentity, pSSCardInfo);
 
 	auto ProgressJson = g_pDataCenter->LoadSSCardData(std::get<1>(tpProgressInfo), pSSCardInfo);
@@ -1162,6 +1164,9 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 		{
 			char szStatus[1024] = { 0 };
 			int nResult = 0;
+			strcpy((char*)pSSCardInfo->strName, (char*)pIDCard->szName);
+			strcpy((char*)pSSCardInfo->strCardID, (char*)pIDCard->szIdentity);
+			strcpy(pSSCardInfo->strCardNum, "NC8691783");
 			if (QFailed(nResult = reportLostCard(*pSSCardInfo, szStatus)))
 			{
 				FailureMessage("挂失失败", pSSCardInfo, szStatus, strMessage);

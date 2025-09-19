@@ -92,24 +92,28 @@ int uc_MakeCard::ProcessBussiness()
 	QString strMessage;
 
 	ui->pushButton_OK->setText("确定");
-	if (!g_pDataCenter->GetPrinter())
+	if (!g_pDataCenter->bNoDevice)
 	{
-		if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+		if (!g_pDataCenter->GetPrinter())
 		{
-			gError() << gQStr(strMessage);
-			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
-			return nResult;
+			if (QFailed(g_pDataCenter->OpenPrinter(strMessage)))
+			{
+				gError() << gQStr(strMessage);
+				emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+				return nResult;
+			}
+		}
+		if (!g_pDataCenter->GetSSCardReader())
+		{
+			if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
+			{
+				gError() << gQStr(strMessage);
+				emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+				return nResult;
+			}
 		}
 	}
-	if (!g_pDataCenter->GetSSCardReader())
-	{
-		if (QFailed(g_pDataCenter->OpenSSCardReader(strMessage)))
-		{
-			gError() << gQStr(strMessage);
-			emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
-			return nResult;
-		}
-	}
+
 	ui->pushButton_OK->setEnabled(true);
 	SSCardInfoPtr& pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
@@ -121,31 +125,31 @@ int uc_MakeCard::ProcessBussiness()
 	strcpy((char*)pSSCardInfo->strSSQX, Reginfo.strCountry.c_str());
 	strcpy((char*)pSSCardInfo->strCardVender, Reginfo.strCardVendor.c_str());
 	strcpy((char*)pSSCardInfo->strBankCode, Reginfo.strBankCode.c_str());
-	if (!g_pDataCenter->strPayCode.size())
-	{
-		char szPayCode[64] = { 0 };
-		if (g_pDataCenter->GetProgressField("payCode", szPayCode))
-			g_pDataCenter->strPayCode = szPayCode;
-		else
-		{
-			emit ShowMaskWidget("操作失败", "缴费码为空!", Fatal, Return_MainPage);
-			return -1;
-		}
-	}
-	if (!g_pDataCenter->strTransTime.size())
-	{
-		char szTranTime[64] = { 0 };
-		if (g_pDataCenter->GetProgressField("transTime", szTranTime))
-			g_pDataCenter->strTransTime = szTranTime;
-		else
-		{
-			emit ShowMaskWidget("操作失败", "缴费时间为空!", Fatal, Return_MainPage);
-			return -1;
-		}
-	}
+	//if (!g_pDataCenter->strPayCode.size())
+	//{
+	//	char szPayCode[64] = { 0 };
+	//	if (g_pDataCenter->GetProgressField("payCode", szPayCode))
+	//		g_pDataCenter->strPayCode = szPayCode;
+	//	else
+	//	{
+	//		emit ShowMaskWidget("操作失败", "缴费码为空!", Fatal, Return_MainPage);
+	//		return -1;
+	//	}
+	//}
+	//if (!g_pDataCenter->strTransTime.size())
+	//{
+	//	char szTranTime[64] = { 0 };
+	//	if (g_pDataCenter->GetProgressField("transTime", szTranTime))
+	//		g_pDataCenter->strTransTime = szTranTime;
+	//	else
+	//	{
+	//		emit ShowMaskWidget("操作失败", "缴费时间为空!", Fatal, Return_MainPage);
+	//		return -1;
+	//	}
+	//}
 		
-	strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
-	strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
+	//strcpy((char*)pSSCardInfo->strPayCode, g_pDataCenter->strPayCode.c_str());
+	//strcpy((char*)pSSCardInfo->strTransactionTime, g_pDataCenter->strTransTime.c_str());
 	ZeroMemory(StepStatus, sizeof(StepStatus));
 	int nStatus = 0;
 	//registerPaymentTemp();

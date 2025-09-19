@@ -94,6 +94,9 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	//ui->comboBox_Guardianship->setStyleSheet(strQSS);
 	ui->comboBox_Nationality->setStyleSheet(strQSS);
 	ui->comboBox_PersonType->setStyleSheet(strQSS);
+	ui->comboBox_Career->setStyleSheet(strQSS);
+	ui->comboBox_Status->setStyleSheet(strQSS);
+	
 	InitializeDB(strMessage);
 	connect(this, &uc_InputIDCardInfo::AddNewIDCard, this, &uc_InputIDCardInfo::on_AddNewIDCard, Qt::QueuedConnection);
 	qDebug() << geometry();
@@ -159,10 +162,18 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 		GetJsonPtrValue(pJson, "Department", pSSCardInfo->strDepartmentName);
 		GetJsonPtrValue(pJson, "Class", pSSCardInfo->strClassName);
 
+		GetJsonPtrValue(pJson, "Career", pSSCardInfo->strCareerType);
+		GetJsonPtrValue(pJson, "Status", pSSCardInfo->strStatus);
+
+		int nCareer = atoi(pSSCardInfo->strCareerType);
+		int nStatus = atoi(pSSCardInfo->strStatus);
+		ui->comboBox_Career->setCurrentIndex(nCareer - 1);
+		ui->comboBox_Status->setCurrentIndex(nStatus - 1);
 
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName));
 		ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
-		ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile);
+		if (!m_bUpdateMode)
+			ui->lineEdit_Mobile->setText(pSSCardInfo->strMobile);
 
 		int nGender = atoi(pSSCardInfo->strSex);
 		if (nGender == 1)
@@ -264,6 +275,9 @@ void uc_InputIDCardInfo::SavePersonInfo()
 		json.Add("Department", pSSCardInfo->strDepartmentName);
 		json.Add("Class", pSSCardInfo->strClassName);
 
+		json.Add("Career", pSSCardInfo->strCareerType);
+		json.Add("Status", pSSCardInfo->strStatus);
+
 		QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
 		if (fi.isFile())
 		{
@@ -309,6 +323,8 @@ int uc_InputIDCardInfo::ProcessBussiness()
 		}
 	}
 	pCompleter->setModel(new QStringListModel(strNameList, pCompleter));
+	ui->comboBox_Career->setCurrentIndex(-1);
+	ui->comboBox_Status->setCurrentIndex(-1);
 	if (g_pDataCenter->GetIDCardInfo())
 	{
 		IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
@@ -330,6 +346,16 @@ int uc_InputIDCardInfo::ProcessBussiness()
 			ui->comboBox_Nationality->setCurrentIndex(nIndex);
 	}
 	
+	if (m_bUpdateMode)
+	{
+		ui->lineEdit_Mobile->hide();
+		ui->label_Mobile->hide();
+		ui->horizontalLayout_Mobile->removeItem(ui->horizontalSpacer_14);
+		ui->horizontalLayout_Mobile->deleteLater();
+		ui->pushButton_TakePhoto->hide();
+		ui->pushButton_SelectPhoto->hide();
+	}
+
 	//LoadPersonInfo();
 	return 0;
 }
@@ -434,12 +460,17 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 		strMessage = "身份证信息无效!";
 		return -1;
 	}
-	QString strMobile = ui->lineEdit_Mobile->text();
-	if (strMobile.size() < 11)
+	QString strMobile;
+	if (!m_bUpdateMode)
 	{
-		strMessage = "手机号码输入有误,必须为11位数字!";
-		return -1;
+		strMobile = ui->lineEdit_Mobile->text();
+		if (strMobile.size() < 11)
+		{
+			strMessage = "手机号码输入有误,必须为11位数字!";
+			return -1;
+		}
 	}
+	
 
 	int nPersonType = ui->comboBox_PersonType->currentIndex() + 1;
 	QString strOrganization = ui->lineEdit_Organization->text();
@@ -511,6 +542,25 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	break;
 	}
 
+	char szCareer[16] = { 0 };
+	int nCareerType = ui->comboBox_Career->currentIndex() + 1;
+	if (nCareerType == 0)
+	{
+		strMessage = "请选择从事职业!";
+		return -1;
+	}
+	sprintf(szCareer, "%02d", nCareerType);
+	strcpy_s((char*)pSSCardInfo->strCareerType, sizeof(pSSCardInfo->strCareerType), szCareer);
+	char szSatus[16] = { 0 };
+	int nStatus = ui->comboBox_Status->currentIndex() + 1;
+	if (nStatus == 0)
+	{
+		strMessage = "请选择个人身份!";
+		return -1;
+	}
+	sprintf(szSatus, "%02d", nStatus);	
+	strcpy_s((char*)pSSCardInfo->strStatus, sizeof(pSSCardInfo->strStatus), szSatus);
+
 	itoa(nPersonType, pSSCardInfo->strPersonType, 10);
 	strcpy_s((char*)pSSCardInfo->strName, sizeof(pSSCardInfo->strName), (const char*)pIDCard->szName);
 	itoa(nGender, (char*)pSSCardInfo->strSex, 10);
@@ -518,10 +568,10 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	strcpy_s((char*)pSSCardInfo->strBirthday, sizeof(pSSCardInfo->strBirthday), (const char*)pIDCard->szBirthday);
 	strcpy_s((char*)pSSCardInfo->strCardID, sizeof(pSSCardInfo->strCardID), (const char*)pIDCard->szIdentity);
 	strcpy_s((char*)pSSCardInfo->strAddress, sizeof(pSSCardInfo->strAddress), strAddress.toLocal8Bit().data());
-	strcpy_s((char*)pSSCardInfo->strReleaseDate, sizeof(pSSCardInfo->strReleaseDate), (char*)pIDCard->szExpirationDate1);
-#ifdef HN2022
+	//strcpy_s((char*)pSSCardInfo->strReleaseDate, sizeof(pSSCardInfo->strReleaseDate), (char*)pIDCard->szExpirationDate1);
+
 	strcpy_s((char*)pSSCardInfo->strIDCardIssuedDate, sizeof(pIDCard->szExpirationDate1), (char*)pIDCard->szExpirationDate1);
-#endif
+
 	strcpy_s((char*)pSSCardInfo->strValidDate, sizeof(pSSCardInfo->strValidDate), (char*)pIDCard->szExpirationDate2);
 
 	strcpy_s((char*)pSSCardInfo->strOrganID, sizeof(pSSCardInfo->strOrganID), Reginfo.strAgency.c_str());
@@ -569,7 +619,12 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 {
 	gInfo() << __FUNCTION__;
 	QString strName = ui->lineEdit_Name->text();
-	QString strMobile = ui->lineEdit_Mobile->text();
+	QString strMobile;
+	if (!m_bUpdateMode)
+	{
+		strMobile = ui->lineEdit_Mobile->text();
+	}
+	
 	QString strCardID = ui->lineEdit_CardID->text();
 	QString strNation = ui->comboBox_Nationality->currentText();
 	QString strNationCode = ui->comboBox_Nationality->currentData().toString();
@@ -853,13 +908,21 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 
 		if (QFailed(GetSSCardInfo(strMessage)))
 			break;
+		if (m_bUpdateMode)
+		{
+			SavePersonInfo();
+			nOperation = Switch_NextPage;
+			nPage = Page_EnsureInformation;
+			nResult = 0;
+			break;
+
+		}
 		if (g_pDataCenter->strSSCardPhotoFile.empty())
 		{
 			strMessage = "尚未选取或采集制卡人照片!";
 			break;
 		}
-		SavePersonInfo();
-			
+					
 		SSCardInfoPtr pSSCardInfoLocal = nullptr;
 		auto tpProgressInfo = FindCardProgress((const char*)pIDCard->szIdentity, pSSCardInfoLocal);
 		switch (std::get<0>(tpProgressInfo))
@@ -913,7 +976,14 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 			}
 			int nStatus = 0;
 			nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
-
+			if (strMessage == "当前接口用户无调用此接口的权限")
+			{
+				nStatus = Failed;
+				strTips = "操作失败";
+				nOperation = Return_MainPage;
+				emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, 0);
+				return;
+			}
 			g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus).toStdString();
 			if (g_pDataCenter->strCardMakeProgress == "制卡中")
 			{
@@ -977,12 +1047,10 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 					g_pDataCenter->SetProgress(tpProgressInfo);
 				}
 			}
-			
 			break;
 		}
 		}
-
-		
+				
 	} while (0);
 
 	if (QFailed(nResult))

@@ -235,6 +235,9 @@ MainWindow::MainWindow(QWidget* parent)
 	}
 	ui->label_BankName->setText(strBankName.c_str());
 	ui->label_Title->setText(g_pDataCenter->strTitle.c_str());
+	
+	if (g_pDataCenter->GetSysConfigure()->Region.strSupport.size())
+		ui->label_Support->setText(g_pDataCenter->GetSysConfigure()->Region.strSupport);
 
 	QString strAppPath = QApplication::applicationDirPath();
 
@@ -361,18 +364,21 @@ void MainWindow::on_pushButton_NewCard_clicked()
 	
 	m_pNewCard->ResetAllPages();
 	int nResult = -1;
-	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+	if (!g_pDataCenter->bNoDevice)
 	{
-		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+		if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+		{
+			m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+			UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
+			return;
+		}
+		nResult = g_pDataCenter->TestPrinter(/*PrinterStatus,*/ strMessage);
 		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
-		return;
-	}
-	nResult = g_pDataCenter->TestPrinter(/*PrinterStatus,*/ strMessage);
-	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
-	if (QFailed(nResult))
-	{
-		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
-		return;
+		if (QFailed(nResult))
+		{
+			m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+			return;
+		}
 	}
 
 	/*if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
@@ -415,20 +421,24 @@ void MainWindow::on_pushButton_Updatecard_clicked()
 	PRINTERSTATUS PrinterStatus;
 	m_pUpdateCard->ResetAllPages();
 	int nResult = -1;
-	if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+	if (!g_pDataCenter->bNoDevice)
 	{
-		m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+		if (QFailed(nResult = g_pDataCenter->OpenDevice(strMessage)))
+		{
+			m_pUpdateCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+			UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
+			return;
+		}
+
+		nResult = g_pDataCenter->TestPrinter(strMessage);
 		UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
-		return;
+		if (QFailed(nResult))
+		{
+			m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
+			return;
+		}
 	}
-	
-	nResult = g_pDataCenter->TestPrinter(strMessage);
-	UpdateRibbonStatus(g_pDataCenter->PrinterStatus.fwToner);
-	if (QFailed(nResult))
-	{
-		m_pNewCard->emit ShowMaskWidget("操作失败", strMessage, Fatal, Return_MainPage);
-		return;
-	}
+
 
 	/*if (QFailed(nResult = g_pDataCenter->TestCard(strMessage)))
 	{
@@ -704,7 +714,7 @@ void MainWindow::timerEvent(QTimerEvent* event)
 		auto tNow = std::chrono::steady_clock::now();
 		auto tDuration = std::chrono::duration_cast<std::chrono::milliseconds>(tNow - tLastTick);
 		tLastTick = tNow;
-		qDebug("Timespan of TimerRibbonStatus = %d.\n",tDuration.count());
+		//qDebug("Timespan of TimerRibbonStatus = %d.\n",tDuration.count());
 		// 0-FLLL;1-LOW;2-OUT;3-NOTSUPP;4-UNKNOW
 #define BlankText	(Ribbon_Max + 1)
 		static QString strText[] = {"充足","告警","耗尽","不兼容","未知","未安装",""};

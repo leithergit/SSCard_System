@@ -27,10 +27,10 @@ SystemManager::SystemManager(QWidget* parent)
 	ui.tabWidget->addTab(new RegionConfigure, "区域设置");
 	//ui.tabWidget->addTab(new PageConfigure, "页面设置");	
 	
-	ui.tabWidget->addTab(new logManager, "日志管理");
+	//ui.tabWidget->addTab(new logManager, "日志管理");
 	ui.tabWidget->addTab(new OtherOptions, "其它选项");
-	uc_Pay* pPagePay = new uc_Pay(nullptr, "", Page_Payment, nullptr);
-	ui.tabWidget->addTab(pPagePay, "支付测试");
+	//uc_Pay* pPagePay = new uc_Pay(nullptr, "", Page_Payment, nullptr);
+	//ui.tabWidget->addTab(pPagePay, "支付测试");
 	IDCardInfoPtr pIDCard = make_shared<IDCardInfo>();
 	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
 	LoadTestIDData(pIDCard, pSSCardInfo);
@@ -38,7 +38,7 @@ SystemManager::SystemManager(QWidget* parent)
 	g_pDataCenter->SetIDCardInfo(pIDCard);
 	g_pDataCenter->SetSSCardInfo(pSSCardInfo);
 	g_pDataCenter->strMobilePhone = "18017348763";
-	pPagePay->ProcessBussiness();
+	//pPagePay->ProcessBussiness();
 	//if (g_pDataCenter->bDebug)
 		ui.tabWidget->addTab(new Sys_SSCardAPITest, "新卡测试");
 	//setWindowFlags((Qt::WindowFlags)(windowFlags() | Qt::WindowStaysOnTopHint));

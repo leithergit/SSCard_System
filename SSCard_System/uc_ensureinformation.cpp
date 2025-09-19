@@ -29,7 +29,7 @@ int uc_EnsureInformation::ProcessBussiness()
 	int nResult = -1;
 	QString strCardProgress;
 
-	SSCardInfoPtr pSSCardInfo = make_shared<SSCardInfo>();
+	SSCardInfoPtr pSSCardInfo = g_pDataCenter->GetSSCardInfo();
 	IDCardInfoPtr& pIDCard = g_pDataCenter->GetIDCardInfo();
 	RegionInfo& Reginfo = g_pDataCenter->GetSysConfigure()->Region;
 	do
@@ -55,7 +55,7 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 		strcpy((char*)pSSCardInfo->strName, (const char*)pIDCard->szName);
 		strcpy((char*)pSSCardInfo->strCardID, (const char*)pIDCard->szIdentity);
-#ifdef HN2022
+#ifdef _HN2022
 		strcpy((char*)pSSCardInfo->strIDCardIssuedDate, (const char*)pIDCard->szExpirationDate1);
 #endif
 		strcpy((char*)pSSCardInfo->strOrganID, Reginfo.strAgency.c_str());

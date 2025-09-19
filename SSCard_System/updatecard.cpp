@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "uc_readidcard.h"
 #include "uc_facecapture.h"
+#include "uc_inputidcardinfo.h"
 //#include "uc_facecapture_ocx.h"
 #include "uc_ensureinformation.h"
 #include "uc_inputmobile.h"
@@ -33,6 +34,9 @@ UpdateCard::UpdateCard(QWidget* parent) :
 		//	ui->stackedWidget->addWidget(new uc_FaceCapture_ocx(ui->label_step, "updatecard2.png", Page_FaceCapture));		// step 1
 		//else
 		AddPage(new uc_FaceCapture(ui->label_step, "updatecard2.png", Page_FaceCapture));			// step 1
+		uc_InputIDCardInfo* pPage = new uc_InputIDCardInfo(ui->label_step, "updatecard3.png", Page_InputIDCardInfo);
+		pPage->SetUpdateMode(true);
+		AddPage(pPage);		// step 1
 		AddPage(new uc_EnsureInformation(ui->label_step, "updatecard3.png", Page_EnsureInformation));	// step 2
 		AddPage(new uc_InputMobile(ui->label_step, "updatecard4.png", Page_InputMobile));				// step 3
 		AddPage(new uc_Pay(ui->label_step, "updatecard5.png", Page_Payment));							// step 4

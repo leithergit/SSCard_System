@@ -103,7 +103,7 @@ font:42px &quot;思源黑体 CN Medium&quot;;
                <property name="minimumSize">
                 <size>
                  <width>600</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -270,7 +270,7 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>200</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -328,7 +328,7 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>600</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -389,7 +389,7 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>280</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -400,7 +400,7 @@ QRadioButton::indicator::checked {
                </property>
                <property name="dateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>7</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>2000</year>
@@ -434,7 +434,7 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>300</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -445,7 +445,7 @@ QRadioButton::indicator::checked {
                </property>
                <property name="dateTime">
                 <datetime>
-                 <hour>0</hour>
+                 <hour>7</hour>
                  <minute>0</minute>
                  <second>0</second>
                  <year>2022</year>
@@ -473,7 +473,7 @@ QRadioButton::indicator::checked {
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <item>
-              <widget class="QLabel" name="label_Career_2">
+              <widget class="QLabel" name="label_Address">
                <property name="minimumSize">
                 <size>
                  <width>220</width>
@@ -499,7 +499,7 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>600</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -532,9 +532,9 @@ QRadioButton::indicator::checked {
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <layout class="QHBoxLayout" name="horizontalLayout_Mobile">
              <item>
-              <widget class="QLabel" name="label_Career">
+              <widget class="QLabel" name="label_Mobile">
                <property name="minimumSize">
                 <size>
                  <width>220</width>
@@ -560,7 +560,7 @@ QRadioButton::indicator::checked {
                <property name="minimumSize">
                 <size>
                  <width>600</width>
-                 <height>60</height>
+                 <height>45</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -626,7 +626,7 @@ QRadioButton::indicator::checked {
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_29">
            <item>
-            <widget class="QLabel" name="label_Address">
+            <widget class="QLabel" name="label_PersonType">
              <property name="minimumSize">
               <size>
                <width>220</width>
@@ -652,12 +652,12 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>600</width>
-               <height>60</height>
+               <height>45</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>600</width>
+               <width>800</width>
                <height>60</height>
               </size>
              </property>
@@ -693,6 +693,242 @@ QRadioButton::indicator::checked {
             <spacer name="horizontalSpacer_10">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_39" stretch="1,1,0">
+           <item>
+            <widget class="QLabel" name="label_Status">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>220</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>个人身份</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBox_Status">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>45</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>600</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="maxVisibleItems">
+              <number>16</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>国家公务员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>专业技术人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>职员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>企业管理人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>工人</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>农民</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>学生</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>现役军人</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>自由职业者</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>个体经营者</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>无业人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>退(离)休人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>其他</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_40">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_49">
+           <item>
+            <widget class="QLabel" name="label_Status2">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>220</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>从事职业</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBox_Career">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>45</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>600</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="maxVisibleItems">
+              <number>16</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>国家机关、党群组织、企业、事业单位负责人</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>专业技术人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>办事人员和有关人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>商业、服务业人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>农、林、牧、渔、水利业生产人员口</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>生产、运输设备操作人员及有关人员</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>军人</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>不便分类的其他从业人员</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_50">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -733,7 +969,7 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>600</width>
-               <height>60</height>
+               <height>45</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -791,7 +1027,7 @@ QRadioButton::indicator::checked {
              <property name="minimumSize">
               <size>
                <width>600</width>
-               <height>60</height>
+               <height>45</height>
               </size>
              </property>
              <property name="maximumSize">
