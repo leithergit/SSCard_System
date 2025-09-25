@@ -350,8 +350,8 @@ int uc_InputIDCardInfo::ProcessBussiness()
 	{
 		ui->lineEdit_Mobile->hide();
 		ui->label_Mobile->hide();
-		ui->horizontalLayout_Mobile->removeItem(ui->horizontalSpacer_14);
-		ui->horizontalLayout_Mobile->deleteLater();
+		//ui->horizontalLayout_Mobile->removeItem(ui->horizontalSpacer_14);
+		//ui->horizontalLayout_Mobile->deleteLater();
 		ui->pushButton_TakePhoto->hide();
 		ui->pushButton_SelectPhoto->hide();
 	}
@@ -427,10 +427,10 @@ void uc_InputIDCardInfo::timerEvent(QTimerEvent* event)
 void uc_InputIDCardInfo::ClearInfo()
 {
 	ui->lineEdit_Name->setText("");
-	//ui->lineEdit_Mobile->setText("");
+	ui->lineEdit_Mobile->setText("");
 	ui->lineEdit_CardID->setText("");
-	/*ui->lineEdit_Address->setText("");
-	ui->lineEdit_GuardianMobile->setText("");*/
+	ui->lineEdit_Address->setText("");
+	
 	ui->comboBox_Nationality->setCurrentIndex(0);
 	ui->radioButton_Male->setChecked(false);
 	ui->radioButton_Female->setChecked(false);

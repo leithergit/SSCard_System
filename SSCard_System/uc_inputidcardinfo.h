@@ -33,6 +33,7 @@ public:
 	bool LoadPersonInfo(QString strJson);
 
 	void SavePersonInfo();
+
 	void  ShutDown() override;
 
 	void timerEvent(QTimerEvent* event) override;

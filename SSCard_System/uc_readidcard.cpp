@@ -107,10 +107,10 @@ int uc_ReadIDCard::ProcessBussiness()
 	//ShowReadCardID();
 
 	disconnect(ui->checkBox_WithoutIDCard, &QCheckBox::stateChanged, this, &uc_ReadIDCard::On_WithoutIDCard);
-	if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
-		ui->checkBox_WithoutIDCard->show();
-	else
-		ui->checkBox_WithoutIDCard->hide();
+	//if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+	//	ui->checkBox_WithoutIDCard->show();
+	//else
+	//	ui->checkBox_WithoutIDCard->hide();
 	StartDetect();
 	ui->checkBox_WithoutIDCard->setChecked(false);
 	m_bAgency = false;
