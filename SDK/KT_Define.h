@@ -119,11 +119,14 @@ struct SSCardInfo
 	char strFailType[10] = { 0 };		//失败类型(银行,制卡)
 	char strFailReason[101] = { 0 };	//失败原因
 	char* strPhoto = NULL;				//相片
-#ifdef HN2022
+#ifdef _HN2022
+	char szGuardianID[20] = { 0 }; //监护人身份证号
 	char strIDCardIssuedDate[32] = { 0 };		//身份证发证日期
-#endif
 	char strTransactionTime[32] = { 0 };
-	char strPayCode[64] = { 0 };
+	char strPayCode[64] = { 0 };		//电子缴款码
+	char strCareerType[4] = { 0 };		//职业
+	char strStatus[4] = { 0 };			//个人身份
+#endif
 };
 
 //山东卡信息

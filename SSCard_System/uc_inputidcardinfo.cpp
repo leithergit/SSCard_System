@@ -18,7 +18,7 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 {
 	ui->setupUi(this);
 
-	//ShowGuardianWidget(false);
+	ShowGuardianWidget(false);
 	ui->lineEdit_CardID->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")));   //只能输入数字
 	//ui->lineEdit_PostCode->setValidator(new QRegExpValidator(QRegExp("\\d{6}")));
 	//ui->lineEdit_Mobile->setValidator(new QRegExpValidator(QRegExp("^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$")));   //只能输入数字
@@ -62,10 +62,10 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 			popup->setStyleSheet("font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";");
 	}
 
-	//ui->checkBox_Agency->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
-    //        QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
-    //        QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
-    //        QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
+	ui->checkBox_Agency->setStyleSheet("QCheckBox::indicator {width: 48px;height: 48px;}\
+            QCheckBox::indicator:unchecked{image:url(./Image/CheckBox_UnCheck.png);}\
+            QCheckBox::indicator:checked{image:url(./Image/CheckBox_Checked.png);}\
+            QCheckBox{font-weight:normal;line-height:49px;letter-spacing:1px;color:#707070;font:42px \"思源黑体 CN Medium\";border-radius: 24px;}");
 	//ui->comboBox_PersonType->clear();
 	//for (auto& var : vecCareer)
 	//{
@@ -470,7 +470,7 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 			return -1;
 		}
 	}
-	
+
 
 	int nPersonType = ui->comboBox_PersonType->currentIndex() + 1;
 	QString strOrganization = ui->lineEdit_Organization->text();
@@ -478,6 +478,8 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	QString strDepartment = ui->lineEdit_Department->text();
 	//QString strClass = ui->lineEdit_Class->text();
 	QString strAddress = ui->lineEdit_Address->text();
+
+	
 
 	int nGender = pButtonGrp->checkedId() + 1;
 	pSSCardInfo = make_shared<SSCardInfo>();
@@ -541,6 +543,24 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	}
 	break;
 	}
+	QString strGuardianName = ui->lineEdit_Guardian->text();
+	QString strGuardianCardID = ui->lineEdit_GuardianCardID->text();
+
+	if (GetAge(string((char*)pIDCard->szBirthday)) < 16 &&
+		ui->checkBox_Agency->checkState() == Qt::Checked)
+	{
+		if (strGuardianName.isEmpty() || strGuardianCardID.isEmpty())
+		{
+			strMessage = "未成年人办卡时,监护人姓名和证件号码不能为空!";
+			return -1;
+		}
+		char szGuardianIDentity[20] = { 0 }; //监护人身份证号
+		char szGuardianName[21] = { 0 };
+		strcpy_s((char*)pSSCardInfo->strGuardianName, sizeof(pSSCardInfo->strGuardianName), (char*)strGuardianName.toLocal8Bit().data());
+
+		strcpy_s((char*)pSSCardInfo->szGuardianID, sizeof(pSSCardInfo->szGuardianID), (char*)strGuardianCardID.toLocal8Bit().data());
+	}
+
 
 	char szCareer[16] = { 0 };
 	int nCareerType = ui->comboBox_Career->currentIndex() + 1;
@@ -581,6 +601,7 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	strcpy_s((char*)pSSCardInfo->strBankCode, sizeof(pSSCardInfo->strBankCode), Reginfo.strBankCode.c_str());
 	strcpy_s((char*)pSSCardInfo->strMobile, sizeof(pSSCardInfo->strMobile), strMobile.toStdString().c_str());
 	strcpy_s((char*)pSSCardInfo->strPostalCode, sizeof(pSSCardInfo->strPostalCode), g_pDataCenter->GetSysConfigure()->Region.strPostCode.c_str());
+
 
 	/*if (ui->checkBox_Agency->isChecked())
 	{
@@ -706,12 +727,50 @@ int uc_InputIDCardInfo::GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMess
 	return 0;
 }
 
+// 只取姓名和身份证号
+int uc_InputIDCardInfo::GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage)
+{
+	gInfo() << __FUNCTION__;
+	QString strName = ui->lineEdit_Name->text();
+	//QString strMobile = ui->lineEdit_Mobile->text();
+	QString strCardID = ui->lineEdit_CardID->text();
+
+	if (strName.isEmpty() ||
+		strCardID.isEmpty())
+
+	{
+		strMessage = "姓名、身份证号码不能为空!";
+		return -1;
+	}
+	if (strName.contains(" "))
+	{
+		strMessage = "姓名中不能含有空格!";
+		return -1;
+	}
+	if (strCardID.size() < 18)
+	{
+		strMessage = "身份证号码位数不足18位，请检查后重新输入!";
+		return -1;
+	}
+
+	char nX = VerifyCardID(strCardID.toStdString().c_str());
+	if (nX != strCardID.toStdString().at(17))
+	{
+		strMessage = "身份证号码有误，请检查后重新输入!";
+		return -1;
+	}
+
+	strcpy((char*)pIDCard->szName, strName.toLocal8Bit().data());
+	strcpy((char*)pIDCard->szIdentity, strCardID.toLocal8Bit().data());
+	return 0;
+}
+
 void uc_InputIDCardInfo::on_AddNewIDCard(IDCardInfo* pIDCard)
 {
 	gInfo() << __FUNCTION__;
 	shared_ptr<IDCardInfo> IDCardPtr(pIDCard);
-	//ui->lineEdit_Guardian->setText(QString::fromLocal8Bit((char*)IDCardPtr->szName));
-	//ui->lineEdit_GuardianCardID->setText(QString::fromLocal8Bit((char*)IDCardPtr->szIdentity));
+	ui->lineEdit_Guardian->setText(QString::fromLocal8Bit((char*)IDCardPtr->szName));
+	ui->lineEdit_GuardianCardID->setText(QString::fromLocal8Bit((char*)IDCardPtr->szIdentity));
 	if (pDialogReadIDCard)
 	{
 		pDialogReadIDCard->accept();
@@ -739,20 +798,36 @@ void uc_InputIDCardInfo::ThreadWork()
 {
 	gInfo() << __FUNCTION__;
 	auto tLast = high_resolution_clock::now();
+	auto tTimeTick = tLast;
 	QString strError;
-	IDCardInfo* pIDCard = new IDCardInfo();
+	IDCardInfo *pIDCard = new IDCardInfo();
 	while (m_bWorkThreadRunning)
 	{
 		auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tLast);
 		if (tDuration.count() >= 1000)
 		{
 			tLast = high_resolution_clock::now();
-			int nResult = g_pDataCenter->ReaderIDCard(pIDCard);
+			int nResult = -1;
+
+			if (g_pDataCenter->bNoDevice)
+			{
+				auto tDuration = duration_cast<milliseconds>(high_resolution_clock::now() - tTimeTick);
+				if (tDuration.count() < 10 * 1000)
+					continue;
+				QString strApp = qApp->applicationDirPath() + "/debug/Person_Test.json";
+				IDCardInfoPtr pIDCardPtr = make_shared<IDCardInfo>();
+				nResult = ::LoadPersonInfo(strApp, pIDCardPtr);
+				*pIDCard = *pIDCardPtr;
+
+			}
+			else
+				nResult = g_pDataCenter->ReaderIDCard(pIDCard);
+
 			if (nResult == IDCard_Status::IDCard_Succeed)
 			{
 				emit AddNewIDCard(pIDCard);
 				pIDCard = new IDCardInfo();
-				continue;
+				break;
 			}
 			else
 			{
@@ -767,8 +842,6 @@ void uc_InputIDCardInfo::ThreadWork()
 			this_thread::sleep_for(chrono::milliseconds(200));
 		}
 	}
-	if (pIDCard)
-		delete pIDCard;
 }
 
 void uc_InputIDCardInfo::StopDetect()
@@ -889,6 +962,7 @@ void uc_InputIDCardInfo::on_pushButton_SelectPhoto_clicked()
 		emit ShowMaskWidget("提示", QString::fromLocal8Bit(e.what()), Fatal, Stay_CurrentPage);
 	}
 }
+
 void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 {
 	gInfo() << __FUNCTION__;
@@ -908,6 +982,8 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 
 		if (QFailed(GetSSCardInfo(strMessage)))
 			break;
+
+		
 		if (m_bUpdateMode)
 		{
 			SavePersonInfo();
@@ -952,7 +1028,16 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 				nStatus = Failed;
 				break;
 			}
-
+			g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus).toStdString();
+			if (g_pDataCenter->strCardMakeProgress == "卡已领取")
+			{
+				nStatus = Failed;
+				strTips = "操作失败";
+				strMessage = "当前申请人卡片已领取,请走补换卡流程!";
+				nOperation = Return_MainPage;
+				emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, 0);
+				return;
+			}
 			if (!pSSCardInfo->strPhoto)
 			{
 				if (g_pDataCenter->strPhotoBase64.size())
@@ -976,6 +1061,10 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 			}
 			int nStatus = 0;
 			nResult = ApplyNewCard(strMessage, nStatus, pSSCardInfo);			 // 申请 新制卡
+			
+			if (QFailed(nResult))
+				break;
+
 			if (strMessage == "当前接口用户无调用此接口的权限")
 			{
 				nStatus = Failed;
@@ -984,7 +1073,15 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 				emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, 0);
 				return;
 			}
+
+			if (QFailed(QueryCardProgress(strMessage, nCardStatus, pSSCardInfo)))
+			{
+				nStatus = Failed;
+				break;
+			}
+
 			g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pSSCardInfo->strCardStatus).toStdString();
+			
 			if (g_pDataCenter->strCardMakeProgress == "制卡中")
 			{
 				// 可以获取新的社保卡一些数据
@@ -1004,15 +1101,6 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 				nResult = 0;
 				break;
 			}
-			else if (g_pDataCenter->strCardMakeProgress == "卡已领取")
-			{
-				nStatus = Failed;
-				strTips = "操作失败";
-				strMessage = "当前申请人卡片已领取,请走补换卡流程!";
-				nOperation = Return_MainPage;
-				emit ShowMaskWidget(strTips, strMessage, nStatus, nOperation, 0);
-				return;
-			}
 		}
 			break;
 		case ProgrerssType::Progress_Making:
@@ -1027,7 +1115,7 @@ void uc_InputIDCardInfo::on_pushButton_OK_clicked()
 		}
 		case ProgrerssType::Progress_Finished:
 		{
-			if (QMessageBox_CN(QMessageBox::Question, "询问", "系统中存在一个已经完成的制卡进度文件，是否需使用该进度?如果是仅打印卡面选择是!", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+			if (QMessageBox_CN(QMessageBox::Question, "询问", "系统中存在一个已经完成的制卡进度文件，是否需使用该进度?如果是仅打印卡面请选择:是!", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				strMessage = "发现已经完成的制卡数据,现将转入制卡页面,你可以进行相关的操作!";
 				g_pDataCenter->SetSSCardInfo(pSSCardInfoLocal);
@@ -1148,4 +1236,43 @@ void uc_InputIDCardInfo::on_Name_textChanged(const QString& arg1)
 void uc_InputIDCardInfo::on_lineEdit_CardID_textChanged(const QString & strCardID)
 {
 	
+}
+
+void uc_InputIDCardInfo::on_checkBox_Agency_clicked()
+{
+	bool bChecked = ui->checkBox_Agency->isChecked();
+	ShowGuardianWidget(bChecked);
+	g_pDataCenter->bGuardian = bChecked;
+	if (bChecked)
+	{
+
+		StartDetect();
+		pDialogReadIDCard = new Sys_DialogReadIDCard("请刷代办人员身份证");
+		if (pDialogReadIDCard->exec() != QDialog::Accepted)
+		{
+			ui->checkBox_Agency->setChecked(false);
+			ShowGuardianWidget(false);
+			g_pDataCenter->bGuardian = false;
+		}
+		delete pDialogReadIDCard;
+		pDialogReadIDCard = nullptr;
+		StopDetect();
+	}
+}
+
+void uc_InputIDCardInfo::ShowGuardianWidget(bool bShow)
+{
+	gInfo() << __FUNCTION__;
+	ui->label_Guardian->setVisible(bShow);
+	ui->label_GuardianIDCard->setVisible(bShow);
+	ui->lineEdit_Guardian->setVisible(bShow);
+	ui->lineEdit_GuardianCardID->setVisible(bShow);
+
+}
+
+void	uc_InputIDCardInfo::ClearGuardianInfo()
+{
+	gInfo() << __FUNCTION__;
+	ui->lineEdit_Guardian->setText("");
+	ui->lineEdit_GuardianCardID->setText("");
 }

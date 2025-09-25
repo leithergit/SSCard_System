@@ -33,7 +33,6 @@ public:
 	bool LoadPersonInfo(QString strJson);
 
 	void SavePersonInfo();
-
 	void  ShutDown() override;
 
 	void timerEvent(QTimerEvent* event) override;
@@ -44,11 +43,14 @@ public:
 
 	int GetCardInfo(/*IDCardInfoPtr& pIDCard,*/ QString& strMessage);
 
-	void StartDetect();
+	int		GetCardInfo(IDCardInfoPtr& pIDCard, QString& strMessage);
 
-	void ThreadWork();
-
-	void StopDetect();
+	bool    bInitialized = false;
+	void	StartDetect();
+	void	StopDetect();
+	void    ThreadWork();
+	void	ShowGuardianWidget(bool bShow);
+	void	ClearGuardianInfo();
 
 	bool GetPersonName(QString strPersonFile, QString& strName);
 
@@ -72,7 +74,7 @@ public:
 signals:
 	void AddNewIDCard(IDCardInfo* IDCard);
 public slots:
-	void on_AddNewIDCard(IDCardInfo* pIDCard);
+	void on_AddNewIDCard(IDCardInfo *pIDCard);
 
 	void on_pushButton_TakePhoto_clicked();
 
@@ -89,6 +91,9 @@ public slots:
 
 	// 只有UI编辑事件会触发
 	// void on_lineEdit_Name_textEdited(const QString& arg1);
+
+private slots:
+    void on_checkBox_Agency_clicked();
 
 private:
 	Ui::uc_InputIDCardInfo* ui;

@@ -163,7 +163,7 @@ border-radius: 24px;
 }</string>
          </property>
          <property name="text">
-          <string>无证办理</string>
+          <string>未成年办卡</string>
          </property>
         </widget>
        </item>

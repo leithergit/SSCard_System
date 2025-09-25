@@ -116,6 +116,18 @@ struct IDCardInfo
 	{
 		memset(this, 0, sizeof(IDCardInfo));
 	}
+	IDCardInfo& operator=(const IDCardInfo& other)
+	{
+		if (this != &other)
+			memcpy(this, &other, sizeof(IDCardInfo));
+		return *this;
+	}
+	IDCardInfo& operator=(const IDCardInfo *other)
+	{
+		if (nullptr != &other)
+			memcpy(this, other, sizeof(IDCardInfo));
+		return *this;
+	}
 };
 
 // 打开读卡器

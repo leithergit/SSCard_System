@@ -993,6 +993,7 @@ public:
 	string		   strTransTime;
 	string		   strCardVersion = "3.0";
 	string		   strTitle = "社保卡制卡系统";
+	bool			bGuardian = false;
 	bool		   bDebug;
 	bool		   bNoDevice = false;
 	bool		   bSkipFaceCapture = false;
