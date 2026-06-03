@@ -299,11 +299,12 @@ int main(int argc, char* argv[])
 	}
 	FLAGS_max_log_size = 256;
 	FLAGS_logbufsecs = 0;	// 无迟延写入
+	google::InitGoogleLogging("SSCardSystem_");
 	google::SetLogDestination(google::GLOG_INFO, strLogDatePath.toLocal8Bit().data());	// 使用该设定时，默认情况下，所有级别日志都用同一的文件名
 	google::SetStderrLogging(google::GLOG_INFO);	// 大于该级别的日志输出到stderr
 	google::SetLogFilenameExtension(".log");
-	google::InitGoogleLogging(strLogDatePath.toLocal8Bit().data());
-
+	
+	LOG(INFO) << "************SSCard_System Application Start************";
 	ifstream ifs("./AppRuning.json");
 	int nRunCount = 0;
 	QDateTime Now = QDateTime::currentDateTime();

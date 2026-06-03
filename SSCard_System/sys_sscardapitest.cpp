@@ -1073,6 +1073,11 @@ void Sys_SSCardAPITest::on_pushButton_Excecute_clicked()
 	default:
 	{
 		RemoveCardData(pSSCardInfo);
+		auto itFind = mapPersonFile.find(ui->lineEdit_Name->text());
+		if (itFind != mapPersonFile.end())
+		{
+			mapPersonFile.erase(itFind);
+		}
 		break;
 	}
 

@@ -106,6 +106,10 @@ uc_InputIDCardInfo::uc_InputIDCardInfo(QLabel* pTitle, QString strStepImage, Pag
 	//ui->lineEdit_Class->hide();
 	ui->lineEdit_Name->setCompleter(pCompleter);
 	connect(ui->lineEdit_Name, &QLineEdit::textChanged, this, &uc_InputIDCardInfo::on_Name_textChanged);
+#ifndef _HN2022
+	ui->comboBox_Career->hide();
+	ui->comboBox_Status->hide();
+#endif
 }
 
 bool  uc_InputIDCardInfo::InitializeDB(QString& strMessage)
@@ -161,14 +165,15 @@ bool uc_InputIDCardInfo::LoadPersonInfo(QString strJson)
 		GetJsonPtrValue(pJson, "LocalNum", pSSCardInfo->strLocalNum);
 		GetJsonPtrValue(pJson, "Department", pSSCardInfo->strDepartmentName);
 		GetJsonPtrValue(pJson, "Class", pSSCardInfo->strClassName);
-
+#ifdef _HN2022
 		GetJsonPtrValue(pJson, "Career", pSSCardInfo->strCareerType);
 		GetJsonPtrValue(pJson, "Status", pSSCardInfo->strStatus);
-
 		int nCareer = atoi(pSSCardInfo->strCareerType);
 		int nStatus = atoi(pSSCardInfo->strStatus);
 		ui->comboBox_Career->setCurrentIndex(nCareer - 1);
 		ui->comboBox_Status->setCurrentIndex(nStatus - 1);
+#endif
+		
 
 		ui->lineEdit_Name->setText(QString::fromLocal8Bit(pSSCardInfo->strName));
 		ui->lineEdit_CardID->setText(pSSCardInfo->strCardID);
@@ -274,9 +279,10 @@ void uc_InputIDCardInfo::SavePersonInfo()
 		json.Add("LocalNum", pSSCardInfo->strLocalNum);
 		json.Add("Department", pSSCardInfo->strDepartmentName);
 		json.Add("Class", pSSCardInfo->strClassName);
-
+#ifdef _HN2022
 		json.Add("Career", pSSCardInfo->strCareerType);
 		json.Add("Status", pSSCardInfo->strStatus);
+#endif
 
 		QFileInfo fi(g_pDataCenter->strSSCardPhotoFile.c_str());
 		if (fi.isFile())
@@ -471,16 +477,13 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 		}
 	}
 
-
 	int nPersonType = ui->comboBox_PersonType->currentIndex() + 1;
 	QString strOrganization = ui->lineEdit_Organization->text();
 	//QString strOrganizationCode = ui->lineEdit_OrganizationCode->text();
 	QString strDepartment = ui->lineEdit_Department->text();
 	//QString strClass = ui->lineEdit_Class->text();
 	QString strAddress = ui->lineEdit_Address->text();
-
 	
-
 	int nGender = pButtonGrp->checkedId() + 1;
 	pSSCardInfo = make_shared<SSCardInfo>();
 	switch (nPersonType)
@@ -557,11 +560,12 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 		char szGuardianIDentity[20] = { 0 }; //监护人身份证号
 		char szGuardianName[21] = { 0 };
 		strcpy_s((char*)pSSCardInfo->strGuardianName, sizeof(pSSCardInfo->strGuardianName), (char*)strGuardianName.toLocal8Bit().data());
-
+#ifdef _HN2022
 		strcpy_s((char*)pSSCardInfo->szGuardianID, sizeof(pSSCardInfo->szGuardianID), (char*)strGuardianCardID.toLocal8Bit().data());
+#endif
 	}
 
-
+#ifdef _HN2022
 	char szCareer[16] = { 0 };
 	int nCareerType = ui->comboBox_Career->currentIndex() + 1;
 	if (nCareerType == 0)
@@ -580,6 +584,7 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	}
 	sprintf(szSatus, "%02d", nStatus);	
 	strcpy_s((char*)pSSCardInfo->strStatus, sizeof(pSSCardInfo->strStatus), szSatus);
+#endif
 
 	itoa(nPersonType, pSSCardInfo->strPersonType, 10);
 	strcpy_s((char*)pSSCardInfo->strName, sizeof(pSSCardInfo->strName), (const char*)pIDCard->szName);
@@ -589,8 +594,9 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	strcpy_s((char*)pSSCardInfo->strCardID, sizeof(pSSCardInfo->strCardID), (const char*)pIDCard->szIdentity);
 	strcpy_s((char*)pSSCardInfo->strAddress, sizeof(pSSCardInfo->strAddress), strAddress.toLocal8Bit().data());
 	//strcpy_s((char*)pSSCardInfo->strReleaseDate, sizeof(pSSCardInfo->strReleaseDate), (char*)pIDCard->szExpirationDate1);
-
+#ifdef _HN2022
 	strcpy_s((char*)pSSCardInfo->strIDCardIssuedDate, sizeof(pIDCard->szExpirationDate1), (char*)pIDCard->szExpirationDate1);
+#endif
 
 	strcpy_s((char*)pSSCardInfo->strValidDate, sizeof(pSSCardInfo->strValidDate), (char*)pIDCard->szExpirationDate2);
 
@@ -601,7 +607,6 @@ int	uc_InputIDCardInfo::GetSSCardInfo(/*IDCardInfoPtr &pIDCard,*/QString& strMes
 	strcpy_s((char*)pSSCardInfo->strBankCode, sizeof(pSSCardInfo->strBankCode), Reginfo.strBankCode.c_str());
 	strcpy_s((char*)pSSCardInfo->strMobile, sizeof(pSSCardInfo->strMobile), strMobile.toStdString().c_str());
 	strcpy_s((char*)pSSCardInfo->strPostalCode, sizeof(pSSCardInfo->strPostalCode), g_pDataCenter->GetSysConfigure()->Region.strPostCode.c_str());
-
 
 	/*if (ui->checkBox_Agency->isChecked())
 	{

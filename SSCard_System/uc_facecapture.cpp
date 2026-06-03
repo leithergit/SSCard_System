@@ -6,6 +6,7 @@
 #include <QObject>
 #include "Gloabal.h"
 
+
 //#include "mainwindow.h"
 
 uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, QString strStepImage, Page_Index nIndex, QWidget* parent) :
@@ -13,6 +14,16 @@ uc_FaceCapture::uc_FaceCapture(QLabel* pTitle, QString strStepImage, Page_Index 
 	ui(new Ui::FaceCapture)
 {
 	ui->setupUi(this);
+
+	if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard && 
+		g_pDataCenter->bSkipFaceCompare)
+	{
+		ui->pushButton_Skip->setVisible(true);
+	}
+	else
+	{
+		ui->pushButton_Skip->setVisible(false);
+	}
 	connect(this, &uc_FaceCapture::FaceCaptureSucceed, this, &uc_FaceCapture::OnFaceCaptureSucceed);
 	connect(this, &uc_FaceCapture::FaceCaptureFailed, this, &uc_FaceCapture::OnFaceCaptureFailed);
 }
@@ -139,7 +150,7 @@ void  uc_FaceCapture::OnFaceCaptureSucceed()
 	{
 		if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
 		{
-			if (g_pDataCenter->GetProgressStatus("Payment"))
+			if (g_pDataCenter->GetProgressStatus("ApplyCardReplacement"))
 			{
 				nOperation = Goto_Page;
 				nNewPage = Page_MakeCard;
@@ -236,55 +247,126 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 			//	gInfo() << gQStr(strInfo);
 			//	return;
 			//}
-			QString strFullImageFile;
-			if (QFailed(SaveImage(strFullImageFile, strEvent, true)))
+			
+			if(g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard && 
+				g_pDataCenter->bFaceRecognitionEnabled)
 			{
-				gError() << gQStr(strEvent);
-				return;
-			}
-			QString strFaceImageFile;
-			if (QFailed(SaveImage(strFaceImageFile, strEvent, false)))
-			{
-				gError() << gQStr(strEvent);
-				return;
-			}
-
-			QFileInfo fi(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
-			if (!fi.isFile())
-			{
-				strEvent = QString("加载身份证照片'%1'失败!").arg(g_pDataCenter->strIDImageFile.c_str());
+				strEvent = QString("尝试使用人社生物识别系统进行人脸识别!");
 				gInfo() << gQStr(strEvent);
-				return;
-			}
+				QWaitCursor Wait;
+				QString strHeaderPhoto;
+				QString strMessage;
+				QString strAppPath = QApplication::applicationDirPath();
+				QString strPhotoPath1 = strAppPath + "/PhotoProcess/1.jpg";
 
-			strEvent = QString("尝试对身份证照片与识别人脸匹配!");
-			gInfo() << gQStr(strEvent);
+				if (fs::exists(strPhotoPath1.toStdString()))
+					fs::remove(strPhotoPath1.toStdString());
 
-			float dfSimilarity = 0.0f;
-			if (g_pDataCenter->FaceCompareByImage(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()).toStdString(), strFaceImageFile.toStdString(), dfSimilarity))
-			{
-				if (dfSimilarity >= g_pDataCenter->GetSysConfigure()->dfFaceSimilarity)
+				if (!g_pDataCenter->SaveFaceImage(strPhotoPath1.toStdString(), true))
 				{
-					gInfo() << QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
-					if (!m_bFaceDetectSucceed)
+					QMessageBox(QMessageBox::Critical, "提示", "无法成图,可能摄像机故障!", QMessageBox::Ok, this);
+					return;
+				}
+	
+				strEvent = QString("保存图象成功!");
+				gInfo() << gQStr(strEvent);
+				if (QFailed(ProcessHeaderImage(strHeaderPhoto, strMessage)))
+				{
+					QMessageBox(QMessageBox::Critical, "提示", strMessage, QMessageBox::Ok, this);
+					return;
+				}
+				strEvent = QString("处理图象成功!");
+				gInfo() << gQStr(strEvent);
+				QByteArray baPhoto;
+				QFileInfo fi(strHeaderPhoto);
+				std::string strFacePhotoBase64;
+				if (fi.isFile())
+				{
+					QFile qfile(strHeaderPhoto);
+					if (qfile.open(QIODevice::ReadOnly))
 					{
-						gInfo() << QString("切换到下一页面!").toLocal8Bit().data();
-						emit FaceCaptureSucceed();
-						m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
+						baPhoto = qfile.readAll().toBase64();
+						strFacePhotoBase64 = baPhoto.data();
+						string strCardID = (char *)g_pDataCenter->GetIDCardInfo()->szIdentity;
+						strEvent = QString("尝试调用人社生物识别接口");
+						gInfo() << gQStr(strEvent);
+						if (!g_pDataCenter->GetSysConfigure()->FaceRecogntionConfig.FaceAuthenticate(strCardID, strFacePhotoBase64))
+						{
+							QString strInfo = QString("人社生物识别系统成功识别:%1").arg((char *)g_pDataCenter->GetIDCardInfo()->szName);
+							gInfo() << gQStr(strInfo);
+							gInfo() << QString("切换到下一页面!").toLocal8Bit().data();
+							emit FaceCaptureSucceed();
+							m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
+						}
+						else
+						{
+							strEvent = QString("人社生物识别系统识别失败.");
+							gInfo() << gQStr(strEvent);
+						}
+					}
+					else
+					{
+						strEvent = QString("无法打开处理后的人脸照片:%1").arg(strHeaderPhoto);
+						gInfo() << gQStr(strEvent);
 					}
 				}
 				else
 				{
-					emit FaceCaptureFailed();
-					strEvent = QString("身份证照片与识别人脸对比相似度:%1,未达到设置最低匹配要求").arg(dfSimilarity);/*.arg(g_pDataCenter->GetSysConfigure()->dfFaceSimilarity);*/
+					strEvent = QString("无法找到处理后的人脸照片:%1").arg(strHeaderPhoto);
 					gInfo() << gQStr(strEvent);
 				}
 			}
 			else
 			{
-				strEvent = QString("人脸对比失败!");
+				QString strFullImageFile;
+				if (QFailed(SaveImage(strFullImageFile, strEvent, true)))
+				{
+					gError() << gQStr(strEvent);
+					return;
+				}
+				QString strFaceImageFile;
+				if (QFailed(SaveImage(strFaceImageFile, strEvent, false)))
+				{
+					gError() << gQStr(strEvent);
+					return;
+				}
+
+				QFileInfo fi(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()));
+				if (!fi.isFile())
+				{
+					strEvent = QString("加载身份证照片'%1'失败!").arg(g_pDataCenter->strIDImageFile.c_str());
+					gInfo() << gQStr(strEvent);
+					return;
+				}
+
+				strEvent = QString("尝试对身份证照片与识别人脸匹配!");
 				gInfo() << gQStr(strEvent);
-				emit FaceCaptureFailed();
+				float dfSimilarity = 0.0f;
+				if (g_pDataCenter->FaceCompareByImage(QString::fromLocal8Bit(g_pDataCenter->strIDImageFile.c_str()).toStdString(), strFaceImageFile.toStdString(), dfSimilarity))
+				{
+					if (dfSimilarity >= g_pDataCenter->GetSysConfigure()->dfFaceSimilarity)
+					{
+						gInfo() << QString("人脸匹配成功!").arg(g_pDataCenter->strIDImageFile.c_str()).arg(strFaceImageFile).arg(dfSimilarity).toLocal8Bit().data();
+						if (!m_bFaceDetectSucceed)
+						{
+							gInfo() << QString("切换到下一页面!").toLocal8Bit().data();
+							emit FaceCaptureSucceed();
+							m_bFaceDetectSucceed = true;        // 防止多次发送消息导致多次页面切换
+						}
+					}
+					else
+					{
+						emit FaceCaptureFailed();
+						strEvent = QString("身份证照片与识别人脸对比相似度:%1,未达到设置最低匹配要求").arg(dfSimilarity);/*.arg(g_pDataCenter->GetSysConfigure()->dfFaceSimilarity);*/
+						gInfo() << gQStr(strEvent);
+					}
+				}
+				else
+				{
+					strEvent = QString("人脸对比失败!");
+					gInfo() << gQStr(strEvent);
+					emit FaceCaptureFailed();
+				}
 			}
 		}
 		catch (std::exception& e)
@@ -345,3 +427,56 @@ void uc_FaceCapture::OnLiveDetectStatusEvent(int eventID, int nFrameStatus)
 	}
 	ui->label_Text->setText(strEvent);
 }
+
+void uc_FaceCapture::on_pushButton_Skip_clicked()
+{
+    QString strError;
+    g_pDataCenter->StopFaceDetect();
+
+    gInfo() << "OnFaceCaptureSucceed!";
+    QString strMessage;
+    int nNewPage = Page_FaceCapture;
+    int nOperation = Switch_NextPage;
+    switch (g_pDataCenter->GetProgressType())
+    {
+    default:
+    case ProgrerssType::Progress_UnStart:
+    {
+        strMessage = "跳过人脸识别,稍后请确认卡信息!";
+    }
+    break;
+
+    case ProgrerssType::Progress_Making:
+    {
+        if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard)
+        {
+            if (g_pDataCenter->GetProgressStatus("ApplyCardReplacement"))
+            {
+                nOperation = Goto_Page;
+                nNewPage = Page_MakeCard;
+                strMessage = "发现尚未完成的制卡数据,现将转入制卡页面!";
+            }
+        }
+        else if (g_pDataCenter->nCardServiceType == ServiceType::Service_NewCard)
+        {
+            if (g_pDataCenter->GetProgressStatus("EnsureInformation"))
+            {
+                nOperation = Goto_Page;
+                nNewPage = Page_MakeCard;
+                strMessage = "发现尚未完成的制卡数据,现将转入制卡页面!";
+            }
+        }
+
+        break;
+    }
+    case ProgrerssType::Progress_Finished:
+    {
+        nOperation = Goto_Page;
+        nNewPage = Page_MakeCard;
+        strMessage = "发现已经完成的制卡数据,现将转入制卡页面,你可以进行相关的操作!";
+        break;
+    }
+    }
+    emit ShowMaskWidget("操作成功", strMessage, Success, nOperation,nNewPage);
+}
+

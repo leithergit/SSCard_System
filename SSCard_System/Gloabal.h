@@ -68,7 +68,9 @@
 #include "../utility/json/CJsonObject.hpp"
 #include "../Update/Update.h"
 #include "../SSCardService/SSCardService.h"
+#include "../FaceRecognize/FaceRecognize.h"
 #include "CPinbroad.hpp"
+
 
 //宏定义
 #define __STR2__(x) #x
@@ -98,6 +100,12 @@ using KT_PrinterLibPtr = shared_ptr<KTModule<KT_Printer>>;
 using KT_ReaderLibPtr = shared_ptr<KTModule<KT_Reader>>;
 string UTF8_GBK(const char* strUtf8);
 string GBK_UTF8(const char* strGBK);
+
+using fnInitialize = void(*)(string&, string&, string&, string&);
+using fnFaceAuthenticate = int(*)(string&, string&, string&, string&, string&, string&,string);
+using fnQueryAuthenticateStatus = int(*)(string&, AuthType&, string&);
+using fnQueryAuthenticateResults = int(*)(string&, vector<AuthResult>&);
+using fnQueryBusinessName = int(*)(vector<BusinessItem>&);
 
 enum ReaderSide
 {
@@ -189,6 +197,121 @@ enum class CameraDriver
 #define gVal(p)      #p<<" = "<<p <<"\t"
 #define gQStr(p)	 #p<<" = "<<p.toLocal8Bit().data()<<"\t"
 #define GBKStr(x)	 QString(x).toLocal8Bit().data()
+
+struct FaceRecognition
+{
+	string strAPIURL;
+	string strUser;
+	string strPass;
+	string strAesKey;
+	string strTypeID;
+	string strCBDID;
+	string strDevID;
+	string strSign;
+	HMODULE hFaceLib = nullptr;
+	bool bEnabled = false;
+	bool bSkipFaceCompare = false;
+	fnInitialize				pInitialize = nullptr;
+	fnFaceAuthenticate			pFaceAuthenticate = nullptr;
+	fnQueryBusinessName			pQueryBusinessName = nullptr;
+	fnQueryAuthenticateStatus	pQueryAuthenticateStatus = nullptr;
+	fnQueryAuthenticateResults	pQueryAuthenticateResults = nullptr;
+	FaceRecognition(QSettings* pSettings)
+	{
+		strAPIURL = pSettings->value("FaceRecognition/ServerUrl").toString().toStdString();
+		strUser = pSettings->value("FaceRecognition/User").toString().toStdString();
+		strPass = pSettings->value("FaceRecognition/Pass").toString().toStdString();
+		strAesKey = pSettings->value("FaceRecognition/AesKey").toString().toStdString();
+		strTypeID = pSettings->value("FaceRecognition/TypeID").toString().toStdString();		
+		strSign = pSettings->value("FaceRecognition/Sign").toString().toStdString();
+		bEnabled = pSettings->value("FaceRecognition/Enable", false).toBool();
+		bSkipFaceCompare = pSettings->value("FaceRecognition/SkipFaceCompare", false).toBool();
+		
+		strCBDID = pSettings->value("Region/City").toString().toStdString();
+
+		strDevID = pSettings->value("Device/TerminalCode").toString().toStdString();
+	}
+	
+	~FaceRecognition()
+	{
+		if (hFaceLib)
+		{
+			FreeLibrary(hFaceLib);
+			hFaceLib = nullptr;
+		}
+	}
+
+	int FaceAuthenticate(string &strCardID, string &strFacePhotoBase64)
+	{
+		/*
+		strFaceData,
+		szCardID,
+		strTypeID,
+		strDevID,
+		strCBDID,
+		strSign)
+		*/
+		return pFaceAuthenticate(
+			strFacePhotoBase64,
+			strCardID,
+			strTypeID,			
+			strDevID,
+			strCBDID,
+			strSign,
+			"jpg");
+	}
+	bool InitializeFaceRecognition(QString& strMessage)
+	{
+		if (!bEnabled)
+			return true;
+
+		if (hFaceLib)
+			return true;
+
+		HMODULE hModule = LoadLibraryA("FaceRecognize.dll");
+		if (hModule == NULL) {
+			strMessage = "无法加载 FaceRecognize.dll";
+			return false;
+		}
+		pInitialize = (fnInitialize)GetProcAddress(hModule, "Initialize");
+		pFaceAuthenticate = (fnFaceAuthenticate)GetProcAddress(hModule, "FaceAuthenticate");
+		pQueryBusinessName = (fnQueryBusinessName)GetProcAddress(hModule, "QueryBusinessName");
+		pQueryAuthenticateStatus = (fnQueryAuthenticateStatus)GetProcAddress(hModule, "QueryAuthenticateStatus");
+		pQueryAuthenticateResults = (fnQueryAuthenticateResults)GetProcAddress(hModule, "QueryAuthenticateResults");
+
+		if (!pInitialize ||
+			!pFaceAuthenticate ||
+			!pQueryBusinessName ||
+			!pQueryAuthenticateStatus ||
+			!pQueryAuthenticateResults)
+		{
+			strMessage = "无法获取函数地址.";
+			FreeLibrary(hModule);
+			gError() << gQStr(strMessage);
+			return false;
+		}
+		
+		pInitialize(
+			strAPIURL,
+			strUser,
+			strPass,
+			strAesKey);
+		hFaceLib = hModule;
+		return true;
+	}
+
+	void UnInitializeFaceRecognition()
+	{
+		if (hFaceLib)
+		{
+			FreeLibrary(hFaceLib);
+			hFaceLib = nullptr;
+		}
+	}
+};
+
+using FaceRecognitionPtr = shared_ptr<FaceRecognition>;
+
 struct DeviceConfig
 {
 	DeviceConfig(QSettings* pSettings)
@@ -481,9 +604,11 @@ struct RegionInfo
 		strPrimaryKey = pSettings->value("PrimaryKey", "").toString().toStdString();
 		strBankCode = pSettings->value("BankCode", "").toString().toStdString();
 		nProvinceCode = (SSCardProvince)pSettings->value("ProvinceCode").toInt();
+
 		pSettings->endGroup();
 		return true;
 	}
+
 	bool Save(QSettings* pSettings, bool bSupervisor = false)
 	{
 		if (!pSettings)
@@ -673,6 +798,7 @@ struct SysConfig
 		: DevConfig(pSettings)
 		, Region(pSettings)
 		, PaymentConfig(pSettings)
+		, FaceRecogntionConfig(pSettings)
 	{
 		if (!pSettings)
 			return;
@@ -833,6 +959,7 @@ struct SysConfig
 	DeviceConfig	DevConfig;							// 设备配置
 	RegionInfo		Region;								// 区域信息配置
 	PaymentOpt      PaymentConfig;						// 支付相关设置
+	FaceRecognition FaceRecogntionConfig;				// 人脸识别模块
 	int				nBatchMode = 0;						// 批量制卡 开启：0    关闭：1
 	string			strDBPath;							// 数据存储路径
 	double          dfFaceSimilarity;					// 人脸认别最低相似度
@@ -920,6 +1047,7 @@ public:
 		return pSysConfig;
 	}
 	int LoadCardForm(QString& strError);
+
 	CardFormPtr& GetCardForm()
 	{
 		return pCardForm;
@@ -931,6 +1059,7 @@ public:
 	{
 		return pSSCardInfo;
 	}
+
 	void FillSSCardWithIDCard()
 	{
 		if (pSSCardInfo && pIDCard)
@@ -994,6 +1123,8 @@ public:
 	string		   strCardVersion = "3.0";
 	string		   strTitle = "社保卡制卡系统";
 	bool			bGuardian = false;
+	bool		   bFaceRecognitionEnabled = false;
+	bool		   bSkipFaceCompare = false;
 	bool		   bDebug;
 	bool		   bNoDevice = false;
 	bool		   bSkipFaceCapture = false;
@@ -1048,7 +1179,7 @@ public:
 	bool SwitchVideoWnd(HWND hWnd);
 
 	bool Snapshot(string strFilePath);
-public:
+
 	int  ReaderIDCard(IDCardInfo* pIDCard);
 
 	int  OpenDevice(QString& strMessage);
@@ -1156,6 +1287,7 @@ public:
 	{
 		return vecAdminister;
 	}
+
 	bool IsAdmin(char* szIdentify)
 	{
 		if (!vecAdminister.size())

@@ -186,6 +186,17 @@ int DataCenter::LoadSysConfigure(QString& strError)
 		bTestCard = GetSysConfigure()->bTestCard;
 		nNetTimeout = GetSysConfigure()->nNetTimeout;
 		strTitle = GetSysConfigure()->strTitle;
+		bFaceRecognitionEnabled = GetSysConfigure()->FaceRecogntionConfig.bEnabled;
+		bSkipFaceCompare = GetSysConfigure()->FaceRecogntionConfig.bSkipFaceCompare;
+		// 初始化人脸识别模块
+
+		QString strMessage;
+		if (!GetSysConfigure()->FaceRecogntionConfig.InitializeFaceRecognition(strMessage))
+		{
+			strError = QString("初始化人脸识别模块失败:%1").arg(strMessage);
+			return -1;
+		}
+		
 		return 0;
 	}
 
@@ -1200,11 +1211,13 @@ bool DataCenter::GetProgress(SSCardInfoPtr& pSSCard,CJsonObjectPtr pJson)
 	GetJsonPtrValue(pJson, "ReleaseDate", pSSCard->strReleaseDate);
 	GetJsonPtrValue(pJson, "ValidDate", pSSCard->strValidDate);
 	GetJsonPtrValue(pJson, "PCH", pSSCard->strPCH);
+#ifdef _HN2022
 	GetJsonPtrStrValue(pJson, "payCode", g_pDataCenter->strPayCode);
 	strcpy(pSSCard->strPayCode , g_pDataCenter->strPayCode.c_str());
+
 	GetJsonPtrStrValue(pJson, "transTime", g_pDataCenter->strTransTime);
 	strcpy(pSSCard->strTransactionTime, g_pDataCenter->strTransTime.c_str());
-#ifdef _HN2022
+
 	GetJsonPtrValue(pJson, "PaperIssuedate", pSSCard->strIDCardIssuedDate);
 #endif
 	GetJsonPtrValuePtr(pJson, "Photo", pSSCard->strPhoto);
@@ -1527,11 +1540,11 @@ int DataCenter::TestPrinter(QString& strMessage)
 			break;
 		}
 
-		if (BoxInfo.BoxList[nDepenseBox - 1].BoxStatus == 2)
-		{
-			strMessage = QString("进卡箱无卡,请放入卡片后重试!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
-			break;
-		}
+		//if (BoxInfo.BoxList[nDepenseBox - 1].BoxStatus == 2)
+		//{
+		//	strMessage = QString("进卡箱无卡,请放入卡片后重试!").arg(nDepenseBox).arg(BoxInfo.BoxList[nDepenseBox].BoxStatus);
+		//	break;
+		//}
 
 		if (QFailed(m_pPrinter->Printer_Status(PrinterStatus, szRCode)))
 		{
@@ -2264,6 +2277,7 @@ done:
 
 	return bRet;
 }
+
 
 int DataCenter::OpenCom(int nPort, int nBraud)
 {

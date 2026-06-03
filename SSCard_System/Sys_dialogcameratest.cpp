@@ -15,6 +15,9 @@ DialogCameraTest::DialogCameraTest(QWidget* parent) :
 	ui(new Ui::DialogCameraTest)
 {
 	ui->setupUi(this);
+	// 设置顶层窗口
+	// 设置窗口置顶
+	setWindowFlags(Qt::WindowStaysOnTopHint);
 	/*QIcon icon;
 	icon.addFile("url(./Image/Camera.png)", QSize(), QIcon::Normal, QIcon::On);
 	ui->pushButton_TakePhoto->setIcon(icon);

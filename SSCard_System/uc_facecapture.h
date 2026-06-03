@@ -38,6 +38,8 @@ private slots:
 	void   OnFaceCaptureSucceed();
 	void   OnFaceCaptureFailed();
 
+    void on_pushButton_Skip_clicked();
+
 private:
 	Ui::FaceCapture* ui;
 };

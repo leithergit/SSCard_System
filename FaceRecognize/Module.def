@@ -1,0 +1,7 @@
+﻿LIBRARY	"FaceReconize"
+EXPORTS
+	Initialize
+	FaceAuthenticate
+	QueryAuthenticateStatus
+	QueryAuthenticateResults
+	QueryBusinessName

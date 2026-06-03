@@ -77,6 +77,8 @@ int uc_EnsureInformation::ProcessBussiness()
 		}
 
 		g_pDataCenter->strCardMakeProgress = QString::fromLocal8Bit(pTempSSCardInfo->strCardStatus).toStdString();
+		qDebug() << "CardMakeProgress:" << g_pDataCenter->strCardMakeProgress.c_str();
+		QString strCardStatus = QString(pTempSSCardInfo->strCardStatus);
 		if (g_pDataCenter->nCardServiceType == ServiceType::Service_ReplaceCard &&
 			g_pDataCenter->strCardMakeProgress == "制卡中")
 		{

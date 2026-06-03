@@ -1,6 +1,8 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource1.h"
+#pragma code_page(65001)
+
+#include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -17,7 +19,6 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-#pragma code_page(936)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -27,7 +28,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource1.h\0"
+    "resource.h\0"
 END
 
 2 TEXTINCLUDE 
@@ -51,8 +52,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,83
- PRODUCTVERSION 1,0,1,83
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -60,21 +61,21 @@ VS_VERSION_INFO VERSIONINFO
  FILEFLAGS 0x0L
 #endif
  FILEOS 0x40004L
- FILETYPE 0x1L
+ FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "080404b0"
         BEGIN
-            VALUE "CompanyName", "Ω««ÏøÏœ(…œ∫£)÷«ƒ‹ø∆ºº”–œﬁπ´Àæ"
-            VALUE "FileDescription", "±„–Ø Ω…Á±£ø®÷∆ø®œµÕ≥"
-            VALUE "FileVersion", "1.0.1.83"
-            VALUE "InternalName", "SSCard_System.exe"
-            VALUE "LegalCopyright", "Ω««ÏøÏœ(…œ∫£)÷«ƒ‹ø∆ºº”–œﬁπ´Àæ (C) 2021∞Ê»®À˘”–"
-            VALUE "OriginalFilename", "SSCard_System.exe"
-            VALUE "ProductName", "±„–Ø Ω…Á±£ø®÷∆ø®œµÕ≥"
-            VALUE "ProductVersion", "1.0.1.83"
+            VALUE "CompanyName", "Èáë‰πîÁÇúÁÖú(‰∏äÊµ∑)Êô∫ËÉΩÁßëÊäÄÊúâÈôêÂÖ¨Âè∏"
+            VALUE "FileDescription", "Ê≤≥Âçó‰∫∫Á§æ‰∫∫ËÑ∏ËØÜÂà´Ê®°Âùó"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "FaceRecognize.dll"
+            VALUE "LegalCopyright", "Èáë‰πîÁÇúÁÖú(‰∏äÊµ∑)Êô∫ËÉΩÁßëÊäÄÊúâÈôêÂÖ¨Âè∏ÁâàÊùÉÊâÄÊúâ (C) 2025"
+            VALUE "OriginalFilename", "FaceRecognize.dll"
+            VALUE "ProductName", "FaceRecognize.dll"
+            VALUE "ProductVersion", "1.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -82,16 +83,6 @@ BEGIN
         VALUE "Translation", 0x804, 1200
     END
 END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_SSCARDSYSTEM        ICON                    "SSCard_System.ico"
 
 #endif    // Chinese (Simplified, China) resources
 /////////////////////////////////////////////////////////////////////////////

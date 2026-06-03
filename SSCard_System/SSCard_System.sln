@@ -15,6 +15,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSCardDriver", "..\..\SDK.g
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSCardHSM", "..\..\SDK.git\sscardhsm\SSCardHSM\SSCardHSM\SSCardHSM.vcxproj", "{90F4AE68-8FBA-4207-ABEB-1FA219EAFAB2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FaceRecognize", "..\FaceRecognize\FaceRecognize.vcxproj", "{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestFaceRecognize", "..\TestFaceRecognize\TestFaceRecognize.vcxproj", "{BE68FF81-A7FE-4ED8-A340-613BE6785438}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -69,6 +73,22 @@ Global
 		{90F4AE68-8FBA-4207-ABEB-1FA219EAFAB2}.Release|x64.Build.0 = Release|x64
 		{90F4AE68-8FBA-4207-ABEB-1FA219EAFAB2}.Release|x86.ActiveCfg = Release|Win32
 		{90F4AE68-8FBA-4207-ABEB-1FA219EAFAB2}.Release|x86.Build.0 = Release|Win32
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Debug|x64.ActiveCfg = Debug|x64
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Debug|x64.Build.0 = Debug|x64
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Debug|x86.ActiveCfg = Debug|Win32
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Debug|x86.Build.0 = Debug|Win32
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Release|x64.ActiveCfg = Release|x64
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Release|x64.Build.0 = Release|x64
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Release|x86.ActiveCfg = Release|Win32
+		{A5719AE1-11CE-4FD4-BB29-9D5AB14DE6C8}.Release|x86.Build.0 = Release|Win32
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Debug|x64.ActiveCfg = Debug|x64
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Debug|x64.Build.0 = Debug|x64
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Debug|x86.ActiveCfg = Debug|Win32
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Debug|x86.Build.0 = Debug|Win32
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Release|x64.ActiveCfg = Release|x64
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Release|x64.Build.0 = Release|x64
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Release|x86.ActiveCfg = Release|Win32
+		{BE68FF81-A7FE-4ED8-A340-613BE6785438}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
